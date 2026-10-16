@@ -4,18 +4,100 @@ import "../styles/global.css";
 import InteractivePuzzle from "../components/InteractivePuzzle";
 import CurriculumExplorer from "../components/CurriculumExplorer";
 import PricingAndCheckout from "../components/PricingAndCheckout";
-import { BRAND_INFO, BRANCHES } from "../data/courses";
+import { BRAND_INFO, BRANCHES, PRICING_PACKAGES } from "../data/courses";
 import { MapPin, Phone, ArrowRight, Sparkles } from "lucide-react";
+
+// Domain lấy từ `site` trong astro.config.mjs.
+// Sửa một chỗ đó là canonical, og:url, sitemap.xml và robots.txt cùng đúng theo.
+const origin = Astro.site ?? Astro.url;
+const canonicalUrl = new URL(Astro.url.pathname, origin).href;
+const ogImageUrl = new URL("/og-image.png", origin).href;
+const logoUrl = new URL("/favicon.svg", origin).href;
+
+const pageTitle = `${BRAND_INFO.name} – ${BRAND_INFO.slogan1}`;
+const pageDescription =
+  "Trung tâm cờ vua Global Chess cho trẻ 7–12 tuổi tại TP.HCM: lộ trình 48 buổi (Sơ cấp & Trung cấp), lớp học tối trong tuần và cuối tuần tại 5 cơ sở.";
+
+// "0789.059.440" -> "+84789059440"
+const hotlineE164 = `+84${BRAND_INFO.hotlines[0].replace(/\./g, "").replace(/^0/, "")}`;
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  name: BRAND_INFO.name,
+  slogan: BRAND_INFO.slogan1,
+  description: pageDescription,
+  url: canonicalUrl,
+  image: ogImageUrl,
+  logo: logoUrl,
+  telephone: hotlineE164,
+  areaServed: { "@type": "City", name: "TP.HCM" },
+  department: BRANCHES.map((branch) => ({
+    "@type": "Place",
+    name: branch.name,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: branch.address,
+      addressLocality: "TP.HCM",
+      addressCountry: "VN",
+    },
+  })),
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Khóa học cờ vua",
+    itemListElement: PRICING_PACKAGES.map((pkg) => ({
+      "@type": "Offer",
+      name: pkg.name,
+      description: pkg.subtitle,
+      price: pkg.price,
+      priceCurrency: "VND",
+      url: canonicalUrl,
+    })),
+  },
+};
 ---
 
 <html lang="vi" class="scroll-smooth">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{BRAND_INFO.name} – {BRAND_INFO.slogan1}</title>
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#0f172a" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={BRAND_INFO.name} />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${BRAND_INFO.name} – ${BRAND_INFO.slogan2}`} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify(structuredData).replace(/</g, "\\u003c")}
+    />
   </head>
 
   <body class="bg-[#FAF8F5] text-slate-900 font-['Plus_Jakarta_Sans',sans-serif] antialiased">
