@@ -267,3 +267,102 @@ export const INTERACTIVE_PUZZLE: InteractivePuzzleConfig = {
   fen: "3r3k/ppp2ppp/8/4p1N1/8/8/PPPP1PPP/R1BQK2R w KQ - 0 1",
   solution: { from: "g5", to: "f7" },
 };
+
+/**
+ * Nhận xét của phụ huynh.
+ *
+ * ĐỌC TRƯỚC KHI SỬA: mảng này đang CỐ Ý ĐỂ TRỐNG.
+ *
+ * Không được bịa nhận xét cho một trung tâm có thật — đó là quảng cáo sai sự thật
+ * và là rủi ro pháp lý cho Global Chess. Hãy xin câu trích dẫn thật từ phụ huynh,
+ * kèm tên và cơ sở, rồi điền vào đây theo đúng cấu trúc bên dưới:
+ *
+ *   { quote: "...", author: "Chị Nguyễn Thị A", role: "Phụ huynh bé Minh An", branch: "Cơ sở 1 – Phú Nhuận" }
+ *
+ * Khi mảng còn rỗng, giao diện tự hiển thị ô trống TODO rất rõ nên không thể vô
+ * tình đưa lên production. Điền đủ 3 mục là giao diện tự chuyển sang bản thật.
+ */
+export interface Testimonial {
+  quote: string;
+  author: string;
+  role: string;
+  branch: string;
+}
+
+export const TESTIMONIALS: Testimonial[] = [];
+
+/**
+ * Câu hỏi thường gặp.
+ *
+ * Mọi câu trả lời ở đây chỉ được dựa trên dữ liệu đã có trong file này (lịch học,
+ * giáo trình, học phí, cơ sở) hoặc trên thông tin vận hành do Global Chess xác
+ * nhận. Không tự thêm chính sách mới (hoàn tiền, bảo lưu, học bù...) khi chưa
+ * được trung tâm xác nhận.
+ */
+export interface FaqItem {
+  q: string;
+  a: string;
+}
+
+export const FAQS: FaqItem[] = [
+  {
+    q: "Bé mấy tuổi thì tham gia được?",
+    a: "Global Chess nhận học viên từ 7 đến 12 tuổi. Các bé được xếp theo trình độ thực tế chứ không chỉ theo tuổi.",
+  },
+  {
+    q: "Một lộ trình học kéo dài bao lâu?",
+    a: "Mỗi giáo trình Sơ Cấp hoặc Trung Cấp gồm 48 buổi, chia thành 2 cấp độ nhỏ 24 buổi. Mỗi buổi kéo dài 60 – 90 phút.",
+  },
+  {
+    q: "Học phí đã bao gồm sách chưa?",
+    a: "Rồi. Mỗi gói đều tặng kèm bộ Giáo trình chuẩn Global Chess, gói 48 buổi tặng trọn bộ 2 giáo trình.",
+  },
+  {
+    q: "Có lớp cuối tuần không?",
+    a: "Có. Khung giờ gồm ca tối trong tuần (Thứ 2 – Thứ 6) và ba ca cuối tuần: sáng, chiều và tối Thứ 7 / Chủ Nhật.",
+  },
+  {
+    q: "Trung tâm có những cơ sở nào?",
+    a: "Hiện có 5 cơ sở tại TP.HCM. Danh sách địa chỉ đầy đủ nằm ở mục “Hệ thống 5 Cơ sở” phía trên.",
+  },
+  {
+    q: "Đóng học phí bằng cách nào?",
+    a: "Điền form đăng ký, hệ thống tạo mã VietQR kèm đúng số tiền và nội dung chuyển khoản. Quét mã bằng app ngân hàng bất kỳ, sau đó báo Zalo cho trung tâm.",
+  },
+  {
+    q: "Chưa rõ trình độ của bé thì sao?",
+    a: "Ghi chú khi đăng ký hoặc gọi hotline. Bộ phận giáo vụ sẽ kiểm tra trình độ đầu vào và xếp lớp phù hợp.",
+  },
+  {
+    q: "Bé nghỉ một buổi thì xử lý thế nào?",
+    a: "Việc học bù và bảo lưu tuỳ theo chính sách hiện hành của trung tâm. Vui lòng liên hệ giáo vụ qua hotline hoặc Zalo để được hướng dẫn cụ thể.",
+  },
+];
+
+/**
+ * Cách lớp học vận hành. Đây là điểm khác biệt thật so với lớp cờ tự phát, nên
+ * mọi dòng ở đây đều phải bám vào dữ liệu vận hành đã có (giáo trình, khung giờ,
+ * cấu trúc buổi học), không phải lời khen tự đánh giá.
+ */
+export const OPERATING_POINTS = [
+  {
+    title: "Giáo trình chuẩn hoá",
+    desc: "24 buổi mỗi cấp độ, có sách và mục tiêu rõ ràng cho từng buổi.",
+    icon: "book",
+  },
+  {
+    title: "Đúng 5 bước mỗi buổi",
+    desc: "Ôn bài cũ, giảng bài mới, luyện tập, thực hành bàn cờ, nhận xét và giao bài.",
+    icon: "steps",
+  },
+  {
+    title: "Lịch học linh hoạt",
+    desc: "Ca tối trong tuần và ba ca cuối tuần, chọn cơ sở theo khu vực nhà bạn.",
+    icon: "clock",
+  },
+  {
+    title: "Thực chiến và giải đấu",
+    desc: "Đấu thực hành trong buổi học và giải đấu nội bộ theo lộ trình.",
+    icon: "trophy",
+  },
+] as const;

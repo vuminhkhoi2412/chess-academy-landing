@@ -4,8 +4,20 @@ import "../styles/global.css";
 import InteractivePuzzle from "../components/InteractivePuzzle";
 import CurriculumExplorer from "../components/CurriculumExplorer";
 import PricingAndCheckout from "../components/PricingAndCheckout";
-import { BRAND_INFO, BRANCHES, PRICING_PACKAGES } from "../data/courses";
-import { MapPin, Phone, ArrowRight, Sparkles } from "lucide-react";
+import { BRAND_INFO, BRANCHES, PRICING_PACKAGES, TESTIMONIALS, FAQS, OPERATING_POINTS } from "../data/courses";
+import {
+  MapPin,
+  Phone,
+  ArrowRight,
+  Sparkles,
+  Quote,
+  BookOpen,
+  ListChecks,
+  Clock,
+  Trophy,
+  HelpCircle,
+  AlertTriangle,
+} from "lucide-react";
 
 // Domain lấy từ `site` trong astro.config.mjs.
 // Sửa một chỗ đó là canonical, og:url, sitemap.xml và robots.txt cùng đúng theo.
@@ -66,11 +78,14 @@ const structuredData = {
     <meta name="description" content={pageDescription} />
     <link rel="canonical" href={canonicalUrl} />
     <meta name="robots" content="index, follow, max-image-preview:large" />
-    <meta name="theme-color" content="#0f172a" />
+    <meta name="theme-color" content="#184268" />
 
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" sizes="32x32" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={BRAND_INFO.name} />
@@ -91,7 +106,10 @@ const structuredData = {
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap"
+      rel="stylesheet"
+    />
 
     <script
       type="application/ld+json"
@@ -100,15 +118,22 @@ const structuredData = {
     />
   </head>
 
-  <body class="bg-[#FAF8F5] text-slate-900 font-['Plus_Jakarta_Sans',sans-serif] antialiased">
+  <body class="antialiased">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-control focus:bg-brand-800 focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-white"
+    >
+      Bỏ qua điều hướng, tới nội dung chính
+    </a>
+
     <!-- Top Hotline Bar -->
-    <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4">
+    <div class="bg-brand-800 text-brand-100 text-xs py-2 px-4">
       <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
-        <span class="font-medium text-amber-400">♟ {BRAND_INFO.slogan1} – {BRAND_INFO.slogan2}</span>
+        <span class="font-medium text-amber-400">{BRAND_INFO.slogan1} – {BRAND_INFO.slogan2}</span>
         <div class="flex items-center gap-4">
-          <span class="flex items-center gap-1">
-            <Phone className="w-3.5 h-3.5 text-amber-400" />
-            Hotline: <strong>{BRAND_INFO.hotlines[0]}</strong> – <strong>{BRAND_INFO.hotlines[1]}</strong>
+          <span class="flex items-center gap-1.5">
+            <Phone className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
+            <span>Hotline: <strong>{BRAND_INFO.hotlines[0]}</strong> – <strong>{BRAND_INFO.hotlines[1]}</strong></span>
           </span>
         </div>
       </div>
@@ -117,79 +142,122 @@ const structuredData = {
     <!-- Navbar -->
     <header class="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-slate-200/80">
       <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        <div class="font-extrabold text-lg tracking-tight flex items-center gap-2.5">
-          <span class="w-9 h-9 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center text-xl shadow-sm">♞</span>
+        <a href="#main" class="font-extrabold text-lg tracking-tight flex items-center gap-2.5">
+          <img
+            src="/brand/mark-128.png"
+            alt=""
+            width="40"
+            height="40"
+            decoding="async"
+            class="w-10 h-10 shrink-0"
+          />
           <div>
             <div class="leading-none">{BRAND_INFO.name}</div>
-            <div class="text-[10px] font-semibold text-amber-700 tracking-wider uppercase mt-0.5">Một nước đi, mở tư duy</div>
+            <div class="text-[10px] font-semibold text-amber-700 tracking-wider uppercase mt-0.5 font-sans">Một nước đi, mở tư duy</div>
           </div>
-        </div>
-        <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
-          <a href="#curriculum" class="hover:text-slate-900">Lộ trình Sơ cấp & Trung cấp</a>
-          <a href="#branches" class="hover:text-slate-900">Hệ thống 5 Cơ sở</a>
-          <a href="#pricing" class="hover:text-slate-900">Đăng ký & Học phí</a>
+        </a>
+        <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600" aria-label="Điều hướng chính">
+          <a href="#curriculum" class="hover:text-slate-900 active:text-amber-700 transition-colors">Lộ trình Sơ cấp &amp; Trung cấp</a>
+          <a href="#branches" class="hover:text-slate-900 active:text-amber-700 transition-colors">Hệ thống 5 Cơ sở</a>
+          <a href="#pricing" class="hover:text-slate-900 active:text-amber-700 transition-colors">Đăng ký &amp; Học phí</a>
         </nav>
         <a
           href="#pricing"
-          class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs md:text-sm font-bold px-4 py-2.5 rounded-xl transition shadow-sm"
+          class="bg-amber-500 hover:bg-amber-400 active:bg-amber-600 active:scale-[0.98] text-slate-950 text-xs md:text-sm font-bold px-4 py-2.5 rounded-control transition shadow-soft"
         >
           Đăng ký giữ chỗ
         </a>
       </div>
     </header>
 
+    <main id="main" tabindex="-1">
     <!-- Hero Section -->
-    <section class="py-12 md:py-16 overflow-hidden">
-      <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-12 gap-10 items-center">
-        <div class="md:col-span-7 space-y-5">
-          <div class="inline-flex items-center gap-2 bg-amber-100 border border-amber-300 text-amber-900 px-3.5 py-1.5 rounded-full text-xs font-bold">
-            <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+    <section class="relative isolate overflow-hidden py-14 md:py-20">
+      <!--
+        Depth is built entirely from geometry: a warm/cool mesh, a chessboard plane
+        receding in perspective, move notation as texture, and a light grain.
+        No photography, nothing that pretends to be a real classroom.
+
+        TODO (nội dung thật): hiện chưa có ảnh/video thật của trung tâm. Khi có ảnh
+        lớp học và thước phim thật, thay lớp trang trí này bằng một gallery ảnh thật
+        (có sự đồng ý của phụ huynh trước khi đăng ảnh trẻ). Xem README.md mục
+        "TODO cần nội dung thật".
+      -->
+      <div aria-hidden="true" class="gc-hero-fade pointer-events-none absolute inset-0 -z-10">
+        <div class="gc-hero-mesh absolute inset-0"></div>
+        <div
+          class="gc-board-field gc-hero-board absolute -right-28 -top-44 h-[46rem] w-[46rem] opacity-[0.075] [--gc-cell:4.5rem]"
+        >
+        </div>
+        <div class="gc-grain absolute inset-0 opacity-[0.045]"></div>
+      </div>
+
+      <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-12 gap-10 md:gap-8 lg:gap-12 items-center">
+        <div class="md:col-span-6 lg:col-span-7 space-y-5">
+          <div class="inline-flex items-center gap-2 bg-amber-100 border border-amber-300 text-amber-900 px-3.5 py-1.5 rounded-control text-xs font-bold">
+            <Sparkles className="w-3.5 h-3.5 text-amber-700" aria-hidden="true" />
             Đào tạo Cờ Vua Trực Tiếp (7 – 12 tuổi) • 5 Cơ sở tại TP.HCM
           </div>
 
-          <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.15]">
-            Một Nước Đi, Mở Tư Duy <br />
-            <span class="text-amber-600">Học Cờ Rèn Tư Duy Vững Tương Lai!</span>
+          <!--
+            Khoá 2 dòng có chủ đích: dòng 1 màu đậm, dòng 2 màu hổ phách, nên màu chữ
+            trùng với nhịp xuống dòng ở mọi khổ màn hình thay vì ngắt tuỳ tiện.
+          -->
+          <h1 class="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight leading-[1.08]">
+            <span class="block text-slate-900">Một Nước Đi,</span>
+            <span class="block text-amber-600">Mở Tư Duy</span>
           </h1>
 
           <p class="text-slate-600 text-base leading-relaxed max-w-xl">
-            Lộ trình chuẩn hóa <strong>Global Chess Sơ Cấp & Trung Cấp (48 buổi)</strong> giúp trẻ làm chủ các hệ thống khai cuộc kinh điển, vận dụng sắc bén các đòn chiến thuật trung – tàn cuộc và tự tin bước vào các giải đấu thực tế.
+            Lộ trình chuẩn hóa <strong>Global Chess Sơ Cấp &amp; Trung Cấp (48 buổi)</strong> giúp trẻ làm chủ các hệ thống khai cuộc kinh điển, vận dụng sắc bén các đòn chiến thuật trung – tàn cuộc và tự tin bước vào các giải đấu thực tế.
           </p>
 
           <div class="flex flex-wrap gap-3.5 pt-2">
             <a
               href="#pricing"
-              class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-3.5 rounded-xl text-sm flex items-center gap-2 shadow-lg transition"
+              class="bg-brand-800 hover:bg-brand-700 active:scale-[0.98] text-white font-bold px-6 py-3.5 rounded-control text-sm flex items-center gap-2 shadow-lifted transition"
             >
-              Đăng ký & Đóng học phí qua QR <ArrowRight className="w-4 h-4 text-amber-400" />
+              Đăng ký &amp; Đóng học phí qua QR <ArrowRight className="w-4 h-4 text-amber-400" aria-hidden="true" />
             </a>
             <a
               href="#curriculum"
-              class="bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-semibold px-6 py-3.5 rounded-xl text-sm transition"
+              class="bg-white/80 hover:bg-white active:scale-[0.98] text-slate-800 border border-slate-300 font-semibold px-6 py-3.5 rounded-control text-sm transition shadow-soft backdrop-blur-sm"
             >
               Xem chi tiết 48 buổi học
             </a>
           </div>
 
-          <div class="grid grid-cols-3 gap-4 pt-4 border-t border-slate-200 max-w-lg">
+          <!--
+            Hai cột đầu chia đều, cột thứ ba ăn theo nội dung. "5 Địa Điểm" ở
+            text-2xl rộng hơn 1/3 hàng, nên nếu chia đều ba cột thì nó buộc phải
+            xuống dòng (hoặc tràn ra ngoài khi chặn xuống dòng).
+          -->
+          <dl class="grid grid-cols-[repeat(2,minmax(0,1fr))_auto] gap-3 sm:gap-4 pt-5 border-t border-slate-300/70 max-w-lg">
             <div>
-              <div class="text-xl md:text-2xl font-extrabold text-slate-900">48 Buổi</div>
-              <div class="text-xs text-slate-500">Mỗi lộ trình Sơ / Trung cấp</div>
+              <dt class="text-xs text-slate-500">Lộ trình chuẩn</dt>
+              <dd class="text-xl md:text-2xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">48 Buổi</dd>
             </div>
             <div>
-              <div class="text-xl md:text-2xl font-extrabold text-slate-900">60 - 90'</div>
-              <div class="text-xs text-slate-500">Thời lượng chuẩn mỗi buổi</div>
+              <dt class="text-xs text-slate-500">Mỗi buổi học</dt>
+              <dd class="text-xl md:text-2xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">60 – 90'</dd>
             </div>
             <div>
-              <div class="text-xl md:text-2xl font-extrabold text-slate-900">5 Cơ Sở</div>
-              <div class="text-xs text-slate-500">Linh hoạt khung giờ học</div>
+              <dt class="text-xs text-slate-500">Cơ sở tại TP.HCM</dt>
+              <dd class="text-xl md:text-2xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">5 Địa Điểm</dd>
             </div>
-          </div>
+          </dl>
         </div>
 
-        <!-- Interactive Chessboard Island -->
-        <div class="md:col-span-5">
-          <InteractivePuzzle client:load />
+        <!-- Interactive Chessboard Island, lifted off the page with a soft ground shadow -->
+        <div class="md:col-span-6 lg:col-span-5 relative lg:mt-2">
+          <div
+            aria-hidden="true"
+            class="absolute inset-x-8 -bottom-4 top-10 rounded-card bg-brand-900/15 blur-2xl"
+          >
+          </div>
+          <div class="relative">
+            <InteractivePuzzle client:load />
+          </div>
         </div>
       </div>
     </section>
@@ -202,70 +270,245 @@ const structuredData = {
       <div class="max-w-6xl mx-auto px-4">
         <div class="text-center max-w-2xl mx-auto mb-12">
           <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Hệ thống phòng học tiêu chuẩn</span>
-          <h2 class="text-2xl md:text-3xl font-extrabold mt-1">5 Cơ Sở Global Chess Tại TP.HCM</h2>
-          <p class="text-xs md:text-sm text-slate-600 mt-2">
+          <h2 class="text-2xl md:text-4xl font-extrabold mt-1">5 Cơ Sở Global Chess Tại TP.HCM</h2>
+          <p class="text-base text-slate-600 mt-2 max-w-2xl mx-auto">
             Các ca học trong tuần và cuối tuần được tổ chức linh hoạt theo trình độ của học viên tại từng cơ sở.
           </p>
         </div>
 
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {BRANCHES.map((branch, idx) => (
-            <div class="bg-[#FAF8F5] p-5 rounded-2xl border border-slate-200/90 flex flex-col justify-between hover:border-amber-400 transition">
-              <div>
+            <div
+              class:list={[
+                "bg-[#FAF8F5] p-5 rounded-card border border-slate-200/90 flex flex-col justify-between hover:border-amber-400 hover:shadow-soft transition",
+                // Bento: cơ sở đầu tiên trải 2 cột để lưới không còn là 6 ô đều nhau.
+                idx === 0 && "lg:col-span-2 relative overflow-hidden",
+              ]}
+            >
+              {idx === 0 && (
+                <span
+                  aria-hidden="true"
+                  class="gc-board-field pointer-events-none absolute -right-10 -bottom-12 h-48 w-48 rounded-full opacity-[0.06] [--gc-cell:1.5rem]"
+                >
+                </span>
+              )}
+              <div class="relative">
                 <div class="flex items-center justify-between mb-3">
-                  <span class="text-xs font-extrabold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-md">
+                  <span class="text-xs font-extrabold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-md tabular-nums">
                     Cơ sở {idx + 1}
                   </span>
-                  <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                  <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-control border border-emerald-200">
                     Đang tuyển sinh
                   </span>
                 </div>
-                <h3 class="font-bold text-base text-slate-900 mb-1">{branch.name}</h3>
-                <p class="text-xs text-slate-600 flex items-start gap-1.5 leading-relaxed">
-                  <MapPin className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <h3 class:list={["font-bold text-slate-900 mb-1", idx === 0 ? "text-lg" : "text-base"]}>{branch.name}</h3>
+                <p class="text-sm text-slate-600 flex items-start gap-1.5 leading-relaxed">
+                  <MapPin className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" aria-hidden="true" />
                   <span>{branch.address}</span>
                 </p>
               </div>
-              <div class="mt-4 pt-3 border-t border-slate-200/70 flex items-center justify-between text-xs">
-                <span class="text-slate-500">Lịch học: Trong tuần & T7-CN</span>
-                <a href="#pricing" class="font-bold text-amber-700 hover:underline">Chọn cơ sở này →</a>
+              <div class="relative mt-4 pt-3 border-t border-slate-200/70 flex items-center justify-between gap-2 text-sm">
+                <span class="text-slate-500">Lịch học: Trong tuần &amp; T7-CN</span>
+                <a
+                  href="#pricing"
+                  data-branch={branch.id}
+                  class="js-choose-branch group inline-flex items-center gap-1 font-bold text-amber-700 hover:text-amber-800 hover:underline transition"
+                  aria-label={`Chọn ${branch.name} và mở form đăng ký`}
+                >
+                  Chọn cơ sở này
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                </a>
               </div>
             </div>
           ))}
 
-          <!-- Thẻ Hotline tư vấn xếp lớp nhanh -->
-          <div class="bg-slate-900 text-white p-5 rounded-2xl flex flex-col justify-between">
+          <!-- Thẻ Hotline tư vấn xếp lớp nhanh: lấp nửa cuối hàng 2 của lưới bento -->
+          <div class="lg:col-span-2 bg-brand-800 text-white p-5 rounded-card flex flex-col justify-between">
             <div>
               <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Hỗ trợ xếp lớp nhanh</span>
               <h3 class="font-bold text-base mt-1 mb-2">Cần Tư Vấn Kiểm Tra Trình Độ Đầu Vào?</h3>
-              <p class="text-xs text-slate-300 leading-relaxed">
+              <p class="text-sm text-brand-200 leading-relaxed">
                 Liên hệ trực tiếp Hotline để bộ phận giáo vụ kiểm tra ca học đang mở sát với trình độ và khu vực nhà bạn nhất.
               </p>
             </div>
-            <div class="mt-4 pt-3 border-t border-slate-800 flex flex-col gap-1.5 text-xs font-bold text-amber-400">
-              <a href={`tel:${BRAND_INFO.hotlines[0].replace(/\./g, "")}`} class="hover:underline">📞 Hotline 1: {BRAND_INFO.hotlines[0]}</a>
-              <a href={`tel:${BRAND_INFO.hotlines[1].replace(/\./g, "")}`} class="hover:underline">📞 Hotline 2: {BRAND_INFO.hotlines[1]}</a>
+            <div class="mt-4 pt-3 border-t border-brand-600 flex flex-col gap-1.5 text-sm font-bold text-amber-400">
+              <a href={`tel:${BRAND_INFO.hotlines[0].replace(/\./g, "")}`} class="inline-flex items-center gap-1.5 hover:underline tabular-nums">
+                <Phone className="w-3.5 h-3.5" aria-hidden="true" /> Hotline 1: {BRAND_INFO.hotlines[0]}
+              </a>
+              <a href={`tel:${BRAND_INFO.hotlines[1].replace(/\./g, "")}`} class="inline-flex items-center gap-1.5 hover:underline tabular-nums">
+                <Phone className="w-3.5 h-3.5" aria-hidden="true" /> Hotline 2: {BRAND_INFO.hotlines[1]}
+              </a>
             </div>
           </div>
         </div>
       </div>
     </section>
 
+    <!--
+      Vận hành lớp học. Đây là phần "social proof" trung thực: bốn điểm khác biệt
+      đều lấy từ dữ liệu vận hành có thật trong src/data/courses.ts, không phải
+      lời khen tự đánh giá hay con số bịa.
+    -->
+    <section id="phuong-phap" class="py-16 bg-white">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="max-w-2xl">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Vận hành lớp học</span>
+          <h2 class="text-2xl md:text-4xl font-extrabold mt-1">Global Chess Khác Gì Lớp Cờ Tự Phát?</h2>
+          <p class="text-base text-slate-600 mt-2">
+            Bốn điểm dưới đây là cách trung tâm tổ chức lớp học, không phải lời tự khen.
+          </p>
+        </div>
+
+        <ul class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-10 list-none">
+          {OPERATING_POINTS.map((point) => (
+            <li class="bg-[#FAF8F5] rounded-card border border-slate-200/90 p-5">
+              <span
+                class="inline-flex w-9 h-9 items-center justify-center rounded-control bg-brand-800 text-amber-400 mb-3"
+                aria-hidden="true"
+              >
+                {point.icon === "book" && <BookOpen className="w-4 h-4" />}
+                {point.icon === "steps" && <ListChecks className="w-4 h-4" />}
+                {point.icon === "clock" && <Clock className="w-4 h-4" />}
+                {point.icon === "trophy" && <Trophy className="w-4 h-4" />}
+              </span>
+              <h3 class="font-bold text-slate-900 text-base">{point.title}</h3>
+              <p class="text-sm text-slate-600 mt-1.5 leading-relaxed">{point.desc}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!--
+      Nhận xét phụ huynh. Mảng TESTIMONIALS đang cố ý để trống: không được bịa
+      nhận xét cho một trung tâm có thật. Khi còn trống, phần này chỉ hiển thị ô
+      TODO rất rõ để không thể vô tình đưa lên production.
+    -->
+    <section id="phu-huynh" class="py-16 border-t border-slate-200">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Nhận xét phụ huynh</span>
+          <h2 class="text-2xl md:text-4xl font-extrabold mt-1">Phụ Huynh Nói Gì Về Global Chess</h2>
+        </div>
+
+        {TESTIMONIALS.length === 0 ? (
+          <div class="rounded-card border-2 border-dashed border-amber-400 bg-amber-50/70 p-6 md:p-8">
+            <div class="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" aria-hidden="true" />
+              <div>
+                <p class="font-bold text-amber-900">
+                  Khu vực này chưa có nội dung thật — không đăng trang khi còn như vậy.
+                </p>
+                <p class="text-sm text-amber-900/80 mt-1.5 leading-relaxed">
+                  Xin câu trích dẫn thật từ phụ huynh (kèm tên và cơ sở), rồi điền vào mảng{" "}
+                  <code class="rounded bg-amber-200/70 px-1.5 py-0.5 font-mono text-[0.85em]">TESTIMONIALS</code> trong{" "}
+                  <code class="rounded bg-amber-200/70 px-1.5 py-0.5 font-mono text-[0.85em]">src/data/courses.ts</code>.
+                  Điền đủ 3 mục là phần này tự chuyển sang bản hoàn chỉnh.
+                </p>
+              </div>
+            </div>
+
+            <ul class="grid md:grid-cols-3 gap-5 mt-8 list-none">
+              {[1, 2, 3].map((slot) => (
+                <li class="rounded-card border-2 border-dashed border-amber-300 bg-white/70 p-5 flex flex-col justify-between min-h-[190px]">
+                  <div>
+                    <Quote className="w-6 h-6 text-amber-300" aria-hidden="true" />
+                    <p class="mt-3 text-sm font-semibold text-amber-900 italic">
+                      Chỗ dành cho nhận xét thật của phụ huynh #{slot}
+                    </p>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-dashed border-amber-300 text-xs text-amber-900 space-y-1">
+                    <div>Tên phụ huynh: <span class="font-bold">TODO</span></div>
+                    <div>Cơ sở: <span class="font-bold">TODO</span></div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <ul class="grid md:grid-cols-3 gap-5 list-none">
+            {TESTIMONIALS.map((item) => (
+              <li class="bg-white rounded-card border border-slate-200 shadow-soft p-6 flex flex-col justify-between">
+                <div>
+                  <Quote className="w-6 h-6 text-amber-500" aria-hidden="true" />
+                  <blockquote class="mt-3 text-sm text-slate-700 leading-relaxed">{item.quote}</blockquote>
+                </div>
+                <footer class="mt-5 pt-4 border-t border-slate-200">
+                  <div class="font-bold text-slate-900 text-sm">{item.author}</div>
+                  <div class="text-xs text-slate-500 mt-0.5">{item.role} • {item.branch}</div>
+                </footer>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
+
+    <!--
+      Câu hỏi thường gặp. Cố tình không dùng accordion: nội dung trả lời luôn hiện,
+      phụ huynh không phải bấm mở từng câu mới đọc được.
+    -->
+    <section id="faq" class="py-16 bg-white border-t border-slate-200">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="max-w-2xl">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Giải đáp trước khi đăng ký</span>
+          <h2 class="text-2xl md:text-4xl font-extrabold mt-1">Câu Hỏi Thường Gặp</h2>
+        </div>
+
+        <dl class="grid md:grid-cols-2 gap-x-10 gap-y-7 mt-10">
+          {FAQS.map((item) => (
+            <div class="border-t border-slate-200 pt-4">
+              <dt class="font-bold text-slate-900 text-base flex items-start gap-2">
+                <HelpCircle className="w-4 h-4 text-amber-600 shrink-0 mt-1" aria-hidden="true" />
+                <span>{item.q}</span>
+              </dt>
+              <dd class="text-sm text-slate-600 mt-2 leading-relaxed pl-6">{item.a}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
     <!-- Pricing & Dynamic VietQR Checkout -->
     <PricingAndCheckout client:load />
+    </main>
 
     <!-- Footer -->
-    <footer class="py-10 bg-slate-950 text-slate-400 text-xs border-t border-slate-800">
-      <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div>
+    <footer class="py-10 bg-brand-950 text-brand-200 text-xs border-t border-brand-800">
+      <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="text-center md:text-left">
           <div class="font-bold text-white text-sm">{BRAND_INFO.name} – "{BRAND_INFO.slogan1}"</div>
           <div class="mt-1">{BRAND_INFO.slogan2}</div>
         </div>
+        <nav class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2" aria-label="Liên kết chân trang">
+          <a href="#faq" class="hover:text-white hover:underline transition-colors">Câu hỏi thường gặp</a>
+          <a href="/chinh-sach-bao-mat" class="hover:text-white hover:underline transition-colors">Chính sách bảo mật</a>
+          <a href="/dieu-khoan-su-dung" class="hover:text-white hover:underline transition-colors">Điều khoản sử dụng</a>
+          <a href="#main" class="hover:text-white hover:underline transition-colors">Về đầu trang</a>
+        </nav>
         <div class="text-center md:text-right space-y-1">
-          <div>Hotline: <strong class="text-white">{BRAND_INFO.hotlines.join(" – ")}</strong></div>
+          <div>Hotline: <strong class="text-white tabular-nums">{BRAND_INFO.hotlines.join(" – ")}</strong></div>
           <div>© {new Date().getFullYear()} Global Chess. All rights reserved.</div>
         </div>
       </div>
     </footer>
+
+    <script is:inline>
+      // Progressive enhancement: clicking a branch card opens the checkout modal
+      // with that branch already selected. Without JS the anchor still jumps to #pricing.
+      document.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const trigger = target.closest(".js-choose-branch");
+        if (!(trigger instanceof HTMLElement)) return;
+        const branchId = trigger.dataset.branch;
+        if (!branchId) return;
+        window.dispatchEvent(
+          new CustomEvent("gc:choose-branch", {
+            detail: { branchId, trigger: trigger },
+          })
+        );
+      });
+    </script>
   </body>
 </html>

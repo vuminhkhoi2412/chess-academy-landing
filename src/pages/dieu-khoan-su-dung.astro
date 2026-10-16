@@ -1,0 +1,136 @@
+---
+// src/pages/dieu-khoan-su-dung.astro
+//
+// LƯU Ý CHO NGƯỜI BẢO TRÌ: bản này mô tả đúng luồng thực tế của trang tĩnh.
+// Trước khi mở rộng sang thanh toán tự động, hoàn tiền hay dữ liệu học viên trên
+// backend, hãy để bên pháp lý rà lại và bổ sung thông tin pháp nhân.
+import "../styles/global.css";
+import { BRAND_INFO } from "../data/courses";
+import { ArrowLeft, Phone } from "lucide-react";
+
+const pageTitle = `Điều khoản sử dụng – ${BRAND_INFO.name}`;
+const pageDescription =
+  "Điều khoản sử dụng trang web và điều kiện đăng ký giữ chỗ, học phí, bảo lưu khoá học tại Global Chess.";
+const updatedAt = "16/10/2026";
+---
+
+<html lang="vi" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#184268" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="antialiased">
+    <header class="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-slate-200/80">
+      <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+        <a href="/" class="font-extrabold text-base flex items-center gap-2.5">
+          <img src="/brand/mark-128.png" alt="" width="40" height="40" decoding="async" class="w-10 h-10 shrink-0" />
+          <span>{BRAND_INFO.name}</span>
+        </a>
+        <a
+          href="/"
+          class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-slate-900 active:scale-[0.98] transition rounded-control px-2 py-1.5"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" /> Về trang chủ
+        </a>
+      </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 py-12 md:py-16">
+      <p class="text-xs font-bold uppercase tracking-wider text-amber-700">Cập nhật lần cuối: {updatedAt}</p>
+      <h1 class="mt-2 text-3xl md:text-4xl font-extrabold text-slate-900">Điều khoản sử dụng</h1>
+      <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+        Khi dùng trang web này và đăng ký giữ chỗ cho bé, bạn đồng ý với các điều khoản dưới đây.
+      </p>
+
+      <div class="mt-10 space-y-8 text-sm text-slate-700 leading-relaxed">
+        <section>
+          <h2 class="text-lg font-bold text-slate-900">1. Giá và thông tin hiển thị</h2>
+          <p class="mt-2">
+            Học phí và lộ trình trên trang là thông tin tham khảo tại thời điểm bạn xem. Con số cuối
+            cùng do giáo vụ xác nhận qua hotline hoặc Zalo trước khi bé vào lớp. Nếu có sai lệch,
+            mức giá đã được giáo vụ xác nhận là mức áp dụng.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-bold text-slate-900">2. Giữ chỗ và thanh toán</h2>
+          <p class="mt-2">
+            Mã VietQR trên trang được tạo tự động theo cấp độ bạn chọn. Chỗ học chỉ được giữ sau khi
+            trung tâm nhận đủ học phí và xác nhận với bạn. Vui lòng giữ đúng nội dung chuyển khoản
+            mà hệ thống gợi ý để giáo vụ đối chiếu nhanh.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-bold text-slate-900">3. Xếp lớp và đổi lịch</h2>
+          <p class="mt-2">
+            Khung giờ bạn chọn là nguyện vọng, không phải lịch đã chốt. Giáo vụ sẽ sắp lớp theo trình
+            độ và số lượng học viên thực tế. Trường hợp phải đổi cơ sở hoặc đổi ca, trung tâm sẽ báo
+            trước cho phụ huynh.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-bold text-slate-900">4. Bảo lưu</h2>
+          <p class="mt-2">
+            Bé có thể bảo lưu khi ốm hoặc có việc gia đình. Phụ huynh báo trước cho giáo vụ để sắp
+            buổi học bù. Thời hạn bảo lưu và số buổi được bù tối đa do trung tâm quy định tại từng
+            thời điểm.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-bold text-slate-900">5. Nội dung trên trang</h2>
+          <p class="mt-2">
+            Giáo trình, mô tả buổi học và bài đố cờ vua thuộc {BRAND_INFO.name}. Vui lòng không sao
+            chép để dùng cho trung tâm khác khi chưa có sự đồng ý.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-bold text-slate-900">6. Giới hạn trách nhiệm</h2>
+          <p class="mt-2">
+            Trang web được cung cấp nguyên trạng. Chúng tôi cố gắng giữ thông tin chính xác nhưng
+            không cam kết trang luôn không có lỗi. Việc quét mã QR và chuyển khoản do bạn tự thực
+            hiện trên ứng dụng ngân hàng của mình.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg font-bold text-slate-900">7. Liên hệ</h2>
+          <div class="mt-2 flex flex-col gap-1.5">
+            {BRAND_INFO.hotlines.map((hotline) => (
+              <a
+                href={`tel:${hotline.replace(/\./g, "")}`}
+                class="inline-flex items-center gap-1.5 font-semibold text-amber-700 hover:underline tabular-nums w-fit"
+              >
+                <Phone className="w-4 h-4" aria-hidden="true" /> {hotline}
+              </a>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <p class="mt-12 pt-6 border-t border-slate-200 text-xs text-slate-500">
+        Xem thêm <a href="/chinh-sach-bao-mat" class="font-semibold text-amber-700 hover:underline">Chính sách bảo mật</a>.
+      </p>
+    </main>
+  </body>
+</html>

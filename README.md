@@ -27,14 +27,20 @@ Dev server chạy nền thì dùng `npx astro dev --background`, quản lý bằ
 ## Cấu trúc
 
 ```
+logo.jpg                file NGUỒN của logo, không được publish (xem TODO bên dưới)
 public/
-  favicon.svg           logo thương hiệu (SVG)
-  favicon.ico           logo 16/32/48px
-  apple-touch-icon.png  icon 180px cho iOS
-  og-image.png          ảnh share 1200x630
+  brand/mark-64..512.png  logo khiên tách sẵn từ logo.jpg, nền trong suốt
+  favicon.svg             icon tab (khiên trên nền kem)
+  favicon.ico             icon 16/32/48px
+  favicon-16/32/48.png    icon PNG cho trình duyệt cũ
+  apple-touch-icon.png    icon 180px cho iOS
+  icon-192/512.png        icon khi cài lên màn hình chính
+  icon-maskable-512.png   icon maskable cho Android
+  site.webmanifest        khai báo PWA (Add to home screen)
+  og-image.png            ảnh share 1200x630
 src/
   data/courses.ts       toàn bộ nội dung: thương hiệu, cơ sở, giáo trình,
-                        học phí, thế cờ đố
+                        học phí, thế cờ đố, FAQ, nhận xét phụ huynh
   data/payment.ts       thông tin nhận chuyển khoản, đọc từ biến môi trường
   components/
     InteractivePuzzle.tsx    bàn cờ đố ở hero
@@ -42,8 +48,12 @@ src/
     PricingAndCheckout.tsx   bảng học phí + form + mã VietQR
   pages/
     index.astro         cả trang, kèm toàn bộ thẻ SEO
+    404.astro           trang 404
+    chinh-sach-bao-mat.astro   chính sách bảo mật
+    dieu-khoan-su-dung.astro   điều khoản sử dụng
     robots.txt.ts       sinh robots.txt từ `site` trong astro.config.mjs
-  styles/global.css     chỉ có `@import "tailwindcss";`
+  styles/global.css     Tailwind + `@theme` token (font, màu brand, radius, shadow)
+                        và vài class trang trí cho hero
 tests/puzzle.test.mjs   test thế cờ đố
 ```
 
@@ -73,9 +83,47 @@ lộ trình 48 buổi, 3 gói học phí, và thế cờ đố ở đầu trang.
 Sửa thế cờ trong `INTERACTIVE_PUZZLE` thì chạy lại `npm test`. Test sẽ báo lỗi nếu
 thế cờ mới không còn là đòn "chĩa đôi" hợp lệ (không chiếu, hoặc Đen bắt lại được quân).
 
+## TODO cần nội dung thật
+
+Ba việc dưới đây **phải xong trước khi chạy quảng cáo**, vì hiện tại trang đang phải
+dùng giải pháp tạm. Không việc nào chặn `npm run build`, nên phải tự nhớ.
+
+### 1. Ảnh và thước phim thật của trung tâm (hero + gallery)
+
+- **Hiện tại:** phần hero không dùng ảnh nào. Độ sâu được dựng hoàn toàn bằng hình học
+  (mesh gradient, mặt bàn cờ nghiêng theo phối cảnh, ký hiệu nước đi, hạt nhiễu). Không
+  có ảnh nào giả làm lớp học thật.
+- **Cần:** ảnh lớp học, phòng học, giải đấu nội bộ; nếu có thì cả footage quay ngắn.
+- **Việc phải làm:** thay lớp trang trí trong `src/pages/index.astro` (khối
+  `<div aria-hidden="true">` ngay dưới `<!-- Hero Section -->`) bằng gallery ảnh thật,
+  hoặc thêm một section gallery riêng. Chỗ này đã có comment `TODO (nội dung thật)`.
+- **Bắt buộc:** xin phép phụ huynh trước khi đăng ảnh hoặc video có mặt trẻ.
+
+### 2. Nhận xét thật của phụ huynh
+
+- **Hiện tại:** mục "Phụ Huynh Nói Gì Về Global Chess" hiển thị 3 ô TODO viền nét đứt,
+  kèm cảnh báo "không đăng trang khi còn như vậy". Mảng `TESTIMONIALS` trong
+  `src/data/courses.ts` đang **cố ý để trống**.
+- **Cần:** 3 câu trích dẫn thật, kèm tên phụ huynh và cơ sở.
+- **Việc phải làm:** điền vào `TESTIMONIALS` theo cấu trúc ghi trong comment ngay trên
+  mảng đó. Điền đủ 3 mục là giao diện tự chuyển sang bản thật, không phải sửa HTML.
+- **Không được:** tự viết nhận xét. Đó là quảng cáo sai sự thật.
+
+### 3. `logo.jpg` ở thư mục gốc
+
+- **Hiện tại:** file nguồn 920x813, JPEG, **nền trắng và không có alpha**. Chỉ nằm trong
+  repo, không được publish (chỉ `public/` mới lên web). Toàn bộ asset thương hiệu đã
+  được tách sẵn từ file này ra `public/`, nên lúc chạy trang không cần file gốc.
+- **Vì sao không dùng trực tiếp:** đây là lockup đầy đủ (khiên + chữ + tagline) nên đặt
+  vào nav sẽ trùng tên thương hiệu và dán một ô trắng lên nền kem. Ở 16px thì không đọc được.
+- **Việc phải làm:** chuyển vào thư mục nguồn không publish (ví dụ `assets/`) hoặc xoá.
+- **Nếu phải tách lại asset từ file này:** xoá nền bằng cách **loang từ viền vào trong**,
+  không key theo độ sáng — key theo độ sáng sẽ xoá luôn bàn cờ caro và vệt phản chiếu
+  **bên trong** khiên.
+
 ## Trước khi deploy
 
-Checklist, làm đủ 4 bước:
+Loại hết mục **TODO cần nội dung thật** ở trên trước. Checklist, làm đủ 4 bước:
 
 1. **Đổi domain.** Sửa `site` trong `astro.config.mjs` từ `https://globalchess.vn` sang
    domain thật. Đây là nguồn duy nhất cho `canonical`, `og:url`, `robots.txt` và
@@ -92,8 +140,12 @@ Checklist, làm đủ 4 bước:
 
 ## Placeholder cần đổi
 
-Chỉ có **một** chỗ: `site` trong `astro.config.mjs` (đang là `https://globalchess.vn`,
-có comment `TODO` ngay trên dòng đó). Mọi URL khác trong trang đều suy ra từ `Astro.site`.
+Placeholder URL chỉ có **một** chỗ: `site` trong `astro.config.mjs` (đang là
+`https://globalchess.vn`, có comment `TODO` ngay trên dòng đó). Mọi URL khác trong trang
+đều suy ra từ `Astro.site`.
+
+Phần nội dung còn thiếu (ảnh thật, nhận xét phụ huynh) không nằm ở đây mà ở mục
+**TODO cần nội dung thật** phía trên.
 
 Thông tin ngân hàng không nằm trong code mà ở `.env` local và biến môi trường của Vercel.
 

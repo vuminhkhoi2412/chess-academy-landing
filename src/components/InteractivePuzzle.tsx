@@ -49,51 +49,57 @@ export default function InteractivePuzzle() {
   }
 
   return (
-    <div className="bg-white p-5 rounded-2xl shadow-xl border border-slate-200 max-w-md mx-auto">
-      <div className="flex items-center justify-between mb-3">
-        <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-amber-700 bg-amber-100 px-3 py-1 rounded-full">
-          <Sparkles className="w-3.5 h-3.5" /> Thử thách 10 giây cho bé
+    <div className="bg-white p-5 rounded-card shadow-lifted border border-slate-200 max-w-md mx-auto">
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-amber-700 bg-amber-100 px-3 py-1 rounded-control">
+          <Sparkles className="w-3.5 h-3.5" aria-hidden="true" /> Thử thách 10 giây cho bé
         </span>
         <button
+          type="button"
           onClick={resetPuzzle}
-          className="text-slate-500 hover:text-slate-800 text-xs flex items-center gap-1 transition"
+          className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-800 active:scale-95 text-sm transition rounded-control px-1 py-1 cursor-pointer shrink-0"
         >
-          <RotateCcw className="w-3.5 h-3.5" /> Chơi lại
+          <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" /> Chơi lại
         </button>
       </div>
 
-      <h3 className="text-base font-bold text-slate-900 mb-1">
+      <h2 className="text-base font-bold text-slate-900 mb-1">
         Trắng đi trước: Làm sao để bắt Xe của Đen?
-      </h3>
-      <p className="text-xs text-slate-600 mb-3">
-        Gợi ý: Kéo quân <strong>Mã trắng (ở ô g5)</strong> để tung đòn "Chĩa đôi"!
+      </h2>
+      <p className="text-sm text-slate-600 mb-3">
+        Gợi ý: Kéo quân <strong>Mã trắng (ở ô g5)</strong> để tung đòn "Chĩa đôi".
       </p>
 
-      <div className="w-full max-w-[340px] aspect-square mx-auto rounded-xl overflow-hidden border-2 border-slate-800 shadow-inner">
+      <div
+        role="group"
+        aria-label="Bàn cờ tương tác: kéo quân Mã trắng từ ô g5 sang ô f7 để giải đố"
+        className="w-full max-w-[340px] aspect-square mx-auto rounded-control overflow-hidden border-2 border-brand-900 shadow-inner"
+      >
         <Chessboard
           options={{
             position: game.fen(),
             onPieceDrop: onDrop,
-            darkSquareStyle: { backgroundColor: "#334155" },
-            lightSquareStyle: { backgroundColor: "#f1f5f9" },
+            // Bàn cờ dùng đúng màu navy thương hiệu thay vì xám slate.
+            darkSquareStyle: { backgroundColor: "#1f5285" },
+            lightSquareStyle: { backgroundColor: "#f7f3ed" },
           }}
         />
       </div>
 
-      <div className="mt-3 min-h-[44px] flex items-center justify-center">
+      <div className="mt-3 min-h-[44px] flex items-center justify-center" role="status" aria-live="polite">
         {status === "playing" && (
-          <p className="text-xs text-slate-500 italic">
+          <p className="text-sm text-slate-500 italic">
             Hãy kéo và thả quân cờ trên bàn cờ để giải đố...
           </p>
         )}
         {status === "wrong" && (
-          <p className="text-xs font-semibold text-red-600 animate-pulse">
-            Chưa chính xác rồi! Hãy thử tìm ô nào tấn công cùng lúc 2 mục tiêu nhé.
+          <p className="text-sm font-semibold text-red-600 animate-pulse motion-reduce:animate-none">
+            Chưa chính xác rồi. Hãy thử tìm ô nào tấn công cùng lúc 2 mục tiêu nhé.
           </p>
         )}
         {status === "solved" && (
-          <div className="flex items-center gap-2 text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg w-full text-xs font-medium border border-emerald-200">
-            <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" />
+          <div className="flex items-center gap-2 text-emerald-700 bg-emerald-50 px-3 py-2 rounded-control w-full text-sm font-medium border border-emerald-200">
+            <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" aria-hidden="true" />
             <span>
               <strong>Tuyệt vời!</strong> Đó chính là đòn <em>Chĩa Đôi (Fork)</em> trong Cấp độ Chiến thuật!
             </span>

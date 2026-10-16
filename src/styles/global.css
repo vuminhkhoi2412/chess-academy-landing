@@ -1,1 +1,133 @@
 @import "tailwindcss";
+
+/*
+ * Design tokens.
+ *
+ * Font pairing: both faces ship a Vietnamese subset, which is a hard
+ * requirement for this site. "Outfit" and other popular display faces were
+ * rejected because they have no Vietnamese diacritics.
+ */
+@theme {
+  --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --font-display: "Bricolage Grotesque", "Be Vietnam Pro", ui-sans-serif,
+    system-ui, sans-serif;
+
+  /*
+   * Brand navy, sampled from logo.jpg (#184268 = brand-800). Every dark surface
+   * uses this scale instead of slate so the site matches the actual logo.
+   * Light tints (100-300) are the only safe text colours on brand-800 and below.
+   */
+  --color-brand-50: #eef5fb;
+  --color-brand-100: #d9e8f5;
+  --color-brand-200: #b6d0e8;
+  --color-brand-300: #8fb4d6;
+  --color-brand-400: #5b8ec0;
+  --color-brand-500: #2f6ba3;
+  --color-brand-600: #1f5285;
+  --color-brand-700: #1b4a76;
+  --color-brand-800: #184268;
+  --color-brand-900: #123350;
+  --color-brand-950: #0b2136;
+
+  /* Shape scale: soft on outer containers, tighter on inner controls. */
+  --radius-card: 1.125rem;
+  --radius-control: 0.75rem;
+
+  /* One light direction. Shadows carry the warm page hue instead of pure black. */
+  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04),
+    0 8px 24px -12px rgb(15 23 42 / 0.16);
+  --shadow-lifted: 0 2px 4px rgb(15 23 42 / 0.05),
+    0 20px 44px -16px rgb(15 23 42 / 0.22);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* The sticky header is 4rem tall. Anchor targets must clear it. */
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background-color: #faf8f5;
+    color: var(--color-slate-900);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  p,
+  li {
+    text-wrap: pretty;
+  }
+
+  /* One visible focus treatment for every interactive element. */
+  :focus-visible {
+    outline: 2px solid var(--color-amber-500);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-amber-200);
+    color: var(--color-slate-900);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@layer components {
+  /*
+   * Chessboard-derived geometry, used only as decoration behind the hero.
+   * A repeating conic gradient produces a true checker in one declaration.
+   */
+  .gc-board-field {
+    background-image: repeating-conic-gradient(
+      from 0deg,
+      var(--color-brand-800) 0deg 90deg,
+      transparent 90deg 180deg
+    );
+    background-size: var(--gc-cell, 72px) var(--gc-cell, 72px);
+  }
+
+  /* Fine grain. Breaks up the flat-vector look on large empty surfaces. */
+  .gc-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Hero backdrop: warm/cool mesh so the cream page is not a flat fill. */
+  .gc-hero-mesh {
+    background-image:
+      radial-gradient(120% 100% at 88% 2%, var(--color-brand-50) 0%, transparent 50%),
+      radial-gradient(90% 78% at 2% 74%, #fdf2e0 0%, transparent 60%),
+      radial-gradient(70% 60% at 58% 34%, #fbf7f0 0%, transparent 72%);
+  }
+
+  /*
+   * The hero's depth layer must dissolve before the section edge. The section
+   * clips it (overflow-hidden), so without this the mesh stops on a hard line at
+   * the exact y where the next cream section starts and reads as a cut-off band.
+   */
+  .gc-hero-fade {
+    mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
+  }
+
+  /* A chessboard plane receding into the distance. Decoration only. */
+  .gc-hero-board {
+    transform: perspective(1100px) rotateX(46deg) rotateZ(-14deg);
+    transform-origin: center;
+    mask-image: radial-gradient(closest-side, #000 16%, transparent 74%);
+    -webkit-mask-image: radial-gradient(closest-side, #000 16%, transparent 74%);
+  }
+}
