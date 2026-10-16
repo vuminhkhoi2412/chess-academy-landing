@@ -1,0 +1,189 @@
+---
+// src/pages/index.astro
+import "../styles/global.css";
+import InteractivePuzzle from "../components/InteractivePuzzle";
+import CurriculumExplorer from "../components/CurriculumExplorer";
+import PricingAndCheckout from "../components/PricingAndCheckout";
+import { BRAND_INFO, BRANCHES } from "../data/courses";
+import { MapPin, Phone, ArrowRight, Sparkles } from "lucide-react";
+---
+
+<html lang="vi" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{BRAND_INFO.name} – {BRAND_INFO.slogan1}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+
+  <body class="bg-[#FAF8F5] text-slate-900 font-['Plus_Jakarta_Sans',sans-serif] antialiased">
+    <!-- Top Hotline Bar -->
+    <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4">
+      <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
+        <span class="font-medium text-amber-400">♟ {BRAND_INFO.slogan1} – {BRAND_INFO.slogan2}</span>
+        <div class="flex items-center gap-4">
+          <span class="flex items-center gap-1">
+            <Phone className="w-3.5 h-3.5 text-amber-400" />
+            Hotline: <strong>{BRAND_INFO.hotlines[0]}</strong> – <strong>{BRAND_INFO.hotlines[1]}</strong>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navbar -->
+    <header class="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-slate-200/80">
+      <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div class="font-extrabold text-lg tracking-tight flex items-center gap-2.5">
+          <span class="w-9 h-9 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center text-xl shadow-sm">♞</span>
+          <div>
+            <div class="leading-none">{BRAND_INFO.name}</div>
+            <div class="text-[10px] font-semibold text-amber-700 tracking-wider uppercase mt-0.5">Một nước đi, mở tư duy</div>
+          </div>
+        </div>
+        <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+          <a href="#curriculum" class="hover:text-slate-900">Lộ trình Sơ cấp & Trung cấp</a>
+          <a href="#branches" class="hover:text-slate-900">Hệ thống 5 Cơ sở</a>
+          <a href="#pricing" class="hover:text-slate-900">Đăng ký & Học phí</a>
+        </nav>
+        <a
+          href="#pricing"
+          class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs md:text-sm font-bold px-4 py-2.5 rounded-xl transition shadow-sm"
+        >
+          Đăng ký giữ chỗ
+        </a>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="py-12 md:py-16 overflow-hidden">
+      <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-12 gap-10 items-center">
+        <div class="md:col-span-7 space-y-5">
+          <div class="inline-flex items-center gap-2 bg-amber-100 border border-amber-300 text-amber-900 px-3.5 py-1.5 rounded-full text-xs font-bold">
+            <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+            Đào tạo Cờ Vua Trực Tiếp (7 – 12 tuổi) • 5 Cơ sở tại TP.HCM
+          </div>
+
+          <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.15]">
+            Một Nước Đi, Mở Tư Duy <br />
+            <span class="text-amber-600">Học Cờ Rèn Tư Duy Vững Tương Lai!</span>
+          </h1>
+
+          <p class="text-slate-600 text-base leading-relaxed max-w-xl">
+            Lộ trình chuẩn hóa <strong>Global Chess Sơ Cấp & Trung Cấp (48 buổi)</strong> giúp trẻ làm chủ các hệ thống khai cuộc kinh điển, vận dụng sắc bén các đòn chiến thuật trung – tàn cuộc và tự tin bước vào các giải đấu thực tế.
+          </p>
+
+          <div class="flex flex-wrap gap-3.5 pt-2">
+            <a
+              href="#pricing"
+              class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-3.5 rounded-xl text-sm flex items-center gap-2 shadow-lg transition"
+            >
+              Đăng ký & Đóng học phí qua QR <ArrowRight className="w-4 h-4 text-amber-400" />
+            </a>
+            <a
+              href="#curriculum"
+              class="bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-semibold px-6 py-3.5 rounded-xl text-sm transition"
+            >
+              Xem chi tiết 48 buổi học
+            </a>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4 pt-4 border-t border-slate-200 max-w-lg">
+            <div>
+              <div class="text-xl md:text-2xl font-extrabold text-slate-900">48 Buổi</div>
+              <div class="text-xs text-slate-500">Mỗi lộ trình Sơ / Trung cấp</div>
+            </div>
+            <div>
+              <div class="text-xl md:text-2xl font-extrabold text-slate-900">60 - 90'</div>
+              <div class="text-xs text-slate-500">Thời lượng chuẩn mỗi buổi</div>
+            </div>
+            <div>
+              <div class="text-xl md:text-2xl font-extrabold text-slate-900">5 Cơ Sở</div>
+              <div class="text-xs text-slate-500">Linh hoạt khung giờ học</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Chessboard Island -->
+        <div class="md:col-span-5">
+          <InteractivePuzzle client:load />
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Curriculum Explorer (Sơ cấp 1-2 & Trung cấp Q1-Q2) -->
+    <CurriculumExplorer client:load />
+
+    <!-- Hệ thống 5 Cơ sở Global Chess tại TP.HCM -->
+    <section id="branches" class="py-16 bg-white border-t border-slate-200">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Hệ thống phòng học tiêu chuẩn</span>
+          <h2 class="text-2xl md:text-3xl font-extrabold mt-1">5 Cơ Sở Global Chess Tại TP.HCM</h2>
+          <p class="text-xs md:text-sm text-slate-600 mt-2">
+            Các ca học trong tuần và cuối tuần được tổ chức linh hoạt theo trình độ của học viên tại từng cơ sở.
+          </p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {BRANCHES.map((branch, idx) => (
+            <div class="bg-[#FAF8F5] p-5 rounded-2xl border border-slate-200/90 flex flex-col justify-between hover:border-amber-400 transition">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-extrabold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-md">
+                    Cơ sở {idx + 1}
+                  </span>
+                  <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    Đang tuyển sinh
+                  </span>
+                </div>
+                <h3 class="font-bold text-base text-slate-900 mb-1">{branch.name}</h3>
+                <p class="text-xs text-slate-600 flex items-start gap-1.5 leading-relaxed">
+                  <MapPin className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <span>{branch.address}</span>
+                </p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-200/70 flex items-center justify-between text-xs">
+                <span class="text-slate-500">Lịch học: Trong tuần & T7-CN</span>
+                <a href="#pricing" class="font-bold text-amber-700 hover:underline">Chọn cơ sở này →</a>
+              </div>
+            </div>
+          ))}
+
+          <!-- Thẻ Hotline tư vấn xếp lớp nhanh -->
+          <div class="bg-slate-900 text-white p-5 rounded-2xl flex flex-col justify-between">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Hỗ trợ xếp lớp nhanh</span>
+              <h3 class="font-bold text-base mt-1 mb-2">Cần Tư Vấn Kiểm Tra Trình Độ Đầu Vào?</h3>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Liên hệ trực tiếp Hotline để bộ phận giáo vụ kiểm tra ca học đang mở sát với trình độ và khu vực nhà bạn nhất.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-800 flex flex-col gap-1.5 text-xs font-bold text-amber-400">
+              <a href={`tel:${BRAND_INFO.hotlines[0].replace(/\./g, "")}`} class="hover:underline">📞 Hotline 1: {BRAND_INFO.hotlines[0]}</a>
+              <a href={`tel:${BRAND_INFO.hotlines[1].replace(/\./g, "")}`} class="hover:underline">📞 Hotline 2: {BRAND_INFO.hotlines[1]}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pricing & Dynamic VietQR Checkout -->
+    <PricingAndCheckout client:load />
+
+    <!-- Footer -->
+    <footer class="py-10 bg-slate-950 text-slate-400 text-xs border-t border-slate-800">
+      <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div>
+          <div class="font-bold text-white text-sm">{BRAND_INFO.name} – "{BRAND_INFO.slogan1}"</div>
+          <div class="mt-1">{BRAND_INFO.slogan2}</div>
+        </div>
+        <div class="text-center md:text-right space-y-1">
+          <div>Hotline: <strong class="text-white">{BRAND_INFO.hotlines.join(" – ")}</strong></div>
+          <div>© {new Date().getFullYear()} Global Chess. All rights reserved.</div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
