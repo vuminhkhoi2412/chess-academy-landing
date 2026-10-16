@@ -2,11 +2,11 @@
 import { useState, type SyntheticEvent } from "react";
 import {
   PRICING_PACKAGES,
-  BANK_CONFIG,
   BRANCHES,
   FLEXIBLE_TIME_SLOTS,
   BRAND_INFO,
 } from "../data/courses";
+import { BANK_CONFIG } from "../data/payment";
 import { Check, QrCode, ShieldCheck, X, Copy, CheckCircle, MapPin, Clock } from "lucide-react";
 
 // Gắn từng Cấp độ đăng ký với Gói học phí (packageId) tương ứng

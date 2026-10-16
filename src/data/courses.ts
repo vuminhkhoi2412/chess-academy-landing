@@ -8,13 +8,6 @@ export const BRAND_INFO = {
   zaloPhone: "0789059440",
 };
 
-export const BANK_CONFIG = {
-  bankId: "ACB", // Đổi mã ngân hàng công ty (VD: ACB, VCB, TCB, MB, ICB...)
-  accountNo: "88991978", // Đổi số tài khoản công ty
-  accountName: "DOAN THI THANH THAO", // Đổi tên chủ tài khoản công ty (Không dấu)
-  template: "compact2",
-};
-
 export const BRANCHES = [
   {
     id: "CS1",

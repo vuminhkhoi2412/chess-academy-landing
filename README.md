@@ -34,7 +34,8 @@ public/
   og-image.png          ảnh share 1200x630
 src/
   data/courses.ts       toàn bộ nội dung: thương hiệu, cơ sở, giáo trình,
-                        học phí, cấu hình ngân hàng, thế cờ đố
+                        học phí, thế cờ đố
+  data/payment.ts       thông tin nhận chuyển khoản, đọc từ biến môi trường
   components/
     InteractivePuzzle.tsx    bàn cờ đố ở hero
     CurriculumExplorer.tsx   tab lộ trình Sơ cấp / Trung cấp
@@ -45,6 +46,24 @@ src/
   styles/global.css     chỉ có `@import "tailwindcss";`
 tests/puzzle.test.mjs   test thế cờ đố
 ```
+
+## Biến môi trường
+
+Thông tin nhận chuyển khoản không nằm trong git. Copy `.env.example` thành `.env`
+rồi điền giá trị thật:
+
+| Biến | Bắt buộc | Mặc định |
+| :--- | :--- | :--- |
+| `PUBLIC_ACB_BANK_ID` | không | `ACB` |
+| `PUBLIC_ACB_ACCOUNT_NO` | có | — |
+| `PUBLIC_ACB_ACCOUNT_NAME` | có | — |
+| `PUBLIC_ACB_TEMPLATE` | không | `compact2` |
+
+Thiếu biến bắt buộc thì `npm run build` báo lỗi ngay, không tạo mã QR sai âm thầm.
+
+Lưu ý: biến `PUBLIC_*` bị inline vào bundle trình duyệt, nên người xem trang vẫn đọc
+được số tài khoản qua DevTools. Muốn giấu cả khỏi người xem thì phải thêm một endpoint
+phía server làm proxy cho ảnh VietQR và dùng biến không có tiền tố `PUBLIC_`.
 
 ## Sửa nội dung
 
@@ -59,10 +78,13 @@ thế cờ mới không còn là đòn "chĩa đôi" hợp lệ (không chiếu,
 Sửa `site` trong `astro.config.mjs` thành domain thật. Giá trị này là nguồn duy nhất
 cho `canonical`, `og:url`, `sitemap-index.xml` và `robots.txt`.
 
+Khai 4 biến trong mục Environment Variables của Vercel (xem phần Biến môi trường).
+Thiếu là build trên Vercel đỗ.
+
 Deploy trên Vercel: import repo, Vercel tự nhận diện Astro. Không cần file cấu hình.
 
 ## Lưu ý
 
-`BANK_CONFIG` trong `src/data/courses.ts` chứa số tài khoản ngân hàng thật. Giữ repo
-ở chế độ private, hoặc chuyển các giá trị này sang biến môi trường (`PUBLIC_*`) trước
-khi public.
+Số tài khoản thật vẫn còn trong commit `9e05ddc`. Repo đang private nên chỉ người có
+quyền mới thấy lịch sử đó. Nếu sau này chuyển repo sang public thì phải viết lại lịch
+sử (`git filter-repo`) rồi `push --force`, chứ xoá trong file thôi là không đủ.
