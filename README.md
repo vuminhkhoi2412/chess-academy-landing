@@ -75,13 +75,50 @@ thế cờ mới không còn là đòn "chĩa đôi" hợp lệ (không chiếu,
 
 ## Trước khi deploy
 
-Sửa `site` trong `astro.config.mjs` thành domain thật. Giá trị này là nguồn duy nhất
-cho `canonical`, `og:url`, `sitemap-index.xml` và `robots.txt`.
+Checklist, làm đủ 4 bước:
 
-Khai 4 biến trong mục Environment Variables của Vercel (xem phần Biến môi trường).
-Thiếu là build trên Vercel đỗ.
+1. **Đổi domain.** Sửa `site` trong `astro.config.mjs` từ `https://globalchess.vn` sang
+   domain thật. Đây là nguồn duy nhất cho `canonical`, `og:url`, `robots.txt` và
+   `sitemap-index.xml`; không có chỗ nào khác hardcode domain.
+2. **Khai 4 biến môi trường trên Vercel:** `PUBLIC_ACB_BANK_ID`,
+   `PUBLIC_ACB_ACCOUNT_NO`, `PUBLIC_ACB_ACCOUNT_NAME`, `PUBLIC_ACB_TEMPLATE`
+   (giá trị xem bảng ở phần Biến môi trường). Khai ở Project Settings → Environment
+   Variables, chọn cả Production và Preview. Thiếu `PUBLIC_ACB_ACCOUNT_NO` hoặc
+   `PUBLIC_ACB_ACCOUNT_NAME` là build trên Vercel đỗ.
+3. **Chạy lại 3 lệnh kiểm tra:** `npm run check`, `npm test`, `npm run build`.
+   Cả 3 phải sạch trước khi push.
+4. **Deploy.** Import repo vào Vercel, Vercel tự nhận diện Astro, không cần file cấu
+   hình. Sau khi deploy, mở `/robots.txt` và `/sitemap-index.xml` để chắc domain đã đúng.
 
-Deploy trên Vercel: import repo, Vercel tự nhận diện Astro. Không cần file cấu hình.
+## Placeholder cần đổi
+
+Chỉ có **một** chỗ: `site` trong `astro.config.mjs` (đang là `https://globalchess.vn`,
+có comment `TODO` ngay trên dòng đó). Mọi URL khác trong trang đều suy ra từ `Astro.site`.
+
+Thông tin ngân hàng không nằm trong code mà ở `.env` local và biến môi trường của Vercel.
+
+Số điện thoại, địa chỉ 5 cơ sở, học phí trong `src/data/courses.ts` là dữ liệu thật của
+trung tâm, không phải placeholder.
+
+## Xử lý sự cố
+
+| Hiện tượng | Nguyên nhân | Cách sửa |
+| :--- | :--- | :--- |
+| Cả 3 island không bấm được, console báo `504 (Outdated Optimize Dep)` | Vite cache cũ trong `node_modules/.vite`, thường sau khi sửa `astro.config.mjs` | `npx astro dev stop`, xoá `node_modules\.vite`, `npx astro dev --background` |
+| Lệnh `astro` báo không tìm thấy | `astro` không có trong PATH | chạy qua `npx`, ví dụ `npx astro dev stop` |
+| Build đỗ với dòng `PUBLIC_ACB_ACCOUNT_NO is missing` | thiếu biến môi trường | tạo `.env` từ `.env.example` ở local, khai trên Vercel khi deploy |
+| Island chưa hiện ngay sau khi reload | Astro hydrate sau sự kiện `load` | chờ thêm, không phải lỗi |
+
+Xoá cache Vite, đúng thứ tự:
+
+```
+npx astro dev stop
+Remove-Item -Recurse -Force node_modules\.vite
+npx astro dev --background
+npx astro dev status
+```
+
+Trên macOS/Linux thì thay dòng thứ hai bằng `rm -rf node_modules/.vite`.
 
 ## Lưu ý
 
