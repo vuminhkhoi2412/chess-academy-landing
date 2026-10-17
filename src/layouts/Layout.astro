@@ -1,0 +1,97 @@
+---
+// src/layouts/Layout.astro
+//
+// Khung HTML dùng chung cho cả bốn trang: <head>, favicon, font và thẻ <body>.
+// Mỗi trang chỉ truyền tiêu đề, mô tả và những điểm khác biệt (robots, canonical,
+// og:, và nội dung <head> riêng như JSON-LD của trang chủ).
+import "../styles/global.css";
+import { BRAND_INFO } from "../data/courses";
+
+interface Props {
+  /** Nội dung <title>. */
+  title: string;
+  /** Nội dung <meta name="description">, og:description và twitter:description. */
+  description: string;
+  /** Nội dung <meta name="robots">. Trang lỗi truyền "noindex, follow". */
+  robots?: string;
+  /** Trang lỗi phải tắt: canonical trỏ về một URL không tồn tại là sai. */
+  canonical?: boolean;
+  /** Thẻ og:/twitter: cho link chia sẻ qua Zalo/Facebook có ảnh xem trước. */
+  social?: boolean;
+  /** Lớp bổ sung cho <body>, ví dụ "min-h-dvh flex flex-col" của trang lỗi. */
+  bodyClass?: string;
+}
+
+const {
+  title,
+  description,
+  robots = "index, follow",
+  canonical = true,
+  social = true,
+  bodyClass,
+} = Astro.props;
+
+// Domain lấy từ `site` trong astro.config.mjs.
+// Sửa một chỗ đó là canonical, og:url, sitemap.xml và robots.txt cùng đúng theo.
+const origin = Astro.site ?? Astro.url;
+const canonicalUrl = new URL(Astro.url.pathname, origin).href;
+const ogImageUrl = new URL("/og-image.png", origin).href;
+
+const socialImageAlt = `${BRAND_INFO.name} – ${BRAND_INFO.slogan2}`;
+---
+
+<html lang="vi" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonicalUrl} />}
+    <meta name="robots" content={robots} />
+    <meta name="theme-color" content="#184268" />
+
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    {
+      social && (
+        <>
+          <meta property="og:type" content="website" />
+          <meta property="og:site_name" content={BRAND_INFO.name} />
+          <meta property="og:locale" content="vi_VN" />
+          <meta property="og:title" content={title} />
+          <meta property="og:description" content={description} />
+          <meta property="og:url" content={canonicalUrl} />
+          <meta property="og:image" content={ogImageUrl} />
+          <meta property="og:image:type" content="image/png" />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+          <meta property="og:image:alt" content={socialImageAlt} />
+
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={title} />
+          <meta name="twitter:description" content={description} />
+          <meta name="twitter:image" content={ogImageUrl} />
+        </>
+      )
+    }
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap"
+      rel="stylesheet"
+    />
+
+    <slot name="head" />
+  </head>
+
+  <body class:list={["antialiased", bodyClass]}>
+    <slot />
+  </body>
+</html>

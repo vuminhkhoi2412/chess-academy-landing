@@ -30,15 +30,22 @@
   --color-brand-900: #123350;
   --color-brand-950: #0b2136;
 
+  /* Warm page surface. Every light section and the sticky header use this one token. */
+  --color-cream: #faf8f5;
+
   /* Shape scale: soft on outer containers, tighter on inner controls. */
   --radius-card: 1.125rem;
   --radius-control: 0.75rem;
 
-  /* One light direction. Shadows carry the warm page hue instead of pure black. */
-  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04),
-    0 8px 24px -12px rgb(15 23 42 / 0.16);
-  --shadow-lifted: 0 2px 4px rgb(15 23 42 / 0.05),
-    0 20px 44px -16px rgb(15 23 42 / 0.22);
+  /*
+   * One light direction. The shadow carries the hue of the cream page (warm
+   * brown) instead of cool slate, so elevation reads as warm light rather than
+   * a grey overlay. Every shadowed surface in the site is light, so one tint fits.
+   */
+  --shadow-soft: 0 1px 2px rgb(68 55 43 / 0.04),
+    0 8px 24px -12px rgb(68 55 43 / 0.16);
+  --shadow-lifted: 0 2px 4px rgb(68 55 43 / 0.05),
+    0 20px 44px -16px rgb(68 55 43 / 0.22);
 }
 
 @layer base {
@@ -49,7 +56,7 @@
   }
 
   body {
-    background-color: #faf8f5;
+    background-color: var(--color-cream);
     color: var(--color-slate-900);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;

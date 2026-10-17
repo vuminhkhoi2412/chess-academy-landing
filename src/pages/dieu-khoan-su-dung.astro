@@ -4,9 +4,10 @@
 // LƯU Ý CHO NGƯỜI BẢO TRÌ: bản này mô tả đúng luồng thực tế của trang tĩnh.
 // Trước khi mở rộng sang thanh toán tự động, hoàn tiền hay dữ liệu học viên trên
 // backend, hãy để bên pháp lý rà lại và bổ sung thông tin pháp nhân.
-import "../styles/global.css";
+import SiteHeader from "../components/SiteHeader.astro";
+import Layout from "../layouts/Layout.astro";
 import { BRAND_INFO } from "../data/courses";
-import { ArrowLeft, Phone } from "lucide-react";
+import { Phone } from "lucide-react";
 
 const pageTitle = `Điều khoản sử dụng – ${BRAND_INFO.name}`;
 const pageDescription =
@@ -14,43 +15,8 @@ const pageDescription =
 const updatedAt = "16/10/2026";
 ---
 
-<html lang="vi" class="scroll-smooth">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{pageTitle}</title>
-    <meta name="description" content={pageDescription} />
-    <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#184268" />
-    <link rel="icon" href="/favicon.ico" sizes="48x48" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-
-  <body class="antialiased">
-    <header class="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-slate-200/80">
-      <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
-        <a href="/" class="font-extrabold text-base flex items-center gap-2.5">
-          <img src="/brand/mark-128.png" alt="" width="40" height="40" decoding="async" class="w-10 h-10 shrink-0" />
-          <span>{BRAND_INFO.name}</span>
-        </a>
-        <a
-          href="/"
-          class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-slate-900 active:scale-[0.98] transition rounded-control px-2 py-1.5"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" /> Về trang chủ
-        </a>
-      </div>
-    </header>
+<Layout title={pageTitle} description={pageDescription}>
+    <SiteHeader variant="document" />
 
     <main class="max-w-3xl mx-auto px-4 py-12 md:py-16">
       <p class="text-xs font-bold uppercase tracking-wider text-amber-700">Cập nhật lần cuối: {updatedAt}</p>
@@ -128,9 +94,8 @@ const updatedAt = "16/10/2026";
         </section>
       </div>
 
-      <p class="mt-12 pt-6 border-t border-slate-200 text-xs text-slate-500">
+      <p class="mt-12 pt-6 border-t border-slate-200 text-xs text-slate-600">
         Xem thêm <a href="/chinh-sach-bao-mat" class="font-semibold text-amber-700 hover:underline">Chính sách bảo mật</a>.
       </p>
     </main>
-  </body>
-</html>
+</Layout>
