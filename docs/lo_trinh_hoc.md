@@ -266,36 +266,3 @@
 
 
 * Vinhomes Grand Parks
-
-
-
----
-
-## GHI CHÚ HỌC PHÍ (CẦN TRUNG TÂM XÁC NHẬN)
-
-
-
-Tài liệu lộ trình này không nêu học phí. Website đang niêm yết ba mức sau, **chưa đối chiếu được với tài liệu chuẩn**:
-
-
-
-- Khóa 24 buổi: 3.600.000đ
-
-
-- Trọn gói 48 buổi: 6.500.000đ
-
-
-- Kèm riêng 1-1 (12 buổi): 4.800.000đ
-
-
-
-Cần bổ sung và xác nhận:
-
-
-1. Học phí cho lộ trình Happy Chess (72 buổi, 3 Level × 24 buổi).
-
-
-2. Học phí Happy Chess có theo mức 24 buổi chung hay có mức riêng cho bé 4–6 tuổi.
-
-
-3. Danh mục "Lớp kèm riêng 1-1" có nằm trong lộ trình chuẩn hay là dịch vụ riêng.

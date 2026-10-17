@@ -85,7 +85,7 @@ thế cờ mới không còn là đòn "chĩa đôi" hợp lệ (không chiếu,
 
 ## TODO cần nội dung thật
 
-Ba việc dưới đây **phải xong trước khi chạy quảng cáo**, vì hiện tại trang đang phải
+Bốn việc dưới đây **phải xong trước khi chạy quảng cáo**, vì hiện tại trang đang phải
 dùng giải pháp tạm. Không việc nào chặn `npm run build`, nên phải tự nhớ.
 
 ### 1. Ảnh và thước phim thật của trung tâm (hero + gallery)
@@ -121,6 +121,19 @@ dùng giải pháp tạm. Không việc nào chặn `npm run build`, nên phải
   không key theo độ sáng — key theo độ sáng sẽ xoá luôn bàn cờ caro và vệt phản chiếu
   **bên trong** khiên.
 
+### 4. Học phí lộ trình Happy Chess
+
+- **Hiện tại:** bảng học phí chỉ có 3 gói của lộ trình Global (24 buổi: 3.600.000đ;
+  trọn gói 48 buổi: 6.500.000đ; kèm riêng 1-1 12 buổi: 4.800.000đ) và chưa được trung tâm
+  xác nhận. Lộ trình Happy Chess (72 buổi, 3 Level × 24 buổi) chưa có mức giá riêng, nên
+  HC1/HC2/HC3 trong `LEVEL_OPTIONS` (`src/components/PricingAndCheckout.tsx`) đang tạm
+  gán `packageId: "hoc-phan-24"`.
+- **Cần:** xác nhận 3 mức giá hiện có, học phí chính thức cho Happy Chess, và Happy Chess
+  tính theo mức 24 buổi chung hay có mức riêng cho bé 4–6 tuổi. Xác nhận luôn "Lớp kèm
+  riêng 1-1" nằm trong lộ trình chuẩn hay là dịch vụ riêng.
+- **Việc phải làm:** cập nhật `PRICING_PACKAGES` trong `src/data/courses.ts` và
+  `LEVEL_OPTIONS` trong `src/components/PricingAndCheckout.tsx` khi có giá thật.
+
 ## Trước khi deploy
 
 Loại hết mục **TODO cần nội dung thật** ở trên trước. Checklist, làm đủ 4 bước:
@@ -144,13 +157,13 @@ Placeholder URL chỉ có **một** chỗ: `site` trong `astro.config.mjs` (đan
 `https://globalchess.vn`, có comment `TODO` ngay trên dòng đó). Mọi URL khác trong trang
 đều suy ra từ `Astro.site`.
 
-Phần nội dung còn thiếu (ảnh thật, nhận xét phụ huynh) không nằm ở đây mà ở mục
+Phần nội dung còn thiếu (ảnh thật, nhận xét phụ huynh, học phí Happy Chess) không nằm ở đây mà ở mục
 **TODO cần nội dung thật** phía trên.
 
 Thông tin ngân hàng không nằm trong code mà ở `.env` local và biến môi trường của Vercel.
 
-Số điện thoại, địa chỉ 5 cơ sở, học phí trong `src/data/courses.ts` là dữ liệu thật của
-trung tâm, không phải placeholder.
+Số điện thoại và địa chỉ 5 cơ sở trong `src/data/courses.ts` là dữ liệu thật của trung tâm.
+Học phí thì chưa đối chiếu được với trung tâm — xem mục **TODO** số 4.
 
 ## Xử lý sự cố
 
