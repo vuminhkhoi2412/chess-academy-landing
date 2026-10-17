@@ -1,0 +1,89 @@
+---
+// src/components/SiteHeader.astro
+//
+// Thanh điều hướng dùng chung cho cả ba trang. Trang chủ cần nav neo trong trang
+// và nút giữ chỗ; hai trang nội dung (điều khoản, bảo mật) chỉ cần lối về trang
+// chủ. Phần khung sticky và logo được tách ra đây thay vì chép lại ở từng trang.
+import { ArrowLeft } from "lucide-react";
+import { BRAND_INFO } from "../data/courses";
+
+interface Props {
+  /** "home": nav neo trong trang + CTA giữ chỗ. "document": link về trang chủ. */
+  variant?: "home" | "document";
+}
+
+const { variant = "home" } = Astro.props;
+const isHome = variant === "home";
+
+const NAV_LINKS = [
+  { href: "#curriculum", label: "Lộ trình Happy Chess & Global" },
+  { href: "#branches", label: "Hệ thống 5 Cơ sở" },
+  { href: "#pricing", label: "Đăng ký & Học phí" },
+];
+---
+
+<header class="sticky top-0 z-40 bg-cream/95 backdrop-blur-md border-b border-slate-200/80">
+  <div
+    class:list={[
+      "mx-auto px-4 h-16 flex items-center justify-between",
+      // Trang chủ không cần gap: justify-between đã tách logo, nav và CTA.
+      isHome ? "max-w-6xl" : "max-w-3xl gap-4",
+    ]}
+  >
+    <a
+      href={isHome ? "#main" : "/"}
+      class:list={["font-extrabold flex items-center gap-2.5", isHome && "text-lg tracking-tight"]}
+    >
+      <img
+        src="/brand/mark-128.png"
+        alt=""
+        width="40"
+        height="40"
+        decoding="async"
+        class="w-10 h-10 shrink-0"
+      />
+      {
+        isHome ? (
+          <div>
+            <div class="leading-none">{BRAND_INFO.name}</div>
+            <div class="text-[11px] font-semibold text-amber-700 tracking-wider uppercase mt-0.5 font-sans">
+              {BRAND_INFO.slogan1}
+            </div>
+          </div>
+        ) : (
+          <span>{BRAND_INFO.name}</span>
+        )
+      }
+    </a>
+
+    {
+      isHome ? (
+        <>
+          <nav
+            class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600"
+            aria-label="Điều hướng chính"
+          >
+            {NAV_LINKS.map((link) => (
+              <a href={link.href} class="hover:text-slate-900 active:text-amber-700 transition-colors">
+                {link.label}
+              </a>
+            ))}
+          </nav>
+          <a
+            href="#pricing"
+            class="bg-amber-500 hover:bg-amber-400 active:bg-amber-600 active:scale-[0.98] text-slate-950 text-xs md:text-sm font-bold px-4 py-2.5 rounded-control transition shadow-soft"
+          >
+            Đăng ký giữ chỗ
+          </a>
+        </>
+      ) : (
+        <a
+          href="/"
+          class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-slate-900 active:scale-[0.98] transition rounded-control px-2 py-1.5"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" /> Về trang chủ
+        </a>
+      )
+    }
+  </div>
+</header>

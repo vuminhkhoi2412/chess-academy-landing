@@ -1,9 +1,10 @@
 ---
 // src/pages/index.astro
-import "../styles/global.css";
 import InteractivePuzzle from "../components/InteractivePuzzle";
 import CurriculumExplorer from "../components/CurriculumExplorer";
 import PricingAndCheckout from "../components/PricingAndCheckout";
+import SiteHeader from "../components/SiteHeader.astro";
+import Layout from "../layouts/Layout.astro";
 import { BRAND_INFO, BRANCHES, PRICING_PACKAGES, TESTIMONIALS, FAQS, OPERATING_POINTS } from "../data/courses";
 import {
   MapPin,
@@ -28,7 +29,7 @@ const logoUrl = new URL("/favicon.svg", origin).href;
 
 const pageTitle = `${BRAND_INFO.name} – ${BRAND_INFO.slogan1}`;
 const pageDescription =
-  "Trung tâm cờ vua Global Chess cho trẻ 7–12 tuổi tại TP.HCM: lộ trình 48 buổi (Sơ cấp & Trung cấp), lớp học tối trong tuần và cuối tuần tại 5 cơ sở.";
+  "Trung tâm cờ vua Global Chess cho trẻ 4–12 tuổi tại TP.HCM: lộ trình Happy Chess 72 buổi và Global Sơ cấp & Trung cấp 48 buổi, lớp tối trong tuần và cuối tuần tại 5 cơ sở.";
 
 // "0789.059.440" -> "+84789059440"
 const hotlineE164 = `+84${BRAND_INFO.hotlines[0].replace(/\./g, "").replace(/^0/, "")}`;
@@ -69,56 +70,18 @@ const structuredData = {
 };
 ---
 
-<html lang="vi" class="scroll-smooth">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  robots="index, follow, max-image-preview:large"
+>
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(structuredData).replace(/</g, "\\u003c")}
+  />
 
-    <title>{pageTitle}</title>
-    <meta name="description" content={pageDescription} />
-    <link rel="canonical" href={canonicalUrl} />
-    <meta name="robots" content="index, follow, max-image-preview:large" />
-    <meta name="theme-color" content="#184268" />
-
-    <link rel="icon" href="/favicon.ico" sizes="48x48" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
-
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content={BRAND_INFO.name} />
-    <meta property="og:locale" content="vi_VN" />
-    <meta property="og:title" content={pageTitle} />
-    <meta property="og:description" content={pageDescription} />
-    <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:image" content={ogImageUrl} />
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={`${BRAND_INFO.name} – ${BRAND_INFO.slogan2}`} />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={pageTitle} />
-    <meta name="twitter:description" content={pageDescription} />
-    <meta name="twitter:image" content={ogImageUrl} />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap"
-      rel="stylesheet"
-    />
-
-    <script
-      type="application/ld+json"
-      is:inline
-      set:html={JSON.stringify(structuredData).replace(/</g, "\\u003c")}
-    />
-  </head>
-
-  <body class="antialiased">
     <a
       href="#main"
       class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-control focus:bg-brand-800 focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-white"
@@ -140,35 +103,7 @@ const structuredData = {
     </div>
 
     <!-- Navbar -->
-    <header class="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-slate-200/80">
-      <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        <a href="#main" class="font-extrabold text-lg tracking-tight flex items-center gap-2.5">
-          <img
-            src="/brand/mark-128.png"
-            alt=""
-            width="40"
-            height="40"
-            decoding="async"
-            class="w-10 h-10 shrink-0"
-          />
-          <div>
-            <div class="leading-none">{BRAND_INFO.name}</div>
-            <div class="text-[10px] font-semibold text-amber-700 tracking-wider uppercase mt-0.5 font-sans">Một nước đi, mở tư duy</div>
-          </div>
-        </a>
-        <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600" aria-label="Điều hướng chính">
-          <a href="#curriculum" class="hover:text-slate-900 active:text-amber-700 transition-colors">Lộ trình Sơ cấp &amp; Trung cấp</a>
-          <a href="#branches" class="hover:text-slate-900 active:text-amber-700 transition-colors">Hệ thống 5 Cơ sở</a>
-          <a href="#pricing" class="hover:text-slate-900 active:text-amber-700 transition-colors">Đăng ký &amp; Học phí</a>
-        </nav>
-        <a
-          href="#pricing"
-          class="bg-amber-500 hover:bg-amber-400 active:bg-amber-600 active:scale-[0.98] text-slate-950 text-xs md:text-sm font-bold px-4 py-2.5 rounded-control transition shadow-soft"
-        >
-          Đăng ký giữ chỗ
-        </a>
-      </div>
-    </header>
+    <SiteHeader />
 
     <main id="main" tabindex="-1">
     <!-- Hero Section -->
@@ -196,7 +131,7 @@ const structuredData = {
         <div class="md:col-span-6 lg:col-span-7 space-y-5">
           <div class="inline-flex items-center gap-2 bg-amber-100 border border-amber-300 text-amber-900 px-3.5 py-1.5 rounded-control text-xs font-bold">
             <Sparkles className="w-3.5 h-3.5 text-amber-700" aria-hidden="true" />
-            Đào tạo Cờ Vua Trực Tiếp (7 – 12 tuổi) • 5 Cơ sở tại TP.HCM
+            Đào tạo Cờ Vua Trực Tiếp (4 – 12 tuổi) • 5 Cơ sở tại TP.HCM
           </div>
 
           <!--
@@ -209,7 +144,7 @@ const structuredData = {
           </h1>
 
           <p class="text-slate-600 text-base leading-relaxed max-w-xl">
-            Lộ trình chuẩn hóa <strong>Global Chess Sơ Cấp &amp; Trung Cấp (48 buổi)</strong> giúp trẻ làm chủ các hệ thống khai cuộc kinh điển, vận dụng sắc bén các đòn chiến thuật trung – tàn cuộc và tự tin bước vào các giải đấu thực tế.
+            Ba lộ trình chuẩn hóa <strong>Happy Chess (72 buổi)</strong> và <strong>Global Chess Sơ Cấp &amp; Trung Cấp (48 buổi)</strong> giúp trẻ đi từ luật chơi cơ bản đến làm chủ các hệ thống khai cuộc và đòn chiến thuật trung – tàn cuộc.
           </p>
 
           <div class="flex flex-wrap gap-3.5 pt-2">
@@ -234,15 +169,15 @@ const structuredData = {
           -->
           <dl class="grid grid-cols-[repeat(2,minmax(0,1fr))_auto] gap-3 sm:gap-4 pt-5 border-t border-slate-300/70 max-w-lg">
             <div>
-              <dt class="text-xs text-slate-500">Lộ trình chuẩn</dt>
-              <dd class="text-xl md:text-2xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">48 Buổi</dd>
+              <dt class="text-xs text-slate-600">Lộ trình chuẩn</dt>
+              <dd class="text-xl md:text-2xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">48 – 72 Buổi</dd>
             </div>
             <div>
-              <dt class="text-xs text-slate-500">Mỗi buổi học</dt>
+              <dt class="text-xs text-slate-600">Mỗi buổi học</dt>
               <dd class="text-xl md:text-2xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">60 – 90'</dd>
             </div>
             <div>
-              <dt class="text-xs text-slate-500">Cơ sở tại TP.HCM</dt>
+              <dt class="text-xs text-slate-600">Cơ sở tại TP.HCM</dt>
               <dd class="text-xl md:text-2xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">5 Địa Điểm</dd>
             </div>
           </dl>
@@ -280,7 +215,7 @@ const structuredData = {
           {BRANCHES.map((branch, idx) => (
             <div
               class:list={[
-                "bg-[#FAF8F5] p-5 rounded-card border border-slate-200/90 flex flex-col justify-between hover:border-amber-400 hover:shadow-soft transition",
+                "bg-cream p-5 rounded-card border border-slate-200/90 flex flex-col justify-between hover:border-amber-400 hover:shadow-soft transition",
                 // Bento: cơ sở đầu tiên trải 2 cột để lưới không còn là 6 ô đều nhau.
                 idx === 0 && "lg:col-span-2 relative overflow-hidden",
               ]}
@@ -297,7 +232,7 @@ const structuredData = {
                   <span class="text-xs font-extrabold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-md tabular-nums">
                     Cơ sở {idx + 1}
                   </span>
-                  <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-control border border-emerald-200">
+                  <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-control border border-emerald-200">
                     Đang tuyển sinh
                   </span>
                 </div>
@@ -308,7 +243,7 @@ const structuredData = {
                 </p>
               </div>
               <div class="relative mt-4 pt-3 border-t border-slate-200/70 flex items-center justify-between gap-2 text-sm">
-                <span class="text-slate-500">Lịch học: Trong tuần &amp; T7-CN</span>
+                <span class="text-slate-600">Lịch học: Trong tuần &amp; T7-CN</span>
                 <a
                   href="#pricing"
                   data-branch={branch.id}
@@ -361,7 +296,7 @@ const structuredData = {
 
         <ul class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-10 list-none">
           {OPERATING_POINTS.map((point) => (
-            <li class="bg-[#FAF8F5] rounded-card border border-slate-200/90 p-5">
+            <li class="bg-cream rounded-card border border-slate-200/90 p-5">
               <span
                 class="inline-flex w-9 h-9 items-center justify-center rounded-control bg-brand-800 text-amber-400 mb-3"
                 aria-hidden="true"
@@ -435,7 +370,7 @@ const structuredData = {
                 </div>
                 <footer class="mt-5 pt-4 border-t border-slate-200">
                   <div class="font-bold text-slate-900 text-sm">{item.author}</div>
-                  <div class="text-xs text-slate-500 mt-0.5">{item.role} • {item.branch}</div>
+                  <div class="text-xs text-slate-600 mt-0.5">{item.role} • {item.branch}</div>
                 </footer>
               </li>
             ))}
@@ -510,5 +445,4 @@ const structuredData = {
         );
       });
     </script>
-  </body>
-</html>
+</Layout>
