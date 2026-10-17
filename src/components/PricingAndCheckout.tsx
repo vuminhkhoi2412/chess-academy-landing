@@ -22,6 +22,21 @@ import {
 // Gắn từng Cấp độ đăng ký với Gói học phí (packageId) tương ứng
 const LEVEL_OPTIONS = [
   {
+    code: "HC1",
+    label: "Happy Chess 1 (Level 1 - 24 buổi)",
+    packageId: "hoc-phan-24",
+  },
+  {
+    code: "HC2",
+    label: "Happy Chess 2 (Level 2 - 24 buổi)",
+    packageId: "hoc-phan-24",
+  },
+  {
+    code: "HC3",
+    label: "Happy Chess 3 (Level 3 - 24 buổi)",
+    packageId: "hoc-phan-24",
+  },
+  {
     code: "SC1",
     label: "Sơ cấp 1 (Level 1 - 24 buổi)",
     packageId: "hoc-phan-24",
@@ -297,8 +312,12 @@ export default function PricingAndCheckout() {
 
               <div>
                 <h3 className="text-xl font-bold text-white">{pkg.name}</h3>
-                {/* min-h giữ cho hàng giá và danh sách quyền lợi thẳng hàng giữa 3 thẻ */}
-                <p className="text-brand-200 text-sm mt-1.5 leading-relaxed min-h-10">
+                {/*
+                  Chừa đúng 2 dòng phụ đề để hàng giá của 3 thẻ luôn thẳng nhau.
+                  3.25em = 2 dòng × leading-relaxed (1.625), nên giá trị này ăn theo
+                  chính cỡ chữ của phụ đề thay vì một số rem đoán trước.
+                */}
+                <p className="text-brand-200 text-sm mt-1.5 leading-relaxed min-h-[3.25em]">
                   {pkg.subtitle}
                 </p>
 
@@ -378,7 +397,7 @@ export default function PricingAndCheckout() {
               type="button"
               onClick={() => setIsModalOpen(false)}
               aria-label="Đóng hộp thoại đăng ký"
-              className="absolute top-4 right-4 p-1.5 rounded-control text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer active:scale-95"
+              className="absolute top-4 right-4 p-1.5 rounded-control text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer active:scale-95"
             >
               <X className="w-5 h-5" aria-hidden="true" />
             </button>
@@ -413,7 +432,7 @@ export default function PricingAndCheckout() {
                   </div>
                   <div>
                     <label htmlFor="gc-child-age" className="block text-sm font-semibold text-slate-700 mb-1">
-                      Năm sinh / Tuổi (7-12 tuổi) *
+                      Năm sinh / Tuổi (4-12 tuổi) *
                     </label>
                     <input
                       id="gc-child-age"
