@@ -17,7 +17,7 @@ export default function CurriculumExplorer() {
   const activeProgram = CURRICULUM_PROGRAMS.find((p) => p.id === activeProgramId) || CURRICULUM_PROGRAMS[0];
 
   return (
-    <section id="curriculum" className="py-20 bg-[#FAF8F5]">
+    <section id="curriculum" className="py-20 bg-cream">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">
@@ -25,10 +25,10 @@ export default function CurriculumExplorer() {
             <BookOpen className="w-3.5 h-3.5" aria-hidden="true" /> Hệ thống giáo trình bài bản
           </span>
           <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-3">
-            Lộ Trình Đào Tạo Global Chess (7 – 12 Tuổi)
+            Lộ Trình Đào Tạo Global Chess (4 – 12 Tuổi)
           </h2>
           <p className="text-slate-600 text-sm md:text-base mt-2">
-            Mỗi lộ trình gồm 48 buổi được chia thành 2 cấp độ nhỏ (24 buổi/cấp độ), giúp học viên nắm chắc từ nguyên lý khai cuộc đến các đòn chiến thuật trung – tàn cuộc nâng cao.
+            Happy Chess gồm 3 Level (72 buổi); Global Sơ cấp và Trung cấp mỗi lộ trình 48 buổi, chia thành các cấp độ nhỏ 24 buổi. Học viên nắm chắc từ luật chơi cơ bản đến các đòn chiến thuật trung – tàn cuộc nâng cao.
           </p>
         </div>
 
@@ -54,7 +54,7 @@ export default function CurriculumExplorer() {
                   </div>
                   <div className="text-base md:text-lg">{prog.title}</div>
                 </div>
-                <ChevronRight className={`w-5 h-5 ${isActive ? "text-amber-400" : "text-slate-400"}`} aria-hidden="true" />
+                <ChevronRight className={`w-5 h-5 ${isActive ? "text-amber-400" : "text-slate-500"}`} aria-hidden="true" />
               </button>
             );
           })}
@@ -100,8 +100,8 @@ export default function CurriculumExplorer() {
           </div>
         </div>
 
-        {/* Tầng 2: Chi tiết 2 Cấp độ nhỏ (24 buổi / cấp độ) */}
-        <div className="grid md:grid-cols-2 gap-8 mb-14">
+        {/* Tầng 2: Chi tiết từng cấp độ nhỏ (24 buổi / cấp độ) */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-14">
           {activeProgram.subLevels.map((sub, index) => (
             <div
               key={sub.code}
@@ -120,7 +120,7 @@ export default function CurriculumExplorer() {
 
                 {/* Danh sách bài học */}
                 <div className="p-6">
-                  <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
+                  <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
                     Nội dung chi tiết từng buổi / bài học:
                   </div>
                   {/* Hiển thị toàn bộ 24 buổi, không nhét vào hộp cuộn để không giấu nội dung. */}
@@ -130,7 +130,7 @@ export default function CurriculumExplorer() {
                         key={idx}
                         className="flex flex-col gap-1 text-sm p-2.5 rounded-control bg-slate-50 border border-slate-100"
                       >
-                        <span className="self-start text-[11px] font-bold text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200 tabular-nums">
+                        <span className="self-start text-xs font-bold text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200 tabular-nums">
                           {item.label}
                         </span>
                         <span className="font-semibold text-slate-900 leading-relaxed">{item.topic}</span>
