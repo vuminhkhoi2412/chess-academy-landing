@@ -75,6 +75,83 @@ export interface MajorProgram {
 
 export const CURRICULUM_PROGRAMS: MajorProgram[] = [
   {
+    id: "happy-chess",
+    title: "Lộ Trình Happy Chess",
+    badge: "4 – 12 tuổi • Nền tảng vững chắc",
+    totalDuration: "72 buổi (3 Level – mỗi Level 24 buổi)",
+    targetAudience: "Trẻ từ 4 – 12 tuổi (cả học viên mới và đã biết chơi)",
+    sessionLength: "60 – 90 phút / buổi (điều chỉnh theo độ tuổi)",
+    objectives: [
+      "Nắm vững luật chơi và cách di chuyển 6 loại quân.",
+      "Hiểu và áp dụng các chiến thuật cơ bản.",
+      "Phát triển tư duy logic và khả năng tính toán.",
+      "Tự tin thi đấu và xử lý các thế cờ thực tế.",
+    ],
+    evaluation: [
+      "Level 1 (24 buổi): Chơi được ván cờ cơ bản, hiểu luật, biết chiếu bí, nhập thành và phong cấp.",
+      "Level 2 (48 buổi): Có tư duy chiến thuật ban đầu, biết tìm nước đi có mục đích và áp dụng trong ván đấu.",
+      "Level 3 (72 buổi): Vận dụng chiến thuật nâng cao, tự tin thi đấu và xử lý các thế cờ phức tạp.",
+    ],
+    subLevels: [
+      {
+        code: "HC1",
+        name: "Level 1 – Happy Chess 1",
+        duration: "24 buổi",
+        lessonCount: "Làm quen và nắm vững luật chơi",
+        goal: "Nhận biết và di chuyển 6 loại quân, nắm luật chơi cơ bản và biết cách chiếu bí.",
+        syllabus: [
+          { label: "Nội dung 1", topic: "Nhận biết và di chuyển 6 loại quân" },
+          { label: "Nội dung 2", topic: "Luật chơi cơ bản, chiếu – chiếu bí" },
+          { label: "Nội dung 3", topic: "Nhập thành, phong cấp, bắt tốt qua đường" },
+          { label: "Nội dung 4", topic: "Ghi chép nước đi và thi đấu" },
+        ],
+        outcomes: [
+          "Chơi được một ván cờ cơ bản.",
+          "Hiểu luật và biết cách chiếu bí.",
+          "Biết nhập thành và phong cấp.",
+        ],
+      },
+      {
+        code: "HC2",
+        name: "Level 2 – Happy Chess 2",
+        duration: "24 buổi",
+        lessonCount: "Hoàn thiện kỹ năng cơ bản",
+        goal: "Hoàn thiện kỹ năng cơ bản và hình thành tư duy chiến thuật ban đầu.",
+        syllabus: [
+          { label: "Nội dung 1", topic: "Ghi chép nước đi, thi đấu" },
+          { label: "Nội dung 2", topic: "Chiếu bí với các quân (tốt, tượng, xe, hậu, mã)" },
+          { label: "Nội dung 3", topic: "Khai cuộc cơ bản" },
+          { label: "Nội dung 4", topic: "Phòng thủ 4 mã" },
+          { label: "Nội dung 5", topic: "Phong cấp tốt" },
+        ],
+        outcomes: [
+          "Có tư duy chiến thuật ban đầu.",
+          "Biết tìm nước đi có mục đích.",
+          "Áp dụng được trong ván đấu thực tế.",
+        ],
+      },
+      {
+        code: "HC3",
+        name: "Level 3 – Happy Chess 3",
+        duration: "24 buổi",
+        lessonCount: "Phát triển chiến thuật và vận dụng",
+        goal: "Phát triển chiến thuật và vận dụng vào các thế cờ phức tạp.",
+        syllabus: [
+          { label: "Nội dung 1", topic: "Chiếu bí với 2 xe, 1 hậu, 1 xe, 2 tượng" },
+          { label: "Nội dung 2", topic: "Khai cuộc cơ bản và các biến thể" },
+          { label: "Nội dung 3", topic: "Phòng thủ 4 mã" },
+          { label: "Nội dung 4", topic: "Phong cấp tốt (nhiều thế cờ nâng cao)" },
+          { label: "Nội dung 5", topic: "Thi đấu và kiểm tra cuối khóa" },
+        ],
+        outcomes: [
+          "Vận dụng chiến thuật nâng cao.",
+          "Tự tin thi đấu.",
+          "Xử lý được các thế cờ phức tạp.",
+        ],
+      },
+    ],
+  },
+  {
     id: "so-cap",
     title: "Lộ Trình Global Chess Sơ Cấp",
     badge: "7 – 12 tuổi • Học viên mới & Đã biết chơi",
