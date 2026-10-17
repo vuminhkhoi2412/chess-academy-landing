@@ -384,11 +384,11 @@ export interface FaqItem {
 export const FAQS: FaqItem[] = [
   {
     q: "Bé mấy tuổi thì tham gia được?",
-    a: "Global Chess nhận học viên từ 7 đến 12 tuổi. Các bé được xếp theo trình độ thực tế chứ không chỉ theo tuổi.",
+    a: "Global Chess nhận học viên từ 4 đến 12 tuổi. Lộ trình Happy Chess dành cho bé từ 4 tuổi; lộ trình Global Sơ cấp và Trung cấp dành cho bé từ 7 tuổi. Các bé được xếp theo trình độ thực tế chứ không chỉ theo tuổi.",
   },
   {
     q: "Một lộ trình học kéo dài bao lâu?",
-    a: "Mỗi giáo trình Sơ Cấp hoặc Trung Cấp gồm 48 buổi, chia thành 2 cấp độ nhỏ 24 buổi. Mỗi buổi kéo dài 60 – 90 phút.",
+    a: "Happy Chess gồm 72 buổi (3 Level, mỗi Level 24 buổi). Lộ trình Global Sơ cấp và Trung cấp mỗi lộ trình gồm 48 buổi, chia thành 2 cấp độ nhỏ 24 buổi. Mỗi buổi kéo dài 60 – 90 phút.",
   },
   {
     q: "Học phí đã bao gồm sách chưa?",
