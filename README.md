@@ -1,6 +1,6 @@
 # Global Chess — Landing Page
 
-Trang giới thiệu trung tâm cờ vua Global Chess (trẻ 7 – 12 tuổi, 5 cơ sở tại TP.HCM).
+Trang giới thiệu trung tâm cờ vua Global Chess (trẻ 4 – 12 tuổi, 5 cơ sở tại TP.HCM).
 Trang tĩnh, một trang duy nhất, có bàn cờ tương tác và form đăng ký tự tạo mã VietQR.
 
 ## Stack
@@ -78,7 +78,7 @@ phía server làm proxy cho ảnh VietQR và dùng biến không có tiền tố
 ## Sửa nội dung
 
 Gần như mọi thứ nằm trong `src/data/courses.ts`: tên thương hiệu, hotline, 5 cơ sở,
-lộ trình 48 buổi, 3 gói học phí, và thế cờ đố ở đầu trang.
+lộ trình Happy Chess 72 buổi & Global 48 buổi, 3 gói học phí, và thế cờ đố ở đầu trang.
 
 Sửa thế cờ trong `INTERACTIVE_PUZZLE` thì chạy lại `npm test`. Test sẽ báo lỗi nếu
 thế cờ mới không còn là đòn "chĩa đôi" hợp lệ (không chiếu, hoặc Đen bắt lại được quân).
