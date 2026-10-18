@@ -6,6 +6,7 @@
 // backend, hãy để bên pháp lý rà lại và bổ sung thông tin pháp nhân.
 import SiteHeader from "../components/SiteHeader.astro";
 import Layout from "../layouts/Layout.astro";
+import SiteFooter from "../components/SiteFooter.astro";
 import { BRAND_INFO } from "../data/courses";
 import { Phone } from "lucide-react";
 
@@ -18,7 +19,7 @@ const updatedAt = "16/10/2026";
 <Layout title={pageTitle} description={pageDescription}>
     <SiteHeader variant="document" />
 
-    <main class="max-w-3xl mx-auto px-4 py-12 md:py-16">
+    <main id="main" tabindex="-1" class="max-w-3xl mx-auto px-4 py-12 md:py-16">
       <p class="text-xs font-bold uppercase tracking-wider text-amber-700">Cập nhật lần cuối: {updatedAt}</p>
       <h1 class="mt-2 text-3xl md:text-4xl font-extrabold text-slate-900">Điều khoản sử dụng</h1>
       <p class="mt-3 text-sm text-slate-600 leading-relaxed">
@@ -98,4 +99,6 @@ const updatedAt = "16/10/2026";
         Xem thêm <a href="/chinh-sach-bao-mat" class="font-semibold text-amber-700 hover:underline">Chính sách bảo mật</a>.
       </p>
     </main>
+
+    <SiteFooter />
 </Layout>

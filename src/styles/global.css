@@ -101,10 +101,19 @@
   .gc-board-field {
     background-image: repeating-conic-gradient(
       from 0deg,
-      var(--color-brand-800) 0deg 90deg,
+      var(--gc-cell-color, var(--color-brand-800)) 0deg 90deg,
       transparent 90deg 180deg
     );
     background-size: var(--gc-cell, 72px) var(--gc-cell, 72px);
+  }
+
+  /*
+   * Cùng một mặt phẳng bàn cờ như trên nhưng tan dần ở rìa, để dùng được ở giữa
+   * một khối lớn (như dải học phí nền navy) mà không lộ đường cắt ở mép khối.
+   */
+  .gc-fade-radial {
+    mask-image: radial-gradient(closest-side, #000 18%, transparent 76%);
+    -webkit-mask-image: radial-gradient(closest-side, #000 18%, transparent 76%);
   }
 
   /* Fine grain. Breaks up the flat-vector look on large empty surfaces. */
@@ -128,6 +137,47 @@
   .gc-hero-fade {
     mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
     -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 100%);
+  }
+
+  /*
+   * Nhãn mục. Trước đây mọi mục trên trang đều dùng chung một kiểu "chữ in hoa
+   * nhỏ, tracking rộng, màu hổ phách", nên tiêu đề mục nào cũng đọc giống nhau.
+   * Nay chỉ còn hai bậc: .gc-eyebrow cho nền sáng và .gc-eyebrow-invert cho nền
+   * navy đậm. Bỏ in hoa ở nền sáng và thêm một gạch hổ phách ngắn để mắt bám vào.
+   */
+  .gc-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    color: var(--color-amber-700);
+  }
+
+  .gc-eyebrow::before {
+    content: "";
+    width: 1.75rem;
+    height: 2px;
+    border-radius: 999px;
+    background-color: var(--color-amber-500);
+  }
+
+  .gc-eyebrow-invert {
+    color: var(--color-amber-400);
+  }
+
+  .gc-eyebrow-invert::before {
+    background-color: var(--color-amber-400);
+  }
+
+  /*
+   * Tiêu đề mục. Cỡ lớn hơn và siết tracking để tiêu đề có trọng lượng, thay vì
+   * đứng cùng cỡ với thân bài rồi chỉ khác mỗi độ đậm.
+   */
+  .gc-section-title {
+    letter-spacing: -0.02em;
+    line-height: 1.08;
   }
 
   /* A chessboard plane receding into the distance. Decoration only. */

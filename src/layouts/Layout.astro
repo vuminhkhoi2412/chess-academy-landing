@@ -92,6 +92,17 @@ const socialImageAlt = `${BRAND_INFO.name} – ${BRAND_INFO.slogan2}`;
   </head>
 
   <body class:list={["antialiased", bodyClass]}>
+    {/*
+      Liên kết nhảy tới nội dung chính. Đặt ở Layout thay vì từng trang để cả bốn
+      trang đều có, kể cả trang lỗi. Mọi trang phải có <main id="main">.
+    */}
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-control focus:bg-brand-800 focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-white"
+    >
+      Bỏ qua điều hướng, tới nội dung chính
+    </a>
+
     <slot />
   </body>
 </html>

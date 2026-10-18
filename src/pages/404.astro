@@ -4,6 +4,9 @@
 // Không import `../data/payment` ở đây: trang lỗi không cần tới biến môi trường ngân hàng.
 import { BRAND_INFO, BRANCHES } from "../data/courses";
 import Layout from "../layouts/Layout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import MobileContactBar from "../components/MobileContactBar.astro";
 import { ArrowLeft, Phone, MapPin } from "lucide-react";
 
 const pageTitle = `Không tìm thấy trang – ${BRAND_INFO.name}`;
@@ -16,9 +19,11 @@ const pageDescription =
   description={pageDescription}
   robots="noindex, follow"
   canonical={false}
-  bodyClass="min-h-dvh flex flex-col"
+  bodyClass="min-h-dvh flex flex-col pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:pb-0"
 >
-    <main class="flex-1 flex items-center justify-center px-4 py-16">
+    <SiteHeader variant="document" />
+
+    <main id="main" tabindex="-1" class="flex-1 flex items-center justify-center px-4 py-16">
       <div class="w-full max-w-2xl">
         <p class="font-display text-7xl md:text-9xl font-extrabold tracking-tight text-amber-500/90 tabular-nums">
           404
@@ -76,4 +81,8 @@ const pageDescription =
         </div>
       </div>
     </main>
+
+    <SiteFooter />
+
+    <MobileContactBar />
 </Layout>

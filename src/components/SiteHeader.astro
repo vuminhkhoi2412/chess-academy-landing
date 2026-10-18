@@ -1,10 +1,13 @@
 ---
 // src/components/SiteHeader.astro
 //
-// Thanh điều hướng dùng chung cho cả ba trang. Trang chủ cần nav neo trong trang
-// và nút giữ chỗ; hai trang nội dung (điều khoản, bảo mật) chỉ cần lối về trang
-// chủ. Phần khung sticky và logo được tách ra đây thay vì chép lại ở từng trang.
-import { ArrowLeft } from "lucide-react";
+// Thanh điều hướng dùng chung cho cả bốn trang. Trang chủ cần nav neo trong trang
+// và nút giữ chỗ; ba trang nội dung (điều khoản, bảo mật, lỗi 404) chỉ cần lối về
+// trang chủ. Phần khung sticky và logo được tách ra đây thay vì chép lại ở từng trang.
+//
+// Trang chủ còn có menu di động: dưới breakpoint md, nav neo trong trang thu vào
+// một nút mở/đóng để phụ huynh dùng điện thoại vẫn tới được mọi mục.
+import { ArrowLeft, ArrowRight, Menu, Phone, X } from "lucide-react";
 import { BRAND_INFO } from "../data/courses";
 
 interface Props {
@@ -20,14 +23,26 @@ const NAV_LINKS = [
   { href: "#branches", label: "Hệ thống 5 Cơ sở" },
   { href: "#pricing", label: "Đăng ký & Học phí" },
 ];
+
+const MENU_ID = "gc-mobile-menu";
+const TOGGLE_ID = "gc-mobile-menu-toggle";
+
+// Nav neo: mục đang xem được đánh dấu bằng data-active để người dùng biết mình
+// đang ở đâu trên trang, thay vì mọi liên kết trông giống hệt nhau.
+const NAV_LINK_CLASS =
+  "transition-colors hover:text-slate-900 active:text-amber-700 data-[active=true]:text-slate-900 data-[active=true]:underline data-[active=true]:decoration-amber-500 data-[active=true]:decoration-2 data-[active=true]:underline-offset-[6px]";
+
+const hotline = BRAND_INFO.hotlines[0];
+const hotlineHref = `tel:${hotline.replace(/\./g, "")}`;
 ---
 
 <header class="sticky top-0 z-40 bg-cream/95 backdrop-blur-md border-b border-slate-200/80">
   <div
     class:list={[
       "mx-auto px-4 h-16 flex items-center justify-between",
-      // Trang chủ không cần gap: justify-between đã tách logo, nav và CTA.
-      isHome ? "max-w-6xl" : "max-w-3xl gap-4",
+      // Trang chủ chỉ cần gap nhỏ: justify-between đã tách logo, nav và CTA,
+      // nhưng vẫn phải giữ khoảng thở khi logo và nút menu gặp nhau ở màn hẹp.
+      isHome ? "max-w-6xl gap-3" : "max-w-3xl gap-4",
     ]}
   >
     <a
@@ -64,17 +79,36 @@ const NAV_LINKS = [
             aria-label="Điều hướng chính"
           >
             {NAV_LINKS.map((link) => (
-              <a href={link.href} class="hover:text-slate-900 active:text-amber-700 transition-colors">
+              <a href={link.href} data-nav-link class={NAV_LINK_CLASS}>
                 {link.label}
               </a>
             ))}
           </nav>
-          <a
-            href="#pricing"
-            class="bg-amber-500 hover:bg-amber-400 active:bg-amber-600 active:scale-[0.98] text-slate-950 text-xs md:text-sm font-bold px-4 py-2.5 rounded-control transition shadow-soft"
-          >
-            Đăng ký giữ chỗ
-          </a>
+
+          <div class="flex items-center gap-2">
+            {/*
+              Dưới sm, CTA nhường chỗ cho nút menu để logo không bị bóp lại. Lối
+              đăng ký khi đó vẫn còn: nằm ngay trong menu và ở thanh liên hệ dưới đáy.
+            */}
+            <a
+              href="#pricing"
+              class="hidden sm:inline-flex bg-amber-500 hover:bg-amber-400 active:bg-amber-600 active:scale-[0.98] text-slate-950 text-xs md:text-sm font-bold px-4 py-2.5 rounded-control transition shadow-soft"
+            >
+              Đăng ký giữ chỗ
+            </a>
+
+            <button
+              type="button"
+              id={TOGGLE_ID}
+              aria-expanded="false"
+              aria-controls={MENU_ID}
+              aria-label="Mở menu điều hướng"
+              class="md:hidden inline-flex h-11 w-11 items-center justify-center rounded-control border border-slate-300/90 bg-white/70 text-slate-700 hover:bg-white hover:text-slate-900 active:scale-95 transition"
+            >
+              <Menu data-menu-icon="open" className="w-5 h-5" aria-hidden="true" />
+              <X data-menu-icon="close" className="hidden w-5 h-5" aria-hidden="true" />
+            </button>
+          </div>
         </>
       ) : (
         <a
@@ -86,4 +120,142 @@ const NAV_LINKS = [
       )
     }
   </div>
+
+  {isHome && (
+    <div
+      id={MENU_ID}
+      hidden
+      class="md:hidden border-t border-slate-200/80 bg-cream/98 backdrop-blur-md"
+    >
+      <nav class="mx-auto max-w-6xl px-4 py-3" aria-label="Điều hướng di động">
+        <ul class="list-none flex flex-col">
+          {NAV_LINKS.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                data-nav-link
+                class="flex min-h-[3rem] items-center justify-between gap-3 border-b border-slate-200/70 text-base font-semibold text-slate-700 transition-colors hover:text-slate-900 active:text-amber-700 data-[active=true]:text-amber-700"
+              >
+                <span>{link.label}</span>
+                <ArrowRight className="w-4 h-4 text-slate-400 shrink-0" aria-hidden="true" />
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <a
+          href="#pricing"
+          class="mt-3 flex min-h-[3rem] items-center justify-center gap-2 rounded-control bg-amber-500 px-4 text-sm font-bold text-slate-950 shadow-soft transition hover:bg-amber-400 active:bg-amber-600 active:scale-[0.98]"
+        >
+          Đăng ký giữ chỗ
+        </a>
+
+        <a
+          href={hotlineHref}
+          class="mt-2 mb-1 flex min-h-[2.75rem] items-center justify-center gap-2 rounded-control text-sm font-semibold text-slate-600 transition hover:text-slate-900 tabular-nums"
+        >
+          <Phone className="w-4 h-4 text-amber-600" aria-hidden="true" /> Hotline {hotline}
+        </a>
+      </nav>
+    </div>
+  )}
 </header>
+
+<script>
+  // Menu di động: mở/đóng, đóng khi bấm Esc, bấm ra ngoài hoặc chọn một mục.
+  function initMobileMenu() {
+    const toggle = document.getElementById("gc-mobile-menu-toggle");
+    const panel = document.getElementById("gc-mobile-menu");
+    if (!toggle || !panel) return;
+
+    const header = toggle.closest("header");
+    const openIcon = toggle.querySelector('[data-menu-icon="open"]');
+    const closeIcon = toggle.querySelector('[data-menu-icon="close"]');
+
+    function isOpen() {
+      return toggle!.getAttribute("aria-expanded") === "true";
+    }
+
+    function setOpen(open: boolean) {
+      toggle!.setAttribute("aria-expanded", String(open));
+      toggle!.setAttribute("aria-label", open ? "Đóng menu điều hướng" : "Mở menu điều hướng");
+      panel!.hidden = !open;
+      openIcon?.classList.toggle("hidden", open);
+      closeIcon?.classList.toggle("hidden", !open);
+    }
+
+    toggle.addEventListener("click", () => setOpen(!isOpen()));
+
+    // Chọn một mục là điều hướng xong: thu menu lại để thấy ngay nội dung.
+    panel.addEventListener("click", (event) => {
+      if (event.target instanceof Element && event.target.closest("a[href]")) setOpen(false);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !isOpen()) return;
+      setOpen(false);
+      toggle.focus();
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!isOpen() || !header) return;
+      const target = event.target;
+      if (target instanceof Node && !header.contains(target)) setOpen(false);
+    });
+
+    // Panel tự ẩn ở breakpoint md, nhưng trạng thái aria phải khớp lại.
+    window.matchMedia("(min-width: 768px)").addEventListener("change", (event) => {
+      if (event.matches) setOpen(false);
+    });
+  }
+
+  // Đánh dấu mục đang xem trong nav neo, để người dùng biết mình đang ở đâu.
+  function initActiveSection() {
+    const links = Array.from(document.querySelectorAll<HTMLAnchorElement>("a[data-nav-link]"));
+    if (links.length === 0 || !("IntersectionObserver" in window)) return;
+
+    const pairs = links
+      .map((link) => {
+        const id = link.getAttribute("href")?.replace("#", "");
+        const section = id ? document.getElementById(id) : null;
+        return section ? { link, section } : null;
+      })
+      .filter((pair): pair is { link: HTMLAnchorElement; section: HTMLElement } => pair !== null);
+    if (pairs.length === 0) return;
+
+    const visible = new Set<HTMLElement>();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const section = entry.target as HTMLElement;
+          if (entry.isIntersecting) visible.add(section);
+          else visible.delete(section);
+        }
+
+        // Nhiều mục có thể cùng nằm trong dải quan sát: chọn mục cao nhất.
+        const active = Array.from(visible).sort(
+          (a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top
+        )[0];
+
+        for (const pair of pairs) {
+          const on = pair.section === active;
+          if (on) {
+            pair.link.dataset.active = "true";
+            pair.link.setAttribute("aria-current", "true");
+          } else {
+            delete pair.link.dataset.active;
+            pair.link.removeAttribute("aria-current");
+          }
+        }
+      },
+      // Dải quan sát nằm dưới thanh header 4rem một chút.
+      { rootMargin: "-88px 0px -55% 0px" }
+    );
+
+    for (const pair of pairs) observer.observe(pair.section);
+  }
+
+  initMobileMenu();
+  initActiveSection();
+</script>

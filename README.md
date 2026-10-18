@@ -46,6 +46,9 @@ src/
     InteractivePuzzle.tsx    bàn cờ đố ở hero
     CurriculumExplorer.tsx   tab lộ trình Sơ cấp / Trung cấp
     PricingAndCheckout.tsx   bảng học phí + form + mã VietQR
+    SiteHeader.astro         thanh nav dùng chung (kèm menu di động ở trang chủ)
+    SiteFooter.astro         chân trang dùng chung cho cả bốn trang
+    MobileContactBar.astro   thanh gọi điện / Zalo cố định ở đáy màn hình điện thoại
   pages/
     index.astro         cả trang, kèm toàn bộ thẻ SEO
     404.astro           trang 404
@@ -53,7 +56,8 @@ src/
     dieu-khoan-su-dung.astro   điều khoản sử dụng
     robots.txt.ts       sinh robots.txt từ `site` trong astro.config.mjs
   styles/global.css     Tailwind + `@theme` token (font, màu brand, radius, shadow)
-                        và vài class trang trí cho hero
+                        và các class dùng chung: nhãn mục (.gc-eyebrow), tiêu đề mục
+                        (.gc-section-title), mặt phẳng bàn cờ, hạt mịn
 tests/puzzle.test.mjs   test thế cờ đố
 ```
 

@@ -4,6 +4,8 @@ import InteractivePuzzle from "../components/InteractivePuzzle";
 import CurriculumExplorer from "../components/CurriculumExplorer";
 import PricingAndCheckout from "../components/PricingAndCheckout";
 import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import MobileContactBar from "../components/MobileContactBar.astro";
 import Layout from "../layouts/Layout.astro";
 import { BRAND_INFO, BRANCHES, PRICING_PACKAGES, TESTIMONIALS, FAQS, OPERATING_POINTS } from "../data/courses";
 import {
@@ -74,6 +76,7 @@ const structuredData = {
   title={pageTitle}
   description={pageDescription}
   robots="index, follow, max-image-preview:large"
+  bodyClass="pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:pb-0"
 >
   <script
     slot="head"
@@ -81,13 +84,6 @@ const structuredData = {
     is:inline
     set:html={JSON.stringify(structuredData).replace(/</g, "\\u003c")}
   />
-
-    <a
-      href="#main"
-      class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-control focus:bg-brand-800 focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-white"
-    >
-      Bỏ qua điều hướng, tới nội dung chính
-    </a>
 
     <!-- Top Hotline Bar -->
     <div class="bg-brand-800 text-brand-100 text-xs py-2 px-4">
@@ -204,10 +200,18 @@ const structuredData = {
     <section id="branches" class="py-16 bg-white border-t border-slate-200">
       <div class="max-w-6xl mx-auto px-4">
         <div class="text-center max-w-2xl mx-auto mb-12">
-          <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Hệ thống phòng học tiêu chuẩn</span>
-          <h2 class="text-2xl md:text-4xl font-extrabold mt-1">5 Cơ Sở Global Chess Tại TP.HCM</h2>
-          <p class="text-base text-slate-600 mt-2 max-w-2xl mx-auto">
+          <span class="gc-eyebrow">Hệ thống phòng học tiêu chuẩn</span>
+          <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">5 Cơ Sở Global Chess Tại TP.HCM</h2>
+          <p class="text-base text-slate-600 mt-3 max-w-prose mx-auto">
             Các ca học trong tuần và cuối tuần được tổ chức linh hoạt theo trình độ của học viên tại từng cơ sở.
+          </p>
+          {/*
+            Tình trạng tuyển sinh nói một lần ở đây. Trước đây mỗi thẻ cơ sở đều gắn
+            nhãn "Đang tuyển sinh" giống hệt nhau, lặp 5 lần mà không thêm thông tin.
+          */}
+          <p class="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
+            <span aria-hidden="true" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Cả 5 cơ sở đang tuyển sinh
           </p>
         </div>
 
@@ -232,8 +236,9 @@ const structuredData = {
                   <span class="text-xs font-extrabold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-md tabular-nums">
                     Cơ sở {idx + 1}
                   </span>
-                  <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-control border border-emerald-200">
-                    Đang tuyển sinh
+                  {/* Nhãn riêng của từng cơ sở, thay cho nhãn trạng thái lặp 5 lần. */}
+                  <span class="text-xs font-semibold text-slate-600 border border-slate-300/80 px-2 py-0.5 rounded-control">
+                    {branch.district}
                   </span>
                 </div>
                 <h3 class:list={["font-bold text-slate-900 mb-1", idx === 0 ? "text-lg" : "text-base"]}>{branch.name}</h3>
@@ -244,11 +249,16 @@ const structuredData = {
               </div>
               <div class="relative mt-4 pt-3 border-t border-slate-200/70 flex items-center justify-between gap-2 text-sm">
                 <span class="text-slate-600">Lịch học: Trong tuần &amp; T7-CN</span>
+                {/*
+                  Nhãn đọc được phải chứa đúng chữ hiển thị "Chọn cơ sở này", nếu không
+                  trình đọc màn hình báo lệch nhãn. Tên cơ sở nối thêm để phân biệt
+                  5 thẻ giống hệt nhau.
+                */}
                 <a
                   href="#pricing"
                   data-branch={branch.id}
                   class="js-choose-branch group inline-flex items-center gap-1 font-bold text-amber-700 hover:text-amber-800 hover:underline transition"
-                  aria-label={`Chọn ${branch.name} và mở form đăng ký`}
+                  aria-label={`Chọn cơ sở này – ${branch.name}`}
                 >
                   Chọn cơ sở này
                   <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
@@ -287,29 +297,49 @@ const structuredData = {
     <section id="phuong-phap" class="py-16 bg-white">
       <div class="max-w-6xl mx-auto px-4">
         <div class="max-w-2xl">
-          <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Vận hành lớp học</span>
-          <h2 class="text-2xl md:text-4xl font-extrabold mt-1">Global Chess Khác Gì Lớp Cờ Tự Phát?</h2>
-          <p class="text-base text-slate-600 mt-2">
+          <span class="gc-eyebrow">Vận hành lớp học</span>
+          <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">Global Chess Khác Gì Lớp Cờ Tự Phát?</h2>
+          <p class="text-base text-slate-600 mt-3 max-w-prose">
             Bốn điểm dưới đây là cách trung tâm tổ chức lớp học, không phải lời tự khen.
           </p>
         </div>
 
-        <ul class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-10 list-none">
-          {OPERATING_POINTS.map((point) => (
-            <li class="bg-cream rounded-card border border-slate-200/90 p-5">
-              <span
-                class="inline-flex w-9 h-9 items-center justify-center rounded-control bg-brand-800 text-amber-400 mb-3"
-                aria-hidden="true"
+        {/*
+          Bốn điểm vận hành xếp theo nhịp 7-5-5-7 trên lưới 12 cột: hàng nào cũng
+          lệch, nên mắt không đọc thành bốn ô giống hệt nhau. Hai thẻ rộng dùng bố
+          cục ngang (biểu tượng bên cạnh chữ) để phần rộng thêm có lý do.
+        */}
+        <ul class="grid sm:grid-cols-2 lg:grid-cols-12 gap-5 mt-10 list-none">
+          {OPERATING_POINTS.map((point, idx) => {
+            const isWide = idx % 4 === 0 || idx % 4 === 3;
+            return (
+              <li
+                class:list={[
+                  "bg-cream rounded-card border border-slate-200/90 p-5",
+                  // Bố cục ngang chỉ bật từ lg, khi thẻ thật sự rộng. Dưới lg, cả
+                  // bốn thẻ giữ nguyên một dáng để không thành hai kiểu thẻ lẫn lộn.
+                  isWide ? "lg:col-span-7 lg:flex lg:items-start lg:gap-4" : "lg:col-span-5",
+                ]}
               >
-                {point.icon === "book" && <BookOpen className="w-4 h-4" />}
-                {point.icon === "steps" && <ListChecks className="w-4 h-4" />}
-                {point.icon === "clock" && <Clock className="w-4 h-4" />}
-                {point.icon === "trophy" && <Trophy className="w-4 h-4" />}
-              </span>
-              <h3 class="font-bold text-slate-900 text-base">{point.title}</h3>
-              <p class="text-sm text-slate-600 mt-1.5 leading-relaxed">{point.desc}</p>
-            </li>
-          ))}
+                <span
+                  class:list={[
+                    "inline-flex items-center justify-center rounded-control bg-brand-800 text-amber-400 shrink-0 mb-3 lg:mb-0",
+                    isWide ? "w-11 h-11" : "w-9 h-9",
+                  ]}
+                  aria-hidden="true"
+                >
+                  {point.icon === "book" && <BookOpen className={isWide ? "w-5 h-5" : "w-4 h-4"} />}
+                  {point.icon === "steps" && <ListChecks className={isWide ? "w-5 h-5" : "w-4 h-4"} />}
+                  {point.icon === "clock" && <Clock className={isWide ? "w-5 h-5" : "w-4 h-4"} />}
+                  {point.icon === "trophy" && <Trophy className={isWide ? "w-5 h-5" : "w-4 h-4"} />}
+                </span>
+                <div>
+                  <h3 class:list={["font-bold text-slate-900", isWide ? "text-lg" : "text-base"]}>{point.title}</h3>
+                  <p class="text-sm text-slate-600 mt-1.5 leading-relaxed">{point.desc}</p>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </section>
@@ -322,8 +352,8 @@ const structuredData = {
     <section id="phu-huynh" class="py-16 border-t border-slate-200">
       <div class="max-w-6xl mx-auto px-4">
         <div class="text-center max-w-2xl mx-auto mb-10">
-          <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Nhận xét phụ huynh</span>
-          <h2 class="text-2xl md:text-4xl font-extrabold mt-1">Phụ Huynh Nói Gì Về Global Chess</h2>
+          <span class="gc-eyebrow">Nhận xét phụ huynh</span>
+          <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">Phụ Huynh Nói Gì Về Global Chess</h2>
         </div>
 
         {TESTIMONIALS.length === 0 ? (
@@ -386,8 +416,8 @@ const structuredData = {
     <section id="faq" class="py-16 bg-white border-t border-slate-200">
       <div class="max-w-6xl mx-auto px-4">
         <div class="max-w-2xl">
-          <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Giải đáp trước khi đăng ký</span>
-          <h2 class="text-2xl md:text-4xl font-extrabold mt-1">Câu Hỏi Thường Gặp</h2>
+          <span class="gc-eyebrow">Giải đáp trước khi đăng ký</span>
+          <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">Câu Hỏi Thường Gặp</h2>
         </div>
 
         <dl class="grid md:grid-cols-2 gap-x-10 gap-y-7 mt-10">
@@ -408,25 +438,9 @@ const structuredData = {
     <PricingAndCheckout client:load />
     </main>
 
-    <!-- Footer -->
-    <footer class="py-10 bg-brand-950 text-brand-200 text-xs border-t border-brand-800">
-      <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div class="text-center md:text-left">
-          <div class="font-bold text-white text-sm">{BRAND_INFO.name} – "{BRAND_INFO.slogan1}"</div>
-          <div class="mt-1">{BRAND_INFO.slogan2}</div>
-        </div>
-        <nav class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2" aria-label="Liên kết chân trang">
-          <a href="#faq" class="hover:text-white hover:underline transition-colors">Câu hỏi thường gặp</a>
-          <a href="/chinh-sach-bao-mat" class="hover:text-white hover:underline transition-colors">Chính sách bảo mật</a>
-          <a href="/dieu-khoan-su-dung" class="hover:text-white hover:underline transition-colors">Điều khoản sử dụng</a>
-          <a href="#main" class="hover:text-white hover:underline transition-colors">Về đầu trang</a>
-        </nav>
-        <div class="text-center md:text-right space-y-1">
-          <div>Hotline: <strong class="text-white tabular-nums">{BRAND_INFO.hotlines.join(" – ")}</strong></div>
-          <div>© {new Date().getFullYear()} Global Chess. All rights reserved.</div>
-        </div>
-      </div>
-    </footer>
+    <SiteFooter />
+
+    <MobileContactBar />
 
     <script is:inline>
       // Progressive enhancement: clicking a branch card opens the checkout modal

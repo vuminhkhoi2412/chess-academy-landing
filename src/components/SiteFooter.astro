@@ -1,0 +1,38 @@
+---
+// src/components/SiteFooter.astro
+//
+// Chân trang dùng chung cho cả bốn trang. Trước đây khối này chỉ nằm trong
+// index.astro, nên hai trang nội dung (điều khoản, bảo mật) và trang 404 kết
+// thúc giữa trang với đúng một liên kết quay về. Tách ra đây để mọi trang có
+// cùng lối đi: câu hỏi thường gặp, chính sách bảo mật, điều khoản, về đầu trang.
+//
+// "Về đầu trang" trỏ tới #main, nên mọi trang dùng chân trang này phải có
+// <main id="main">. "Câu hỏi thường gặp" trỏ tuyệt đối về trang chủ để bấm từ
+// trang điều khoản vẫn tới đúng mục.
+import { BRAND_INFO } from "../data/courses";
+
+const FOOTER_LINKS = [
+  { href: "/#faq", label: "Câu hỏi thường gặp" },
+  { href: "/chinh-sach-bao-mat", label: "Chính sách bảo mật" },
+  { href: "/dieu-khoan-su-dung", label: "Điều khoản sử dụng" },
+  { href: "#main", label: "Về đầu trang" },
+];
+---
+
+<footer class="py-10 bg-brand-950 text-brand-200 text-xs border-t border-brand-800">
+  <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
+    <div class="text-center md:text-left">
+      <div class="font-bold text-white text-sm">{BRAND_INFO.name} – "{BRAND_INFO.slogan1}"</div>
+      <div class="mt-1">{BRAND_INFO.slogan2}</div>
+    </div>
+    <nav class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2" aria-label="Liên kết chân trang">
+      {FOOTER_LINKS.map((link) => (
+        <a href={link.href} class="hover:text-white hover:underline transition-colors">{link.label}</a>
+      ))}
+    </nav>
+    <div class="text-center md:text-right space-y-1">
+      <div>Hotline: <strong class="text-white tabular-nums">{BRAND_INFO.hotlines.join(" – ")}</strong></div>
+      <div>© {new Date().getFullYear()} Global Chess. All rights reserved.</div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,39 @@
+---
+// src/components/MobileContactBar.astro
+//
+// Thanh liên hệ cố định dưới đáy màn hình điện thoại. Trang chủ rất dài: mỗi cấp
+// độ hiển thị trọn 24 buổi học, nên phụ huynh dùng điện thoại cần lối gọi điện /
+// nhắn Zalo luôn trong tầm tay thay vì phải cuộn ngược về đầu trang.
+// Ẩn từ breakpoint md: trên desktop hotline đã nằm ở thanh trên cùng và footer.
+//
+// Lưu ý khi dùng: trang gắn thanh này phải chừa chỗ dưới đáy, nếu không thanh sẽ
+// che dòng cuối của footer. Xem `bodyClass` truyền cho Layout ở index.astro và 404.astro.
+import { MessageCircle, Phone } from "lucide-react";
+import { BRAND_INFO } from "../data/courses";
+
+const hotline = BRAND_INFO.hotlines[0];
+const hotlineHref = `tel:${hotline.replace(/\./g, "")}`;
+const zaloUrl = `https://zalo.me/${BRAND_INFO.zaloPhone}`;
+---
+
+<div
+  class="md:hidden fixed inset-x-0 bottom-0 z-40 border-t border-slate-200/80 bg-cream/95 backdrop-blur-md pb-[env(safe-area-inset-bottom)]"
+>
+  <div class="mx-auto flex max-w-6xl items-center gap-2 px-4 py-2">
+    <a
+      href={hotlineHref}
+      class="flex min-h-[2.75rem] flex-1 items-center justify-center gap-2 rounded-control bg-brand-800 px-4 text-sm font-bold text-white shadow-soft transition hover:bg-brand-700 active:bg-brand-900 active:scale-[0.98] tabular-nums"
+    >
+      <Phone className="w-4 h-4 text-amber-400 shrink-0" aria-hidden="true" /> Gọi {hotline}
+    </a>
+
+    <a
+      href={zaloUrl}
+      target="_blank"
+      rel="noreferrer"
+      class="flex min-h-[2.75rem] flex-1 items-center justify-center gap-2 rounded-control border border-emerald-300 bg-white px-4 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50 active:scale-[0.98]"
+    >
+      <MessageCircle className="w-4 h-4 shrink-0" aria-hidden="true" /> Nhắn Zalo
+    </a>
+  </div>
+</div>

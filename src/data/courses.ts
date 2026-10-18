@@ -8,30 +8,40 @@ export const BRAND_INFO = {
   zaloPhone: "0789059440",
 };
 
+/*
+ * `district` tách từ chính tên cơ sở, dùng làm nhãn phân biệt trên thẻ cơ sở.
+ * Trước đây cả 5 thẻ đều gắn chung một nhãn "Đang tuyển sinh", lặp lại 5 lần nên
+ * không truyền thêm thông tin gì; tình trạng tuyển sinh nay nói một lần ở tiêu đề mục.
+ */
 export const BRANCHES = [
   {
     id: "CS1",
     name: "Cơ sở Bình Phú (Q.6)",
+    district: "Q.6",
     address: "811 Hậu Giang, P. Bình Phú, TP.HCM",
   },
   {
     id: "CS2",
     name: "Cơ sở Tên Lửa (Bình Tân)",
+    district: "Bình Tân",
     address: "55 Tên Lửa, P. An Lạc, TP.HCM",
   },
   {
     id: "CS3",
     name: "Cơ sở Tây Thạnh (Tân Phú)",
+    district: "Tân Phú",
     address: "93 đường T6, P. Tây Thạnh, TP.HCM",
   },
   {
     id: "CS4",
     name: "Cơ sở Phú Thọ Hoà (Tân Phú)",
+    district: "Tân Phú",
     address: "152 Nguyễn Sơn, P. Phú Thọ Hoà, TP.HCM",
   },
   {
     id: "CS5",
     name: "Cơ sở Vinhomes Grand Park (TP. Thủ Đức)",
+    district: "Thủ Đức",
     address: "Khu đô thị Vinhomes Grand Park, TP.HCM",
   },
 ];
@@ -423,23 +433,23 @@ export const FAQS: FaqItem[] = [
  */
 export const OPERATING_POINTS = [
   {
-    title: "Giáo trình chuẩn hoá",
-    desc: "24 buổi mỗi cấp độ, có sách và mục tiêu rõ ràng cho từng buổi.",
-    icon: "book",
-  },
-  {
     title: "Đúng 5 bước mỗi buổi",
     desc: "Ôn bài cũ, giảng bài mới, luyện tập, thực hành bàn cờ, nhận xét và giao bài.",
     icon: "steps",
   },
   {
-    title: "Lịch học linh hoạt",
-    desc: "Ca tối trong tuần và ba ca cuối tuần, chọn cơ sở theo khu vực nhà bạn.",
-    icon: "clock",
+    title: "Giáo trình chuẩn hoá",
+    desc: "24 buổi mỗi cấp độ, có sách và mục tiêu rõ ràng cho từng buổi.",
+    icon: "book",
   },
   {
     title: "Thực chiến và giải đấu",
     desc: "Đấu thực hành trong buổi học và giải đấu nội bộ theo lộ trình.",
     icon: "trophy",
+  },
+  {
+    title: "Lịch học linh hoạt",
+    desc: "Ca tối trong tuần và ba ca cuối tuần, chọn cơ sở theo khu vực nhà bạn.",
+    icon: "clock",
   },
 ] as const;

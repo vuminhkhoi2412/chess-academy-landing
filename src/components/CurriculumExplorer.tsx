@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { CURRICULUM_PROGRAMS, SESSION_TIMELINE } from "../data/courses";
 import {
-  BookOpen,
   Check,
   CheckCircle2,
   Clock,
@@ -15,19 +14,19 @@ import {
 export default function CurriculumExplorer() {
   const [activeProgramId, setActiveProgramId] = useState(CURRICULUM_PROGRAMS[0].id);
   const activeProgram = CURRICULUM_PROGRAMS.find((p) => p.id === activeProgramId) || CURRICULUM_PROGRAMS[0];
+  // Lưới 3 cột chỉ dành cho lộ trình 3 cấp độ; lộ trình 2 cấp độ chia đôi cho đầy hàng.
+  const subLevelCount = activeProgram.subLevels.length;
 
   return (
     <section id="curriculum" className="py-20 bg-cream">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-3.5 py-1.5 rounded-control">
-            <BookOpen className="w-3.5 h-3.5" aria-hidden="true" /> Hệ thống giáo trình bài bản
-          </span>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-3">
+          <span className="gc-eyebrow">Hệ thống giáo trình bài bản</span>
+          <h2 className="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 mt-3">
             Lộ Trình Đào Tạo Global Chess (4 – 12 Tuổi)
           </h2>
-          <p className="text-slate-600 text-sm md:text-base mt-2">
+          <p className="text-slate-600 text-sm md:text-base mt-3 max-w-prose mx-auto">
             Happy Chess gồm 3 Level (72 buổi); Global Sơ cấp và Trung cấp mỗi lộ trình 48 buổi, chia thành các cấp độ nhỏ 24 buổi. Học viên nắm chắc từ luật chơi cơ bản đến các đòn chiến thuật trung – tàn cuộc nâng cao.
           </p>
         </div>
@@ -49,7 +48,7 @@ export default function CurriculumExplorer() {
                 }`}
               >
                 <div>
-                  <div className={`text-xs font-semibold ${isActive ? "text-amber-400" : "text-amber-600"}`}>
+                  <div className={`text-xs font-semibold ${isActive ? "text-amber-400" : "text-amber-700"}`}>
                     {prog.badge}
                   </div>
                   <div className="text-base md:text-lg">{prog.title}</div>
@@ -92,7 +91,7 @@ export default function CurriculumExplorer() {
               </div>
               {activeProgram.evaluation.map((ev, idx) => (
                 <div key={idx} className="text-sm text-slate-700 flex items-start gap-2 leading-relaxed">
-                  <span className="font-bold text-amber-600">•</span>
+                  <span className="font-bold text-amber-700">•</span>
                   <span>{ev}</span>
                 </div>
               ))}
@@ -101,7 +100,17 @@ export default function CurriculumExplorer() {
         </div>
 
         {/* Tầng 2: Chi tiết từng cấp độ nhỏ (24 buổi / cấp độ) */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-14">
+        {/*
+          Số cột ăn theo số cấp độ của lộ trình đang chọn: lộ trình 3 cấp độ chia ba
+          cột, lộ trình 2 cấp độ chia đôi. Trước đây lộ trình 2 cấp độ vẫn dùng lưới
+          ba cột nên hai thẻ chỉ chiếm 2/3 chiều rộng và chừa một khoảng trống lớn
+          bên phải.
+
+          Các thẻ giữ chiều cao bằng nhau (mặc định stretch của grid) để hàng thẻ
+          thẳng hàng; phần "Kết quả đạt được" được justify-between đẩy xuống đáy nên
+          mọi thẻ kết thúc ở cùng một mức.
+        */}
+        <div className={`grid md:grid-cols-2 gap-8 mb-14${subLevelCount >= 3 ? " lg:grid-cols-3" : ""}`}>
           {activeProgram.subLevels.map((sub, index) => (
             <div
               key={sub.code}
@@ -109,10 +118,21 @@ export default function CurriculumExplorer() {
             >
               <div>
                 {/* Top bar */}
-                <div className="bg-brand-800 text-white p-6">
-                  <div className="flex items-center justify-between text-xs font-semibold text-amber-400 mb-1">
-                    <span>CHẶNG {index + 1} • {sub.duration}</span>
-                    <span className="bg-brand-700 px-2.5 py-1 rounded-control text-brand-100 tabular-nums">{sub.lessonCount}</span>
+                <div className="bg-brand-800 text-white p-6 lg:min-h-[12.5rem]">
+                  {/*
+                    min-h trên hàng nhãn: mô tả cấp độ ("Làm quen và nắm vững luật chơi")
+                    dài ngắn khác nhau nên có thẻ xuống 2 dòng, có thẻ 1 dòng, làm dải
+                    navy trên cùng cao thấp lệch nhau. Chặn sàn 2,5rem cho hàng này thì
+                    mọi thẻ bắt đầu phần nội dung ở cùng một mức.
+
+                    Còn min-h 12.5rem ở khung ngoài là cho lưới 3 cột ở đúng cỡ màn
+                    hình lg hẹp (~1024px): khi đó thẻ chỉ rộng ~309px nên mục tiêu của
+                    Level 1 xuống 3 dòng trong khi hai Level kia vẫn 2 dòng. Sàn này
+                    giữ đáy dải navy thẳng hàng ở mọi bề rộng lg.
+                  */}
+                  <div className="flex items-start justify-between gap-2 min-h-[2.5rem] text-xs font-semibold text-amber-400 mb-1">
+                    <span className="shrink-0">CHẶNG {index + 1} • {sub.duration}</span>
+                    <span className="bg-brand-700 px-2.5 py-1 rounded-control text-brand-100 text-right tabular-nums">{sub.lessonCount}</span>
                   </div>
                   <h4 className="text-xl font-bold">{sub.name}</h4>
                   <p className="text-sm text-brand-200 mt-2 leading-relaxed">{sub.goal}</p>
