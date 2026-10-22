@@ -1,7 +1,7 @@
 # Global Chess — Landing Page
 
 Trang giới thiệu trung tâm cờ vua Global Chess (trẻ 4 – 12 tuổi, 5 cơ sở tại TP.HCM).
-Trang tĩnh, một trang duy nhất, có bàn cờ tương tác và form đăng ký tự tạo mã VietQR.
+Trang tĩnh, một trang duy nhất, có bàn cờ tương tác, gallery ảnh lớp học và form đăng ký tự tạo mã VietQR.
 
 ## Stack
 
@@ -31,6 +31,7 @@ assets/
   logo.jpg                file NGUỒN của logo, không được publish
   nguon/bang-hoc-phi-global-chess.pdf   bảng học phí gốc của trung tâm
   nguon/trichdan.txt      trích dẫn gốc của phụ huynh
+  nguon/hinh-anh/         file gốc 5 ảnh + NGUON.md ghi Drive ID và consent
 DESIGN.md                 quy ước thiết kế: màu, chữ, chuyển động, chống mẫu AI
 docs/
   lo_trinh_hoc.md         tài liệu chuẩn của trung tâm (lộ trình, giáo trình)
@@ -46,6 +47,7 @@ public/
   site.webmanifest        khai báo PWA (Add to home screen)
   og-image.png            ảnh share 1200x630
 src/
+  assets/images/        5 ảnh gallery đã crop, Astro tối ưu WebP khi build
   layouts/Layout.astro  khung HTML dùng chung: <head>, favicon, font, SEO
   data/courses.ts       toàn bộ nội dung: thương hiệu, cơ sở, giáo trình,
                         học phí, thế cờ đố, FAQ, nhận xét phụ huynh
@@ -131,25 +133,23 @@ bộ cờ tiêu chuẩn thi đấu 250.000đ, đồng hồ thi đấu 400.000đ.
 Sửa giá: cập nhật `TUITION_LEVELS`, cập nhật số kỳ vọng trong `tests/tuition.test.mjs`,
 rồi chạy `npm test`.
 
-## TODO cần nội dung thật
+## Hình ảnh
 
-Còn một việc phải xong trước khi chạy quảng cáo. Việc này không chặn `npm run build`,
-nên phải tự nhớ.
+Gallery `#hinh-anh` dùng 5 ảnh thật của trung tâm, không dùng stock/AI. Ảnh gốc nằm ở
+`assets/nguon/hinh-anh/`; bản crop trong `src/assets/images/` đã bỏ banner/logo in sẵn
+trên ảnh. Astro sinh WebP và srcset khi build.
 
-### 1. Ảnh và thước phim thật của trung tâm (hero + gallery)
-
-- **Hiện tại:** phần hero không dùng ảnh nào. Độ sâu được dựng hoàn toàn bằng hình học
-  (mesh gradient, mặt bàn cờ nghiêng theo phối cảnh, ký hiệu nước đi, hạt nhiễu). Không
-  có ảnh nào giả làm lớp học thật.
-- **Cần:** ảnh lớp học, phòng học, giải đấu nội bộ; nếu có thì cả footage quay ngắn.
-- **Việc phải làm:** thay lớp trang trí trong `src/pages/index.astro` (khối
-  `<div aria-hidden="true">` ngay dưới `<!-- Hero Section -->`) bằng gallery ảnh thật,
-  hoặc thêm một section gallery riêng. Chỗ này đã có comment `TODO (nội dung thật)`.
-- **Bắt buộc:** xin phép phụ huynh trước khi đăng ảnh hoặc video có mặt trẻ.
+- Ảnh đã có sự đồng ý của phụ huynh cho việc dùng trên website. Không thay bằng ảnh
+  khác nếu chưa xác nhận lại consent.
+- Không gắn tên cơ sở vào alt text vì nguồn ảnh không ghi rõ ảnh chụp ở cơ sở nào.
+- Chưa có ảnh mặt tiền/phòng học riêng cho 5 cơ sở, nên 5 thẻ cơ sở vẫn chỉ có phần chữ.
+  Nếu bổ sung, dùng ảnh 4:3 và thêm vào `BRANCHES`/markup tương ứng.
+- Video trong folder nguồn là 720×1280 dọc, 55 giây, có overlay kiểu TikTok + hotline;
+  chưa dùng. Nếu muốn dùng video, cần bản ngang 1080p, ngắn 10–20 giây, không chữ đè.
 
 ## Trước khi deploy
 
-Loại hết mục **TODO cần nội dung thật** ở trên trước. Checklist, làm đủ 4 bước:
+Phần ảnh gallery đã xong; còn cấu hình domain, biến môi trường và deploy. Checklist, làm đủ 4 bước:
 
 1. **Đổi domain.** Sửa `site` trong `astro.config.mjs` từ `https://globalchess.vn` sang
    domain thật. Đây là nguồn duy nhất cho `canonical`, `og:url`, `robots.txt` và
@@ -170,8 +170,7 @@ Placeholder URL chỉ có **một** chỗ: `site` trong `astro.config.mjs` (đan
 `https://globalchess.vn`, có comment `TODO` ngay trên dòng đó). Mọi URL khác trong trang
 đều suy ra từ `Astro.site`.
 
-Phần nội dung còn thiếu (ảnh thật) không nằm ở đây mà ở mục **TODO cần nội dung thật**
-phía trên.
+Ảnh thật đã nằm trong `src/assets/images/` và gallery `#hinh-anh`; không còn placeholder ảnh.
 
 Thông tin ngân hàng không nằm trong code mà ở `.env` local và biến môi trường của Vercel.
 

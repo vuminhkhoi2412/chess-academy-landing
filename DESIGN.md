@@ -29,9 +29,10 @@ paper and a single amber accent keep it friendly for parents of 4–12 year old 
   limited to CSS `transition`, tactile `active:scale`, and one `animate-pulse` on a
   form error. No scroll-jacking, no parallax, no entrance choreography.
 
-The signature move is **geometry instead of photography**: depth is built from a
-perspective-rotated chessboard plane, a warm/cool radial mesh, and a fine SVG grain —
-never from stock photos of children in classrooms.
+The signature move is **geometry for atmosphere, real photos for proof**: the hero
+builds depth from a perspective-rotated chessboard plane, a warm/cool radial mesh and a
+fine SVG grain; the `#hinh-anh` gallery then shows only real center photos, used with
+parents' consent. Never stock photos or AI-generated children.
 
 ---
 
@@ -140,6 +141,16 @@ Rules:
 - On hover a card may change border to `amber-400` and gain `shadow-soft`. No translate, no lift.
 - Bento is preferred over equal grids: the first branch card spans two columns and carries a faded chessboard circle at 6% opacity as its badge of rank.
 
+**Gallery**
+
+- `#hinh-anh` is a two-column offset collage: left column is lead → classroom → coach,
+  right column starts lower (`md:pt-12`) with practice → tournament → branches note.
+  Mobile stacks to one column.
+- Figures: `rounded-card overflow-hidden bg-slate-100 ring-1 ring-slate-900/5`; images are
+  `w-full h-auto`. No text overlay, tilt, hover zoom or fake polaroid frame.
+- Only real photos from the center, with consent. Alt text describes what is visible;
+  never invent a branch name, student name, event result or award.
+
 **Inputs and forms**
 
 - Label above the control, `text-xs`–`text-sm`, neutral weight; helper or error text below in `text-sm`.
@@ -171,7 +182,7 @@ Rules:
 - Max-width containment: `max-w-6xl mx-auto px-4` for marketing sections. Document pages narrow to `max-w-3xl`.
 - **Grid-first.** Use CSS Grid with the 12-column or fractional track syntax. Never `calc()` percentage math, never flexbox width games.
 - Section rhythm: `py-16` for standard sections, `py-20` for the pricing band, `py-14 md:py-20` for the hero. Sections alternate `bg-cream` / `bg-white`, separated by `border-t border-slate-200`.
-- **Asymmetry is required.** Hero is `md:grid-cols-12` split 7/5. Operating points run `lg:grid-cols-12` as 7-5-5-7. Branch grid is `sm:grid-cols-2 lg:grid-cols-4` bento with a 2-column lead card and a 2-column navy hotline card closing the row.
+- **Asymmetry is required.** Hero is `md:grid-cols-12` split 7/5. Operating points run `lg:grid-cols-12` as 7-5-5-7. Branch grid is `sm:grid-cols-2 lg:grid-cols-4` bento with a 2-column lead card and a 2-column navy hotline card closing the row. The photo gallery is a two-column offset collage, not an equal grid.
 - Banned: three equal cards in a row; centered hero (this is a variance-6 system, the hero stays left-aligned with the board island on the right).
 - Even centered headings are paired with a left-aligned eyebrow or a stat row so the composition never reads as a flat stack.
 - Depth layers sit behind content on `-z-10` with `pointer-events-none` and an `aria-hidden` attribute, and must fade out before the section edge (`mask-image: linear-gradient(to bottom, #000 58%, transparent 100%)`) so no hard band appears where the next section begins.
@@ -232,7 +243,7 @@ none should be introduced for a marketing page.
 - No custom mouse cursors.
 - No overlapping elements; no absolutely-positioned content stacking on top of text.
 - No three-equal-card rows; no centered hero.
-- No stock photography of classrooms or children, and no fake image links. Where imagery is missing, draw geometry (chessboard plane, mesh, grain) or leave a labeled TODO.
+- No stock or AI photography of classrooms or children, and no fake image links. Only real center photos with parents' consent, in the `#hinh-anh` gallery; never invent captions, branch names or results. Where imagery is missing, draw geometry (chessboard plane, mesh, grain) or leave a labeled TODO.
 - No fabricated testimonials, ratings, student counts, or awards.
 - No `h-screen`; no `calc()` percentage layout hacks; no animating layout properties.
 - No emoji, no decorative confetti, no bouncing arrows.
