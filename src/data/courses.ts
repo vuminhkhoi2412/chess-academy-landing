@@ -289,12 +289,18 @@ export const CURRICULUM_PROGRAMS: MajorProgram[] = [
   },
 ];
 
+/**
+ * Học phí: cả ba mức dưới đây CHƯA được trung tâm xác nhận, và lộ trình Happy Chess
+ * chưa có mức giá riêng (HC1–HC3 trong `LEVEL_OPTIONS` đang tạm dùng gói 24 buổi).
+ * Không tự sửa số — xem README.md mục "TODO cần nội dung thật" số 3 để biết việc
+ * cần chốt với trung tâm.
+ */
 export const PRICING_PACKAGES = [
   {
     id: "hoc-phan-24",
     name: "Khóa Tiêu Chuẩn (1 Giáo Trình / 24 Buổi)",
     subtitle: "Đăng ký theo từng cấp độ nhỏ (Sơ cấp 1, Sơ cấp 2, Trung cấp Q1 hoặc Q2)",
-    price: 3600000, // Bạn có thể sửa lại đúng mức học phí thực tế của Global Chess
+    price: 3600000,
     duration: "/ 24 buổi (60 - 90 phút/buổi)",
     popular: false,
     features: [
@@ -308,7 +314,7 @@ export const PRICING_PACKAGES = [
     id: "lo-trinh-48",
     name: "Trọn Gói Lộ Trình Hoàn Chỉnh (48 Buổi)",
     subtitle: "Cam kết đầu ra toàn diện (Trọn bộ 2 Giáo trình Sơ Cấp hoặc Trung Cấp)",
-    price: 6500000, // Bạn có thể sửa lại đúng mức học phí ưu đãi 48 buổi
+    price: 6500000,
     duration: "/ 48 buổi (Tiết kiệm ưu đãi)",
     popular: true,
     features: [
@@ -322,7 +328,7 @@ export const PRICING_PACKAGES = [
     id: "kem-1-1",
     name: "Lớp Kèm Riêng 1-1 (Theo Yêu Cầu)",
     subtitle: "Lộ trình cá nhân hóa & thời gian linh hoạt tuyệt đối theo học viên",
-    price: 4800000, // Bạn có thể sửa lại mức học phí 1-1
+    price: 4800000,
     duration: "/ khóa 12 buổi (Linh hoạt)",
     popular: false,
     features: [

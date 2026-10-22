@@ -19,7 +19,9 @@ import {
   Clock,
 } from "lucide-react";
 
-// Gắn từng Cấp độ đăng ký với Gói học phí (packageId) tương ứng
+// Gắn từng Cấp độ đăng ký với Gói học phí (packageId) tương ứng.
+// HC1–HC3 tạm dùng gói 24 buổi vì Happy Chess chưa có giá riêng — xem README.md
+// mục "TODO cần nội dung thật" số 3.
 const LEVEL_OPTIONS = [
   {
     code: "HC1",
@@ -248,21 +250,12 @@ export default function PricingAndCheckout() {
 
   const copyToClipboard = async (text: string) => {
     try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        // Fallback cho trình duyệt không cấp quyền Clipboard API.
-        const area = document.createElement("textarea");
-        area.value = text;
-        area.setAttribute("readonly", "");
-        area.style.position = "fixed";
-        area.style.opacity = "0";
-        document.body.appendChild(area);
-        area.select();
-        const ok = document.execCommand("copy");
-        document.body.removeChild(area);
-        if (!ok) throw new Error("copy bị từ chối");
+      // Clipboard API chỉ có trong secure context (https hoặc localhost). Khi trình
+      // duyệt chặn hoặc không hỗ trợ, hiện thông báo để phụ huynh sao chép thủ công.
+      if (!navigator.clipboard?.writeText) {
+        throw new Error("Clipboard API không khả dụng");
       }
+      await navigator.clipboard.writeText(text);
       setCopied(true);
       setCopyFailed(false);
     } catch {
