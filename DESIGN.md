@@ -116,7 +116,7 @@ Rules:
 - Hierarchy comes from size + weight + color, not from all-caps. Uppercase is reserved for micro-labels only: `text-xs` (or `text-[11px]`) combined with `tracking-wide`/`tracking-wider`, used on card group labels, the logo slogan, "cập nhật lần cuối" stamps, and the pricing ribbon. Never uppercase a heading, body copy, button, or an eyebrow label.
 - Body measure caps at `max-w-prose` / `max-w-xl` (≈65ch). Never a full-width paragraph on a wide screen.
 - Eyebrow labels: `0.9375rem`, `font-semibold`, `tracking-[-0.005em]`, amber-700 on light and amber-400 on navy, prefixed by a 1.75rem × 2px amber dash. Sentence case — never uppercase on light surfaces.
-- Numbers in stats and prices use `tabular-nums` with `whitespace-nowrap`; a value like `48 – 72 Buổi` must never break across lines.
+- Numbers in stats and prices use `tabular-nums` with `whitespace-nowrap`; a value like `48 Buổi` must never break across lines.
 - Banned fonts: `Inter`, `Times New Roman`, `Georgia`, `Garamond`, `Palatino`, and any generic system serif. Bricolage Grotesque is the only display face that satisfies the Vietnamese requirement in this set.
 
 ---
@@ -208,7 +208,7 @@ none should be introduced for a marketing page.
 ## 7. Responsive Rules
 
 - **Mobile-first collapse below 768px.** All multi-column layouts become a single column. No exceptions.
-- No horizontal scroll at any viewport width — a scrollbar on mobile is a failure, not a nit. Long values (`48 – 72 Buổi`, account numbers) get `whitespace-nowrap` plus a track that can absorb them.
+- No horizontal scroll at any viewport width — a scrollbar on mobile is a failure, not a nit. Long values (`48 Buổi`, account numbers) get `whitespace-nowrap` plus a track that can absorb them.
 - Headlines scale, they do not shrink-wrap: `text-5xl` → `lg:text-7xl` → `xl:text-8xl`. Body text never drops below `1rem` (`text-sm` only for metadata and labels, never for a paragraph a parent must read).
 - Touch targets: minimum 44px. Header icon button is `h-11 w-11`; mobile menu rows are `min-h-[3rem]`.
 - Desktop nav collapses below `md` into a toggle menu that closes on Escape, on outside click, and on link selection, and re-syncs `aria-expanded` when the viewport crosses 768px.

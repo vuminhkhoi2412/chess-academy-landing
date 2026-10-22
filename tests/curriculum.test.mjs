@@ -26,11 +26,13 @@ test("Happy Chess: 72 buổi, 3 level × 24 buổi, tuổi 4–12", () => {
   }
 });
 
-test("Level 1 Happy Chess dạy 6 loại quân, nhập thành, phong cấp", () => {
-  const topics = byId("happy-chess").subLevels[0].syllabus.map((s) => s.topic).join(" | ");
-  assert.match(topics, /6 loại quân/);
+test("Level 1 Happy Chess dạy nhận biết quân, nhập thành, phong cấp", () => {
+  const syllabus = byId("happy-chess").subLevels[0].syllabus;
+  const topics = syllabus.map((s) => s.topic).join(" | ");
+  assert.match(topics, /Nhận biết và đi quân/);
   assert.match(topics, /Nhập thành/);
   assert.match(topics, /phong cấp/);
+  assert.deepEqual(syllabus.map((s) => s.label), ["Bài 1", "Bài 2", "Bài 3", "Bài 4"]);
 });
 
 test("mỗi chương trình đều có bài học và kết quả", () => {

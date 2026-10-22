@@ -276,14 +276,11 @@ export default function PricingAndCheckout() {
       <div className="relative max-w-6xl mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="gc-eyebrow gc-eyebrow-invert">
-            Đăng ký trực tuyến • Xếp lịch linh hoạt tại 5 cơ sở
+            Đăng ký trực tuyến
           </span>
           <h2 className="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">
-            Chọn Khóa Học &amp; Giữ Chỗ Cho Bé
+            Tham Khảo Chi Phí
           </h2>
-          <p className="text-brand-100 mt-3 text-base max-w-prose mx-auto">
-            Phụ huynh chọn cơ sở gần nhất và cấp độ học. Hệ thống tự động tính học phí và tạo mã VietQR tương ứng.
-          </p>
         </div>
 
         {/* 3 Pricing Cards */}
@@ -356,7 +353,7 @@ export default function PricingAndCheckout() {
                   }`}
                 >
                   <QrCode className="w-4 h-4" aria-hidden="true" />
-                  Chọn cơ sở &amp; Tạo mã QR
+                  Tham khảo Lộ trình
                 </button>
               </div>
             );

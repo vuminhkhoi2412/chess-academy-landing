@@ -24,7 +24,7 @@ export default function CurriculumExplorer() {
         <div className="text-center max-w-3xl mx-auto mb-10">
           <span className="gc-eyebrow">Hệ thống giáo trình bài bản</span>
           <h2 className="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 mt-3">
-            Lộ Trình Đào Tạo Global Chess (4 – 12 Tuổi)
+            Lộ Trình Đào Tạo
           </h2>
           <p className="text-slate-600 text-sm md:text-base mt-3 max-w-prose mx-auto">
             Happy Chess gồm 3 Level (72 buổi); Global Sơ cấp và Trung cấp mỗi lộ trình 48 buổi, chia thành các cấp độ nhỏ 24 buổi. Học viên nắm chắc từ luật chơi cơ bản đến các đòn chiến thuật trung – tàn cuộc nâng cao.
@@ -141,7 +141,7 @@ export default function CurriculumExplorer() {
                 {/* Danh sách bài học */}
                 <div className="p-6">
                   <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
-                    Nội dung chi tiết từng buổi / bài học:
+                    Nội dung chi tiết:
                   </div>
                   {/* Hiển thị toàn bộ 24 buổi, không nhét vào hộp cuộn để không giấu nội dung. */}
                   <ul className="grid sm:grid-cols-2 gap-2 list-none">
@@ -178,14 +178,14 @@ export default function CurriculumExplorer() {
           ))}
         </div>
 
-        {/* Cấu trúc chuẩn 1 buổi học 60 - 90 phút */}
+        {/* Cấu trúc chuẩn 1 buổi học */}
         <div className="bg-brand-800 text-white rounded-card p-6 md:p-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-2">
             <div>
               <span className="text-amber-400 text-xs font-bold uppercase tracking-wider">Phương pháp sư phạm</span>
-              <h3 className="text-xl font-bold mt-0.5">Cấu Trúc Chuẩn Mỗi Buổi Học (60 – 90 Phút)</h3>
+              <h3 className="text-xl font-bold mt-0.5">Cấu Trúc Chuẩn Mỗi Buổi Học</h3>
             </div>
-            <span className="text-sm text-brand-200">Đảm bảo cân bằng giữa Lý thuyết - Bài tập - Thực chiến</span>
+            <span className="text-sm text-brand-200 italic">Lý thuyết - Bài tập - Thực chiến</span>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">

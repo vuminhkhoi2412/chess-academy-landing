@@ -86,8 +86,8 @@ export interface MajorProgram {
 export const CURRICULUM_PROGRAMS: MajorProgram[] = [
   {
     id: "happy-chess",
-    title: "Lộ Trình Happy Chess",
-    badge: "4 – 12 tuổi • Nền tảng vững chắc",
+    title: "Happy Chess",
+    badge: "Nền tảng vững chắc",
     totalDuration: "72 buổi (3 Level – mỗi Level 24 buổi)",
     targetAudience: "Trẻ từ 4 – 12 tuổi (cả học viên mới và đã biết chơi)",
     sessionLength: "60 – 90 phút / buổi (điều chỉnh theo độ tuổi)",
@@ -110,10 +110,10 @@ export const CURRICULUM_PROGRAMS: MajorProgram[] = [
         lessonCount: "Làm quen và nắm vững luật chơi",
         goal: "Nhận biết và di chuyển 6 loại quân, nắm luật chơi cơ bản và biết cách chiếu bí.",
         syllabus: [
-          { label: "Nội dung 1", topic: "Nhận biết và di chuyển 6 loại quân" },
-          { label: "Nội dung 2", topic: "Luật chơi cơ bản, chiếu – chiếu bí" },
-          { label: "Nội dung 3", topic: "Nhập thành, phong cấp, bắt tốt qua đường" },
-          { label: "Nội dung 4", topic: "Ghi chép nước đi và thi đấu" },
+          { label: "Bài 1", topic: "Nhận biết và đi quân" },
+          { label: "Bài 2", topic: "Luật chơi cơ bản" },
+          { label: "Bài 3", topic: "Nhập thành & phong cấp" },
+          { label: "Bài 4", topic: "Ghi chép & thi đấu" },
         ],
         outcomes: [
           "Chơi được một ván cờ cơ bản.",
@@ -128,11 +128,11 @@ export const CURRICULUM_PROGRAMS: MajorProgram[] = [
         lessonCount: "Hoàn thiện kỹ năng cơ bản",
         goal: "Hoàn thiện kỹ năng cơ bản và hình thành tư duy chiến thuật ban đầu.",
         syllabus: [
-          { label: "Nội dung 1", topic: "Ghi chép nước đi, thi đấu" },
-          { label: "Nội dung 2", topic: "Chiếu bí với các quân (tốt, tượng, xe, hậu, mã)" },
-          { label: "Nội dung 3", topic: "Khai cuộc cơ bản" },
-          { label: "Nội dung 4", topic: "Phòng thủ 4 mã" },
-          { label: "Nội dung 5", topic: "Phong cấp tốt" },
+          { label: "Bài 1", topic: "Ghi chép & thi đấu" },
+          { label: "Bài 2", topic: "Chiếu bí với các loại quân" },
+          { label: "Bài 3", topic: "Khai cuộc cơ bản" },
+          { label: "Bài 4", topic: "Phòng thủ 4 mã" },
+          { label: "Bài 5", topic: "Phong cấp tốt" },
         ],
         outcomes: [
           "Có tư duy chiến thuật ban đầu.",
@@ -147,11 +147,11 @@ export const CURRICULUM_PROGRAMS: MajorProgram[] = [
         lessonCount: "Phát triển chiến thuật và vận dụng",
         goal: "Phát triển chiến thuật và vận dụng vào các thế cờ phức tạp.",
         syllabus: [
-          { label: "Nội dung 1", topic: "Chiếu bí với 2 xe, 1 hậu, 1 xe, 2 tượng" },
-          { label: "Nội dung 2", topic: "Khai cuộc cơ bản và các biến thể" },
-          { label: "Nội dung 3", topic: "Phòng thủ 4 mã" },
-          { label: "Nội dung 4", topic: "Phong cấp tốt (nhiều thế cờ nâng cao)" },
-          { label: "Nội dung 5", topic: "Thi đấu và kiểm tra cuối khóa" },
+          { label: "Bài 1", topic: "Chiếu bí nhiều quân" },
+          { label: "Bài 2", topic: "Khai cuộc & biến thể" },
+          { label: "Bài 3", topic: "Phòng thủ 4 mã" },
+          { label: "Bài 4", topic: "Phong cấp nâng cao" },
+          { label: "Bài 5", topic: "Thi đấu cuối khóa" },
         ],
         outcomes: [
           "Vận dụng chiến thuật nâng cao.",
@@ -163,8 +163,8 @@ export const CURRICULUM_PROGRAMS: MajorProgram[] = [
   },
   {
     id: "so-cap",
-    title: "Lộ Trình Global Chess Sơ Cấp",
-    badge: "7 – 12 tuổi • Học viên mới & Đã biết chơi",
+    title: "Global Chess Sơ Cấp",
+    badge: "Học viên mới & Đã biết chơi",
     totalDuration: "48 buổi (2 giáo trình – 1 lộ trình hoàn chỉnh)",
     targetAudience: "Trẻ từ 7 – 12 tuổi (cả học viên mới và đã biết chơi)",
     sessionLength: "60 – 90 phút / buổi",
@@ -224,8 +224,8 @@ export const CURRICULUM_PROGRAMS: MajorProgram[] = [
   },
   {
     id: "trung-cap",
-    title: "Lộ Trình Global Chess Trung Cấp",
-    badge: "7 – 12 tuổi • Đã nắm vững cơ bản",
+    title: "Global Chess Trung Cấp",
+    badge: "Đã nắm vững cơ bản",
     totalDuration: "48 buổi (2 quyển – 15 bài học chuyên sâu)",
     targetAudience: "Trẻ từ 7 – 12 tuổi (đã nắm vững kiến thức cơ bản, muốn nâng cao kỹ năng)",
     sessionLength: "60 – 90 phút / buổi (điều chỉnh theo độ tuổi)",
@@ -538,7 +538,7 @@ export const FAQS: FaqItem[] = [
   },
   {
     q: "Trung tâm có những cơ sở nào?",
-    a: "Hiện có 5 cơ sở tại TP.HCM. Danh sách địa chỉ đầy đủ nằm ở mục “Hệ thống 5 Cơ sở” phía trên.",
+    a: "Hiện có 5 cơ sở tại TP.HCM. Danh sách địa chỉ đầy đủ nằm ở mục “Hệ thống các cơ sở” phía trên.",
   },
   {
     q: "Đóng học phí bằng cách nào?",
