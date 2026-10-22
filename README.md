@@ -27,9 +27,14 @@ Dev server chạy nền thì dùng `npx astro dev --background`, quản lý bằ
 ## Cấu trúc
 
 ```
-logo.jpg                file NGUỒN của logo, không được publish (xem TODO bên dưới)
+assets/
+  logo.jpg                file NGUỒN của logo, không được publish
+DESIGN.md                 quy ước thiết kế: màu, chữ, chuyển động, chống mẫu AI
+docs/
+  lo_trinh_hoc.md         tài liệu chuẩn của trung tâm (lộ trình, giáo trình)
+  superpowers/plans/      plan triển khai đã thực hiện
 public/
-  brand/mark-64..512.png  logo khiên tách sẵn từ logo.jpg, nền trong suốt
+  brand/mark-64..512.png  logo khiên tách sẵn từ assets/logo.jpg, nền trong suốt
   favicon.svg             icon tab (khiên trên nền kem)
   favicon.ico             icon 16/32/48px
   favicon-16/32/48.png    icon PNG cho trình duyệt cũ
@@ -39,12 +44,13 @@ public/
   site.webmanifest        khai báo PWA (Add to home screen)
   og-image.png            ảnh share 1200x630
 src/
+  layouts/Layout.astro  khung HTML dùng chung: <head>, favicon, font, SEO
   data/courses.ts       toàn bộ nội dung: thương hiệu, cơ sở, giáo trình,
                         học phí, thế cờ đố, FAQ, nhận xét phụ huynh
   data/payment.ts       thông tin nhận chuyển khoản, đọc từ biến môi trường
   components/
     InteractivePuzzle.tsx    bàn cờ đố ở hero
-    CurriculumExplorer.tsx   tab lộ trình Sơ cấp / Trung cấp
+    CurriculumExplorer.tsx   tab 3 lộ trình: Happy Chess / Sơ cấp / Trung cấp
     PricingAndCheckout.tsx   bảng học phí + form + mã VietQR
     SiteHeader.astro         thanh nav dùng chung (kèm menu di động ở trang chủ)
     SiteFooter.astro         chân trang dùng chung cho cả bốn trang
@@ -58,8 +64,15 @@ src/
   styles/global.css     Tailwind + `@theme` token (font, màu brand, radius, shadow)
                         và các class dùng chung: nhãn mục (.gc-eyebrow), tiêu đề mục
                         (.gc-section-title), mặt phẳng bàn cờ, hạt mịn
-tests/puzzle.test.mjs   test thế cờ đố
+tests/
+  puzzle.test.mjs       test thế cờ đố
+  curriculum.test.mjs   test dữ liệu 3 lộ trình
 ```
+
+`assets/logo.jpg` là file gốc duy nhất không publish (920x813, JPEG, nền trắng, không alpha).
+Nếu phải tách lại asset từ file này: xoá nền bằng cách **loang từ viền vào trong**,
+không key theo độ sáng — key theo độ sáng sẽ xoá luôn bàn cờ caro và vệt phản chiếu
+**bên trong** khiên.
 
 ## Biến môi trường
 
@@ -89,7 +102,7 @@ thế cờ mới không còn là đòn "chĩa đôi" hợp lệ (không chiếu,
 
 ## TODO cần nội dung thật
 
-Bốn việc dưới đây **phải xong trước khi chạy quảng cáo**, vì hiện tại trang đang phải
+Ba việc dưới đây **phải xong trước khi chạy quảng cáo**, vì hiện tại trang đang phải
 dùng giải pháp tạm. Không việc nào chặn `npm run build`, nên phải tự nhớ.
 
 ### 1. Ảnh và thước phim thật của trung tâm (hero + gallery)
@@ -113,19 +126,7 @@ dùng giải pháp tạm. Không việc nào chặn `npm run build`, nên phải
   mảng đó. Điền đủ 3 mục là giao diện tự chuyển sang bản thật, không phải sửa HTML.
 - **Không được:** tự viết nhận xét. Đó là quảng cáo sai sự thật.
 
-### 3. `logo.jpg` ở thư mục gốc
-
-- **Hiện tại:** file nguồn 920x813, JPEG, **nền trắng và không có alpha**. Chỉ nằm trong
-  repo, không được publish (chỉ `public/` mới lên web). Toàn bộ asset thương hiệu đã
-  được tách sẵn từ file này ra `public/`, nên lúc chạy trang không cần file gốc.
-- **Vì sao không dùng trực tiếp:** đây là lockup đầy đủ (khiên + chữ + tagline) nên đặt
-  vào nav sẽ trùng tên thương hiệu và dán một ô trắng lên nền kem. Ở 16px thì không đọc được.
-- **Việc phải làm:** chuyển vào thư mục nguồn không publish (ví dụ `assets/`) hoặc xoá.
-- **Nếu phải tách lại asset từ file này:** xoá nền bằng cách **loang từ viền vào trong**,
-  không key theo độ sáng — key theo độ sáng sẽ xoá luôn bàn cờ caro và vệt phản chiếu
-  **bên trong** khiên.
-
-### 4. Học phí lộ trình Happy Chess
+### 3. Học phí lộ trình Happy Chess
 
 - **Hiện tại:** bảng học phí chỉ có 3 gói của lộ trình Global (24 buổi: 3.600.000đ;
   trọn gói 48 buổi: 6.500.000đ; kèm riêng 1-1 12 buổi: 4.800.000đ) và chưa được trung tâm
@@ -167,7 +168,7 @@ Phần nội dung còn thiếu (ảnh thật, nhận xét phụ huynh, học ph�
 Thông tin ngân hàng không nằm trong code mà ở `.env` local và biến môi trường của Vercel.
 
 Số điện thoại và địa chỉ 5 cơ sở trong `src/data/courses.ts` là dữ liệu thật của trung tâm.
-Học phí thì chưa đối chiếu được với trung tâm — xem mục **TODO** số 4.
+Học phí thì chưa đối chiếu được với trung tâm — xem mục **TODO** số 3.
 
 ## Xử lý sự cố
 

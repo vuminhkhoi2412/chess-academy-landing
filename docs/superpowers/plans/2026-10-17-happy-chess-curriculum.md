@@ -10,6 +10,11 @@
 
 **Spec:** `docs/lo_trinh_hoc.md` (mục 1 — LỘ TRÌNH HAPPY CHESS).
 
+> **Trạng thái (2026-10-22):** đã triển khai xong và kiểm tra lại — `npm test` 13/13 pass,
+> `npm run check` 0 lỗi. Khác plan một chỗ: ghi chú học phí của Task 7 được chuyển từ
+> `docs/lo_trinh_hoc.md` sang `README.md` (mục "TODO cần nội dung thật" số 3) thay vì nằm
+> cuối tài liệu lộ trình. Checkbox dưới đây đánh dấu theo trạng thái thực tế của code.
+
 ## Global Constraints
 
 - Ngôn ngữ copy: tiếng Việt, giữ giọng văn hiện có trong `src/data/courses.ts`.
@@ -44,7 +49,7 @@ Năm điểm dễ vỡ mà tài liệu chuẩn ngầm yêu cầu nhưng không c
 - Consumes: interface `MajorProgram` / `SubLevel` đã có trong `src/data/courses.ts`.
 - Produces: `CURRICULUM_PROGRAMS[0]` là `{ id: "happy-chess", ... }` với `subLevels` mã `HC1`, `HC2`, `HC3`; `totalDuration` chứa `72 buổi`; `targetAudience` chứa `4 – 12`.
 
-- [ ] **Step 1: Viết test thất bại**
+- [x] **Step 1: Viết test thất bại**
 
 Tạo `tests/curriculum.test.mjs`:
 
@@ -97,12 +102,12 @@ test("mỗi chương trình đều có bài học và kết quả", () => {
 });
 ```
 
-- [ ] **Step 2: Chạy test để chắc chắn nó fail**
+- [x] **Step 2: Chạy test để chắc chắn nó fail**
 
 Run: `npm test`
 Expected: FAIL — `có đủ 3 lộ trình lớn` báo `3 !== 2`, và `thiếu happy-chess`.
 
-- [ ] **Step 3: Thêm dữ liệu Happy Chess vào `src/data/courses.ts`**
+- [x] **Step 3: Thêm dữ liệu Happy Chess vào `src/data/courses.ts`**
 
 Chèn object sau vào `CURRICULUM_PROGRAMS` **ngay trước** phần tử `id: "so-cap"` (giữ dấu phẩy ngăn cách giữa hai phần tử):
 
@@ -186,12 +191,12 @@ Chèn object sau vào `CURRICULUM_PROGRAMS` **ngay trước** phần tử `id: "
   },
 ```
 
-- [ ] **Step 4: Chạy lại test để chắc chắn pass**
+- [x] **Step 4: Chạy lại test để chắc chắn pass**
 
 Run: `npm test`
 Expected: PASS — cả 4 test mới và các test puzzle cũ đều xanh.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/data/courses.ts tests/curriculum.test.mjs
@@ -209,7 +214,7 @@ git commit -m "feat: add Happy Chess curriculum program with tests"
 - Consumes: `CURRICULUM_PROGRAMS` từ Task 1 (3 phần tử, mỗi phần tử 1–3 `subLevels`).
 - Produces: không có API mới; chỉ đổi markup.
 
-- [ ] **Step 1: Sửa tiêu đề và mô tả phụ cho đúng 4–12 tuổi và 3 lộ trình**
+- [x] **Step 1: Sửa tiêu đề và mô tả phụ cho đúng 4–12 tuổi và 3 lộ trình**
 
 Thay `CurriculumExplorer.tsx:28`:
 
@@ -225,7 +230,7 @@ Thay `CurriculumExplorer.tsx:30-32`:
           </p>
 ```
 
-- [ ] **Step 2: Sửa comment và lưới 2 cột thành 3 cột**
+- [x] **Step 2: Sửa comment và lưới 2 cột thành 3 cột**
 
 Thay `CurriculumExplorer.tsx:103`:
 
@@ -239,17 +244,17 @@ Thay `CurriculumExplorer.tsx:104` (dòng `<div className="grid md:grid-cols-2 ga
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-14">
 ```
 
-- [ ] **Step 3: Kiểm tra lưới đã nhận 3 cột**
+- [x] **Step 3: Kiểm tra lưới đã nhận 3 cột**
 
 Run: `git grep -n "lg:grid-cols-3" -- src/components/CurriculumExplorer.tsx`
 Expected: 1 kết quả ở dòng lưới tầng 2.
 
-- [ ] **Step 4: Kiểm tra typecheck**
+- [x] **Step 4: Kiểm tra typecheck**
 
 Run: `npm run check`
 Expected: PASS, không lỗi TypeScript/Astro.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/components/CurriculumExplorer.tsx
@@ -270,7 +275,7 @@ git commit -m "feat: render 3 sub-levels per curriculum track"
 
 Ràng buộc: nhãn nav mới không dài hơn `Lộ trình Sơ cấp & Trung cấp` (30 ký tự) để không tràn thanh nav.
 
-- [ ] **Step 1: Cập nhật nhãn nav**
+- [x] **Step 1: Cập nhật nhãn nav**
 
 Thay `SiteHeader.astro:19`:
 
@@ -278,7 +283,7 @@ Thay `SiteHeader.astro:19`:
   { href: "#curriculum", label: "Lộ trình Happy Chess & Global" },
 ```
 
-- [ ] **Step 2: Cập nhật description SEO trang chủ**
+- [x] **Step 2: Cập nhật description SEO trang chủ**
 
 Thay `index.astro:31-32`:
 
@@ -287,7 +292,7 @@ const pageDescription =
   "Trung tâm cờ vua Global Chess cho trẻ 4–12 tuổi tại TP.HCM: lộ trình Happy Chess 72 buổi và Global Sơ cấp & Trung cấp 48 buổi, lớp tối trong tuần và cuối tuần tại 5 cơ sở.";
 ```
 
-- [ ] **Step 3: Cập nhật badge tuổi và đoạn mô tả hero**
+- [x] **Step 3: Cập nhật badge tuổi và đoạn mô tả hero**
 
 Thay `index.astro:134` (dòng `Đào tạo Cờ Vua Trực Tiếp (7 – 12 tuổi) • 5 Cơ sở tại TP.HCM`):
 
@@ -303,7 +308,7 @@ Thay `index.astro:146-148` (thẻ `<p class="text-slate-600 text-base leading-re
           </p>
 ```
 
-- [ ] **Step 4: Cập nhật ô số liệu "Lộ trình chuẩn"**
+- [x] **Step 4: Cập nhật ô số liệu "Lộ trình chuẩn"**
 
 Thay `index.astro:173` (dòng `<dd ...>48 Buổi</dd>`):
 
@@ -311,7 +316,7 @@ Thay `index.astro:173` (dòng `<dd ...>48 Buổi</dd>`):
               <dd class="text-xl md:text-2xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">48 – 72 Buổi</dd>
 ```
 
-- [ ] **Step 5: Kiểm tra nhãn nav không dài hơn nhãn cũ**
+- [x] **Step 5: Kiểm tra nhãn nav không dài hơn nhãn cũ**
 
 Chạy PowerShell để đo độ dài nhãn nav mới:
 
@@ -321,12 +326,12 @@ Chạy PowerShell để đo độ dài nhãn nav mới:
 
 Expected: `30` hoặc nhỏ hơn (nhãn cũ `Lộ trình Sơ cấp & Trung cấp` cũng 30 ký tự, nên nav không tràn thêm).
 
-- [ ] **Step 6: Kiểm tra còn sót copy cũ**
+- [x] **Step 6: Kiểm tra còn sót copy cũ**
 
 Run: `git grep -n "7 – 12\|7-12" -- src/pages/index.astro src/components/SiteHeader.astro`
 Expected: không kết quả.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/pages/index.astro src/components/SiteHeader.astro
@@ -346,7 +351,7 @@ git commit -m "feat: update hero, SEO and nav for Happy Chess track"
 
 Ràng buộc: `packageId` tạm gán `"hoc-phan-24"` (gói 24 buổi chung) — học phí Happy Chess chưa được xác nhận, ghi chú ở Task 7. Không đổi giá trị `PRICING_PACKAGES`.
 
-- [ ] **Step 1: Thêm 3 lựa chọn cấp độ Happy Chess**
+- [x] **Step 1: Thêm 3 lựa chọn cấp độ Happy Chess**
 
 Trong `LEVEL_OPTIONS`, chèn 3 phần tử sau **ngay trước** phần tử `code: "SC1"`:
 
@@ -368,7 +373,7 @@ Trong `LEVEL_OPTIONS`, chèn 3 phần tử sau **ngay trước** phần tử `co
   },
 ```
 
-- [ ] **Step 2: Cập nhật nhãn tuổi của ô năm sinh**
+- [x] **Step 2: Cập nhật nhãn tuổi của ô năm sinh**
 
 Thay `PricingAndCheckout.tsx:420`:
 
@@ -376,12 +381,12 @@ Thay `PricingAndCheckout.tsx:420`:
                       Năm sinh / Tuổi (4-12 tuổi) *
 ```
 
-- [ ] **Step 3: Kiểm tra typecheck**
+- [x] **Step 3: Kiểm tra typecheck**
 
 Run: `npm run check`
 Expected: PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/components/PricingAndCheckout.tsx
@@ -399,7 +404,7 @@ git commit -m "feat: add Happy Chess levels to enrolment form"
 - Consumes: không có.
 - Produces: không có.
 
-- [ ] **Step 1: Cập nhật câu trả lời về độ tuổi**
+- [x] **Step 1: Cập nhật câu trả lời về độ tuổi**
 
 Thay nội dung `a` của câu `q: "Bé mấy tuổi thì tham gia được?"`:
 
@@ -407,7 +412,7 @@ Thay nội dung `a` của câu `q: "Bé mấy tuổi thì tham gia được?"`:
     a: "Global Chess nhận học viên từ 4 đến 12 tuổi. Lộ trình Happy Chess dành cho bé từ 4 tuổi; lộ trình Global Sơ cấp và Trung cấp dành cho bé từ 7 tuổi. Các bé được xếp theo trình độ thực tế chứ không chỉ theo tuổi.",
 ```
 
-- [ ] **Step 2: Cập nhật câu trả lời về thời lượng lộ trình**
+- [x] **Step 2: Cập nhật câu trả lời về thời lượng lộ trình**
 
 Thay nội dung `a` của câu `q: "Một lộ trình học kéo dài bao lâu?"`:
 
@@ -415,12 +420,12 @@ Thay nội dung `a` của câu `q: "Một lộ trình học kéo dài bao lâu?"
     a: "Happy Chess gồm 72 buổi (3 Level, mỗi Level 24 buổi). Lộ trình Global Sơ cấp và Trung cấp mỗi lộ trình gồm 48 buổi, chia thành 2 cấp độ nhỏ 24 buổi. Mỗi buổi kéo dài 60 – 90 phút.",
 ```
 
-- [ ] **Step 3: Chạy test dữ liệu**
+- [x] **Step 3: Chạy test dữ liệu**
 
 Run: `npm test`
 Expected: PASS (không ảnh hưởng test nhưng xác nhận file còn hợp lệ).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/data/courses.ts
@@ -441,7 +446,7 @@ git commit -m "docs: update FAQ for three curriculum tracks"
 - Consumes: không có.
 - Produces: không có.
 
-- [ ] **Step 1: Cập nhật webmanifest**
+- [x] **Step 1: Cập nhật webmanifest**
 
 Thay `site.webmanifest:2` và `:4`:
 
@@ -453,7 +458,7 @@ Thay `site.webmanifest:2` và `:4`:
   "description": "Trung tâm cờ vua Global Chess tại TP.HCM: lộ trình Happy Chess 72 buổi và Global Sơ cấp & Trung cấp 48 buổi cho trẻ 4-12 tuổi, 5 cơ sở.",
 ```
 
-- [ ] **Step 2: Cập nhật trang 404**
+- [x] **Step 2: Cập nhật trang 404**
 
 Thay `404.astro:11`:
 
@@ -467,7 +472,7 @@ Thay `404.astro:33` (dòng `48 buổi, 5 cơ sở tại TP.HCM và học phí.`)
           48 – 72 buổi, 5 cơ sở tại TP.HCM và học phí.
 ```
 
-- [ ] **Step 3: Cập nhật chính sách bảo mật**
+- [x] **Step 3: Cập nhật chính sách bảo mật**
 
 Thay `chinh-sach-bao-mat.astro:69`:
 
@@ -475,7 +480,7 @@ Thay `chinh-sach-bao-mat.astro:69`:
             Học viên là trẻ 4–12 tuổi, nên mọi thông tin về bé đều do phụ huynh hoặc người giám hộ
 ```
 
-- [ ] **Step 4: Cập nhật README**
+- [x] **Step 4: Cập nhật README**
 
 Thay `README.md:3`:
 
@@ -489,18 +494,18 @@ Thay `README.md:81`:
 lộ trình Happy Chess 72 buổi & Global 48 buổi, 3 gói học phí, và thế cờ đố ở đầu trang.
 ```
 
-- [ ] **Step 5: Grep xác nhận không còn nhãn tuổi cũ trong `src` và `public`**
+- [x] **Step 5: Grep xác nhận không còn nhãn tuổi cũ trong `src` và `public`**
 
 Run: `git grep -n "7 – 12\|7-12" -- src public`
 Expected: chỉ còn kết quả ở hai lộ trình Global trong `src/data/courses.ts` (`badge`/`targetAudience` của `so-cap` và `trung-cap`) và câu FAQ Global — không còn ở `index.astro`, `PricingAndCheckout.tsx`, `chinh-sach-bao-mat.astro`, `site.webmanifest`.
 
-- [ ] **Step 6: Build toàn bộ**
+- [x] **Step 6: Build toàn bộ**
 
 Nếu chưa có `.env`: `Copy-Item .env.example .env` rồi điền `PUBLIC_ACB_ACCOUNT_NO` và `PUBLIC_ACB_ACCOUNT_NAME`.
 Run: `npm run build`
 Expected: build thành công, không lỗi env, sinh `dist/`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add public/site.webmanifest src/pages/404.astro src/pages/chinh-sach-bao-mat.astro README.md
@@ -518,7 +523,7 @@ git commit -m "docs: align remaining copy with four-to-twelve age range"
 - Consumes: không có.
 - Produces: không có.
 
-- [ ] **Step 1: Thêm mục ghi chú học phí cuối tài liệu**
+- [x] **Step 1: Thêm mục ghi chú học phí cuối tài liệu**
 
 Thêm vào cuối `docs/lo_trinh_hoc.md` (sau phần "THÔNG TIN LIÊN HỆ ĐƠN VỊ ĐÀO TẠO"):
 
@@ -539,7 +544,7 @@ Cần bổ sung và xác nhận:
 3. Danh mục "Lớp kèm riêng 1-1" có nằm trong lộ trình chuẩn hay là dịch vụ riêng.
 ```
 
-- [ ] **Step 2: Sửa lỗi số bài học phần Trung cấp**
+- [x] **Step 2: Sửa lỗi số bài học phần Trung cấp**
 
 Trong `docs/lo_trinh_hoc.md`, mục "3. LỘ TRÌNH GLOBAL CHESS TRUNG CẤP", thay dòng:
 
@@ -555,12 +560,12 @@ thành:
 
 (Quyển 1 có 5 bài + Quyển 2 có 10 bài = 15 bài; con số cũ "10 bài học" mâu thuẫn với danh sách bên dưới.)
 
-- [ ] **Step 3: Xác nhận nội dung đã sửa**
+- [x] **Step 3: Xác nhận nội dung đã sửa**
 
 Run: `git grep -n "10 bài học" -- docs/lo_trinh_hoc.md`
 Expected: không kết quả ở dòng "Thời lượng" (dòng còn lại `Trung cấp Quyển 2 (10 bài học – 24 buổi)` là đúng, được phép còn).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add docs/lo_trinh_hoc.md
