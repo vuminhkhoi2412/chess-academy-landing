@@ -29,6 +29,8 @@ Dev server chạy nền thì dùng `npx astro dev --background`, quản lý bằ
 ```
 assets/
   logo.jpg                file NGUỒN của logo, không được publish
+  nguon/bang-hoc-phi-global-chess.pdf   bảng học phí gốc của trung tâm
+  nguon/trichdan.txt      trích dẫn gốc của phụ huynh
 DESIGN.md                 quy ước thiết kế: màu, chữ, chuyển động, chống mẫu AI
 docs/
   lo_trinh_hoc.md         tài liệu chuẩn của trung tâm (lộ trình, giáo trình)
@@ -67,6 +69,7 @@ src/
 tests/
   puzzle.test.mjs       test thế cờ đố
   curriculum.test.mjs   test dữ liệu 3 lộ trình
+  tuition.test.mjs      test bảng học phí chính thức
 ```
 
 `assets/logo.jpg` là file gốc duy nhất không publish (920x813, JPEG, nền trắng, không alpha).
@@ -95,15 +98,43 @@ phía server làm proxy cho ảnh VietQR và dùng biến không có tiền tố
 ## Sửa nội dung
 
 Gần như mọi thứ nằm trong `src/data/courses.ts`: tên thương hiệu, hotline, 5 cơ sở,
-lộ trình Happy Chess 72 buổi & Global 48 buổi, 3 gói học phí, và thế cờ đố ở đầu trang.
+lộ trình Happy Chess 72 buổi & Global 48 buổi, bảng học phí 7 cấp độ, nhận xét phụ huynh
+và thế cờ đố ở đầu trang.
 
 Sửa thế cờ trong `INTERACTIVE_PUZZLE` thì chạy lại `npm test`. Test sẽ báo lỗi nếu
 thế cờ mới không còn là đòn "chĩa đôi" hợp lệ (không chiếu, hoặc Đen bắt lại được quân).
 
+## Học phí
+
+Nguồn duy nhất: `assets/nguon/bang-hoc-phi-global-chess.pdf` (bảng chính thức của trung tâm).
+Dữ liệu nằm trong `TUITION_LEVELS` và `TUITION_PROGRAMS` (`src/data/courses.ts`), được khóa
+bởi `tests/tuition.test.mjs`.
+
+| Cấp độ | Thời lượng | Group 12 buổi | Group 24 buổi | 1 kèm 1 | 1 kèm 2 |
+| :--- | :-- | --: | --: | --: | --: |
+| Happy Chess 1–3 | 60 phút | 1.800.000đ | 2.700.000đ | 350.000đ/buổi | 250.000đ/buổi |
+| Sơ cấp 1 (Global 1,2) | 60 phút | 2.100.000đ | 3.240.000đ | 400.000đ/buổi | 300.000đ/buổi |
+| Sơ cấp 2 (Global 3,4) | 90 phút | 2.700.000đ | 4.860.000đ | 400.000đ/buổi | 300.000đ/buổi |
+| Trung cấp 1 (Global 5,6) | 90 phút | 3.240.000đ | 5.830.000đ | 450.000đ/buổi | 350.000đ/buổi |
+| Trung cấp 2 (Global 7,8) | 90 phút | 3.888.000đ | 6.996.000đ | 450.000đ/buổi | 350.000đ/buổi |
+
+Global Chess 9–10 (Chuyên nghiệp) có giá theo cấp kiện tướng nên chưa mở trong form.
+
+Cách ghép mã cấp độ: SC1 = Global 1,2; SC2 = Global 3,4; TC1 = Global 5,6;
+TC2 = Global 7,8. Lớp 1 kèm 1 / 1 kèm 2 tính đơn giá mỗi buổi; form cho chọn 12 hoặc
+24 buổi rồi nhân với đơn giá.
+
+Đồ dùng bán riêng: sách học 50.000đ, sách bài tập bổ trợ 90.000đ, áo đồng phục 150.000đ,
+bộ cờ tiêu chuẩn thi đấu 250.000đ, đồng hồ thi đấu 400.000đ. Vì vậy website không ghi
+"tặng kèm giáo trình" nữa.
+
+Sửa giá: cập nhật `TUITION_LEVELS`, cập nhật số kỳ vọng trong `tests/tuition.test.mjs`,
+rồi chạy `npm test`.
+
 ## TODO cần nội dung thật
 
-Ba việc dưới đây **phải xong trước khi chạy quảng cáo**, vì hiện tại trang đang phải
-dùng giải pháp tạm. Không việc nào chặn `npm run build`, nên phải tự nhớ.
+Còn một việc phải xong trước khi chạy quảng cáo. Việc này không chặn `npm run build`,
+nên phải tự nhớ.
 
 ### 1. Ảnh và thước phim thật của trung tâm (hero + gallery)
 
@@ -115,29 +146,6 @@ dùng giải pháp tạm. Không việc nào chặn `npm run build`, nên phải
   `<div aria-hidden="true">` ngay dưới `<!-- Hero Section -->`) bằng gallery ảnh thật,
   hoặc thêm một section gallery riêng. Chỗ này đã có comment `TODO (nội dung thật)`.
 - **Bắt buộc:** xin phép phụ huynh trước khi đăng ảnh hoặc video có mặt trẻ.
-
-### 2. Nhận xét thật của phụ huynh
-
-- **Hiện tại:** mục "Phụ Huynh Nói Gì Về Global Chess" hiển thị 3 ô TODO viền nét đứt,
-  kèm cảnh báo "không đăng trang khi còn như vậy". Mảng `TESTIMONIALS` trong
-  `src/data/courses.ts` đang **cố ý để trống**.
-- **Cần:** 3 câu trích dẫn thật, kèm tên phụ huynh và cơ sở.
-- **Việc phải làm:** điền vào `TESTIMONIALS` theo cấu trúc ghi trong comment ngay trên
-  mảng đó. Điền đủ 3 mục là giao diện tự chuyển sang bản thật, không phải sửa HTML.
-- **Không được:** tự viết nhận xét. Đó là quảng cáo sai sự thật.
-
-### 3. Học phí lộ trình Happy Chess
-
-- **Hiện tại:** bảng học phí chỉ có 3 gói của lộ trình Global (24 buổi: 3.600.000đ;
-  trọn gói 48 buổi: 6.500.000đ; kèm riêng 1-1 12 buổi: 4.800.000đ) và chưa được trung tâm
-  xác nhận. Lộ trình Happy Chess (72 buổi, 3 Level × 24 buổi) chưa có mức giá riêng, nên
-  HC1/HC2/HC3 trong `LEVEL_OPTIONS` (`src/components/PricingAndCheckout.tsx`) đang tạm
-  gán `packageId: "hoc-phan-24"`.
-- **Cần:** xác nhận 3 mức giá hiện có, học phí chính thức cho Happy Chess, và Happy Chess
-  tính theo mức 24 buổi chung hay có mức riêng cho bé 4–6 tuổi. Xác nhận luôn "Lớp kèm
-  riêng 1-1" nằm trong lộ trình chuẩn hay là dịch vụ riêng.
-- **Việc phải làm:** cập nhật `PRICING_PACKAGES` trong `src/data/courses.ts` và
-  `LEVEL_OPTIONS` trong `src/components/PricingAndCheckout.tsx` khi có giá thật.
 
 ## Trước khi deploy
 
@@ -162,13 +170,14 @@ Placeholder URL chỉ có **một** chỗ: `site` trong `astro.config.mjs` (đan
 `https://globalchess.vn`, có comment `TODO` ngay trên dòng đó). Mọi URL khác trong trang
 đều suy ra từ `Astro.site`.
 
-Phần nội dung còn thiếu (ảnh thật, nhận xét phụ huynh, học phí Happy Chess) không nằm ở đây mà ở mục
-**TODO cần nội dung thật** phía trên.
+Phần nội dung còn thiếu (ảnh thật) không nằm ở đây mà ở mục **TODO cần nội dung thật**
+phía trên.
 
 Thông tin ngân hàng không nằm trong code mà ở `.env` local và biến môi trường của Vercel.
 
-Số điện thoại và địa chỉ 5 cơ sở trong `src/data/courses.ts` là dữ liệu thật của trung tâm.
-Học phí thì chưa đối chiếu được với trung tâm — xem mục **TODO** số 3.
+Số điện thoại, địa chỉ 5 cơ sở và bảng học phí trong `src/data/courses.ts` là dữ liệu thật
+của trung tâm. Học phí lấy từ `assets/nguon/bang-hoc-phi-global-chess.pdf` — xem mục
+**Học phí** phía trên.
 
 ## Xử lý sự cố
 

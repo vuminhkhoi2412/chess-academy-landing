@@ -14,6 +14,11 @@
 > `npm run check` 0 lỗi. Khác plan một chỗ: ghi chú học phí của Task 7 được chuyển từ
 > `docs/lo_trinh_hoc.md` sang `README.md` (mục "TODO cần nội dung thật" số 3) thay vì nằm
 > cuối tài liệu lộ trình. Checkbox dưới đây đánh dấu theo trạng thái thực tế của code.
+>
+> **Cập nhật sau đó:** ngày 2026-10-22, bảng giá cũ (`3600000`, `6500000`, `4800000`,
+> `PRICING_PACKAGES`) đã được thay bằng bảng học phí chính thức của trung tâm. Các số cũ
+> trong plan này chỉ còn giá trị lịch sử — nguồn hiện tại là `TUITION_LEVELS` trong
+> `src/data/courses.ts` và mục **Học phí** của `README.md`.
 
 ## Global Constraints
 

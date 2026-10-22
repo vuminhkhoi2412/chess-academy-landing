@@ -1,7 +1,8 @@
 // src/components/PricingAndCheckout.tsx
 import { useEffect, useRef, useState, type SyntheticEvent } from "react";
 import {
-  PRICING_PACKAGES,
+  TUITION_PROGRAMS,
+  TUITION_LEVELS,
   BRANCHES,
   FLEXIBLE_TIME_SLOTS,
   BRAND_INFO,
@@ -19,61 +20,23 @@ import {
   Clock,
 } from "lucide-react";
 
-// Gắn từng Cấp độ đăng ký với Gói học phí (packageId) tương ứng.
-// HC1–HC3 tạm dùng gói 24 buổi vì Happy Chess chưa có giá riêng — xem README.md
-// mục "TODO cần nội dung thật" số 3.
-const LEVEL_OPTIONS = [
-  {
-    code: "HC1",
-    label: "Happy Chess 1 (Level 1 - 24 buổi)",
-    packageId: "hoc-phan-24",
-  },
-  {
-    code: "HC2",
-    label: "Happy Chess 2 (Level 2 - 24 buổi)",
-    packageId: "hoc-phan-24",
-  },
-  {
-    code: "HC3",
-    label: "Happy Chess 3 (Level 3 - 24 buổi)",
-    packageId: "hoc-phan-24",
-  },
-  {
-    code: "SC1",
-    label: "Sơ cấp 1 (Level 1 - 24 buổi)",
-    packageId: "hoc-phan-24",
-  },
-  {
-    code: "SC2",
-    label: "Sơ cấp 2 (Level 2 - 24 buổi)",
-    packageId: "hoc-phan-24",
-  },
-  {
-    code: "TC1",
-    label: "Trung cấp Quyển 1 (24 buổi)",
-    packageId: "hoc-phan-24",
-  },
-  {
-    code: "TC2",
-    label: "Trung cấp Quyển 2 (24 buổi)",
-    packageId: "hoc-phan-24",
-  },
-  {
-    code: "SCFULL",
-    label: "Trọn lộ trình Sơ cấp (48 buổi - Ưu đãi)",
-    packageId: "lo-trinh-48",
-  },
-  {
-    code: "TCFULL",
-    label: "Trọn lộ trình Trung cấp (48 buổi - Ưu đãi)",
-    packageId: "lo-trinh-48",
-  },
-  {
-    code: "VIP11",
-    label: "Kèm riêng 1-1 theo yêu cầu (12 buổi)",
-    packageId: "kem-1-1",
-  },
+// Hình thức học lấy từ bảng học phí chính thức. Lớp 1 kèm 1 / 1 kèm 2 tính
+// đơn giá mỗi buổi, nên có thêm lựa chọn số buổi đăng ký.
+type TuitionFormat = "group12" | "group24" | "oneOnOne" | "oneOnTwo";
+
+const FORMAT_OPTIONS: { value: TuitionFormat; label: string; short: string }[] = [
+  { value: "group12", label: "Lớp group — 12 buổi (1 buổi/tuần)", short: "12 buổi" },
+  { value: "group24", label: "Lớp group — 24 buổi (2 buổi/tuần)", short: "24 buổi" },
+  { value: "oneOnOne", label: "Lớp 1 kèm 1 — tính theo buổi", short: "1 kèm 1" },
+  { value: "oneOnTwo", label: "Lớp 1 kèm 2 — tính theo buổi", short: "1 kèm 2" },
 ];
+
+const FORMAT_CODE: Record<TuitionFormat, string> = {
+  group12: "G12",
+  group24: "G24",
+  oneOnOne: "P11",
+  oneOnTwo: "P12",
+};
 
 const FOCUSABLE_SELECTOR = [
   "a[href]",
@@ -88,7 +51,9 @@ const DIALOG_TITLE_ID = "checkout-dialog-title";
 
 export default function PricingAndCheckout() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedLevelCode, setSelectedLevelCode] = useState(LEVEL_OPTIONS[0].code);
+  const [selectedLevelCode, setSelectedLevelCode] = useState(TUITION_LEVELS[0].code);
+  const [tuitionFormat, setTuitionFormat] = useState<TuitionFormat>("group24");
+  const [privateSessions, setPrivateSessions] = useState(12);
   const [parentName, setParentName] = useState("");
   const [phone, setPhone] = useState("");
   const [childName, setChildName] = useState("");
@@ -107,12 +72,34 @@ export default function PricingAndCheckout() {
   // bấm, vì sau khi mở hộp thoại thì document.activeElement đã đổi.
   const returnFocusRef = useRef<HTMLElement | null>(null);
 
-  // Tự động suy ra thông tin Cấp độ & Gói giá tiền dựa trên dropdown "Cấp độ đăng ký"
-  const activeLevelObj =
-    LEVEL_OPTIONS.find((lvl) => lvl.code === selectedLevelCode) || LEVEL_OPTIONS[0];
+  // Suy ra cấp độ, chương trình và số tiền từ 3 lựa chọn: cấp độ, hình thức học
+  // (12/24 buổi hoặc 1-1/1-2) và số buổi nếu học kèm riêng.
+  const activeLevel =
+    TUITION_LEVELS.find((level) => level.code === selectedLevelCode) || TUITION_LEVELS[0];
 
-  const activePackage =
-    PRICING_PACKAGES.find((pkg) => pkg.id === activeLevelObj.packageId) || PRICING_PACKAGES[0];
+  const activeProgram =
+    TUITION_PROGRAMS.find((program) => program.id === activeLevel.programId) ||
+    TUITION_PROGRAMS[0];
+
+  const isPrivateFormat = tuitionFormat === "oneOnOne" || tuitionFormat === "oneOnTwo";
+
+  const privateRate =
+    tuitionFormat === "oneOnOne" ? activeLevel.oneOnOne : activeLevel.oneOnTwo;
+
+  const levelPrice = (level: (typeof TUITION_LEVELS)[number]) =>
+    isPrivateFormat
+      ? tuitionFormat === "oneOnOne"
+        ? level.oneOnOne
+        : level.oneOnTwo
+      : tuitionFormat === "group12"
+        ? level.group12
+        : level.group24;
+
+  const tuitionAmount = isPrivateFormat
+    ? privateRate * privateSessions
+    : levelPrice(activeLevel);
+
+  const activeFormat = FORMAT_OPTIONS.find((format) => format.value === tuitionFormat) || FORMAT_OPTIONS[1];
 
   // Thẻ "Chọn cơ sở này" ở phần Hệ thống cơ sở bắn sự kiện này để mở sẵn đúng cơ sở.
   useEffect(() => {
@@ -206,26 +193,24 @@ export default function PricingAndCheckout() {
   // Số điện thoại chỉ giữ chữ số để cú pháp chuyển khoản luôn sạch.
   const cleanPhone = phone.replace(/[^0-9]/g, "");
 
-  // Cú pháp chuyển khoản chuẩn Kế toán: GC [Mã Cơ Sở] [Mã Cấp Độ] [Tên Bé] [SĐT]
+  // Cú pháp chuyển khoản chuẩn Kế toán:
+  // GC [Mã Cơ Sở] [Mã Cấp Độ] [Mã Hình Thức] [Tên Bé] [SĐT]
   const cleanChildName = removeAccents(childName || "HOCVIEN").replace(/\s+/g, "");
-  const transferMemo = `GC ${selectedBranch} ${selectedLevelCode} ${cleanChildName} ${cleanPhone}`;
+  const transferMemo = `GC ${selectedBranch} ${selectedLevelCode} ${FORMAT_CODE[tuitionFormat]} ${cleanChildName} ${cleanPhone}`;
 
-  // Mã VietQR lấy trực tiếp số tiền từ activePackage.price (ăn theo Cấp độ đăng ký)
-  const qrUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNo}-${BANK_CONFIG.template}.png?amount=${activePackage.price}&addInfo=${encodeURIComponent(transferMemo)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
+  // Mã VietQR lấy trực tiếp số tiền từ lựa chọn cấp độ + hình thức học.
+  const qrUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNo}-${BANK_CONFIG.template}.png?amount=${tuitionAmount}&addInfo=${encodeURIComponent(transferMemo)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
 
-  // Khi bấm vào 1 trong 3 thẻ bên ngoài -> Chọn sẵn cấp độ mặc định của thẻ đó
+  // Khi bấm vào một trong 3 thẻ bên ngoài -> chọn sẵn cấp độ đầu tiên của chương trình.
   const handleOpenModal = (
-    pkg: typeof PRICING_PACKAGES[0],
+    program: (typeof TUITION_PROGRAMS)[number],
     trigger?: HTMLElement | null
   ) => {
+    const firstLevel = TUITION_LEVELS.find((level) => level.programId === program.id);
     returnFocusRef.current = trigger ?? null;
-    if (pkg.id === "lo-trinh-48") {
-      setSelectedLevelCode("SCFULL");
-    } else if (pkg.id === "kem-1-1") {
-      setSelectedLevelCode("VIP11");
-    } else {
-      setSelectedLevelCode("SC1");
-    }
+    if (firstLevel) setSelectedLevelCode(firstLevel.code);
+    setTuitionFormat("group24");
+    setPrivateSessions(12);
     setShowQR(false);
     setSlotError(false);
     setIsModalOpen(true);
@@ -303,63 +288,79 @@ export default function PricingAndCheckout() {
 
         {/* 3 Pricing Cards */}
         <div className="grid md:grid-cols-3 gap-6">
-          {PRICING_PACKAGES.map((pkg) => (
-            <div
-              key={pkg.id}
-              className={`rounded-card p-7 flex flex-col justify-between border transition ${
-                pkg.popular
-                  ? "bg-brand-700 border-amber-500 shadow-2xl shadow-amber-500/10 relative"
-                  : "bg-brand-700/40 border-brand-600 hover:border-brand-500"
-              }`}
-            >
-              {pkg.popular && (
-                <span className="absolute -top-3.5 left-6 bg-amber-500 text-slate-950 text-xs font-bold px-3 py-1 rounded-control uppercase tracking-wide">
-                  Lộ trình tối ưu nhất
-                </span>
-              )}
+          {TUITION_PROGRAMS.map((program) => {
+            const levels = TUITION_LEVELS.filter((level) => level.programId === program.id);
+            const min12 = Math.min(...levels.map((level) => level.group12));
+            const min24 = Math.min(...levels.map((level) => level.group24));
+            const minOneOnOne = Math.min(...levels.map((level) => level.oneOnOne));
+            const multipleTiers = new Set(levels.map((level) => level.group24)).size > 1;
 
-              <div>
-                <h3 className="text-xl font-bold text-white">{pkg.name}</h3>
-                {/*
-                  Chừa đúng 2 dòng phụ đề để hàng giá của 3 thẻ luôn thẳng nhau.
-                  3.25em = 2 dòng × leading-relaxed (1.625), nên giá trị này ăn theo
-                  chính cỡ chữ của phụ đề thay vì một số rem đoán trước.
-                */}
-                <p className="text-brand-200 text-sm mt-1.5 leading-relaxed min-h-[3.25em]">
-                  {pkg.subtitle}
-                </p>
-
-                <div className="my-5 pb-5 border-b border-brand-600">
-                  <span className="text-3xl font-extrabold text-amber-400 tabular-nums">
-                    {pkg.price.toLocaleString("vi-VN")}đ
-                  </span>
-                  <div className="text-brand-200 text-sm mt-1">{pkg.duration}</div>
-                </div>
-
-                <ul className="space-y-2.5 mb-8">
-                  {pkg.features.map((feat, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5 text-sm text-brand-100 leading-relaxed">
-                      <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" aria-hidden="true" />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <button
-                type="button"
-                onClick={(event) => handleOpenModal(pkg, event.currentTarget)}
-                className={`w-full py-3.5 px-5 rounded-control font-bold text-sm flex items-center justify-center gap-2 transition cursor-pointer active:scale-[0.98] ${
-                  pkg.popular
-                    ? "bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 shadow-lg shadow-amber-500/20"
-                    : "bg-white hover:bg-slate-100 active:bg-slate-200 text-slate-900"
+            return (
+              <div
+                key={program.id}
+                className={`rounded-card p-7 flex flex-col justify-between border transition ${
+                  program.popular
+                    ? "bg-brand-700 border-amber-500 shadow-2xl shadow-amber-500/10 relative"
+                    : "bg-brand-700/40 border-brand-600 hover:border-brand-500"
                 }`}
               >
-                <QrCode className="w-4 h-4" aria-hidden="true" />
-                Chọn cơ sở &amp; Tạo mã QR
-              </button>
-            </div>
-          ))}
+                {program.popular && (
+                  <span className="absolute -top-3.5 left-6 bg-amber-500 text-slate-950 text-xs font-bold px-3 py-1 rounded-control uppercase tracking-wide">
+                    Lộ trình tối ưu nhất
+                  </span>
+                )}
+
+                <div>
+                  <h3 className="text-xl font-bold text-white">{program.name}</h3>
+                  {/*
+                    Chừa đúng 2 dòng phụ đề để hàng giá của 3 thẻ luôn thẳng nhau.
+                    3.25em = 2 dòng × leading-relaxed (1.625), nên giá trị này ăn theo
+                    chính cỡ chữ của phụ đề thay vì một số rem đoán trước.
+                  */}
+                  <p className="text-brand-200 text-sm mt-1.5 leading-relaxed min-h-[3.25em]">
+                    {program.subtitle}
+                  </p>
+
+                  <div className="my-5 pb-5 border-b border-brand-600">
+                    <div className="text-brand-200 text-xs font-semibold uppercase tracking-wider">
+                      24 buổi (2 buổi/tuần)
+                    </div>
+                    <span className="text-3xl font-extrabold text-amber-400 tabular-nums">
+                      {multipleTiers ? "từ " : ""}
+                      {min24.toLocaleString("vi-VN")}đ
+                    </span>
+                    <div className="text-brand-200 text-xs mt-1.5 leading-relaxed">
+                      12 buổi: {min12.toLocaleString("vi-VN")}đ
+                      <br />
+                      1 kèm 1: từ {minOneOnOne.toLocaleString("vi-VN")}đ/buổi
+                    </div>
+                  </div>
+
+                  <ul className="space-y-2.5 mb-8">
+                    {program.features.map((feat, idx) => (
+                      <li key={idx} className="flex items-start gap-2.5 text-sm text-brand-100 leading-relaxed">
+                        <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" aria-hidden="true" />
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={(event) => handleOpenModal(program, event.currentTarget)}
+                  className={`w-full py-3.5 px-5 rounded-control font-bold text-sm flex items-center justify-center gap-2 transition cursor-pointer active:scale-[0.98] ${
+                    program.popular
+                      ? "bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 shadow-lg shadow-amber-500/20"
+                      : "bg-white hover:bg-slate-100 active:bg-slate-200 text-slate-900"
+                  }`}
+                >
+                  <QrCode className="w-4 h-4" aria-hidden="true" />
+                  Chọn cơ sở &amp; Tạo mã QR
+                </button>
+              </div>
+            );
+          })}
         </div>
 
         {/*
@@ -372,7 +373,7 @@ export default function PricingAndCheckout() {
           </div>
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              "Giáo trình chuẩn Global Chess kèm theo",
+              "Lớp group từ 2 học viên, hoặc 1 kèm 1 / 1 kèm 2",
               "Ca tối trong tuần hoặc cuối tuần (T7 – CN)",
               "Kiểm tra đánh giá định kỳ và cuối khóa",
               "Tự chọn cơ sở trong 5 địa điểm tại TP.HCM",
@@ -413,7 +414,7 @@ export default function PricingAndCheckout() {
             <div className="mb-4 pr-10">
               {/* Badge tự động nhảy tên gói theo Cấp độ đăng ký */}
               <span className="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-2.5 py-1 rounded-control">
-                {activePackage.name}
+                {activeProgram.name}
               </span>
               <h3 id={DIALOG_TITLE_ID} className="text-xl font-bold mt-2">
                 {showQR ? "Quét Mã VietQR Để Hoàn Tất Học Phí" : "Đăng Ký Cơ Sở & Khung Giờ Học"}
@@ -533,16 +534,54 @@ export default function PricingAndCheckout() {
                       onChange={(e) => setSelectedLevelCode(e.target.value)}
                       className="w-full px-3 py-2 text-sm font-semibold border border-amber-400 rounded-control focus:ring-2 focus:ring-amber-500 outline-none bg-amber-50/40 text-slate-900"
                     >
-                      {LEVEL_OPTIONS.map((lvl) => {
-                        const pkgPrice = PRICING_PACKAGES.find((p) => p.id === lvl.packageId)?.price || 0;
-                        return (
-                          <option key={lvl.code} value={lvl.code}>
-                            {lvl.label} — ({pkgPrice.toLocaleString("vi-VN")}đ)
-                          </option>
-                        );
-                      })}
+                      {TUITION_LEVELS.map((level) => (
+                        <option key={level.code} value={level.code}>
+                          {level.label} — {levelPrice(level).toLocaleString("vi-VN")}đ
+                          {isPrivateFormat ? "/buổi" : ""}
+                        </option>
+                      ))}
                     </select>
                   </div>
+                </div>
+
+                {/* Hình thức học lấy từ bảng học phí: 12/24 buổi hoặc kèm riêng. */}
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="gc-format" className="block text-sm font-semibold text-slate-700 mb-1">
+                      Hình thức học *
+                    </label>
+                    <select
+                      id="gc-format"
+                      value={tuitionFormat}
+                      onChange={(e) => setTuitionFormat(e.target.value as TuitionFormat)}
+                      className="w-full px-3 py-2 text-sm font-semibold border border-slate-300 rounded-control focus:ring-2 focus:ring-amber-500 outline-none bg-white"
+                    >
+                      {FORMAT_OPTIONS.map((format) => (
+                        <option key={format.value} value={format.value}>
+                          {format.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {isPrivateFormat && (
+                    <div>
+                      <label htmlFor="gc-private-sessions" className="block text-sm font-semibold text-slate-700 mb-1">
+                        Số buổi đăng ký *
+                      </label>
+                      <select
+                        id="gc-private-sessions"
+                        value={privateSessions}
+                        onChange={(e) => setPrivateSessions(Number(e.target.value))}
+                        className="w-full px-3 py-2 text-sm font-semibold border border-slate-300 rounded-control focus:ring-2 focus:ring-amber-500 outline-none bg-white"
+                      >
+                        {[12, 24].map((sessions) => (
+                          <option key={sessions} value={sessions}>
+                            {sessions} buổi — {(privateRate * sessions).toLocaleString("vi-VN")}đ
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                 </div>
 
                 {/* Chọn các khung thời gian rảnh */}
@@ -586,14 +625,17 @@ export default function PricingAndCheckout() {
                   )}
                 </fieldset>
 
-                {/* Hộp hiển thị tổng tiền tự động cập nhật theo Cấp độ đăng ký */}
+                {/* Hộp hiển thị tổng tiền tự động cập nhật theo Cấp độ & Hình thức học */}
                 <div className="bg-slate-50 p-3.5 rounded-control border border-slate-200 flex items-center justify-between">
                   <div>
                     <div className="text-sm text-slate-600 font-medium">Học phí cần thanh toán:</div>
-                    <div className="text-sm text-amber-700 font-semibold">{activeLevelObj.label}</div>
+                    <div className="text-sm text-amber-700 font-semibold">
+                      {activeLevel.label} • {activeLevel.sessionLength}/buổi • {activeFormat.short}
+                      {isPrivateFormat ? ` × ${privateSessions} buổi` : ""}
+                    </div>
                   </div>
                   <span className="text-lg font-extrabold text-slate-900 tabular-nums">
-                    {activePackage.price.toLocaleString("vi-VN")}đ
+                    {tuitionAmount.toLocaleString("vi-VN")}đ
                   </span>
                 </div>
 
@@ -602,7 +644,7 @@ export default function PricingAndCheckout() {
                   className="w-full py-3.5 bg-brand-800 hover:bg-brand-700 active:bg-brand-900 active:scale-[0.99] text-white font-bold rounded-control text-sm transition flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <QrCode className="w-4 h-4" aria-hidden="true" />
-                  Tạo Mã VietQR ({activePackage.price.toLocaleString("vi-VN")}đ)
+                  Tạo Mã VietQR ({tuitionAmount.toLocaleString("vi-VN")}đ)
                 </button>
               </form>
             ) : (
@@ -610,7 +652,7 @@ export default function PricingAndCheckout() {
                 <div className="bg-slate-50 p-3 rounded-control border border-slate-200 inline-block">
                   <img
                     src={qrUrl}
-                    alt={`Mã VietQR thanh toán ${activePackage.price.toLocaleString("vi-VN")} đồng cho ${BRAND_INFO.name}`}
+                    alt={`Mã VietQR thanh toán ${tuitionAmount.toLocaleString("vi-VN")} đồng cho ${BRAND_INFO.name}`}
                     width={224}
                     height={224}
                     loading="lazy"
@@ -626,12 +668,23 @@ export default function PricingAndCheckout() {
                   </div>
                   <div className="flex justify-between gap-3">
                     <span className="text-slate-500 shrink-0">Cấp độ đăng ký:</span>
-                    <span className="font-bold text-amber-800 text-right">{activeLevelObj.label}</span>
+                    <span className="font-bold text-amber-800 text-right">
+                      {activeLevel.label} ({activeLevel.sessionLength}/buổi)
+                    </span>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <span className="text-slate-500 shrink-0">Hình thức học:</span>
+                    <span className="font-bold text-amber-800 text-right">
+                      {activeFormat.short}
+                      {isPrivateFormat
+                        ? ` × ${privateSessions} buổi (${privateRate.toLocaleString("vi-VN")}đ/buổi)`
+                        : ""}
+                    </span>
                   </div>
                   <div className="flex justify-between gap-3">
                     <span className="text-slate-500 shrink-0">Số tiền học phí:</span>
                     <span className="font-extrabold text-emerald-700 tabular-nums">
-                      {activePackage.price.toLocaleString("vi-VN")}đ
+                      {tuitionAmount.toLocaleString("vi-VN")}đ
                     </span>
                   </div>
                   <div className="flex justify-between gap-3">

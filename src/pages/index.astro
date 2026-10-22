@@ -7,7 +7,7 @@ import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import MobileContactBar from "../components/MobileContactBar.astro";
 import Layout from "../layouts/Layout.astro";
-import { BRAND_INFO, BRANCHES, PRICING_PACKAGES, TESTIMONIALS, FAQS, OPERATING_POINTS } from "../data/courses";
+import { BRAND_INFO, BRANCHES, TUITION_PROGRAMS, TUITION_LEVELS, TESTIMONIALS, FAQS, OPERATING_POINTS } from "../data/courses";
 import {
   MapPin,
   Phone,
@@ -60,14 +60,19 @@ const structuredData = {
   hasOfferCatalog: {
     "@type": "OfferCatalog",
     name: "Khóa học cờ vua",
-    itemListElement: PRICING_PACKAGES.map((pkg) => ({
-      "@type": "Offer",
-      name: pkg.name,
-      description: pkg.subtitle,
-      price: pkg.price,
-      priceCurrency: "VND",
-      url: canonicalUrl,
-    })),
+    itemListElement: TUITION_PROGRAMS.map((program) => {
+      const levels = TUITION_LEVELS.filter((level) => level.programId === program.id);
+      return {
+        "@type": "AggregateOffer",
+        name: program.name,
+        description: program.subtitle,
+        lowPrice: Math.min(...levels.map((level) => level.group12)),
+        highPrice: Math.max(...levels.map((level) => level.group24)),
+        priceCurrency: "VND",
+        offerCount: levels.length * 2,
+        url: canonicalUrl,
+      };
+    }),
   },
 };
 ---
@@ -345,9 +350,9 @@ const structuredData = {
     </section>
 
     <!--
-      Nhận xét phụ huynh. Mảng TESTIMONIALS đang cố ý để trống: không được bịa
-      nhận xét cho một trung tâm có thật. Khi còn trống, phần này chỉ hiển thị ô
-      TODO rất rõ để không thể vô tình đưa lên production.
+      Nhận xét phụ huynh. Nội dung thật nằm trong TESTIMONIALS (src/data/courses.ts).
+      Nếu mảng rỗng, phần này tự hiển thị ô TODO rất rõ để không thể vô tình đưa
+      lên production.
     -->
     <section id="phu-huynh" class="py-16 border-t border-slate-200">
       <div class="max-w-6xl mx-auto px-4">

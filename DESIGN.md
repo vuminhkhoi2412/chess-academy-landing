@@ -151,7 +151,7 @@ Rules:
 **Loaders, empty and error states**
 
 - Skeletons must match the exact dimensions of the content they replace. No circular spinner.
-- Empty testimonial section renders a heavy dashed `border-2 border-dashed border-amber-400` TODO panel with three skeleton quote slots, each showing `Tên phụ huynh: TODO` / `Cơ sở: TODO`. This is intentional design, not a temporary hack.
+- When `TESTIMONIALS` is empty, the testimonial section renders a heavy dashed `border-2 border-dashed border-amber-400` TODO panel with three skeleton quote slots, each showing `Tên phụ huynh: TODO` / `Cơ sở: TODO`. This is intentional design, not a temporary hack. With real quotes present, it switches to filled cards automatically.
 - Error pages reuse the same cream + navy + amber vocabulary: the 404 shows a navy chessboard motif and a filled amber or navy return button.
 
 **Modal**

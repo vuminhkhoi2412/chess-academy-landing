@@ -290,52 +290,152 @@ export const CURRICULUM_PROGRAMS: MajorProgram[] = [
 ];
 
 /**
- * Học phí: cả ba mức dưới đây CHƯA được trung tâm xác nhận, và lộ trình Happy Chess
- * chưa có mức giá riêng (HC1–HC3 trong `LEVEL_OPTIONS` đang tạm dùng gói 24 buổi).
- * Không tự sửa số — xem README.md mục "TODO cần nội dung thật" số 3 để biết việc
- * cần chốt với trung tâm.
+ * Học phí chính thức — nguồn: "Bảng học phí Global Chess các cơ sở.pdf".
+ *
+ * Bảng gốc chia theo nhóm lớp:
+ *   - Happy Chess 1–3 (Căn bản, 60 phút)
+ *   - Global Chess 1,2 (Sơ cấp, 60 phút)
+ *   - Global Chess 3,4 (Sơ cấp, 90 phút)
+ *   - Global Chess 5,6 (Trung cấp, 90 phút)
+ *   - Global Chess 7,8 (Trung cấp, 90 phút)
+ *   - Global Chess 9,10 (Chuyên nghiệp): giá theo cấp kiện tướng, chưa mở form.
+ *
+ * Mỗi nhóm có 4 mức:
+ *   group12  — lớp group, 1 buổi/tuần, 12 buổi
+ *   group24  — lớp group, 2 buổi/tuần, 24 buổi
+ *   oneOnOne — lớp 1 kèm 1, đơn giá MỖI BUỔI
+ *   oneOnTwo — lớp 1 kèm 2, đơn giá MỖI BUỔI
+ *
+ * Mã HC1–TC2 khớp đúng `subLevels` trong CURRICULUM_PROGRAMS. Không tự sửa giá
+ * mà không đối chiếu lại bảng gốc và tests/tuition.test.mjs.
  */
-export const PRICING_PACKAGES = [
+export interface TuitionLevel {
+  code: string;
+  programId: "happy-chess" | "so-cap" | "trung-cap";
+  label: string;
+  sessionLength: string;
+  group12: number;
+  group24: number;
+  oneOnOne: number;
+  oneOnTwo: number;
+}
+
+export const TUITION_LEVELS: TuitionLevel[] = [
   {
-    id: "hoc-phan-24",
-    name: "Khóa Tiêu Chuẩn (1 Giáo Trình / 24 Buổi)",
-    subtitle: "Đăng ký theo từng cấp độ nhỏ (Sơ cấp 1, Sơ cấp 2, Trung cấp Q1 hoặc Q2)",
-    price: 3600000,
-    duration: "/ 24 buổi (60 - 90 phút/buổi)",
+    code: "HC1",
+    programId: "happy-chess",
+    label: "Happy Chess 1 (Level 1)",
+    sessionLength: "60 phút",
+    group12: 1800000,
+    group24: 2700000,
+    oneOnOne: 350000,
+    oneOnTwo: 250000,
+  },
+  {
+    code: "HC2",
+    programId: "happy-chess",
+    label: "Happy Chess 2 (Level 2)",
+    sessionLength: "60 phút",
+    group12: 1800000,
+    group24: 2700000,
+    oneOnOne: 350000,
+    oneOnTwo: 250000,
+  },
+  {
+    code: "HC3",
+    programId: "happy-chess",
+    label: "Happy Chess 3 (Level 3)",
+    sessionLength: "60 phút",
+    group12: 1800000,
+    group24: 2700000,
+    oneOnOne: 350000,
+    oneOnTwo: 250000,
+  },
+  {
+    code: "SC1",
+    programId: "so-cap",
+    label: "Sơ cấp 1 (Global 1, 2)",
+    sessionLength: "60 phút",
+    group12: 2100000,
+    group24: 3240000,
+    oneOnOne: 400000,
+    oneOnTwo: 300000,
+  },
+  {
+    code: "SC2",
+    programId: "so-cap",
+    label: "Sơ cấp 2 (Global 3, 4)",
+    sessionLength: "90 phút",
+    group12: 2700000,
+    group24: 4860000,
+    oneOnOne: 400000,
+    oneOnTwo: 300000,
+  },
+  {
+    code: "TC1",
+    programId: "trung-cap",
+    label: "Trung cấp 1 (Global 5, 6)",
+    sessionLength: "90 phút",
+    group12: 3240000,
+    group24: 5830000,
+    oneOnOne: 450000,
+    oneOnTwo: 350000,
+  },
+  {
+    code: "TC2",
+    programId: "trung-cap",
+    label: "Trung cấp 2 (Global 7, 8)",
+    sessionLength: "90 phút",
+    group12: 3888000,
+    group24: 6996000,
+    oneOnOne: 450000,
+    oneOnTwo: 350000,
+  },
+];
+
+export interface TuitionProgram {
+  id: "happy-chess" | "so-cap" | "trung-cap";
+  name: string;
+  subtitle: string;
+  popular: boolean;
+  features: string[];
+}
+
+export const TUITION_PROGRAMS: TuitionProgram[] = [
+  {
+    id: "happy-chess",
+    name: "Happy Chess (Căn bản)",
+    subtitle: "3 Level × 24 buổi, dành cho bé từ 4 tuổi",
     popular: false,
     features: [
-      "Tặng kèm bộ Giáo trình chuẩn Global Chess",
-      "Lớp tiêu chuẩn: Ôn bài - Giảng mới - Giải bài tập - Đấu thực hành",
-      "Kiểm tra đánh giá định kỳ & cuối khóa",
-      "Linh hoạt chọn cơ sở và khung giờ học hàng tuần",
+      "Happy Chess 1 – 3, mỗi Level 24 buổi",
+      "60 phút mỗi buổi",
+      "Lớp group từ 2 học viên",
+      "12 buổi (1 buổi/tuần) hoặc 24 buổi (2 buổi/tuần)",
     ],
   },
   {
-    id: "lo-trinh-48",
-    name: "Trọn Gói Lộ Trình Hoàn Chỉnh (48 Buổi)",
-    subtitle: "Cam kết đầu ra toàn diện (Trọn bộ 2 Giáo trình Sơ Cấp hoặc Trung Cấp)",
-    price: 6500000,
-    duration: "/ 48 buổi (Tiết kiệm ưu đãi)",
+    id: "so-cap",
+    name: "Global Chess Sơ cấp",
+    subtitle: "Global Chess 1 – 4, nền tảng khai cuộc và chiến thuật",
     popular: true,
     features: [
-      "Bao gồm toàn bộ 2 cấp độ (48 buổi thực chiến bài bản)",
-      "Tặng trọn bộ 2 Giáo trình Global Chess chuyên sâu",
-      "Ưu tiên xếp lịch tại cả 5 cơ sở TP.HCM",
-      "Theo dõi sát sao tiến độ qua bài tập, thực hành & giải đấu nội bộ",
+      "Global Chess 1 – 4",
+      "60 phút (Global 1–2) • 90 phút (Global 3–4)",
+      "Lớp group từ 2 học viên",
+      "Luyện khai cuộc, chiến thuật và thi đấu",
     ],
   },
   {
-    id: "kem-1-1",
-    name: "Lớp Kèm Riêng 1-1 (Theo Yêu Cầu)",
-    subtitle: "Lộ trình cá nhân hóa & thời gian linh hoạt tuyệt đối theo học viên",
-    price: 4800000,
-    duration: "/ khóa 12 buổi (Linh hoạt)",
+    id: "trung-cap",
+    name: "Global Chess Trung cấp",
+    subtitle: "Global Chess 5 – 8, chiến thuật trung – tàn cuộc",
     popular: false,
     features: [
-      "Huấn luyện viên kèm trực tiếp 1-1, đẩy nhanh tốc độ tiếp thu",
-      "Bám sát giáo trình Sơ cấp / Trung cấp hoặc ôn luyện thi đấu",
-      "Chủ động chọn khung giờ học và cơ sở thuận tiện nhất",
-      "Phân tích chuyên sâu từng ván đấu thực tế của bé",
+      "Global Chess 5 – 8",
+      "90 phút mỗi buổi",
+      "Lớp group từ 2 học viên",
+      "Chiến thuật trung – tàn cuộc nâng cao",
     ],
   },
 ];
@@ -364,16 +464,12 @@ export const INTERACTIVE_PUZZLE: InteractivePuzzleConfig = {
 /**
  * Nhận xét của phụ huynh.
  *
- * ĐỌC TRƯỚC KHI SỬA: mảng này đang CỐ Ý ĐỂ TRỐNG.
- *
- * Không được bịa nhận xét cho một trung tâm có thật — đó là quảng cáo sai sự thật
- * và là rủi ro pháp lý cho Global Chess. Hãy xin câu trích dẫn thật từ phụ huynh,
- * kèm tên và cơ sở, rồi điền vào đây theo đúng cấu trúc bên dưới:
- *
- *   { quote: "...", author: "Chị Nguyễn Thị A", role: "Phụ huynh bé Minh An", branch: "Cơ sở 1 – Phú Nhuận" }
+ * Nguồn: `assets/nguon/trichdan.txt` do trung tâm cung cấp. Giữ nguyên câu chữ và tên bé;
+ * không tự viết thêm, không sửa lời trích dẫn. Cơ sở ghi theo tên chi nhánh
+ * chính thức trong `BRANCHES`.
  *
  * Khi mảng còn rỗng, giao diện tự hiển thị ô trống TODO rất rõ nên không thể vô
- * tình đưa lên production. Điền đủ 3 mục là giao diện tự chuyển sang bản thật.
+ * tình đưa lên production. Có ít nhất 1 mục là giao diện chuyển sang bản thật.
  */
 export interface Testimonial {
   quote: string;
@@ -382,7 +478,29 @@ export interface Testimonial {
   branch: string;
 }
 
-export const TESTIMONIALS: Testimonial[] = [];
+export const TESTIMONIALS: Testimonial[] = [
+  {
+    quote:
+      "Bé học tiến bộ lắm á thầy, chơi tốt hơn lúc chưa học, chiếu bí ba hoài luôn",
+    author: "Phụ huynh bé Bảo Khang",
+    role: "Phụ huynh học viên",
+    branch: "Cơ sở Bình Phú (Q.6)",
+  },
+  {
+    quote:
+      "Bé thích học ở đây lắm á thầy, có các bạn chơi chung và biết thêm được nhiều thế cờ hay",
+    author: "Phụ huynh bé Kính Long",
+    role: "Phụ huynh học viên",
+    branch: "Cơ sở Tên Lửa (Bình Tân)",
+  },
+  {
+    quote:
+      "Học ở Global Chess ngoài cờ vua ra bé còn học được robotics, đưa bé đến 1 chỗ mà học được nhiều môn, mẹ đỡ phải chạy đi chạy lại",
+    author: "Phụ huynh bé Văn Minh",
+    role: "Phụ huynh học viên",
+    branch: "Cơ sở Tên Lửa (Bình Tân)",
+  },
+];
 
 /**
  * Câu hỏi thường gặp.
@@ -408,7 +526,11 @@ export const FAQS: FaqItem[] = [
   },
   {
     q: "Học phí đã bao gồm sách chưa?",
-    a: "Rồi. Mỗi gói đều tặng kèm bộ Giáo trình chuẩn Global Chess, gói 48 buổi tặng trọn bộ 2 giáo trình.",
+    a: "Học phí niêm yết là học phí lớp học. Sách học theo cấp độ 50.000đ, sách bài tập bổ trợ 90.000đ; áo đồng phục 150.000đ, bộ cờ tiêu chuẩn thi đấu 250.000đ, đồng hồ thi đấu 400.000đ (theo bảng giá của trung tâm).",
+  },
+  {
+    q: "Học 1 buổi/tuần hay 2 buổi/tuần?",
+    a: "Trung tâm có cả hai hình thức: gói 12 buổi học 1 buổi/tuần, gói 24 buổi học 2 buổi/tuần. Ngoài ra có lớp 1 kèm 1 và 1 kèm 2, học phí tính theo từng buổi.",
   },
   {
     q: "Có lớp cuối tuần không?",
