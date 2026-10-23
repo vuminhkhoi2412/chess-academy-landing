@@ -1,9 +1,9 @@
 // src/components/InteractivePuzzle.tsx
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import { Chessboard, type PieceDropHandlerArgs } from "react-chessboard";
 import confetti from "canvas-confetti";
-import { Sparkles, RotateCcw, CheckCircle2 } from "lucide-react";
+import { Timer, RotateCcw, CheckCircle2 } from "lucide-react";
 import { INTERACTIVE_PUZZLE } from "../data/courses";
 
 // Thế cờ và nước giải nằm trong src/data/courses.ts để test được logic cờ.
@@ -13,6 +13,10 @@ const SOLUTION = INTERACTIVE_PUZZLE.solution;
 export default function InteractivePuzzle() {
   const [game, setGame] = useState(() => new Chess(INITIAL_FEN));
   const [status, setStatus] = useState<"playing" | "solved" | "wrong">("playing");
+  const wrongTimer = useRef<number | undefined>(undefined);
+
+  // The "wrong move" hint resets itself. Clear the timer if the island unmounts first.
+  useEffect(() => () => window.clearTimeout(wrongTimer.current), []);
 
   function onDrop({ sourceSquare, targetSquare }: PieceDropHandlerArgs) {
     // Đã giải xong, hoặc thả ra ngoài bàn cờ
@@ -21,7 +25,7 @@ export default function InteractivePuzzle() {
     // Sai nước: trả quân về chỗ cũ, không đổi thế cờ
     if (sourceSquare !== SOLUTION.from || targetSquare !== SOLUTION.to) {
       setStatus("wrong");
-      window.setTimeout(
+      wrongTimer.current = window.setTimeout(
         () => setStatus((prev) => (prev === "wrong" ? "playing" : prev)),
         1400
       );
@@ -36,7 +40,10 @@ export default function InteractivePuzzle() {
 
       setGame(next);
       setStatus("solved");
-      confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
+      // Confetti is decoration; skip it when the visitor asked for reduced motion.
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
+      }
       return true;
     } catch {
       return false;
@@ -44,6 +51,7 @@ export default function InteractivePuzzle() {
   }
 
   function resetPuzzle() {
+    window.clearTimeout(wrongTimer.current);
     setGame(new Chess(INITIAL_FEN));
     setStatus("playing");
   }
@@ -52,12 +60,12 @@ export default function InteractivePuzzle() {
     <div className="bg-white p-5 rounded-card shadow-lifted border border-slate-200 max-w-md mx-auto">
       <div className="flex items-center justify-between gap-3 mb-3">
         <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-amber-700 bg-amber-100 px-3 py-1 rounded-control">
-          <Sparkles className="w-3.5 h-3.5" aria-hidden="true" /> Thử thách 10 giây cho bé
+          <Timer className="w-3.5 h-3.5" aria-hidden="true" /> Thử thách 10 giây cho bé
         </span>
         <button
           type="button"
           onClick={resetPuzzle}
-          className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-800 active:scale-95 text-sm transition rounded-control px-1 py-1 cursor-pointer shrink-0"
+          className="inline-flex min-h-11 items-center gap-1 text-slate-500 hover:text-slate-800 active:scale-95 text-sm transition rounded-control px-2 py-1 cursor-pointer shrink-0"
         >
           <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" /> Chơi lại
         </button>

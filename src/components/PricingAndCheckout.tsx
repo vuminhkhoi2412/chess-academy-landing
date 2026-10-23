@@ -10,7 +10,7 @@ import {
 import { BANK_CONFIG } from "../data/payment";
 import {
   Check,
-  QrCode,
+  ArrowRight,
   ShieldCheck,
   X,
   Copy,
@@ -61,6 +61,8 @@ export default function PricingAndCheckout() {
   const [selectedBranch, setSelectedBranch] = useState(BRANCHES[0].id);
   const [selectedSlots, setSelectedSlots] = useState<string[]>([FLEXIBLE_TIME_SLOTS[1]]);
   const [showQR, setShowQR] = useState(false);
+  const [qrLoaded, setQrLoaded] = useState(false);
+  const [qrError, setQrError] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);
   const [slotError, setSlotError] = useState(false);
@@ -231,6 +233,8 @@ export default function PricingAndCheckout() {
     }
 
     setShowQR(true);
+    setQrLoaded(false);
+    setQrError(false);
   };
 
   const copyToClipboard = async (text: string) => {
@@ -279,7 +283,7 @@ export default function PricingAndCheckout() {
             Đăng ký trực tuyến
           </span>
           <h2 className="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">
-            Tham Khảo Chi Phí
+            Tham khảo chi phí
           </h2>
         </div>
 
@@ -297,7 +301,7 @@ export default function PricingAndCheckout() {
                 key={program.id}
                 className={`rounded-card p-7 flex flex-col justify-between border transition ${
                   program.popular
-                    ? "bg-brand-700 border-amber-500 shadow-2xl shadow-amber-500/10 relative"
+                    ? "bg-brand-700 border-amber-500 shadow-lifted relative"
                     : "bg-brand-700/40 border-brand-600 hover:border-brand-500"
                 }`}
               >
@@ -346,14 +350,14 @@ export default function PricingAndCheckout() {
                 <button
                   type="button"
                   onClick={(event) => handleOpenModal(program, event.currentTarget)}
-                  className={`w-full py-3.5 px-5 rounded-control font-bold text-sm flex items-center justify-center gap-2 transition cursor-pointer active:scale-[0.98] ${
-                    program.popular
-                      ? "bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 shadow-lg shadow-amber-500/20"
-                      : "bg-white hover:bg-slate-100 active:bg-slate-200 text-slate-900"
-                  }`}
+                  className={`gc-move gc-move--block ${
+                    program.popular ? "gc-move--amber" : "gc-move--quiet"
+                  } cursor-pointer`}
                 >
-                  <QrCode className="w-4 h-4" aria-hidden="true" />
-                  Tham khảo Lộ trình
+                  <span className="gc-move__label">Đăng ký ngay</span>
+                  <span className="gc-move__go" aria-hidden="true">
+                    <ArrowRight className="w-4 h-4" />
+                  </span>
                 </button>
               </div>
             );
@@ -387,7 +391,7 @@ export default function PricingAndCheckout() {
       {/* Modal Chọn Cơ Sở, Cấp Độ & VietQR */}
       {isModalOpen && (
         <div
-          className="fixed inset-0 z-50 bg-brand-950/85 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto overscroll-contain"
+          className="fixed inset-0 z-50 bg-brand-950/85 backdrop-blur-sm flex items-start justify-center p-4 overflow-y-auto overscroll-contain"
           onClick={(event) => {
             if (event.target === event.currentTarget) setIsModalOpen(false);
           }}
@@ -397,33 +401,42 @@ export default function PricingAndCheckout() {
             role="dialog"
             aria-modal="true"
             aria-labelledby={DIALOG_TITLE_ID}
-            className="bg-white text-slate-900 rounded-card max-w-xl w-full p-6 md:p-8 relative shadow-2xl my-8"
+            className="bg-white text-slate-900 rounded-card max-w-xl w-full my-8 flex max-h-[calc(100dvh-6rem)] flex-col overflow-hidden shadow-2xl"
           >
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(false)}
-              aria-label="Đóng hộp thoại đăng ký"
-              className="absolute top-4 right-4 p-1.5 rounded-control text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer active:scale-95"
-            >
-              <X className="w-5 h-5" aria-hidden="true" />
-            </button>
-
-            <div className="mb-4 pr-10">
-              {/* Badge tự động nhảy tên gói theo Cấp độ đăng ký */}
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-2.5 py-1 rounded-control">
-                {activeProgram.name}
-              </span>
-              <h3 id={DIALOG_TITLE_ID} className="text-xl font-bold mt-2">
-                {showQR ? "Quét Mã VietQR Để Hoàn Tất Học Phí" : "Đăng Ký Cơ Sở & Khung Giờ Học"}
-              </h3>
+            {/*
+              Đầu hộp thoại đứng yên, phần thân tự cuộn. Trước đây cả hộp thoại
+              cuộn trong lớp phủ, nên trên điện thoại nút đóng trôi khỏi màn hình
+              khi phụ huynh kéo xuống tới nút gửi — muốn thoát phải kéo ngược lên.
+            */}
+            <div className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-200 px-6 pb-4 pt-5 md:px-8">
+              <div className="min-w-0 pr-2">
+                {/* Badge tự động nhảy tên gói theo Cấp độ đăng ký */}
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-2.5 py-1 rounded-control">
+                  {activeProgram.name}
+                </span>
+                <h3 id={DIALOG_TITLE_ID} className="text-xl font-bold mt-2">
+                  {showQR ? "Quét mã VietQR để hoàn tất học phí" : "Đăng ký cơ sở & khung giờ học"}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                aria-label="Đóng hộp thoại đăng ký"
+                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-control text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer active:scale-95"
+              >
+                <X className="w-5 h-5" aria-hidden="true" />
+              </button>
             </div>
 
             {!showQR ? (
-              <form onSubmit={handleGenerateQR} className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
+              <form
+                onSubmit={handleGenerateQR}
+                className="min-h-0 space-y-4 overflow-y-auto overscroll-contain px-6 py-5 md:px-8"
+              >
+                <div className="grid gap-3 sm:grid-cols-2">
                   <div>
                     <label htmlFor="gc-child-name" className="block text-sm font-semibold text-slate-700 mb-1">
-                      Họ tên Học viên (Bé) *
+                      Họ tên học viên (bé) *
                     </label>
                     <input
                       id="gc-child-name"
@@ -438,7 +451,7 @@ export default function PricingAndCheckout() {
                   </div>
                   <div>
                     <label htmlFor="gc-child-age" className="block text-sm font-semibold text-slate-700 mb-1">
-                      Năm sinh / Tuổi (4-12 tuổi) *
+                      Năm sinh / tuổi (4–12 tuổi) *
                     </label>
                     <input
                       id="gc-child-age"
@@ -453,10 +466,10 @@ export default function PricingAndCheckout() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid gap-3 sm:grid-cols-2">
                   <div>
                     <label htmlFor="gc-parent-name" className="block text-sm font-semibold text-slate-700 mb-1">
-                      Họ tên Phụ huynh *
+                      Họ tên phụ huynh *
                     </label>
                     <input
                       id="gc-parent-name"
@@ -505,7 +518,7 @@ export default function PricingAndCheckout() {
                 <div className="grid sm:grid-cols-2 gap-3">
                   <div>
                     <label htmlFor="gc-branch" className="text-sm font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-amber-600" aria-hidden="true" /> Chọn Cơ sở Global Chess *
+                      <MapPin className="w-3.5 h-3.5 text-amber-600" aria-hidden="true" /> Chọn cơ sở Global Chess *
                     </label>
                     <select
                       id="gc-branch"
@@ -523,7 +536,7 @@ export default function PricingAndCheckout() {
 
                   <div>
                     <label htmlFor="gc-level" className="block text-sm font-semibold text-slate-700 mb-1">
-                      Cấp độ / Khóa đăng ký *
+                      Cấp độ / khóa đăng ký *
                     </label>
                     <select
                       id="gc-level"
@@ -542,7 +555,7 @@ export default function PricingAndCheckout() {
                 </div>
 
                 {/* Hình thức học lấy từ bảng học phí: 12/24 buổi hoặc kèm riêng. */}
-                <div className="grid sm:grid-cols-2 gap-3">
+                <div className={`grid gap-3 ${isPrivateFormat ? "sm:grid-cols-2" : ""}`}>
                   <div>
                     <label htmlFor="gc-format" className="block text-sm font-semibold text-slate-700 mb-1">
                       Hình thức học *
@@ -584,7 +597,7 @@ export default function PricingAndCheckout() {
                 {/* Chọn các khung thời gian rảnh */}
                 <fieldset>
                   <legend className="text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-amber-600" aria-hidden="true" /> Khung giờ bé có thể tham gia (Có thể chọn nhiều) *
+                    <Clock className="w-3.5 h-3.5 text-amber-600" aria-hidden="true" /> Khung giờ bé có thể tham gia (có thể chọn nhiều) *
                   </legend>
                   <div className="grid sm:grid-cols-2 gap-2">
                     {FLEXIBLE_TIME_SLOTS.map((slot) => {
@@ -638,24 +651,44 @@ export default function PricingAndCheckout() {
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-brand-800 hover:bg-brand-700 active:bg-brand-900 active:scale-[0.99] text-white font-bold rounded-control text-sm transition flex items-center justify-center gap-2 cursor-pointer"
+                  className="gc-move gc-move--navy gc-move--block gc-move--lg cursor-pointer"
                 >
-                  <QrCode className="w-4 h-4" aria-hidden="true" />
-                  Tạo Mã VietQR ({tuitionAmount.toLocaleString("vi-VN")}đ)
+                  <span className="gc-move__label">
+                    Tạo mã VietQR
+                    <span className="ml-auto whitespace-nowrap pl-3 font-semibold tabular-nums text-brand-200">
+                      {tuitionAmount.toLocaleString("vi-VN")}đ
+                    </span>
+                  </span>
+                  <span className="gc-move__go" aria-hidden="true">
+                    <ArrowRight className="w-4 h-4" />
+                  </span>
                 </button>
               </form>
             ) : (
-              <div className="space-y-4 text-center">
-                <div className="bg-slate-50 p-3 rounded-control border border-slate-200 inline-block">
-                  <img
-                    src={qrUrl}
-                    alt={`Mã VietQR thanh toán ${tuitionAmount.toLocaleString("vi-VN")} đồng cho ${BRAND_INFO.name}`}
-                    width={224}
-                    height={224}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-56 h-auto mx-auto rounded-control"
-                  />
+              <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain px-6 py-5 text-center md:px-8">
+                <div className="relative mx-auto h-56 w-56 overflow-hidden rounded-control border border-slate-200 bg-slate-50">
+                  {!qrLoaded && !qrError && (
+                    <div className="absolute inset-0 grid place-items-center px-6 text-center text-xs font-medium text-slate-500">
+                      Đang tạo mã QR…
+                    </div>
+                  )}
+                  {qrError && (
+                    <div className="absolute inset-0 grid place-items-center px-6 text-center text-xs font-semibold text-red-600">
+                      Không tải được mã QR. Vui lòng thử lại.
+                    </div>
+                  )}
+                  {!qrError && (
+                    <img
+                      src={qrUrl}
+                      alt={`Mã VietQR thanh toán ${tuitionAmount.toLocaleString("vi-VN")} đồng cho ${BRAND_INFO.name}`}
+                      width={224}
+                      height={224}
+                      decoding="async"
+                      onLoad={() => setQrLoaded(true)}
+                      onError={() => setQrError(true)}
+                      className={`h-full w-full object-contain transition-opacity duration-200 ${qrLoaded ? "opacity-100" : "opacity-0"}`}
+                    />
+                  )}
                 </div>
 
                 <div className="text-left bg-amber-50/80 border border-amber-200 rounded-control p-3.5 text-sm space-y-1.5">
@@ -722,25 +755,30 @@ export default function PricingAndCheckout() {
 
                 <div className="flex items-center justify-center gap-2 text-sm text-emerald-700 font-medium">
                   <ShieldCheck className="w-4 h-4 shrink-0" aria-hidden="true" />
-                  Quét bằng bất kỳ App Ngân hàng nào để tự động điền đúng số tiền và cú pháp.
+                  Quét bằng bất kỳ app ngân hàng nào để tự động điền đúng số tiền và cú pháp.
                 </div>
 
-                <div className="flex gap-3 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => setShowQR(false)}
-                    className="w-1/3 py-2.5 border border-slate-300 rounded-control text-sm font-semibold text-slate-600 hover:bg-slate-100 active:bg-slate-200 active:scale-[0.98] cursor-pointer transition"
-                  >
-                    Sửa thông tin
-                  </button>
+                <div className="pt-1">
                   <a
                     href={`https://zalo.me/${BRAND_INFO.zaloPhone}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-2/3 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 active:scale-[0.98] text-white rounded-control text-sm font-bold flex items-center justify-center gap-1.5 transition"
+                    className="gc-move gc-move--zalo gc-move--block"
                   >
-                    Đã chuyển khoản • Báo Zalo Trung tâm ({BRAND_INFO.hotlines[0]})
+                    <span className="gc-move__label">
+                      Đã chuyển khoản • Báo Zalo trung tâm ({BRAND_INFO.hotlines[0]})
+                    </span>
+                    <span className="gc-move__go" aria-hidden="true">
+                      <ArrowRight className="w-4 h-4" />
+                    </span>
                   </a>
+                  <button
+                    type="button"
+                    onClick={() => setShowQR(false)}
+                    className="mt-1 flex min-h-11 w-full cursor-pointer items-center justify-center text-sm font-semibold text-slate-500 transition hover:text-slate-800"
+                  >
+                    Sửa thông tin
+                  </button>
                 </div>
               </div>
             )}

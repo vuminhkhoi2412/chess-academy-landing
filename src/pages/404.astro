@@ -7,7 +7,7 @@ import Layout from "../layouts/Layout.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import MobileContactBar from "../components/MobileContactBar.astro";
-import { ArrowLeft, Phone, MapPin } from "lucide-react";
+import { ArrowLeft, ArrowRight, Phone, MapPin } from "lucide-react";
 
 const pageTitle = `Không tìm thấy trang – ${BRAND_INFO.name}`;
 const pageDescription =
@@ -38,18 +38,15 @@ const pageDescription =
           48 buổi, 5 cơ sở tại TP.HCM và học phí.
         </p>
 
-        <div class="mt-7 flex flex-wrap gap-3">
-          <a
-            href="/"
-            class="inline-flex items-center gap-2 bg-brand-800 hover:bg-brand-700 active:scale-[0.98] text-white font-bold px-5 py-3 rounded-control text-sm shadow-lifted transition"
-          >
-            <ArrowLeft className="w-4 h-4 text-amber-400" aria-hidden="true" /> Về trang chủ
+        <div class="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2">
+          <a href="/" class="gc-move gc-move--navy">
+            <span class="gc-move__label">
+              <ArrowLeft className="w-4 h-4 text-amber-400" aria-hidden="true" /> Về trang chủ
+            </span>
           </a>
-          <a
-            href="/#pricing"
-            class="inline-flex items-center gap-2 bg-white hover:bg-slate-100 active:scale-[0.98] text-slate-800 border border-slate-300 font-semibold px-5 py-3 rounded-control text-sm shadow-soft transition"
-          >
+          <a href="/#pricing" class="gc-ref min-h-11">
             Xem học phí &amp; giữ chỗ
+            <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
           </a>
         </div>
 

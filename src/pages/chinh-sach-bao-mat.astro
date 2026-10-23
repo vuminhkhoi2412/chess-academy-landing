@@ -23,13 +23,13 @@ const updatedAt = "16/10/2026";
     <main id="main" tabindex="-1" class="max-w-3xl mx-auto px-4 py-12 md:py-16">
       <p class="text-xs font-bold uppercase tracking-wider text-amber-700">Cập nhật lần cuối: {updatedAt}</p>
       <h1 class="mt-2 text-3xl md:text-4xl font-extrabold text-slate-900">Chính sách bảo mật</h1>
-      <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+      <p class="mt-3 text-base text-slate-600 leading-relaxed">
         Trang này giải thích {BRAND_INFO.name} xử lý thông tin của phụ huynh và học viên như thế nào.
       </p>
 
-      <div class="mt-10 space-y-8 text-sm text-slate-700 leading-relaxed">
+      <div class="mt-10 space-y-8 text-base text-slate-700 leading-relaxed">
         <section>
-          <h2 class="text-lg font-bold text-slate-900">1. Trang web này thu thập thông tin gì</h2>
+          <h2 class="text-lg md:text-xl font-bold text-slate-900">1. Trang web này thu thập thông tin gì</h2>
           <p class="mt-2">
             Trang chủ là một trang tĩnh. Form đăng ký giữ chỗ chỉ chạy trong trình duyệt của bạn để
             tính học phí và tạo mã VietQR; <strong>không có dữ liệu nào được gửi tới máy chủ của
@@ -42,7 +42,7 @@ const updatedAt = "16/10/2026";
         </section>
 
         <section>
-          <h2 class="text-lg font-bold text-slate-900">2. Dữ liệu đi đâu khi bạn chuyển khoản</h2>
+          <h2 class="text-lg md:text-xl font-bold text-slate-900">2. Dữ liệu đi đâu khi bạn chuyển khoản</h2>
           <p class="mt-2">
             Mã QR do đơn vị thứ ba <span class="font-semibold">img.vietqr.io</span> tạo ra. Khi quét
             mã, ứng dụng ngân hàng của bạn tự điền số tài khoản, số tiền và nội dung chuyển khoản.
@@ -56,7 +56,7 @@ const updatedAt = "16/10/2026";
         </section>
 
         <section>
-          <h2 class="text-lg font-bold text-slate-900">3. Chúng tôi dùng thông tin để làm gì</h2>
+          <h2 class="text-lg md:text-xl font-bold text-slate-900">3. Chúng tôi dùng thông tin để làm gì</h2>
           <ul class="mt-2 space-y-1.5 list-none">
             <li>– Kiểm tra trình độ đầu vào và xếp lớp phù hợp cho bé.</li>
             <li>– Liên hệ xác nhận cơ sở, khung giờ học và tình trạng học phí.</li>
@@ -65,7 +65,7 @@ const updatedAt = "16/10/2026";
         </section>
 
         <section>
-          <h2 class="text-lg font-bold text-slate-900">4. Trẻ em</h2>
+          <h2 class="text-lg md:text-xl font-bold text-slate-900">4. Trẻ em</h2>
           <p class="mt-2">
             Học viên là trẻ 4–12 tuổi, nên mọi thông tin về bé đều do phụ huynh hoặc người giám hộ
             cung cấp. Vui lòng chỉ nhập thông tin của bé khi bạn là cha mẹ hoặc người giám hộ hợp pháp.
@@ -73,7 +73,7 @@ const updatedAt = "16/10/2026";
         </section>
 
         <section>
-          <h2 class="text-lg font-bold text-slate-900">5. Yêu cầu xem, sửa hoặc xoá thông tin</h2>
+          <h2 class="text-lg md:text-xl font-bold text-slate-900">5. Yêu cầu xem, sửa hoặc xoá thông tin</h2>
           <p class="mt-2">
             Vì trang web không lưu dữ liệu, phần lớn thông tin chỉ còn trong tin nhắn Zalo và sao kê
             ngân hàng. Nếu bạn muốn trung tâm xoá thông tin đã trao đổi qua Zalo, hãy gọi hoặc nhắn
@@ -82,12 +82,12 @@ const updatedAt = "16/10/2026";
         </section>
 
         <section>
-          <h2 class="text-lg font-bold text-slate-900">6. Liên hệ</h2>
+          <h2 class="text-lg md:text-xl font-bold text-slate-900">6. Liên hệ</h2>
           <div class="mt-2 flex flex-col gap-1.5">
             {BRAND_INFO.hotlines.map((hotline) => (
               <a
                 href={`tel:${hotline.replace(/\./g, "")}`}
-                class="inline-flex items-center gap-1.5 font-semibold text-amber-700 hover:underline tabular-nums w-fit"
+                class="inline-flex min-h-11 items-center gap-1.5 font-semibold text-amber-700 hover:underline tabular-nums w-fit"
               >
                 <Phone className="w-4 h-4" aria-hidden="true" /> {hotline}
               </a>

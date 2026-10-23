@@ -22,13 +22,13 @@ const updatedAt = "16/10/2026";
     <main id="main" tabindex="-1" class="max-w-3xl mx-auto px-4 py-12 md:py-16">
       <p class="text-xs font-bold uppercase tracking-wider text-amber-700">Cập nhật lần cuối: {updatedAt}</p>
       <h1 class="mt-2 text-3xl md:text-4xl font-extrabold text-slate-900">Điều khoản sử dụng</h1>
-      <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+      <p class="mt-3 text-base text-slate-600 leading-relaxed">
         Khi dùng trang web này và đăng ký giữ chỗ cho bé, bạn đồng ý với các điều khoản dưới đây.
       </p>
 
-      <div class="mt-10 space-y-8 text-sm text-slate-700 leading-relaxed">
+      <div class="mt-10 space-y-8 text-base text-slate-700 leading-relaxed">
         <section>
-          <h2 class="text-lg font-bold text-slate-900">1. Giá và thông tin hiển thị</h2>
+          <h2 class="text-lg md:text-xl font-bold text-slate-900">1. Giá và thông tin hiển thị</h2>
           <p class="mt-2">
             Học phí và lộ trình trên trang là thông tin tham khảo tại thời điểm bạn xem. Con số cuối
             cùng do giáo vụ xác nhận qua hotline hoặc Zalo trước khi bé vào lớp. Nếu có sai lệch,
@@ -37,7 +37,7 @@ const updatedAt = "16/10/2026";
         </section>
 
         <section>
-          <h2 class="text-lg font-bold text-slate-900">2. Giữ chỗ và thanh toán</h2>
+          <h2 class="text-lg md:text-xl font-bold text-slate-900">2. Giữ chỗ và thanh toán</h2>
           <p class="mt-2">
             Mã VietQR trên trang được tạo tự động theo cấp độ bạn chọn. Chỗ học chỉ được giữ sau khi
             trung tâm nhận đủ học phí và xác nhận với bạn. Vui lòng giữ đúng nội dung chuyển khoản
@@ -46,7 +46,7 @@ const updatedAt = "16/10/2026";
         </section>
 
         <section>
-          <h2 class="text-lg font-bold text-slate-900">3. Xếp lớp và đổi lịch</h2>
+          <h2 class="text-lg md:text-xl font-bold text-slate-900">3. Xếp lớp và đổi lịch</h2>
           <p class="mt-2">
             Khung giờ bạn chọn là nguyện vọng, không phải lịch đã chốt. Giáo vụ sẽ sắp lớp theo trình
             độ và số lượng học viên thực tế. Trường hợp phải đổi cơ sở hoặc đổi ca, trung tâm sẽ báo
@@ -55,7 +55,7 @@ const updatedAt = "16/10/2026";
         </section>
 
         <section>
-          <h2 class="text-lg font-bold text-slate-900">4. Bảo lưu</h2>
+          <h2 class="text-lg md:text-xl font-bold text-slate-900">4. Bảo lưu</h2>
           <p class="mt-2">
             Bé có thể bảo lưu khi ốm hoặc có việc gia đình. Phụ huynh báo trước cho giáo vụ để sắp
             buổi học bù. Thời hạn bảo lưu và số buổi được bù tối đa do trung tâm quy định tại từng
@@ -64,7 +64,7 @@ const updatedAt = "16/10/2026";
         </section>
 
         <section>
-          <h2 class="text-lg font-bold text-slate-900">5. Nội dung trên trang</h2>
+          <h2 class="text-lg md:text-xl font-bold text-slate-900">5. Nội dung trên trang</h2>
           <p class="mt-2">
             Giáo trình, mô tả buổi học và bài đố cờ vua thuộc {BRAND_INFO.name}. Vui lòng không sao
             chép để dùng cho trung tâm khác khi chưa có sự đồng ý.
@@ -72,7 +72,7 @@ const updatedAt = "16/10/2026";
         </section>
 
         <section>
-          <h2 class="text-lg font-bold text-slate-900">6. Giới hạn trách nhiệm</h2>
+          <h2 class="text-lg md:text-xl font-bold text-slate-900">6. Giới hạn trách nhiệm</h2>
           <p class="mt-2">
             Trang web được cung cấp nguyên trạng. Chúng tôi cố gắng giữ thông tin chính xác nhưng
             không cam kết trang luôn không có lỗi. Việc quét mã QR và chuyển khoản do bạn tự thực
@@ -81,12 +81,12 @@ const updatedAt = "16/10/2026";
         </section>
 
         <section>
-          <h2 class="text-lg font-bold text-slate-900">7. Liên hệ</h2>
+          <h2 class="text-lg md:text-xl font-bold text-slate-900">7. Liên hệ</h2>
           <div class="mt-2 flex flex-col gap-1.5">
             {BRAND_INFO.hotlines.map((hotline) => (
               <a
                 href={`tel:${hotline.replace(/\./g, "")}`}
-                class="inline-flex items-center gap-1.5 font-semibold text-amber-700 hover:underline tabular-nums w-fit"
+                class="inline-flex min-h-11 items-center gap-1.5 font-semibold text-amber-700 hover:underline tabular-nums w-fit"
               >
                 <Phone className="w-4 h-4" aria-hidden="true" /> {hotline}
               </a>

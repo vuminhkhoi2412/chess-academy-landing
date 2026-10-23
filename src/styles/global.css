@@ -180,6 +180,257 @@
     line-height: 1.08;
   }
 
+  /*
+   * Hành động — mỗi nút là một "nước đi": nhãn nằm bên trái, ô đích nằm bên
+   * phải. Trước đây mọi CTA trên trang đều là cùng một viên thuốc bo tròn, chữ
+   * căn giữa, biểu tượng bên trái, nên nút đăng ký trông giống hệt nút đổi cơ
+   * sở và giống hệt nút gọi điện.
+   *
+   * Ba bậc, khác nhau về cấu trúc chứ không chỉ về màu:
+   *   .gc-move--navy / --amber  hành động chính, ô đích được tô màu đối lại
+   *   .gc-move--quiet           hành động phụ, chỉ còn đường viền
+   *   .gc-ref                   lối đi tham khảo, không có khung
+   */
+  .gc-move {
+    display: inline-flex;
+    align-items: stretch;
+    min-height: 3rem;
+    max-width: 100%;
+    overflow: hidden;
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-decoration: none;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease,
+      transform 150ms ease;
+  }
+
+  .gc-move:active {
+    transform: scale(0.99);
+  }
+
+  .gc-move__label {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    padding-inline: 1.125rem;
+    text-align: left;
+  }
+
+  .gc-move__go {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+  }
+
+  .gc-move--block {
+    display: flex;
+    width: 100%;
+  }
+
+  .gc-move--block .gc-move__label {
+    flex: 1 1 auto;
+  }
+
+  /* Bậc cỡ: hero và bước thanh toán lớn hơn một nhịp so với CTA trong thẻ. */
+  .gc-move--lg {
+    min-height: 3.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .gc-move--lg .gc-move__label {
+    padding-inline: 1.375rem;
+  }
+
+  .gc-move--lg .gc-move__go {
+    width: 3.25rem;
+  }
+
+  /* Nền sáng: thân navy, ô đích hổ phách. */
+  .gc-move--navy {
+    background-color: var(--color-brand-800);
+    color: #fff;
+    box-shadow: var(--shadow-lifted);
+  }
+
+  .gc-move--navy:hover {
+    background-color: var(--color-brand-700);
+  }
+
+  .gc-move--navy .gc-move__go {
+    background-color: var(--color-amber-400);
+    color: var(--color-slate-950);
+  }
+
+  /* Nền navy: thân hổ phách, ô đích navy. */
+  .gc-move--amber {
+    background-color: var(--color-amber-500);
+    color: var(--color-slate-950);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .gc-move--amber:hover {
+    background-color: var(--color-amber-400);
+  }
+
+  .gc-move--amber .gc-move__go {
+    background-color: var(--color-brand-900);
+    color: var(--color-amber-400);
+  }
+
+  /* Bậc phụ trên nền navy: nền trắng đặc, cùng cấu trúc với nút chính nhưng
+     nhạt hơn. Trước đây là viền trong suốt, trông như một ô nhập liệu bị chia
+     đôi trên nền navy. */
+  .gc-move--quiet {
+    background-color: #fff;
+    border-color: #fff;
+    color: var(--color-brand-900);
+  }
+
+  .gc-move--quiet:hover {
+    background-color: var(--color-brand-50);
+    border-color: var(--color-brand-50);
+  }
+
+  .gc-move--quiet .gc-move__go {
+    border-inline-start: 1px solid rgb(15 23 42 / 0.10);
+    color: var(--color-brand-800);
+  }
+
+  /* Bậc phụ trên nền sáng. */
+  .gc-move--quiet-light {
+    background-color: #fff;
+    border-color: var(--color-slate-300);
+    color: var(--color-slate-800);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .gc-move--quiet-light:hover {
+    background-color: var(--color-slate-50);
+  }
+
+  .gc-move--quiet-light .gc-move__go {
+    border-inline-start: 1px solid var(--color-slate-300);
+    color: var(--color-slate-600);
+  }
+
+  /* Xác nhận đã chuyển khoản: màu trạng thái, chỉ dùng ở bước cuối. */
+  .gc-move--zalo {
+    background-color: var(--color-emerald-600);
+    color: #fff;
+  }
+
+  .gc-move--zalo:hover {
+    background-color: var(--color-emerald-500);
+  }
+
+  .gc-move--zalo .gc-move__go {
+    background-color: var(--color-emerald-800);
+    color: #fff;
+  }
+
+  .gc-move[aria-disabled="true"] {
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  /* Lối đi tham khảo: chữ, không khung. Gạch chân mảnh để vẫn là một hành động. */
+  .gc-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-amber-700);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--color-amber-300);
+    text-underline-offset: 6px;
+    transition: color 150ms ease, text-decoration-color 150ms ease;
+  }
+
+  .gc-ref:hover {
+    color: var(--color-amber-800);
+    text-decoration-color: var(--color-amber-600);
+  }
+
+  .gc-ref svg {
+    flex: none;
+    transition: transform 150ms ease;
+  }
+
+  .gc-ref:hover svg {
+    transform: translateX(3px);
+  }
+
+  .gc-ref--invert {
+    color: var(--color-amber-400);
+    text-decoration-color: rgb(251 191 36 / 0.45);
+  }
+
+  .gc-ref--invert:hover {
+    color: var(--color-amber-300);
+    text-decoration-color: var(--color-amber-400);
+  }
+
+  /* Chọn một mục trong danh sách: cả dòng là nút, ô đích nhỏ ở cuối dòng. */
+  .gc-choice {
+    display: flex;
+    width: 100%;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-amber-700);
+    text-decoration: none;
+    transition: color 150ms ease;
+  }
+
+  .gc-choice:hover {
+    color: var(--color-amber-800);
+  }
+
+  .gc-choice__go {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 1px solid rgb(180 83 9 / 0.35);
+    border-radius: 6px;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+  }
+
+  .gc-choice:hover .gc-choice__go,
+  .gc-choice:focus-visible .gc-choice__go {
+    background-color: var(--color-amber-700);
+    border-color: var(--color-amber-700);
+    color: #fff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gc-ref svg,
+    .gc-ref:hover svg {
+      transform: none;
+      transition: none;
+    }
+
+    .gc-move:active {
+      transform: none;
+    }
+  }
+
   /* A chessboard plane receding into the distance. Decoration only. */
   .gc-hero-board {
     transform: perspective(1100px) rotateX(46deg) rotateZ(-14deg);

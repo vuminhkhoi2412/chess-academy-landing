@@ -18,7 +18,7 @@ import {
   MapPin,
   Phone,
   ArrowRight,
-  Sparkles,
+  Crown,
   Quote,
   BookOpen,
   ListChecks,
@@ -99,7 +99,7 @@ const structuredData = {
     <!-- Top Hotline Bar -->
     <div class="bg-brand-800 text-brand-100 text-xs py-2 px-4">
       <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
-        <span class="font-medium text-amber-400">{BRAND_INFO.slogan1} – {BRAND_INFO.slogan2}</span>
+        <span class="font-medium text-amber-400">Lớp tối trong tuần &amp; cuối tuần • 5 cơ sở tại TP.HCM</span>
         <div class="flex items-center gap-4">
           <span class="flex items-center gap-1.5">
             <Phone className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
@@ -135,8 +135,8 @@ const structuredData = {
       <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-12 gap-10 md:gap-8 lg:gap-12 items-center">
         <div class="md:col-span-6 lg:col-span-7 space-y-5">
           <div class="inline-flex items-center gap-2 bg-amber-100 border border-amber-300 text-amber-900 px-3.5 py-1.5 rounded-control text-xs font-bold">
-            <Sparkles className="w-3.5 h-3.5 text-amber-700" aria-hidden="true" />
-            Đào tạo Cờ Vua Trực Tiếp (4 – 12 tuổi) • 5 Cơ sở tại TP.HCM
+            <Crown className="w-3.5 h-3.5 text-amber-700" aria-hidden="true" />
+            Đào tạo cờ vua trực tiếp (4 – 12 tuổi) • 5 cơ sở tại TP.HCM
           </div>
 
           <!--
@@ -152,18 +152,19 @@ const structuredData = {
             Ba lộ trình chuẩn hóa <strong>Happy Chess (72 buổi)</strong> và <strong>Global Chess Sơ Cấp &amp; Trung Cấp (48 buổi)</strong> giúp trẻ đi từ luật chơi cơ bản đến làm chủ các hệ thống khai cuộc và đòn chiến thuật trung – tàn cuộc.
           </p>
 
-          <div class="flex flex-wrap gap-3.5 pt-2">
-            <a
-              href="#pricing"
-              class="bg-brand-800 hover:bg-brand-700 active:scale-[0.98] text-white font-bold px-6 py-3.5 rounded-control text-sm flex items-center gap-2 shadow-lifted transition"
-            >
-              Đăng ký &amp; Đóng học phí qua QR <ArrowRight className="w-4 h-4 text-amber-400" aria-hidden="true" />
+          <div class="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2">
+            {/*
+              Một hành động chính duy nhất trong hero. Nút phụ cũ cùng cỡ, cùng bo
+              góc, chữ căn giữa đứng cạnh nó khiến hai lựa chọn trông ngang hàng
+              nhau; nay lối xem lộ trình lùi về thành một liên kết có gạch chân.
+            */}
+            <a href="#pricing" class="gc-move gc-move--navy gc-move--lg">
+              <span class="gc-move__label">Đăng ký &amp; Đóng học phí qua QR</span>
+              <span class="gc-move__go" aria-hidden="true"><ArrowRight className="w-4 h-4" /></span>
             </a>
-            <a
-              href="#curriculum"
-              class="bg-white/80 hover:bg-white active:scale-[0.98] text-slate-800 border border-slate-300 font-semibold px-6 py-3.5 rounded-control text-sm transition shadow-soft backdrop-blur-sm"
-            >
-              Xem chi tiết 48 buổi học
+            <a href="#curriculum" class="gc-ref min-h-11">
+              Xem chi tiết lộ trình
+              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
             </a>
           </div>
 
@@ -172,14 +173,19 @@ const structuredData = {
             text-2xl rộng hơn 1/3 hàng, nên nếu chia đều ba cột thì nó buộc phải
             xuống dòng (hoặc tràn ra ngoài khi chặn xuống dòng).
           -->
-          <dl class="grid grid-cols-[repeat(2,minmax(0,1fr))_auto] gap-3 sm:gap-4 pt-5 border-t border-slate-300/70 max-w-lg">
+          {/*
+            Ở md (768–1023px) cột chữ của hero chỉ rộng ~352px, chia ba cột thì
+            mỗi ô còn ~98px trong khi "60–90 phút" cần 145px và tràn sang ô bên
+            cạnh. Khoảng đó dùng hai cột; từ lg cột chữ rộng lại nên trả về ba.
+          */}
+          <dl class="grid grid-cols-[repeat(2,minmax(0,1fr))_auto] gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-[repeat(2,minmax(0,1fr))_auto] pt-5 border-t border-slate-300/70 max-w-lg">
             <div>
               <dt class="text-xs text-slate-600">Lộ trình Global</dt>
               <dd class="text-xl md:text-2xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">48 Buổi</dd>
             </div>
             <div>
               <dt class="text-xs text-slate-600">Mỗi buổi học</dt>
-              <dd class="text-xl md:text-2xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">60'</dd>
+              <dd class="text-xl md:text-2xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">60–90 phút</dd>
             </div>
             <div>
               <dt class="text-xs text-slate-600">Cơ sở tại TP.HCM</dt>
@@ -256,21 +262,25 @@ const structuredData = {
                   <span>{branch.address}</span>
                 </p>
               </div>
-              <div class="relative mt-4 pt-3 border-t border-slate-200/70 flex items-center justify-between gap-2 text-sm">
-                <span class="text-slate-600">Lịch học: Trong tuần &amp; T7-CN</span>
+              <div class="relative mt-4 border-t border-slate-200/70 pt-1">
                 {/*
                   Nhãn đọc được phải chứa đúng chữ hiển thị "Chọn cơ sở này", nếu không
                   trình đọc màn hình báo lệch nhãn. Tên cơ sở nối thêm để phân biệt
                   5 thẻ giống hệt nhau.
+
+                  Lịch học chung đã nói một lần ở phần mô tả đầu mục, nên không lặp lại
+                  trên cả 5 thẻ. Nhờ vậy CTA giữ được một hàng và đủ 44px để bấm trên điện thoại.
                 */}
                 <a
                   href="#pricing"
                   data-branch={branch.id}
-                  class="js-choose-branch group inline-flex items-center gap-1 font-bold text-amber-700 hover:text-amber-800 hover:underline transition"
+                  class="js-choose-branch gc-choice"
                   aria-label={`Chọn cơ sở này – ${branch.name}`}
                 >
                   Chọn cơ sở này
-                  <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  <span class="gc-choice__go" aria-hidden="true">
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
                 </a>
               </div>
             </div>
@@ -280,16 +290,16 @@ const structuredData = {
           <div class="lg:col-span-2 bg-brand-800 text-white p-5 rounded-card flex flex-col justify-between">
             <div>
               <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Hỗ trợ xếp lớp nhanh</span>
-              <h3 class="font-bold text-base mt-1 mb-2">Cần Tư Vấn Kiểm Tra Trình Độ Đầu Vào?</h3>
+              <h3 class="font-bold text-base mt-1 mb-2">Cần tư vấn kiểm tra trình độ đầu vào?</h3>
               <p class="text-sm text-brand-200 leading-relaxed">
                 Liên hệ trực tiếp Hotline để bộ phận giáo vụ kiểm tra ca học đang mở sát với trình độ và khu vực nhà bạn nhất.
               </p>
             </div>
-            <div class="mt-4 pt-3 border-t border-brand-600 flex flex-col gap-1.5 text-sm font-bold text-amber-400">
-              <a href={`tel:${BRAND_INFO.hotlines[0].replace(/\./g, "")}`} class="inline-flex items-center gap-1.5 hover:underline tabular-nums">
+            <div class="mt-4 pt-3 border-t border-brand-600 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-bold text-amber-400">
+              <a href={`tel:${BRAND_INFO.hotlines[0].replace(/\./g, "")}`} class="inline-flex min-h-11 items-center gap-1.5 hover:underline tabular-nums">
                 <Phone className="w-3.5 h-3.5" aria-hidden="true" /> Hotline 1: {BRAND_INFO.hotlines[0]}
               </a>
-              <a href={`tel:${BRAND_INFO.hotlines[1].replace(/\./g, "")}`} class="inline-flex items-center gap-1.5 hover:underline tabular-nums">
+              <a href={`tel:${BRAND_INFO.hotlines[1].replace(/\./g, "")}`} class="inline-flex min-h-11 items-center gap-1.5 hover:underline tabular-nums">
                 <Phone className="w-3.5 h-3.5" aria-hidden="true" /> Hotline 2: {BRAND_INFO.hotlines[1]}
               </a>
             </div>
@@ -311,7 +321,7 @@ const structuredData = {
         <div class="grid lg:grid-cols-12 gap-4 lg:gap-8 lg:items-end">
           <div class="lg:col-span-7">
             <span class="gc-eyebrow">Thư viện hình ảnh</span>
-            <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">Hình ảnh Trung Tâm</h2>
+            <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">Hình ảnh trung tâm</h2>
           </div>
           <p class="lg:col-span-5 text-base text-slate-600 leading-relaxed lg:pb-1">
             Những khoảnh khắc trong lớp Happy Chess và Global Chess: huấn luyện viên kèm từng thế cờ, học viên luyện đối kháng và không gian học tại cơ sở.
@@ -401,7 +411,7 @@ const structuredData = {
               </p>
               <a
                 href="#branches"
-                class="mt-3 inline-flex items-center gap-1 text-xs font-bold text-amber-400 hover:text-amber-300 hover:underline transition"
+                class="gc-ref gc-ref--invert mt-3 min-h-11"
               >
                 Xem địa chỉ 5 cơ sở
                 <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -459,7 +469,7 @@ const structuredData = {
                 </span>
                 <div>
                   <h3 class:list={["font-bold text-slate-900", isWide ? "text-lg" : "text-base"]}>{point.title}</h3>
-                  <p class="text-sm text-slate-600 mt-1.5 leading-relaxed">{point.desc}</p>
+                  <p class="text-base text-slate-600 mt-1.5 leading-relaxed">{point.desc}</p>
                 </div>
               </li>
             );
@@ -475,9 +485,14 @@ const structuredData = {
     -->
     <section id="phu-huynh" class="py-16 border-t border-slate-200">
       <div class="max-w-6xl mx-auto px-4">
-        <div class="text-center max-w-2xl mx-auto mb-10">
-          <span class="gc-eyebrow">Nhận xét phụ huynh</span>
-          <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">Phụ Huynh Nói Gì Về Global Chess</h2>
+        <div class="grid gap-4 lg:grid-cols-12 lg:items-end mb-10">
+          <div class="lg:col-span-8">
+            <span class="gc-eyebrow">Nhận xét phụ huynh</span>
+            <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">Phụ huynh nói gì về Global Chess</h2>
+          </div>
+          <p class="lg:col-span-4 text-sm text-slate-600 leading-relaxed lg:pb-1 lg:text-right">
+            Trích nguyên văn chia sẻ của phụ huynh, ghi theo cơ sở bé đang học.
+          </p>
         </div>
 
         {TESTIMONIALS.length === 0 ? (
@@ -515,20 +530,49 @@ const structuredData = {
             </ul>
           </div>
         ) : (
-          <ul class="grid md:grid-cols-3 gap-5 list-none">
-            {TESTIMONIALS.map((item) => (
-              <li class="bg-white rounded-card border border-slate-200 shadow-soft p-6 flex flex-col justify-between">
-                <div>
-                  <Quote className="w-6 h-6 text-amber-500" aria-hidden="true" />
-                  <blockquote class="mt-3 text-sm text-slate-700 leading-relaxed">{item.quote}</blockquote>
+          <div class="grid gap-5 lg:grid-cols-12 lg:items-stretch lg:gap-6">
+            {/*
+              Bố cục lệch thay cho hàng 3 thẻ đều nhau: chia sẻ đầu tiên thành
+              một khối navy lớn bên trái, hai chia sẻ còn lại xếp lệch xuống ở
+              cột phải. Mắt đọc được thứ tự trước sau thay vì quét ba ô giống hệt.
+            */}
+            {TESTIMONIALS[0] && (
+              <figure class="relative isolate flex flex-col overflow-hidden rounded-card bg-brand-800 p-7 text-white lg:col-span-7 lg:p-9">
+                {/*
+                  Mặt bàn cờ chỉ dùng từ lg trở lên: ở màn hình hẹp thẻ đã tự vừa
+                  nội dung nên không cần lấp, còn ô 2rem phóng to sẽ lộ thành một
+                  dải sáng cắt ngang chữ. Trên desktop pattern phủ kín rồi tan ở rìa.
+                */}
+                <span
+                  aria-hidden="true"
+                  class="gc-board-field gc-fade-radial pointer-events-none absolute inset-0 hidden opacity-[0.1] [--gc-cell:2.25rem] [--gc-cell-color:var(--color-brand-500)] lg:block"
+                />
+                <div class="relative flex flex-1 flex-col justify-center">
+                  <Quote className="w-8 h-8 text-amber-400" aria-hidden="true" />
+                  <blockquote class="mt-5 max-w-[30ch] text-xl leading-snug text-brand-100 md:text-3xl md:leading-[1.32]">
+                    {TESTIMONIALS[0].quote}
+                  </blockquote>
                 </div>
-                <footer class="mt-5 pt-4 border-t border-slate-200">
-                  <div class="font-bold text-slate-900 text-sm">{item.author}</div>
-                  <div class="text-xs text-slate-600 mt-0.5">{item.role} • {item.branch}</div>
-                </footer>
-              </li>
-            ))}
-          </ul>
+                <figcaption class="relative mt-8 border-t border-brand-600 pt-5">
+                  <div class="font-bold text-white">{TESTIMONIALS[0].author}</div>
+                  <div class="mt-1 text-sm text-brand-200">{TESTIMONIALS[0].role} • {TESTIMONIALS[0].branch}</div>
+                </figcaption>
+              </figure>
+            )}
+
+            <div class="grid gap-5 lg:col-span-5 lg:pt-10">
+              {TESTIMONIALS.slice(1).map((item) => (
+                <figure class="rounded-card border border-slate-200 bg-white p-6 shadow-soft">
+                  <Quote className="w-5 h-5 text-amber-500" aria-hidden="true" />
+                  <blockquote class="mt-3 text-base text-slate-700 leading-relaxed">{item.quote}</blockquote>
+                  <figcaption class="mt-5 border-t border-slate-200 pt-4">
+                    <div class="text-sm font-bold text-slate-900">{item.author}</div>
+                    <div class="text-xs text-slate-600 mt-0.5">{item.role} • {item.branch}</div>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </section>
@@ -541,7 +585,7 @@ const structuredData = {
       <div class="max-w-6xl mx-auto px-4">
         <div class="max-w-2xl">
           <span class="gc-eyebrow">Giải đáp trước khi đăng ký</span>
-          <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">Câu Hỏi Thường Gặp</h2>
+          <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">Câu hỏi thường gặp</h2>
         </div>
 
         <dl class="grid md:grid-cols-2 gap-x-10 gap-y-7 mt-10">
@@ -551,7 +595,7 @@ const structuredData = {
                 <HelpCircle className="w-4 h-4 text-amber-600 shrink-0 mt-1" aria-hidden="true" />
                 <span>{item.q}</span>
               </dt>
-              <dd class="text-sm text-slate-600 mt-2 leading-relaxed pl-6">{item.a}</dd>
+              <dd class="text-base text-slate-600 mt-2.5 leading-relaxed pl-6">{item.a}</dd>
             </div>
           ))}
         </dl>

@@ -25,14 +25,14 @@ const FOOTER_LINKS = [
       <div class="font-bold text-white text-sm">{BRAND_INFO.name} – "{BRAND_INFO.slogan1}"</div>
       <div class="mt-1">{BRAND_INFO.slogan2}</div>
     </div>
-    <nav class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2" aria-label="Liên kết chân trang">
+    <nav class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1" aria-label="Liên kết chân trang">
       {FOOTER_LINKS.map((link) => (
-        <a href={link.href} class="hover:text-white hover:underline transition-colors">{link.label}</a>
+        <a href={link.href} class="inline-flex min-h-11 items-center hover:text-white hover:underline transition-colors md:min-h-0">{link.label}</a>
       ))}
     </nav>
     <div class="text-center md:text-right space-y-1">
       <div>Hotline: <strong class="text-white tabular-nums">{BRAND_INFO.hotlines.join(" – ")}</strong></div>
-      <div>© {new Date().getFullYear()} Global Chess. All rights reserved.</div>
+      <div>© {new Date().getFullYear()} Global Chess. Bảo lưu mọi quyền.</div>
     </div>
   </div>
 </footer>
