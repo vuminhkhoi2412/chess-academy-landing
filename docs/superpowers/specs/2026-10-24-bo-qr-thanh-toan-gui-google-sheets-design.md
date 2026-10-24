@@ -65,9 +65,11 @@ Hệ quả trực tiếp: website không còn nhận tiền, nên mọi thứ t�
 2. Điền form. Ô học phí tạm tính vẫn tự cập nhật theo chương trình, cấp độ, hình thức, số buổi.
 3. Bấm nút gửi ở cuối form. Nhãn nút đổi từ **"Tạo mã VietQR"** thành **"Gửi đăng ký"**;
    số tiền bên phải nhãn giữ nguyên.
-4. Ba kiểm tra như cũ, chạy theo thứ tự cũ: tên bé không được toàn khoảng trắng, số điện
-   thoại phải ≥ 10 chữ số sau khi bỏ ký tự không phải số, phải chọn ít nhất một khung giờ.
-   Sai thì báo lỗi tại chỗ như hiện tại và **không gửi**.
+4. Ba kiểm tra, chạy theo thứ tự này: tên bé không được toàn khoảng trắng (**mới**, bản cũ
+   chưa có), số điện thoại phải ≥ 10 chữ số sau khi bỏ ký tự không phải số (**nâng từ 9
+   lên 10**; thông báo lỗi "ít nhất 9 chữ số" đổi thành 10), phải chọn ít nhất một khung
+   giờ. Sai thì báo lỗi tại chỗ theo cách lỗi SĐT/khung giờ đang làm và **không gửi**. Lỗi tên
+   bé dùng cùng kiểu hiển thị với lỗi SĐT (`aria-invalid`, `role="alert"`).
 5. Nút chuyển sang trạng thái đang gửi: khoá, nhãn "Đang gửi…". Không cho bấm lại.
 6. Thành công → màn hình xác nhận (mục 7.5), thay chỗ màn hình QR cũ.
 7. Thất bại → khối lỗi ngay trong modal, giữ nguyên toàn bộ câu trả lời, có nút "Thử lại" và
@@ -166,7 +168,7 @@ Cấu trúc bắt buộc:
   6. `setupSheet_()` nếu tab chưa có tiêu đề (lần chạy đầu).
   7. Ghi một dòng, thời gian do script sinh, định dạng `Asia/Ho_Chi_Minh`.
   8. Trả `{ok:true}`.
-- `setupSheet_()`: tạo tiêu đề 17 cột, đóng băng dòng 1, đặt độ rộng cột, đặt định dạng số cho
+- `setupSheet_()`: tạo tiêu đề 18 cột, đóng băng dòng 1, đặt độ rộng cột, đặt định dạng số cho
   cột học phí, và gắn data validation danh sách cho cột trạng thái.
 - Mọi ô chữ phải được ghi dưới dạng **text**, nếu không `0901234567` thành `901234567` (mất số
   0 đầu) và nội dung bắt đầu bằng `=` thành công thức. Cách làm: đặt `setNumberFormat('@')`
@@ -178,7 +180,7 @@ giá trị thì script im lặng bỏ qua. Không dùng CAPTCHA — thêm phụ 
 
 ### 7.5. Bố cục sheet
 
-Tab tên `Đăng ký`, 17 cột theo đúng thứ tự:
+Tab tên `Đăng ký`, 18 cột theo đúng thứ tự:
 
 | # | Cột | Nguồn |
 | --: | :--- | :--- |
@@ -271,6 +273,8 @@ Xoá hẳn:
 - Bốn biến `PUBLIC_ACB_*` khỏi `astro.config.mjs`, `.env.example`, README, AGENTS.md, PRODUCT.md.
 
 Sửa câu chữ:
+
+- `PricingAndCheckout.tsx`: nhãn "Học phí cần thanh toán:" trong form → "Học phí tạm tính:".
 
 - `src/data/courses.ts` dòng ~545 (FAQ "Đóng học phí bằng cách nào?"): tả lại luồng mới — điền
   form, trung tâm gọi lại, học phí trao đổi trực tiếp.
