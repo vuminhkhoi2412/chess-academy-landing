@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Chess } from "chess.js";
 import { Chessboard, type PieceDropHandlerArgs } from "react-chessboard";
 import confetti from "canvas-confetti";
-import { Timer, RotateCcw, CheckCircle2 } from "lucide-react";
+import { RotateCcw, CheckCircle2 } from "lucide-react";
 import { INTERACTIVE_PUZZLE } from "../data/courses";
 
 // Thế cờ và nước giải nằm trong src/data/courses.ts để test được logic cờ.
@@ -59,8 +59,9 @@ export default function InteractivePuzzle() {
   return (
     <div className="bg-white p-5 rounded-card shadow-lifted border border-slate-200 max-w-md mx-auto">
       <div className="flex items-center justify-between gap-3 mb-3">
-        <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-amber-700 bg-amber-100 px-3 py-1 rounded-control">
-          <Timer className="w-3.5 h-3.5" aria-hidden="true" /> Thử thách 10 giây cho bé
+        <span className="inline-flex items-center gap-3 text-[0.9375rem] leading-6 font-semibold tracking-[-0.005em] text-amber-700">
+          <span aria-hidden="true" className="h-0.5 w-7 bg-amber-500 rounded-full shrink-0"></span>
+          Thử thách 10 giây cho bé
         </span>
         <button
           type="button"

@@ -17,6 +17,7 @@ type ProgramStyle = {
   band: string;
   bandTitle: string;
   bandMeta: string;
+  rule: string;
 };
 
 const PROGRAM_STYLES: Record<string, ProgramStyle> = {
@@ -27,6 +28,7 @@ const PROGRAM_STYLES: Record<string, ProgramStyle> = {
     band: "bg-brand-50/70 border-brand-200/70",
     bandTitle: "text-brand-900",
     bandMeta: "text-brand-700",
+    rule: "border-brand-800",
   },
   "so-cap": {
     bar: "bg-amber-700",
@@ -35,6 +37,7 @@ const PROGRAM_STYLES: Record<string, ProgramStyle> = {
     band: "bg-amber-50/70 border-amber-200/70",
     bandTitle: "text-amber-900",
     bandMeta: "text-amber-800",
+    rule: "border-amber-700",
   },
   "trung-cap": {
     bar: "bg-emerald-700",
@@ -43,6 +46,7 @@ const PROGRAM_STYLES: Record<string, ProgramStyle> = {
     band: "bg-emerald-50/70 border-emerald-200/70",
     bandTitle: "text-emerald-900",
     bandMeta: "text-emerald-800",
+    rule: "border-emerald-700",
   },
 };
 
@@ -167,35 +171,34 @@ export default function CurriculumExplorer() {
         </ol>
 
         {/* Dải chương trình: giữ danh tính của ba khóa mà thang vẫn là một đường. */}
-        <div className="mt-3 grid gap-2 sm:grid-cols-[3fr_2fr_2fr]">
+        <div className="mt-3 grid gap-x-2 gap-y-3 sm:grid-cols-[3fr_2fr_2fr]">
           {CURRICULUM_PROGRAMS.map((program) => {
             const style = PROGRAM_STYLES[program.id] ?? FALLBACK_STYLE;
             return (
-              <div key={program.id} className={`rounded-control border px-3 py-2 ${style.band}`}>
-                <div className={`text-xs font-extrabold ${style.bandTitle}`}>{program.title}</div>
-                <div className={`mt-0.5 text-[11px] ${style.bandMeta}`}>{bandMeta(program)}</div>
+              <div key={program.id} className={`border-t-2 pt-2 ${style.rule}`}>
+                <div className={`text-sm font-extrabold ${style.bandTitle}`}>{program.title}</div>
+                <div className={`mt-0.5 text-xs ${style.bandMeta}`}>{bandMeta(program)}</div>
               </div>
             );
           })}
         </div>
 
         {/* Nấc đang chọn: chỉ mục tiêu, không đổ cả giáo trình ra đây. */}
-        <div
-          className="mt-6 rounded-card border border-slate-200 bg-white p-5 md:p-6"
-          role="region"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          <div className="flex flex-wrap items-center gap-2">
-            <span className={`rounded-control border px-2.5 py-1 text-xs font-bold ${selected.style.chip}`}>
-              {selected.program.title}
-            </span>
-            <span className="text-xs font-semibold text-slate-500 tabular-nums">
-              {selected.duration}
-            </span>
+        <div className="mt-6 grid gap-x-6 gap-y-2 rounded-card border border-slate-200 bg-white p-5 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:p-6" role="region" aria-live="polite" aria-atomic="true">
+          <div>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span className={`rounded-control border px-2.5 py-1 text-xs font-bold ${selected.style.chip}`}>
+                {selected.program.title}
+              </span>
+              <span className="text-sm font-semibold text-slate-600 tabular-nums whitespace-nowrap">
+                {selected.duration}
+              </span>
+            </div>
+            <h3 className="mt-3 font-display text-2xl font-extrabold leading-tight tracking-tight text-slate-900 text-balance">
+              {selected.name}
+            </h3>
           </div>
-          <h3 className="mt-2 text-lg font-bold text-slate-900">{selected.name}</h3>
-          <p className="mt-1 text-sm text-slate-700 leading-relaxed">{selected.goal}</p>
+          <p className="self-center text-base text-slate-700 leading-relaxed text-pretty">{selected.goal}</p>
         </div>
 
         {/* Cách xếp lớp: phụ huynh không tự chọn cấp độ, giáo viên chốt sau ván thử. */}
