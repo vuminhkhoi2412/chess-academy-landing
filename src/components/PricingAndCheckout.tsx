@@ -10,6 +10,7 @@ import {
 import { PUBLIC_GOOGLE_SHEETS_ENDPOINT } from "astro:env/client";
 import {
   buildEnrolmentPayload,
+  newSubmissionId,
   postEnrolment,
   validateEnrolment,
 } from "../lib/enrolment";
@@ -70,6 +71,7 @@ export default function PricingAndCheckout() {
   const [slotError, setSlotError] = useState(false);
   const [phoneError, setPhoneError] = useState(false);
   const [nameError, setNameError] = useState(false);
+  const [parentError, setParentError] = useState(false);
 
   const dialogRef = useRef<HTMLDivElement>(null);
   // Giữ nguyên qua các lần "Thử lại" để Apps Script bỏ qua bản trùng; xoá khi mở hộp thoại.
@@ -197,6 +199,7 @@ export default function PricingAndCheckout() {
     setSelectedSlots([FLEXIBLE_TIME_SLOTS[1]]);
     setPrivateSessions(12);
     setNameError(false);
+    setParentError(false);
     setPhoneError(false);
     setSlotError(false);
     setSubmitState("form");
@@ -234,8 +237,9 @@ export default function PricingAndCheckout() {
     e.preventDefault();
     if (submitState === "sending") return;
 
-    const problem = validateEnrolment({ childName, phone, timeSlots: selectedSlots });
+    const problem = validateEnrolment({ childName, parentName, phone, timeSlots: selectedSlots });
     setNameError(problem === "name");
+    setParentError(problem === "parent");
     setPhoneError(problem === "phone");
     setSlotError(problem === "slots");
     if (problem) return;
@@ -253,7 +257,7 @@ export default function PricingAndCheckout() {
       tuitionEstimate: tuitionAmount,
       timeSlots: selectedSlots,
       note: "",
-      submissionId: crypto.randomUUID(),
+      submissionId: newSubmissionId(),
       honeypot,
     });
     void sendPayload();
@@ -434,6 +438,8 @@ export default function PricingAndCheckout() {
                 onSubmit={handleSubmit}
                 className="min-h-0 space-y-4 overflow-y-auto overscroll-contain px-6 py-5 md:px-8"
               >
+                {/* Khoá mọi ô khi đang gửi, để màn xác nhận không hiện dữ liệu khác với dòng đã vào sheet. */}
+                <fieldset disabled={submitState === "sending"} className="min-w-0 space-y-4">
                 {/* Bẫy spam: người thật không thấy và không điền; Apps Script bỏ qua nếu có giá trị. */}
                 <input
                   type="text"
@@ -504,9 +510,23 @@ export default function PricingAndCheckout() {
                       autoComplete="name"
                       placeholder="VD: Chị Thảo"
                       value={parentName}
-                      onChange={(e) => setParentName(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-control focus:ring-2 focus:ring-amber-500 outline-none"
+                      aria-invalid={parentError}
+                      aria-describedby={parentError ? "gc-parent-name-error" : undefined}
+                      onChange={(e) => {
+                        setParentName(e.target.value);
+                        setParentError(false);
+                      }}
+                      className={`w-full px-3 py-2 text-sm border rounded-control focus:ring-2 outline-none ${
+                        parentError
+                          ? "border-red-400 focus:ring-red-500 bg-red-50/40"
+                          : "border-slate-300 focus:ring-amber-500"
+                      }`}
                     />
+                    {parentError && (
+                      <p id="gc-parent-name-error" role="alert" className="mt-1 text-xs font-semibold text-red-600">
+                        Vui lòng nhập họ tên phụ huynh.
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label htmlFor="gc-phone" className="block text-sm font-semibold text-slate-700 mb-1">
@@ -690,6 +710,7 @@ export default function PricingAndCheckout() {
                     <ArrowRight className="w-4 h-4" />
                   </span>
                 </button>
+                </fieldset>
               </form>
             ) : submitState === "error" ? (
               <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain px-6 py-5 text-center md:px-8">

@@ -22,6 +22,9 @@ const HEADERS = [
 const COL_SESSIONS = 14;
 const COL_TUITION = 15;
 const COL_ID = 18;
+// Dài hơn timeout 10 giây của trình duyệt: lúc quá tải phụ huynh thấy lỗi và bấm Thử lại
+// (an toàn nhờ chống trùng), thay vì thấy "đã gửi" mà không có dòng nào.
+const LOCK_WAIT_MS = 30000;
 
 // Mở URL /exec trên trình duyệt: thấy "ok" nghĩa là bản deploy đang sống.
 function doGet() {
@@ -69,7 +72,7 @@ function doPost(e) {
   if (validate_(p) !== "ok") return json_({ ok: false, error: "missing_field" });
 
   const lock = LockService.getScriptLock();
-  lock.waitLock(5000);
+  lock.waitLock(LOCK_WAIT_MS);
   try {
     const sheet = getSheet_();
     const last = sheet.getLastRow();

@@ -21,15 +21,17 @@ export interface EnrolmentInput {
   honeypot: string;
 }
 
-export type EnrolmentError = "name" | "phone" | "slots";
+export type EnrolmentError = "name" | "parent" | "phone" | "slots";
 
 const digitsOnly = (value: string) => value.replace(/[^0-9]/g, "");
 
-// Thứ tự kiểm tra cũng là thứ tự báo lỗi: tên → SĐT → khung giờ.
+// Thứ tự kiểm tra cũng là thứ tự báo lỗi: tên bé → phụ huynh → SĐT → khung giờ. Mọi trường
+// Code.gs coi là bắt buộc phải được chặn ở đây: script từ chối thì trình duyệt không biết.
 export function validateEnrolment(
-  input: Pick<EnrolmentInput, "childName" | "phone" | "timeSlots">
+  input: Pick<EnrolmentInput, "childName" | "parentName" | "phone" | "timeSlots">
 ): EnrolmentError | null {
   if (input.childName.trim() === "") return "name";
+  if (input.parentName.trim() === "") return "parent";
   if (digitsOnly(input.phone).length < 10) return "phone";
   if (input.timeSlots.length === 0) return "slots";
   return null;
@@ -60,12 +62,27 @@ export function buildEnrolmentPayload(input: EnrolmentInput): Record<string, str
 // `no-cors`: response của Apps Script không có header CORS, nên trình duyệt trả response
 // rỗng và trang không biết dòng đã vào sheet hay chưa. fetch chỉ ném lỗi khi mất mạng hoặc
 // quá 10 giây; `submission_id` giữ cho việc thử lại không sinh dòng trùng.
+// AbortController thay cho AbortSignal.timeout vì iOS 15 chưa có hàm đó.
 export async function postEnrolment(endpoint: string, payload: object): Promise<void> {
-  await fetch(endpoint, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(10000),
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10000);
+  try {
+    await fetch(endpoint, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// crypto.randomUUID cần Safari 15.4+; máy cũ hơn rơi về getRandomValues.
+export function newSubmissionId(): string {
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  return Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) =>
+    b.toString(16).padStart(2, "0")
+  ).join("");
 }

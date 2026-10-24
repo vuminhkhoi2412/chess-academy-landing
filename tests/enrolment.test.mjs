@@ -7,6 +7,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   buildEnrolmentPayload,
+  newSubmissionId,
   postEnrolment,
   validateEnrolment,
 } from "../src/lib/enrolment.ts";
@@ -29,23 +30,23 @@ const baseInput = () => ({
 });
 
 test("validateEnrolment: tên toàn khoảng trắng bị chặn", () => {
-  assert.equal(validateEnrolment({ childName: "   ", phone: "0901234567", timeSlots: ["a"] }), "name");
+  assert.equal(validateEnrolment({ parentName: "Chị Thảo", childName: "   ", phone: "0901234567", timeSlots: ["a"] }), "name");
 });
 
 test("validateEnrolment: SĐT 9 chữ số bị chặn", () => {
-  assert.equal(validateEnrolment({ childName: "An", phone: "0901 234 56", timeSlots: ["a"] }), "phone");
+  assert.equal(validateEnrolment({ parentName: "Chị Thảo", childName: "An", phone: "0901 234 56", timeSlots: ["a"] }), "phone");
 });
 
 test("validateEnrolment: SĐT có +84, dấu chấm, khoảng trắng vẫn hợp lệ", () => {
-  assert.equal(validateEnrolment({ childName: "An", phone: "+84 901.234.567", timeSlots: ["a"] }), null);
+  assert.equal(validateEnrolment({ parentName: "Chị Thảo", childName: "An", phone: "+84 901.234.567", timeSlots: ["a"] }), null);
 });
 
 test("validateEnrolment: thiếu khung giờ bị chặn", () => {
-  assert.equal(validateEnrolment({ childName: "An", phone: "0901234567", timeSlots: [] }), "slots");
+  assert.equal(validateEnrolment({ parentName: "Chị Thảo", childName: "An", phone: "0901234567", timeSlots: [] }), "slots");
 });
 
 test("validateEnrolment: tên và SĐT cùng sai thì báo tên trước", () => {
-  assert.equal(validateEnrolment({ childName: "", phone: "1", timeSlots: [] }), "name");
+  assert.equal(validateEnrolment({ parentName: "Chị Thảo", childName: "", phone: "1", timeSlots: [] }), "name");
 });
 
 test("buildEnrolmentPayload: đủ 17 khoá của spec 7.2", () => {
@@ -115,5 +116,55 @@ test("postEnrolment: lỗi mạng được ném ra cho nơi gọi", async () => 
     await assert.rejects(postEnrolment("https://example.test/exec", {}), /Failed to fetch/);
   } finally {
     globalThis.fetch = original;
+  }
+});
+
+test("validateEnrolment: tên phụ huynh toàn khoảng trắng bị chặn (script sẽ từ chối và phụ huynh không biết)", () => {
+  assert.equal(
+    validateEnrolment({ parentName: "   ", childName: "An", phone: "0901234567", timeSlots: ["a"] }),
+    "parent"
+  );
+});
+
+test("validateEnrolment: thứ tự tên bé → phụ huynh → SĐT", () => {
+  assert.equal(
+    validateEnrolment({ parentName: "", childName: "", phone: "1", timeSlots: [] }),
+    "name"
+  );
+  assert.equal(
+    validateEnrolment({ parentName: "", childName: "An", phone: "1", timeSlots: [] }),
+    "parent"
+  );
+});
+
+test("postEnrolment: vẫn gửi được khi trình duyệt chưa có AbortSignal.timeout (iOS 15)", async () => {
+  const originalFetch = globalThis.fetch;
+  const originalTimeout = AbortSignal.timeout;
+  let seen;
+  globalThis.fetch = async (url, init) => {
+    seen = init;
+    return new Response(null);
+  };
+  AbortSignal.timeout = undefined;
+  try {
+    await postEnrolment("https://example.test/exec", {});
+    assert.ok(seen.signal instanceof AbortSignal);
+  } finally {
+    globalThis.fetch = originalFetch;
+    AbortSignal.timeout = originalTimeout;
+  }
+});
+
+test("newSubmissionId: vẫn sinh mã khác nhau khi không có crypto.randomUUID", () => {
+  const original = crypto.randomUUID;
+  Object.defineProperty(crypto, "randomUUID", { value: undefined, configurable: true });
+  try {
+    const a = newSubmissionId();
+    const b = newSubmissionId();
+    assert.equal(typeof a, "string");
+    assert.ok(a.length >= 16);
+    assert.notEqual(a, b);
+  } finally {
+    Object.defineProperty(crypto, "randomUUID", { value: original, configurable: true });
   }
 });

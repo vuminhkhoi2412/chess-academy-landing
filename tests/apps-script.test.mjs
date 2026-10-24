@@ -9,8 +9,8 @@ import { readFileSync } from "node:fs";
 import vm from "node:vm";
 
 const source = readFileSync(new URL("../google-apps-script/Code.gs", import.meta.url), "utf8");
-const { validate_, isDuplicate_, buildRow_ } = vm.runInNewContext(
-  `${source}\n;({ validate_, isDuplicate_, buildRow_ })`
+const { validate_, isDuplicate_, buildRow_, LOCK_WAIT_MS } = vm.runInNewContext(
+  `${source}\n;({ validate_, isDuplicate_, buildRow_, LOCK_WAIT_MS })`
 );
 
 const payload = () => ({
@@ -67,4 +67,8 @@ test("buildRow_: 18 cột đúng thứ tự spec 7.5, SĐT còn số 0, học ph
   assert.equal(row[15], "Tối T2–T6; Sáng T7");
   assert.equal(row[16], '=HYPERLINK("x")');
   assert.equal(row[17], "abc-123");
+});
+
+test("LOCK_WAIT_MS: chờ khoá lâu hơn timeout 10 giây của trình duyệt, để quá tải thành lỗi nhìn thấy được thay vì mất dòng", () => {
+  assert.ok(LOCK_WAIT_MS >= 30000);
 });
