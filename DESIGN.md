@@ -98,7 +98,7 @@ diacritic coverage — a hard requirement, not a preference.
 
 - **Display:** `Bricolage Grotesque` (`--font-display`, optical size 12–96, weights 400–800). Used for `h1`–`h4`. Track-tight, controlled scale, weight-driven hierarchy. Headlines carry `text-wrap: balance`.
 - **Body:** `Be Vietnam Pro` (`--font-sans`, 400/500/600/700). Body copy, labels, buttons, numerals. Paragraphs and list items carry `text-wrap: pretty`.
-- **Mono:** system mono / `font-mono`. Only for code-like tokens: bank account numbers, inline `code` references, branch ids. High-density numbers use `tabular-nums`.
+- **Mono:** system mono / `font-mono`. Only for code-like tokens: inline `code` references, branch ids. High-density numbers use `tabular-nums`.
 
 Scale (Tailwind steps, as shipped):
 
@@ -208,7 +208,7 @@ none should be introduced for a marketing page.
 ## 7. Responsive Rules
 
 - **Mobile-first collapse below 768px.** All multi-column layouts become a single column. No exceptions.
-- No horizontal scroll at any viewport width — a scrollbar on mobile is a failure, not a nit. Long values (`48 Buổi`, account numbers) get `whitespace-nowrap` plus a track that can absorb them.
+- No horizontal scroll at any viewport width — a scrollbar on mobile is a failure, not a nit. Long values (`48 Buổi`, phone numbers) get `whitespace-nowrap` plus a track that can absorb them.
 - Headlines scale, they do not shrink-wrap: `text-5xl` → `lg:text-7xl` → `xl:text-8xl`. Body text never drops below `1rem` (`text-sm` only for metadata and labels, never for a paragraph a parent must read).
 - Touch targets: minimum 44px. Header icon button is `h-11 w-11`; mobile menu rows are `min-h-[3rem]`.
 - Desktop nav collapses below `md` into a toggle menu that closes on Escape, on outside click, and on link selection, and re-syncs `aria-expanded` when the viewport crosses 768px.

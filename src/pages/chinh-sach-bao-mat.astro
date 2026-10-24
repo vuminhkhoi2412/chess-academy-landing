@@ -2,8 +2,9 @@
 // src/pages/chinh-sach-bao-mat.astro
 //
 // LƯU Ý CHO NGƯỜI BẢO TRÌ: đây là bản mô tả trung thực cách trang web này
-// thực sự xử lý dữ liệu (trang tĩnh, form không gửi đi đâu cả). Trước khi chạy
-// quảng cáo hoặc thu thập dữ liệu qua backend/CRM, hãy để bên pháp lý rà lại
+// thực sự xử lý dữ liệu (trang tĩnh; form gửi sang Google Sheets qua Apps Script).
+// Mỗi khi đổi luồng dữ liệu, sửa trang này cho khớp. Trước khi chạy quảng cáo hoặc
+// nối CRM, hãy để bên pháp lý rà lại
 // và bổ sung thông tin pháp nhân (tên công ty, mã số thuế, địa chỉ).
 import SiteHeader from "../components/SiteHeader.astro";
 import Layout from "../layouts/Layout.astro";
@@ -13,7 +14,7 @@ import { Phone } from "lucide-react";
 
 const pageTitle = `Chính sách bảo mật – ${BRAND_INFO.name}`;
 const pageDescription =
-  "Global Chess thu thập những thông tin gì khi phụ huynh đăng ký giữ chỗ cho bé, dùng để làm gì và liên hệ ở đâu để yêu cầu xoá.";
+  "Global Chess thu thập những thông tin gì khi phụ huynh đăng ký cho bé, dùng để làm gì và liên hệ ở đâu để yêu cầu xoá.";
 const updatedAt = "24/10/2026";
 ---
 

@@ -51,6 +51,12 @@ Lần gửi đầu tiên script tự tạo tab **Đăng ký** với 18 cột. M�
 `Đã đăng ký`, `Huỷ`). Cột **Mã gửi** (cột R) bị ẩn: script dùng nó để không ghi trùng khi
 phụ huynh bấm "Thử lại". Đừng xoá cột này.
 
+**Đừng đổi tên tab `Đăng ký`.** Script tìm tab theo tên; đổi tên thì lần gửi kế tiếp tạo một tab
+`Đăng ký` mới và các dòng mới nằm ở đó, còn lịch sử chống trùng ở tab cũ.
+
+Tab **`Spam?`** (tự tạo khi có lần gửi dính bẫy chống spam) giữ lại những lần gửi bị bỏ qua. Thỉnh
+thoảng mở xem: nếu có đăng ký thật bị trình duyệt tự điền nhầm ô ẩn, hãy gọi lại phụ huynh đó.
+
 ## Khi có sự cố
 
 | Hiện tượng | Nguyên nhân thường gặp |

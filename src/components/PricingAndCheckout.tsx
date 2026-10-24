@@ -74,6 +74,8 @@ export default function PricingAndCheckout() {
   const [parentError, setParentError] = useState(false);
 
   const dialogRef = useRef<HTMLDivElement>(null);
+  // Màn xác nhận/lỗi thay thế form nên nút vừa bấm bị gỡ; đưa focus về đây để không rơi ra <body>.
+  const resultRef = useRef<HTMLDivElement>(null);
   // Giữ nguyên qua các lần "Thử lại" để Apps Script bỏ qua bản trùng; xoá khi mở hộp thoại.
   const payloadRef = useRef<ReturnType<typeof buildEnrolmentPayload> | null>(null);
   // Tăng mỗi lần mở hộp thoại, để kết quả của lần gửi cũ không lật form trắng sang "sent".
@@ -180,6 +182,10 @@ export default function PricingAndCheckout() {
       returnFocusRef.current = null;
     };
   }, [isModalOpen]);
+
+  useEffect(() => {
+    if (submitState === "sent" || submitState === "error") resultRef.current?.focus();
+  }, [submitState]);
 
   const toggleSlot = (slot: string) => {
     setSlotError(false);
@@ -713,7 +719,11 @@ export default function PricingAndCheckout() {
                 </fieldset>
               </form>
             ) : submitState === "error" ? (
-              <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain px-6 py-5 text-center md:px-8">
+              <div
+                ref={resultRef}
+                tabIndex={-1}
+                className="min-h-0 space-y-4 overflow-y-auto overscroll-contain px-6 py-5 text-center outline-none md:px-8"
+              >
                 <p role="alert" className="flex items-center justify-center gap-2 text-sm font-semibold text-red-600">
                   <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
                   Chưa gửi được thông tin. Vui lòng kiểm tra kết nối mạng và thử lại.
@@ -741,7 +751,11 @@ export default function PricingAndCheckout() {
                 </a>
               </div>
             ) : (
-              <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain px-6 py-5 text-center md:px-8">
+              <div
+                ref={resultRef}
+                tabIndex={-1}
+                className="min-h-0 space-y-4 overflow-y-auto overscroll-contain px-6 py-5 text-center outline-none md:px-8"
+              >
                 <div className="flex flex-col items-center gap-2">
                   <CheckCircle className="w-10 h-10 text-emerald-600" aria-hidden="true" />
                   <p className="text-base font-semibold text-slate-900">

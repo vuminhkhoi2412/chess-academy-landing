@@ -11,6 +11,9 @@
 // Mặc định là sheet test; chuyển sang sheet thật chỉ cần sửa dòng này rồi deploy version mới.
 const SPREADSHEET_ID = "1Zy_w09HQbZzotiUXPdZrRCMt0qgb-MuMuhYO83YqY-k";
 const SHEET_NAME = "Đăng ký";
+// Lần gửi dính bẫy spam được giữ lại ở đây thay vì bỏ, phòng trình duyệt tự điền nhầm ô ẩn
+// làm mất một đăng ký thật.
+const SPAM_SHEET_NAME = "Spam?";
 const STATUSES = ["Mới", "Đã liên hệ", "Đã đăng ký", "Huỷ"];
 
 const HEADERS = [
@@ -67,7 +70,10 @@ function doPost(e) {
   }
 
   // Bẫy spam: người thật không thấy ô này nên không bao giờ điền. Trả ok để bot không dò được.
-  if (p._hp) return json_({ ok: true });
+  if (p._hp) {
+    logSpam_(p);
+    return json_({ ok: true });
+  }
 
   if (validate_(p) !== "ok") return json_({ ok: false, error: "missing_field" });
 
@@ -79,8 +85,7 @@ function doPost(e) {
     const ids = last > 1 ? sheet.getRange(2, COL_ID, last - 1, 1).getValues().map(function (r) { return String(r[0]); }) : [];
     if (isDuplicate_(ids, p.submission_id)) return json_({ ok: true });
 
-    const timestamp = Utilities.formatDate(new Date(), "Asia/Ho_Chi_Minh", "yyyy-MM-dd HH:mm:ss");
-    const row = buildRow_(p, timestamp);
+    const row = buildRow_(p, now_());
     if (last + 1 > sheet.getMaxRows()) sheet.insertRowsAfter(sheet.getMaxRows(), 100);
     const range = sheet.getRange(last + 1, 1, 1, HEADERS.length);
     // Cột chữ phải là text, nếu không 0901234567 mất số 0 và nội dung bắt đầu bằng "=" thành công thức.
@@ -91,10 +96,31 @@ function doPost(e) {
     });
     range.setNumberFormats([formats]);
     range.setValues([row]);
+    // Dropdown trạng thái của setupSheet_ chỉ phủ 999 dòng đầu; gắn lại cho từng dòng mới.
+    sheet.getRange(last + 1, 2).setDataValidation(statusRule_());
     return json_({ ok: true });
   } finally {
     lock.releaseLock();
   }
+}
+
+function now_() {
+  return Utilities.formatDate(new Date(), "Asia/Ho_Chi_Minh", "yyyy-MM-dd HH:mm:ss");
+}
+
+// Ghi nguyên payload dưới dạng JSON (bắt đầu bằng "{" nên không thành công thức).
+function logSpam_(p) {
+  try {
+    const book = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = book.getSheetByName(SPAM_SHEET_NAME) || book.insertSheet(SPAM_SHEET_NAME);
+    sheet.appendRow([now_(), JSON.stringify(p)]);
+  } catch (err) {
+    // Không để việc ghi nhật ký làm hỏng phản hồi.
+  }
+}
+
+function statusRule_() {
+  return SpreadsheetApp.newDataValidation().requireValueInList(STATUSES, true).build();
 }
 
 function getSheet_() {
@@ -112,9 +138,7 @@ function setupSheet_(sheet) {
   sheet.setColumnWidth(8, 260);
   sheet.setColumnWidth(16, 220);
   sheet.setColumnWidth(17, 220);
-  sheet.getRange(2, 2, 999, 1).setDataValidation(
-    SpreadsheetApp.newDataValidation().requireValueInList(STATUSES, true).build()
-  );
+  sheet.getRange(2, 2, 999, 1).setDataValidation(statusRule_());
   // Script dùng cột này để chống ghi trùng: ẩn đi, đừng xoá.
   sheet.hideColumns(COL_ID);
 }

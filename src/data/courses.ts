@@ -4,7 +4,7 @@ export const BRAND_INFO = {
   name: "GLOBAL CHESS",
   slogan1: "Một nước đi, mở tư duy",
   slogan2: "Học cờ rèn tư duy vững tương lai!",
-  hotlines: ["0789.059.440", "0963.848.430"],
+  hotlines: ["0789059440", "0963848430"],
   zaloPhone: "0789059440",
 };
 

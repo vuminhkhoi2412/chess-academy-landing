@@ -109,7 +109,7 @@ tuition grid.
    file the centre supplied. Where truth is missing, show an explicit Vietnamese TODO block;
    never a plausible placeholder, stock photo or invented statistic.
 2. **Operational clarity beats persuasion.** A parent decides with tuition, session count,
-   schedule, address and payment steps. Superlatives are treated as defects.
+   schedule, address and enrolment steps. Superlatives are treated as defects.
 3. **The curriculum is the proof.** Depth of syllabus and outcome per level carries the
    argument; imagery and motion support it, never replace it.
 4. **One page, one decision.** The page stays a single linear path from "is this for my child"

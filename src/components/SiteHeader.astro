@@ -2,7 +2,7 @@
 // src/components/SiteHeader.astro
 //
 // Thanh điều hướng dùng chung cho cả bốn trang. Trang chủ cần nav neo trong trang
-// và nút giữ chỗ; ba trang nội dung (điều khoản, bảo mật, lỗi 404) chỉ cần lối về
+// và nút đăng ký; ba trang nội dung (điều khoản, bảo mật, lỗi 404) chỉ cần lối về
 // trang chủ. Phần khung sticky và logo được tách ra đây thay vì chép lại ở từng trang.
 //
 // Trang chủ còn có menu di động: dưới breakpoint md, nav neo trong trang thu vào
@@ -11,7 +11,7 @@ import { ArrowLeft, ArrowRight, Menu, Phone, X } from "lucide-react";
 import { BRAND_INFO } from "../data/courses";
 
 interface Props {
-  /** "home": nav neo trong trang + CTA giữ chỗ. "document": link về trang chủ. */
+  /** "home": nav neo trong trang + CTA đăng ký. "document": link về trang chủ. */
   variant?: "home" | "document";
 }
 
@@ -94,7 +94,7 @@ const hotlineHref = `tel:${hotline.replace(/\./g, "")}`;
               href="#pricing"
               class="gc-move gc-move--amber hidden min-h-11 text-xs sm:inline-flex md:text-sm"
             >
-              <span class="gc-move__label whitespace-nowrap">Đăng ký giữ chỗ</span>
+              <span class="gc-move__label whitespace-nowrap">Đăng ký tư vấn</span>
               {/*
                 Ô đích chỉ hiện từ lg: trong khoảng 768–1023px thanh header đã có
                 logo, ba mục nav và nút này, thêm 44px nữa là logo và nav bị ép
@@ -155,7 +155,7 @@ const hotlineHref = `tel:${hotline.replace(/\./g, "")}`;
           href="#pricing"
           class="gc-move gc-move--amber gc-move--block mt-3"
         >
-          <span class="gc-move__label">Đăng ký giữ chỗ</span>
+          <span class="gc-move__label">Đăng ký tư vấn</span>
           <span class="gc-move__go" aria-hidden="true">
             <ArrowRight className="w-4 h-4" />
           </span>

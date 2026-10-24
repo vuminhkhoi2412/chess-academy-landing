@@ -239,7 +239,7 @@
     flex: 1 1 auto;
   }
 
-  /* Bậc cỡ: hero và bước thanh toán lớn hơn một nhịp so với CTA trong thẻ. */
+  /* Bậc cỡ: hero và bước gửi đăng ký lớn hơn một nhịp so với CTA trong thẻ. */
   .gc-move--lg {
     min-height: 3.5rem;
     font-size: 0.9375rem;
