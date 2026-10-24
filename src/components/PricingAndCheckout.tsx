@@ -7,13 +7,16 @@ import {
   FLEXIBLE_TIME_SLOTS,
   BRAND_INFO,
 } from "../data/courses";
-import { BANK_CONFIG } from "../data/payment";
+import { PUBLIC_GOOGLE_SHEETS_ENDPOINT } from "astro:env/client";
+import {
+  buildEnrolmentPayload,
+  postEnrolment,
+  validateEnrolment,
+} from "../lib/enrolment";
 import {
   Check,
   ArrowRight,
-  ShieldCheck,
   X,
-  Copy,
   CheckCircle,
   AlertCircle,
   MapPin,
@@ -49,6 +52,8 @@ const FOCUSABLE_SELECTOR = [
 
 const DIALOG_TITLE_ID = "checkout-dialog-title";
 
+type SubmitState = "form" | "sending" | "sent" | "error";
+
 export default function PricingAndCheckout() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedLevelCode, setSelectedLevelCode] = useState(TUITION_LEVELS[0].code);
@@ -60,16 +65,17 @@ export default function PricingAndCheckout() {
   const [childAge, setChildAge] = useState("");
   const [selectedBranch, setSelectedBranch] = useState(BRANCHES[0].id);
   const [selectedSlots, setSelectedSlots] = useState<string[]>([FLEXIBLE_TIME_SLOTS[1]]);
-  const [showQR, setShowQR] = useState(false);
-  const [qrLoaded, setQrLoaded] = useState(false);
-  const [qrError, setQrError] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [copyFailed, setCopyFailed] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
+  const [submitState, setSubmitState] = useState<SubmitState>("form");
   const [slotError, setSlotError] = useState(false);
   const [phoneError, setPhoneError] = useState(false);
+  const [nameError, setNameError] = useState(false);
 
   const dialogRef = useRef<HTMLDivElement>(null);
-  const copyTimer = useRef<number | undefined>(undefined);
+  // Giữ nguyên qua các lần "Thử lại" để Apps Script bỏ qua bản trùng; xoá khi mở hộp thoại.
+  const payloadRef = useRef<ReturnType<typeof buildEnrolmentPayload> | null>(null);
+  // Tăng mỗi lần mở hộp thoại, để kết quả của lần gửi cũ không lật form trắng sang "sent".
+  const attemptRef = useRef(0);
   // Phần tử cần nhận lại focus khi hộp thoại đóng. Ghi lại ngay lúc người dùng
   // bấm, vì sau khi mở hộp thoại thì document.activeElement đã đổi.
   const returnFocusRef = useRef<HTMLElement | null>(null);
@@ -112,8 +118,7 @@ export default function PricingAndCheckout() {
       returnFocusRef.current =
         detail?.trigger instanceof HTMLElement ? detail.trigger : null;
       setSelectedBranch(branchId);
-      setShowQR(false);
-      setSlotError(false);
+      resetForm();
       setIsModalOpen(true);
     }
     window.addEventListener("gc:choose-branch", onChooseBranch);
@@ -133,7 +138,7 @@ export default function PricingAndCheckout() {
       const root = dialogRef.current;
       if (!root) return [];
       return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
-        (el) => el.offsetParent !== null
+        (el) => el.offsetParent !== null && el.tabIndex >= 0
       );
     }
 
@@ -174,9 +179,6 @@ export default function PricingAndCheckout() {
     };
   }, [isModalOpen]);
 
-  // Dọn timer copy khi island bị gỡ khỏi DOM.
-  useEffect(() => () => window.clearTimeout(copyTimer.current), []);
-
   const toggleSlot = (slot: string) => {
     setSlotError(false);
     setSelectedSlots((prev) =>
@@ -184,24 +186,23 @@ export default function PricingAndCheckout() {
     );
   };
 
-  const removeAccents = (str: string) =>
-    str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/đ/g, "d")
-      .replace(/Đ/g, "D")
-      .toUpperCase();
-
-  // Số điện thoại chỉ giữ chữ số để cú pháp chuyển khoản luôn sạch.
-  const cleanPhone = phone.replace(/[^0-9]/g, "");
-
-  // Cú pháp chuyển khoản chuẩn Kế toán:
-  // GC [Mã Cơ Sở] [Mã Cấp Độ] [Mã Hình Thức] [Tên Bé] [SĐT]
-  const cleanChildName = removeAccents(childName || "HOCVIEN").replace(/\s+/g, "");
-  const transferMemo = `GC ${selectedBranch} ${selectedLevelCode} ${FORMAT_CODE[tuitionFormat]} ${cleanChildName} ${cleanPhone}`;
-
-  // Mã VietQR lấy trực tiếp số tiền từ lựa chọn cấp độ + hình thức học.
-  const qrUrl = `https://img.vietqr.io/image/${BANK_CONFIG.bankId}-${BANK_CONFIG.accountNo}-${BANK_CONFIG.template}.png?amount=${tuitionAmount}&addInfo=${encodeURIComponent(transferMemo)}&accountName=${encodeURIComponent(BANK_CONFIG.accountName)}`;
+  // Mở hộp thoại luôn đưa về form trắng (không reset lúc đóng, để phụ huynh lỡ tay đóng
+  // giữa chừng vẫn thấy phần đã gõ). Nếu không, form điền sẵn dữ liệu vừa gửi sẽ đẻ ra dòng thứ hai.
+  const resetForm = () => {
+    setChildName("");
+    setChildAge("");
+    setParentName("");
+    setPhone("");
+    setHoneypot("");
+    setSelectedSlots([FLEXIBLE_TIME_SLOTS[1]]);
+    setPrivateSessions(12);
+    setNameError(false);
+    setPhoneError(false);
+    setSlotError(false);
+    setSubmitState("form");
+    payloadRef.current = null;
+    attemptRef.current += 1;
+  };
 
   // Khi bấm vào một trong 3 thẻ bên ngoài -> chọn sẵn cấp độ đầu tiên của chương trình.
   const handleOpenModal = (
@@ -212,53 +213,53 @@ export default function PricingAndCheckout() {
     returnFocusRef.current = trigger ?? null;
     if (firstLevel) setSelectedLevelCode(firstLevel.code);
     setTuitionFormat("group24");
-    setPrivateSessions(12);
-    setShowQR(false);
-    setSlotError(false);
+    resetForm();
     setIsModalOpen(true);
   };
 
-  const handleGenerateQR = (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (cleanPhone.length < 9) {
-      setPhoneError(true);
-      return;
-    }
-    setPhoneError(false);
-
-    if (selectedSlots.length === 0) {
-      setSlotError(true);
-      return;
-    }
-
-    setShowQR(true);
-    setQrLoaded(false);
-    setQrError(false);
-  };
-
-  const copyToClipboard = async (text: string) => {
+  const sendPayload = async () => {
+    const payload = payloadRef.current;
+    if (!payload) return;
+    const attempt = attemptRef.current;
+    setSubmitState("sending");
     try {
-      // Clipboard API chỉ có trong secure context (https hoặc localhost). Khi trình
-      // duyệt chặn hoặc không hỗ trợ, hiện thông báo để phụ huynh sao chép thủ công.
-      if (!navigator.clipboard?.writeText) {
-        throw new Error("Clipboard API không khả dụng");
-      }
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setCopyFailed(false);
+      await postEnrolment(PUBLIC_GOOGLE_SHEETS_ENDPOINT, payload);
+      if (attempt === attemptRef.current) setSubmitState("sent");
     } catch {
-      setCopied(false);
-      setCopyFailed(true);
+      if (attempt === attemptRef.current) setSubmitState("error");
     }
-    window.clearTimeout(copyTimer.current);
-    copyTimer.current = window.setTimeout(() => {
-      setCopied(false);
-      setCopyFailed(false);
-    }, 2400);
   };
 
-  const currentBranchObj = BRANCHES.find((b) => b.id === selectedBranch);
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (submitState === "sending") return;
+
+    const problem = validateEnrolment({ childName, phone, timeSlots: selectedSlots });
+    setNameError(problem === "name");
+    setPhoneError(problem === "phone");
+    setSlotError(problem === "slots");
+    if (problem) return;
+
+    payloadRef.current = buildEnrolmentPayload({
+      childName,
+      childAge,
+      parentName,
+      phone,
+      branch: { name: currentBranchObj.name, address: currentBranchObj.address },
+      program: activeProgram.name,
+      level: { label: activeLevel.label, code: activeLevel.code },
+      format: { label: activeFormat.label, code: FORMAT_CODE[tuitionFormat] },
+      sessions: isPrivateFormat ? privateSessions : tuitionFormat === "group12" ? 12 : 24,
+      tuitionEstimate: tuitionAmount,
+      timeSlots: selectedSlots,
+      note: "",
+      submissionId: crypto.randomUUID(),
+      honeypot,
+    });
+    void sendPayload();
+  };
+
+  const currentBranchObj = BRANCHES.find((b) => b.id === selectedBranch) ?? BRANCHES[0];
 
   return (
     <section id="pricing" className="relative overflow-hidden py-20 bg-brand-800 text-white">
@@ -388,7 +389,7 @@ export default function PricingAndCheckout() {
         </div>
       </div>
 
-      {/* Modal Chọn Cơ Sở, Cấp Độ & VietQR */}
+      {/* Modal Chọn Cơ Sở, Cấp Độ & gửi đăng ký */}
       {isModalOpen && (
         <div
           className="fixed inset-0 z-50 bg-brand-950/85 backdrop-blur-sm flex items-start justify-center p-4 overflow-y-auto overscroll-contain"
@@ -415,7 +416,7 @@ export default function PricingAndCheckout() {
                   {activeProgram.name}
                 </span>
                 <h3 id={DIALOG_TITLE_ID} className="text-xl font-bold mt-2">
-                  {showQR ? "Quét mã VietQR để hoàn tất học phí" : "Đăng ký cơ sở & khung giờ học"}
+                  {submitState === "sent" ? "Đã gửi đăng ký" : "Đăng ký cơ sở & khung giờ học"}
                 </h3>
               </div>
               <button
@@ -428,11 +429,22 @@ export default function PricingAndCheckout() {
               </button>
             </div>
 
-            {!showQR ? (
+            {submitState === "form" || submitState === "sending" ? (
               <form
-                onSubmit={handleGenerateQR}
+                onSubmit={handleSubmit}
                 className="min-h-0 space-y-4 overflow-y-auto overscroll-contain px-6 py-5 md:px-8"
               >
+                {/* Bẫy spam: người thật không thấy và không điền; Apps Script bỏ qua nếu có giá trị. */}
+                <input
+                  type="text"
+                  name="_hp"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  className="absolute -left-[9999px] h-0 w-0 opacity-0"
+                />
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div>
                     <label htmlFor="gc-child-name" className="block text-sm font-semibold text-slate-700 mb-1">
@@ -445,9 +457,23 @@ export default function PricingAndCheckout() {
                       autoComplete="off"
                       placeholder="VD: Nguyễn Minh An"
                       value={childName}
-                      onChange={(e) => setChildName(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-control focus:ring-2 focus:ring-amber-500 outline-none"
+                      aria-invalid={nameError}
+                      aria-describedby={nameError ? "gc-child-name-error" : undefined}
+                      onChange={(e) => {
+                        setChildName(e.target.value);
+                        setNameError(false);
+                      }}
+                      className={`w-full px-3 py-2 text-sm border rounded-control focus:ring-2 outline-none ${
+                        nameError
+                          ? "border-red-400 focus:ring-red-500 bg-red-50/40"
+                          : "border-slate-300 focus:ring-amber-500"
+                      }`}
                     />
+                    {nameError && (
+                      <p id="gc-child-name-error" role="alert" className="mt-1 text-xs font-semibold text-red-600">
+                        Vui lòng nhập họ tên của bé.
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label htmlFor="gc-child-age" className="block text-sm font-semibold text-slate-700 mb-1">
@@ -508,7 +534,7 @@ export default function PricingAndCheckout() {
                     />
                     {phoneError && (
                       <p id="gc-phone-error" role="alert" className="mt-1 text-xs font-semibold text-red-600">
-                        Số điện thoại cần ít nhất 9 chữ số. Vui lòng kiểm tra lại.
+                        Số điện thoại cần ít nhất 10 chữ số. Vui lòng kiểm tra lại.
                       </p>
                     )}
                   </div>
@@ -638,7 +664,7 @@ export default function PricingAndCheckout() {
                 {/* Hộp hiển thị tổng tiền tự động cập nhật theo Cấp độ & Hình thức học */}
                 <div className="bg-slate-50 p-3.5 rounded-control border border-slate-200 flex items-center justify-between">
                   <div>
-                    <div className="text-sm text-slate-600 font-medium">Học phí cần thanh toán:</div>
+                    <div className="text-sm text-slate-600 font-medium">Học phí tạm tính:</div>
                     <div className="text-sm text-amber-700 font-semibold">
                       {activeLevel.label} • {activeLevel.sessionLength}/buổi • {activeFormat.short}
                       {isPrivateFormat ? ` × ${privateSessions} buổi` : ""}
@@ -651,10 +677,11 @@ export default function PricingAndCheckout() {
 
                 <button
                   type="submit"
-                  className="gc-move gc-move--navy gc-move--block gc-move--lg cursor-pointer"
+                  disabled={submitState === "sending"}
+                  className="gc-move gc-move--navy gc-move--block gc-move--lg cursor-pointer disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   <span className="gc-move__label">
-                    Tạo mã VietQR
+                    {submitState === "sending" ? "Đang gửi…" : "Gửi đăng ký"}
                     <span className="ml-auto whitespace-nowrap pl-3 font-semibold tabular-nums text-brand-200">
                       {tuitionAmount.toLocaleString("vi-VN")}đ
                     </span>
@@ -664,37 +691,51 @@ export default function PricingAndCheckout() {
                   </span>
                 </button>
               </form>
+            ) : submitState === "error" ? (
+              <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain px-6 py-5 text-center md:px-8">
+                <p role="alert" className="flex items-center justify-center gap-2 text-sm font-semibold text-red-600">
+                  <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
+                  Chưa gửi được thông tin. Vui lòng kiểm tra kết nối mạng và thử lại.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => void sendPayload()}
+                  className="gc-move gc-move--navy gc-move--block gc-move--lg cursor-pointer"
+                >
+                  <span className="gc-move__label">Thử lại</span>
+                  <span className="gc-move__go" aria-hidden="true">
+                    <ArrowRight className="w-4 h-4" />
+                  </span>
+                </button>
+                <a
+                  href={`https://zalo.me/${BRAND_INFO.zaloPhone}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="gc-move gc-move--zalo gc-move--block"
+                >
+                  <span className="gc-move__label">Nhắn Zalo trung tâm ({BRAND_INFO.hotlines[0]})</span>
+                  <span className="gc-move__go" aria-hidden="true">
+                    <ArrowRight className="w-4 h-4" />
+                  </span>
+                </a>
+              </div>
             ) : (
               <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain px-6 py-5 text-center md:px-8">
-                <div className="relative mx-auto h-56 w-56 overflow-hidden rounded-control border border-slate-200 bg-slate-50">
-                  {!qrLoaded && !qrError && (
-                    <div className="absolute inset-0 grid place-items-center px-6 text-center text-xs font-medium text-slate-500">
-                      Đang tạo mã QR…
-                    </div>
-                  )}
-                  {qrError && (
-                    <div className="absolute inset-0 grid place-items-center px-6 text-center text-xs font-semibold text-red-600">
-                      Không tải được mã QR. Vui lòng thử lại.
-                    </div>
-                  )}
-                  {!qrError && (
-                    <img
-                      src={qrUrl}
-                      alt={`Mã VietQR thanh toán ${tuitionAmount.toLocaleString("vi-VN")} đồng cho ${BRAND_INFO.name}`}
-                      width={224}
-                      height={224}
-                      decoding="async"
-                      onLoad={() => setQrLoaded(true)}
-                      onError={() => setQrError(true)}
-                      className={`h-full w-full object-contain transition-opacity duration-200 ${qrLoaded ? "opacity-100" : "opacity-0"}`}
-                    />
-                  )}
+                <div className="flex flex-col items-center gap-2">
+                  <CheckCircle className="w-10 h-10 text-emerald-600" aria-hidden="true" />
+                  <p className="text-base font-semibold text-slate-900">
+                    Trung tâm đã nhận thông tin của bé {childName.trim()}.
+                  </p>
+                  <p className="text-sm text-slate-700">
+                    Trung tâm sẽ liên hệ sớm qua số{" "}
+                    <span className="font-bold tabular-nums">{phone.trim()}</span>.
+                  </p>
                 </div>
 
                 <div className="text-left bg-amber-50/80 border border-amber-200 rounded-control p-3.5 text-sm space-y-1.5">
                   <div className="flex justify-between gap-3">
                     <span className="text-slate-500 shrink-0">Học viên:</span>
-                    <span className="font-bold text-slate-900 text-right">{childName} ({childAge})</span>
+                    <span className="font-bold text-slate-900 text-right">{childName.trim()} ({childAge.trim()})</span>
                   </div>
                   <div className="flex justify-between gap-3">
                     <span className="text-slate-500 shrink-0">Cấp độ đăng ký:</span>
@@ -712,14 +753,14 @@ export default function PricingAndCheckout() {
                     </span>
                   </div>
                   <div className="flex justify-between gap-3">
-                    <span className="text-slate-500 shrink-0">Số tiền học phí:</span>
+                    <span className="text-slate-500 shrink-0">Học phí tạm tính:</span>
                     <span className="font-extrabold text-emerald-700 tabular-nums">
                       {tuitionAmount.toLocaleString("vi-VN")}đ
                     </span>
                   </div>
                   <div className="flex justify-between gap-3">
                     <span className="text-slate-500 shrink-0">Cơ sở đăng ký:</span>
-                    <span className="font-semibold text-slate-900 text-right">{currentBranchObj?.address}</span>
+                    <span className="font-semibold text-slate-900 text-right">{currentBranchObj.address}</span>
                   </div>
                   <div className="flex justify-between gap-3">
                     <span className="text-slate-500 shrink-0">Khung giờ đã chọn:</span>
@@ -727,35 +768,6 @@ export default function PricingAndCheckout() {
                       {selectedSlots.join(", ")}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center gap-3 pt-1.5 border-t border-amber-200">
-                    <span className="text-slate-500 shrink-0">Nội dung CK tự động:</span>
-                    <button
-                      type="button"
-                      onClick={() => copyToClipboard(transferMemo)}
-                      className="inline-flex items-center gap-1 font-mono font-bold text-amber-900 hover:underline cursor-pointer rounded-control"
-                      aria-label={`Sao chép nội dung chuyển khoản: ${transferMemo}`}
-                    >
-                      <span className="break-all text-right">{transferMemo}</span>
-                      {copied ? (
-                        <CheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" aria-hidden="true" />
-                      ) : (
-                        <Copy className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                      )}
-                    </button>
-                  </div>
-                  <p role="status" aria-live="polite" className="text-sm font-semibold">
-                    {copied && <span className="text-emerald-700">Đã sao chép nội dung chuyển khoản.</span>}
-                    {copyFailed && (
-                      <span className="text-red-600">
-                        Trình duyệt chặn sao chép. Vui lòng bôi đen và sao chép thủ công.
-                      </span>
-                    )}
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-center gap-2 text-sm text-emerald-700 font-medium">
-                  <ShieldCheck className="w-4 h-4 shrink-0" aria-hidden="true" />
-                  Quét bằng bất kỳ app ngân hàng nào để tự động điền đúng số tiền và cú pháp.
                 </div>
 
                 <div className="pt-1">
@@ -765,19 +777,17 @@ export default function PricingAndCheckout() {
                     rel="noreferrer"
                     className="gc-move gc-move--zalo gc-move--block"
                   >
-                    <span className="gc-move__label">
-                      Đã chuyển khoản • Báo Zalo trung tâm ({BRAND_INFO.hotlines[0]})
-                    </span>
+                    <span className="gc-move__label">Nhắn Zalo trung tâm ngay</span>
                     <span className="gc-move__go" aria-hidden="true">
                       <ArrowRight className="w-4 h-4" />
                     </span>
                   </a>
                   <button
                     type="button"
-                    onClick={() => setShowQR(false)}
+                    onClick={() => setIsModalOpen(false)}
                     className="mt-1 flex min-h-11 w-full cursor-pointer items-center justify-center text-sm font-semibold text-slate-500 transition hover:text-slate-800"
                   >
-                    Sửa thông tin
+                    Đóng
                   </button>
                 </div>
               </div>
