@@ -18,9 +18,9 @@ send it to parents over Zalo.
 
 A single Vietnamese landing page for Global Chess, a chess centre with five TP.HCM campuses.
 It exists to turn a browsing parent into an enrolled student: it explains the curriculum,
-shows real classes, lists tuition per level, and produces a VietQR transfer code with the
-right amount and memo for the chosen class. Success means an enrolment form submitted and a
-transfer reported to the centre over Zalo — the page itself takes no payment.
+shows real classes, lists tuition per level, and collects an enrolment form for the chosen
+class. Success means an enrolment submitted to the centre's Google Sheet so staff can call the
+parent back — the page itself takes no payment.
 
 ## Positioning
 
@@ -35,9 +35,10 @@ tuition grid.
 - Vietnamese-facing, TP.HCM only. Families choose a campus by district, then a weekly slot.
 - Schedule slots: weekday evenings (Mon–Fri 17:30–20:30) and three weekend slots (Sat/Sun
   morning 08:00–11:30, afternoon 14:00–17:30, evening 17:30–20:30).
-- Enrolment is a form on the page. It calculates tuition, then renders a VietQR code with the
-  exact amount plus a transfer memo; the parent scans it in any banking app and reports the
-  transfer to the centre on Zalo. There is no payment gateway, no account, no server.
+- Enrolment is a form on the page. It calculates an estimated tuition, then POSTs the answers
+  to a Google Apps Script web app that appends one row to the centre's Google Sheet; the parent
+  sees a confirmation that the centre will contact them soon. There is no payment of any kind,
+  no account, no server of our own.
 - Two hotlines and one Zalo number are the only contact channels:
   0789.059.440, 0963.848.430, Zalo 0789059440.
 - Five campuses: 811 Hậu Giang, P. Bình Phú (Q.6) · 55 Tên Lửa, P. An Lạc (Bình Tân) ·
@@ -68,10 +69,11 @@ tuition grid.
   (Chuyên nghiệp) is priced by title and is deliberately absent from the form.
 - Changing tuition means editing `TUITION_LEVELS` and `tests/tuition.test.mjs` together;
   changing the puzzle in `INTERACTIVE_PUZZLE` means re-running `npm test`.
-- The build fails when `PUBLIC_ACB_ACCOUNT_NO` or `PUBLIC_ACB_ACCOUNT_NAME` is unset, so no
-  QR code is ever generated with wrong details. `PUBLIC_*` values are inlined into the
-  browser bundle, so the account number is visible to anyone; hiding it would need a server
-  proxy and non-public variables.
+- The build fails when `PUBLIC_GOOGLE_SHEETS_ENDPOINT` is unset, so a dead form is never
+  deployed. `PUBLIC_*` values are inlined into the browser bundle, so the endpoint URL is
+  visible to anyone; a honeypot field (`_hp`) deflects naive bots, and the sheet owner deletes
+  junk rows. The Apps Script source is `google-apps-script/Code.gs`; setup is in
+  `docs/google-sheets-setup.md`.
 - The production domain is still a placeholder (`site` in `astro.config.mjs`, marked TODO);
   canonical URLs, `robots.txt`, `og:url` and the sitemap all derive from it.
 - Vietnamese only, with correct diacritics everywhere. Fonts must ship a Vietnamese subset.

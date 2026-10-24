@@ -321,7 +321,7 @@
     color: var(--color-slate-600);
   }
 
-  /* Xác nhận đã chuyển khoản: màu trạng thái, chỉ dùng ở bước cuối. */
+  /* Xác nhận đã gửi đăng ký: màu trạng thái, chỉ dùng ở bước cuối. */
   .gc-move--zalo {
     background-color: var(--color-emerald-600);
     color: #fff;

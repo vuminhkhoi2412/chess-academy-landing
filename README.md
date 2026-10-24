@@ -1,7 +1,7 @@
 # Global Chess — Landing Page
 
 Trang giới thiệu trung tâm cờ vua Global Chess (trẻ 4 – 12 tuổi, 5 cơ sở tại TP.HCM).
-Trang tĩnh, một trang duy nhất, có bàn cờ tương tác, gallery ảnh lớp học và form đăng ký tự tạo mã VietQR.
+Trang tĩnh, một trang duy nhất, có bàn cờ tương tác, gallery ảnh lớp học và form đăng ký gửi thẳng sang Google Sheets của trung tâm.
 
 ## Stack
 
@@ -33,7 +33,10 @@ assets/
   nguon/trichdan.txt      trích dẫn gốc của phụ huynh
   nguon/hinh-anh/         file gốc 5 ảnh + NGUON.md ghi Drive ID và consent
 DESIGN.md                 quy ước thiết kế: màu, chữ, chuyển động, chống mẫu AI
+google-apps-script/
+  Code.gs                 bản nguồn Apps Script để dán vào sheet (không được build)
 docs/
+  google-sheets-setup.md  hướng dẫn deploy Apps Script, khai endpoint
   lo_trinh_hoc.md         tài liệu chuẩn của trung tâm (lộ trình, giáo trình)
   superpowers/plans/      plan triển khai đã thực hiện
 public/
@@ -51,11 +54,11 @@ src/
   layouts/Layout.astro  khung HTML dùng chung: <head>, favicon, font, SEO
   data/courses.ts       toàn bộ nội dung: thương hiệu, cơ sở, giáo trình,
                         học phí, thế cờ đố, FAQ, nhận xét phụ huynh
-  data/payment.ts       thông tin nhận chuyển khoản, đọc từ biến môi trường
+  lib/enrolment.ts      kiểm tra, dựng và gửi payload đăng ký (test được bằng node --test)
   components/
     InteractivePuzzle.tsx    bàn cờ đố ở hero
     CurriculumExplorer.tsx   tab 3 lộ trình: Happy Chess / Sơ cấp / Trung cấp
-    PricingAndCheckout.tsx   bảng học phí + form + mã VietQR
+    PricingAndCheckout.tsx   bảng học phí + form đăng ký gửi Google Sheets
     SiteHeader.astro         thanh nav dùng chung (kèm menu di động ở trang chủ)
     SiteFooter.astro         chân trang dùng chung cho cả bốn trang
     MobileContactBar.astro   thanh gọi điện / Zalo cố định ở đáy màn hình điện thoại
@@ -81,21 +84,18 @@ không key theo độ sáng — key theo độ sáng sẽ xoá luôn bàn cờ c
 
 ## Biến môi trường
 
-Thông tin nhận chuyển khoản không nằm trong git. Copy `.env.example` thành `.env`
-rồi điền giá trị thật:
+URL của Google Apps Script nhận đăng ký không nằm trong git. Copy `.env.example` thành `.env`
+rồi điền giá trị thật (cách lấy URL: `docs/google-sheets-setup.md`):
 
 | Biến | Bắt buộc | Mặc định |
 | :--- | :--- | :--- |
-| `PUBLIC_ACB_BANK_ID` | không | `ACB` |
-| `PUBLIC_ACB_ACCOUNT_NO` | có | — |
-| `PUBLIC_ACB_ACCOUNT_NAME` | có | — |
-| `PUBLIC_ACB_TEMPLATE` | không | `compact2` |
+| `PUBLIC_GOOGLE_SHEETS_ENDPOINT` | có | — |
 
-Thiếu biến bắt buộc thì `npm run build` báo lỗi ngay, không tạo mã QR sai âm thầm.
+Thiếu biến bắt buộc thì `npm run build` báo lỗi ngay, không deploy một form không gửi được đi đâu.
 
-Lưu ý: biến `PUBLIC_*` bị inline vào bundle trình duyệt, nên người xem trang vẫn đọc
-được số tài khoản qua DevTools. Muốn giấu cả khỏi người xem thì phải thêm một endpoint
-phía server làm proxy cho ảnh VietQR và dùng biến không có tiền tố `PUBLIC_`.
+Lưu ý: biến `PUBLIC_*` bị inline vào bundle trình duyệt, nên ai đọc source cũng thấy URL
+endpoint và có thể gửi rác vào sheet. Ô ẩn `_hp` chặn bot ngây thơ; dòng rác thì quản lý
+xoá tay. Muốn chặn triệt để phải thêm một proxy phía server.
 
 ## Sửa nội dung
 
@@ -154,11 +154,10 @@ Phần ảnh gallery đã xong; còn cấu hình domain, biến môi trường v
 1. **Đổi domain.** Sửa `site` trong `astro.config.mjs` từ `https://globalchess.vn` sang
    domain thật. Đây là nguồn duy nhất cho `canonical`, `og:url`, `robots.txt` và
    `sitemap-index.xml`; không có chỗ nào khác hardcode domain.
-2. **Khai 4 biến môi trường trên Vercel:** `PUBLIC_ACB_BANK_ID`,
-   `PUBLIC_ACB_ACCOUNT_NO`, `PUBLIC_ACB_ACCOUNT_NAME`, `PUBLIC_ACB_TEMPLATE`
-   (giá trị xem bảng ở phần Biến môi trường). Khai ở Project Settings → Environment
-   Variables, chọn cả Production và Preview. Thiếu `PUBLIC_ACB_ACCOUNT_NO` hoặc
-   `PUBLIC_ACB_ACCOUNT_NAME` là build trên Vercel đỗ.
+2. **Deploy Apps Script và khai biến môi trường trên Vercel:** làm theo
+   `docs/google-sheets-setup.md` để lấy URL `/exec`, rồi khai `PUBLIC_GOOGLE_SHEETS_ENDPOINT`
+   ở Project Settings → Environment Variables, chọn cả Production và Preview. Thiếu biến
+   là build trên Vercel đỗ. Siết quyền chia sẻ của sheet trước khi nhận đăng ký thật.
 3. **Chạy lại 3 lệnh kiểm tra:** `npm run check`, `npm test`, `npm run build`.
    Cả 3 phải sạch trước khi push.
 4. **Deploy.** Import repo vào Vercel, Vercel tự nhận diện Astro, không cần file cấu
@@ -172,7 +171,7 @@ Placeholder URL chỉ có **một** chỗ: `site` trong `astro.config.mjs` (đan
 
 Ảnh thật đã nằm trong `src/assets/images/` và gallery `#hinh-anh`; không còn placeholder ảnh.
 
-Thông tin ngân hàng không nằm trong code mà ở `.env` local và biến môi trường của Vercel.
+URL Google Apps Script không nằm trong code mà ở `.env` local và biến môi trường của Vercel.
 
 Số điện thoại, địa chỉ 5 cơ sở và bảng học phí trong `src/data/courses.ts` là dữ liệu thật
 của trung tâm. Học phí lấy từ `assets/nguon/bang-hoc-phi-global-chess.pdf` — xem mục
@@ -184,7 +183,7 @@ của trung tâm. Học phí lấy từ `assets/nguon/bang-hoc-phi-global-chess.
 | :--- | :--- | :--- |
 | Cả 3 island không bấm được, console báo `504 (Outdated Optimize Dep)` | Vite cache cũ trong `node_modules/.vite`, thường sau khi sửa `astro.config.mjs` | `npx astro dev stop`, xoá `node_modules\.vite`, `npx astro dev --background` |
 | Lệnh `astro` báo không tìm thấy | `astro` không có trong PATH | chạy qua `npx`, ví dụ `npx astro dev stop` |
-| Build đỗ với dòng `PUBLIC_ACB_ACCOUNT_NO is missing` | thiếu biến môi trường | tạo `.env` từ `.env.example` ở local, khai trên Vercel khi deploy |
+| Build đỗ với dòng `PUBLIC_GOOGLE_SHEETS_ENDPOINT is missing` | thiếu biến môi trường | tạo `.env` từ `.env.example` ở local, khai trên Vercel khi deploy |
 | Island chưa hiện ngay sau khi reload | Astro hydrate sau sự kiện `load` | chờ thêm, không phải lỗi |
 
 Xoá cache Vite, đúng thứ tự:

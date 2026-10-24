@@ -81,7 +81,7 @@ Amber-500 is reserved for the button fill and the focus ring.
 
 **Status color — used sparingly, meaning-carrying only**
 
-- **Emerald** (`#059669` / `#047857`) — "đang tuyển sinh" live dot, payment success panel, "copy account number" action. Never decorative.
+- **Emerald** (`#059669` / `#047857`) — "đang tuyển sinh" live dot, submit-confirmation panel ("Đã gửi đăng ký"). Never decorative.
 
 **Elevation tint.** Every shadow is warm, carrying the hue of the cream page
 (`rgb(68 55 43 / …)`) rather than cool slate, so elevation reads as warm light:
@@ -156,7 +156,7 @@ Rules:
 - Label above the control, `text-xs`–`text-sm`, neutral weight; helper or error text below in `text-sm`.
 - Field: `w-full px-3 py-2 text-sm border border-slate-300 rounded-control bg-white outline-none focus:ring-2 focus:ring-amber-500`.
 - Selected / validated field: `border-amber-400 bg-amber-50/40 font-semibold`.
-- Invalid: red text plus a `bg-red-50` inline message. A `text-red-600 animate-pulse motion-reduce:animate-none` warning is reserved for the one blocking payment error.
+- Invalid: red text plus a `bg-red-50` inline message. A `text-red-600 animate-pulse motion-reduce:animate-none` warning is reserved for the one blocking submit error.
 - No floating labels. No placeholder-only forms.
 
 **Loaders, empty and error states**

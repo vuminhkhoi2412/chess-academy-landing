@@ -18,7 +18,7 @@ astro dev --background
 
 ## Required environment
 
-`npm run build` fails when `PUBLIC_ACB_ACCOUNT_NO` or `PUBLIC_ACB_ACCOUNT_NAME` are unset. Copy `.env.example` to `.env` before building. The README lists the full set.
+`npm run build` fails when `PUBLIC_GOOGLE_SHEETS_ENDPOINT` is unset. Copy `.env.example` to `.env` before building. The README lists the full set.
 
 ## Documentation
 

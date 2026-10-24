@@ -542,7 +542,7 @@ export const FAQS: FaqItem[] = [
   },
   {
     q: "Đóng học phí bằng cách nào?",
-    a: "Điền form đăng ký, hệ thống tạo mã VietQR kèm đúng số tiền và nội dung chuyển khoản. Quét mã bằng app ngân hàng bất kỳ, sau đó báo Zalo cho trung tâm.",
+    a: "Điền form đăng ký, trung tâm sẽ liên hệ lại với phụ huynh. Học phí và hình thức đóng được trao đổi trực tiếp với trung tâm.",
   },
   {
     q: "Chưa rõ trình độ của bé thì sao?",
