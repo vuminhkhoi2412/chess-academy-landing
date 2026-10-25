@@ -181,6 +181,77 @@
   }
 
   /*
+   * Đường ray thời lượng của một buổi học: mỗi bước là một chấm trên đường kẻ,
+   * số phút đứng trên chấm. Điện thoại chạy dọc bên trái, từ md trở lên chạy ngang.
+   */
+  .gc-rail {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .gc-rail__item {
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .gc-rail__item::before {
+    content: "";
+    position: absolute;
+    left: 0.3125rem;
+    top: 0.75rem;
+    bottom: -1.5rem;
+    width: 1px;
+    background-color: var(--color-brand-600);
+  }
+
+  .gc-rail__item:last-child::before {
+    display: none;
+  }
+
+  .gc-rail__item::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.75rem;
+    width: 0.6875rem;
+    height: 0.6875rem;
+    border-radius: 50%;
+    border: 2px solid var(--color-amber-400);
+    background-color: var(--color-brand-800);
+  }
+
+  @media (min-width: 48rem) {
+    .gc-rail {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+
+    .gc-rail__item {
+      padding-left: 0;
+      padding-top: 4rem;
+    }
+
+    .gc-rail__num {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .gc-rail__item::before {
+      left: 0.6875rem;
+      right: -1.5rem;
+      top: 3.34rem;
+      bottom: auto;
+      width: auto;
+      height: 1px;
+    }
+
+    .gc-rail__item::after {
+      top: 3rem;
+    }
+  }
+
+  /*
    * Hành động — mỗi nút là một "nước đi": nhãn nằm bên trái, ô đích nằm bên
    * phải. Trước đây mọi CTA trên trang đều là cùng một viên thuốc bo tròn, chữ
    * căn giữa, biểu tượng bên trái, nên nút đăng ký trông giống hệt nút đổi cơ

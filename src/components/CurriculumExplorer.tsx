@@ -5,7 +5,6 @@ import type { MajorProgram } from "../data/courses";
 import {
   Check,
   ChevronDown,
-  Clock,
   GraduationCap,
   Sparkles,
 } from "lucide-react";
@@ -281,26 +280,22 @@ export default function CurriculumExplorer() {
         </div>
 
         {/* Cấu trúc chuẩn 1 buổi học */}
-        <div className="mt-12 bg-brand-800 text-white rounded-card p-6 md:p-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-2">
-            <div>
-              <span className="text-amber-400 text-xs font-bold uppercase tracking-wider">Phương pháp sư phạm</span>
-              <h3 className="text-xl font-bold mt-0.5">Cấu trúc chuẩn mỗi buổi học</h3>
-            </div>
-            <span className="text-sm text-brand-200 italic">Lý thuyết - Bài tập - Thực chiến</span>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="mt-12 rounded-card bg-brand-800 px-6 py-7 text-white md:p-8">
+          <h3 className="font-display text-[1.375rem] font-bold tracking-[-0.015em]">Cấu trúc chuẩn mỗi buổi học</h3>
+          <p className="mt-1 text-sm text-brand-200">Phương pháp sư phạm: Lý thuyết – Bài tập – Thực chiến</p>
+          {/* Thời lượng là thông tin chính (5/15/20/15/5 phút) nên số phút đứng lớn trên một đường ray, thay cho 5 thẻ bằng nhau. */}
+          <ol className="gc-rail mt-7">
             {SESSION_TIMELINE.map((step, idx) => (
-              <div key={idx} className="bg-brand-700/60 border border-brand-600 rounded-card p-4 relative">
-                <div className="inline-flex items-center gap-1 text-xs font-extrabold text-amber-400 bg-amber-400/10 px-2.5 py-1 rounded-control mb-2 tabular-nums">
-                  <Clock className="w-3.5 h-3.5" aria-hidden="true" /> {step.time}
+              <li key={idx} className="gc-rail__item">
+                <div className="gc-rail__num font-display text-4xl font-extrabold leading-none tracking-[-0.03em] text-amber-400 tabular-nums">
+                  {parseInt(step.time, 10)}
+                  <small className="ml-1 font-sans text-[0.8125rem] font-semibold tracking-normal text-brand-200">phút</small>
                 </div>
-                <h4 className="font-bold text-sm text-white mb-1">{step.title}</h4>
-                <p className="text-sm text-brand-200 leading-relaxed">{step.desc}</p>
-              </div>
+                <h4 className="mt-2 text-[0.9375rem] font-bold">{step.title}</h4>
+                <p className="mt-1 text-sm leading-relaxed text-brand-200">{step.desc}</p>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </div>
     </section>
