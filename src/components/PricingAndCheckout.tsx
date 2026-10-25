@@ -422,9 +422,7 @@ export default function PricingAndCheckout() {
             <div className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-200 px-6 pb-4 pt-5 md:px-8">
               <div className="min-w-0 pr-2">
                 {/* Badge tự động nhảy tên gói theo Cấp độ đăng ký */}
-                <span className="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-2.5 py-1 rounded-control">
-                  {activeProgram.name}
-                </span>
+                <span className="gc-eyebrow text-sm">{activeProgram.name}</span>
                 <h3 id={DIALOG_TITLE_ID} className="text-xl font-bold mt-2">
                   {submitState === "sent" ? "Đã gửi đăng ký" : "Đăng ký cơ sở & khung giờ học"}
                 </h3>
@@ -754,58 +752,86 @@ export default function PricingAndCheckout() {
               <div
                 ref={resultRef}
                 tabIndex={-1}
-                className="min-h-0 space-y-4 overflow-y-auto overscroll-contain px-6 py-5 text-center outline-none md:px-8"
+                className="min-h-0 space-y-5 overflow-y-auto overscroll-contain px-6 py-5 outline-none md:px-8"
               >
-                <div className="flex flex-col items-center gap-2">
-                  <CheckCircle className="w-10 h-10 text-emerald-600" aria-hidden="true" />
-                  <p className="text-base font-semibold text-slate-900">
-                    Trung tâm đã nhận thông tin của bé {childName.trim()}.
-                  </p>
-                  <p className="text-sm text-slate-700">
-                    Trung tâm sẽ liên hệ sớm qua số{" "}
-                    <span className="font-bold tabular-nums">{phone.trim()}</span>.
-                  </p>
+                <div className="flex items-start gap-3.5">
+                  <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-emerald-600 text-white">
+                    <Check className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
+                  </span>
+                  <div className="space-y-1.5">
+                    <p className="font-display text-lg font-bold leading-snug text-slate-900">
+                      Cảm ơn ba mẹ đã tin tưởng gửi gắm bé {childName.trim()} cho Global Chess.
+                    </p>
+                    <p className="text-sm leading-relaxed text-slate-600">
+                      Trung tâm đã nhận thông tin và sẽ liên hệ qua số{" "}
+                      <span className="font-semibold tabular-nums text-slate-900">{phone.trim()}</span>{" "}
+                      để xếp lớp theo khung giờ của bé. Hẹn gặp bé trên bàn cờ!
+                    </p>
+                  </div>
                 </div>
 
-                <div className="text-left bg-amber-50/80 border border-amber-200 rounded-control p-3.5 text-sm space-y-1.5">
-                  <div className="flex justify-between gap-3">
-                    <span className="text-slate-500 shrink-0">Học viên:</span>
-                    <span className="font-bold text-slate-900 text-right">{childName.trim()} ({childAge.trim()})</span>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <span className="text-slate-500 shrink-0">Cấp độ đăng ký:</span>
-                    <span className="font-bold text-amber-800 text-right">
-                      {activeLevel.label} ({activeLevel.sessionLength}/buổi)
+                {/* Phiếu tóm tắt: lưới nhãn trên / giá trị dưới, học phí tách thành cuống phiếu ở đáy. */}
+                <div className="overflow-hidden rounded-control border border-slate-200 text-sm">
+                  <dl className="grid gap-x-6 gap-y-4 bg-white p-4 sm:grid-cols-2">
+                    <div>
+                      <dt className="text-xs font-semibold text-slate-500">Học viên</dt>
+                      <dd className="mt-0.5 font-semibold text-slate-900">
+                        {childName.trim()}
+                        {childAge.trim() && (
+                          <span className="font-normal text-slate-600"> · {childAge.trim()}</span>
+                        )}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-semibold text-slate-500">Cấp độ</dt>
+                      <dd className="mt-0.5 font-semibold text-slate-900">
+                        {activeLevel.label}
+                        <span className="font-normal text-slate-600"> · {activeLevel.sessionLength}/buổi</span>
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-semibold text-slate-500">Cơ sở</dt>
+                      <dd className="mt-0.5 font-semibold text-slate-900">{currentBranchObj.name}</dd>
+                      <dd className="text-slate-600">{currentBranchObj.address}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-semibold text-slate-500">Hình thức học</dt>
+                      <dd className="mt-0.5 font-semibold text-slate-900">
+                        {activeFormat.short}
+                        {isPrivateFormat && (
+                          <span className="font-normal text-slate-600">
+                            {" "}× {privateSessions} buổi ({privateRate.toLocaleString("vi-VN")}đ/buổi)
+                          </span>
+                        )}
+                      </dd>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <dt className="flex items-center gap-1 text-xs font-semibold text-slate-500">
+                        <Clock className="h-3.5 w-3.5 text-amber-600" aria-hidden="true" /> Khung giờ đã chọn
+                      </dt>
+                      <dd className="mt-1">
+                        <ul className="grid gap-x-6 gap-y-1 sm:grid-cols-2">
+                          {selectedSlots.map((slot) => (
+                            <li key={slot} className="border-l-2 border-amber-500 pl-2 text-slate-900">
+                              {slot}
+                            </li>
+                          ))}
+                        </ul>
+                      </dd>
+                    </div>
+                  </dl>
+                  <div className="flex items-baseline justify-between gap-3 border-t border-dashed border-slate-300 bg-amber-50 px-4 py-3">
+                    <span className="text-slate-600">
+                      Học phí tạm tính
+                      <span className="block text-xs text-slate-500">Trung tâm sẽ xác nhận lại khi xếp lớp</span>
                     </span>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <span className="text-slate-500 shrink-0">Hình thức học:</span>
-                    <span className="font-bold text-amber-800 text-right">
-                      {activeFormat.short}
-                      {isPrivateFormat
-                        ? ` × ${privateSessions} buổi (${privateRate.toLocaleString("vi-VN")}đ/buổi)`
-                        : ""}
-                    </span>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <span className="text-slate-500 shrink-0">Học phí tạm tính:</span>
-                    <span className="font-extrabold text-emerald-700 tabular-nums">
+                    <span className="font-display text-xl font-extrabold tabular-nums text-slate-900">
                       {tuitionAmount.toLocaleString("vi-VN")}đ
                     </span>
                   </div>
-                  <div className="flex justify-between gap-3">
-                    <span className="text-slate-500 shrink-0">Cơ sở đăng ký:</span>
-                    <span className="font-semibold text-slate-900 text-right">{currentBranchObj.address}</span>
-                  </div>
-                  <div className="flex justify-between gap-3">
-                    <span className="text-slate-500 shrink-0">Khung giờ đã chọn:</span>
-                    <span className="font-semibold text-slate-800 text-right max-w-[60%]">
-                      {selectedSlots.join(", ")}
-                    </span>
-                  </div>
                 </div>
 
-                <div className="pt-1">
+                <div>
                   <a
                     href={`https://zalo.me/${BRAND_INFO.zaloPhone}`}
                     target="_blank"
