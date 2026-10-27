@@ -23,11 +23,7 @@ const payload = () => ({
   program: "Sơ cấp",
   level_label: "Sơ cấp 1",
   level_code: "SC1",
-  format_label: "Lớp group — 24 buổi",
-  format_code: "G24",
-  sessions: 24,
   tuition_estimate: 3600000,
-  time_slots: "Tối T2–T6; Sáng T7",
   note: "=HYPERLINK(\"x\")",
   submission_id: "abc-123",
   _hp: "",
@@ -54,19 +50,17 @@ test("isDuplicate_: mã mới hoặc cột rỗng không phải bản trùng", (
   assert.equal(isDuplicate_([], "z"), false);
 });
 
-test("buildRow_: 18 cột đúng thứ tự spec 7.5, SĐT còn số 0, học phí là number", () => {
+test("buildRow_: 14 cột đúng thứ tự HEADERS, SĐT còn số 0, học phí là number", () => {
   const row = buildRow_(payload(), "2026-10-24 09:00:00");
-  assert.equal(row.length, 18);
+  assert.equal(row.length, 14);
   assert.equal(row[0], "2026-10-24 09:00:00");
   assert.equal(row[1], "Mới");
   assert.equal(row[2], "Nguyễn Minh An");
   assert.equal(row[5], "0901234567");
-  assert.equal(typeof row[13], "number");
-  assert.equal(typeof row[14], "number");
-  assert.equal(row[14], 3600000);
-  assert.equal(row[15], "Tối T2–T6; Sáng T7");
-  assert.equal(row[16], '=HYPERLINK("x")');
-  assert.equal(row[17], "abc-123");
+  assert.equal(typeof row[11], "number");
+  assert.equal(row[11], 3600000);
+  assert.equal(row[12], '=HYPERLINK("x")');
+  assert.equal(row[13], "abc-123");
 });
 
 test("LOCK_WAIT_MS: chờ khoá lâu hơn timeout 10 giây của trình duyệt, để quá tải thành lỗi nhìn thấy được thay vì mất dòng", () => {

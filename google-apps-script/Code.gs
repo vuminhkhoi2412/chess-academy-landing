@@ -19,12 +19,10 @@ const STATUSES = ["Mới", "Đã liên hệ", "Đã đăng ký", "Huỷ"];
 const HEADERS = [
   "Thời gian gửi", "Trạng thái", "Họ tên bé", "Năm sinh / tuổi", "Họ tên phụ huynh",
   "SĐT Zalo", "Cơ sở", "Địa chỉ cơ sở", "Chương trình", "Cấp độ dự kiến", "Mã cấp độ",
-  "Hình thức học", "Mã hình thức", "Số buổi", "Học phí tạm tính (đ)", "Khung giờ",
-  "Ghi chú", "Mã gửi",
+  "Học phí tạm tính (đ)", "Ghi chú", "Mã gửi",
 ];
-const COL_SESSIONS = 14;
-const COL_TUITION = 15;
-const COL_ID = 18;
+const COL_TUITION = 12;
+const COL_ID = 14;
 // Dài hơn timeout 10 giây của trình duyệt: lúc quá tải phụ huynh thấy lỗi và bấm Thử lại
 // (an toàn nhờ chống trùng), thay vì thấy "đã gửi" mà không có dòng nào.
 const LOCK_WAIT_MS = 30000;
@@ -50,8 +48,8 @@ function isDuplicate_(ids, id) {
 function buildRow_(p, timestamp) {
   return [
     timestamp, STATUSES[0], p.child_name, p.child_age, p.parent_name, p.phone, p.branch,
-    p.branch_address, p.program, p.level_label, p.level_code, p.format_label, p.format_code,
-    p.sessions, p.tuition_estimate, p.time_slots, p.note, p.submission_id,
+    p.branch_address, p.program, p.level_label, p.level_code, p.tuition_estimate, p.note,
+    p.submission_id,
   ];
 }
 
@@ -90,7 +88,6 @@ function doPost(e) {
     const range = sheet.getRange(last + 1, 1, 1, HEADERS.length);
     // Cột chữ phải là text, nếu không 0901234567 mất số 0 và nội dung bắt đầu bằng "=" thành công thức.
     const formats = HEADERS.map(function (_, i) {
-      if (i + 1 === COL_SESSIONS) return "0";
       if (i + 1 === COL_TUITION) return "#,##0";
       return "@";
     });
@@ -136,8 +133,7 @@ function setupSheet_(sheet) {
   sheet.setFrozenRows(1);
   sheet.setColumnWidths(1, HEADERS.length, 140);
   sheet.setColumnWidth(8, 260);
-  sheet.setColumnWidth(16, 220);
-  sheet.setColumnWidth(17, 220);
+  sheet.setColumnWidth(13, 220);
   sheet.getRange(2, 2, 999, 1).setDataValidation(statusRule_());
   // Script dùng cột này để chống ghi trùng: ẩn đi, đừng xoá.
   sheet.hideColumns(COL_ID);

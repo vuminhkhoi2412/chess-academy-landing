@@ -20,49 +20,41 @@ const baseInput = () => ({
   branch: { name: "Cơ sở Quận 1", address: "1 Lê Lợi" },
   program: "Sơ cấp",
   level: { label: "Sơ cấp 1", code: "SC1" },
-  format: { label: "Lớp group — 24 buổi (2 buổi/tuần)", code: "G24" },
-  sessions: 24,
   tuitionEstimate: 3600000,
-  timeSlots: ["Tối T2–T6", "Sáng T7"],
   note: "  ",
   submissionId: "11111111-2222-3333-4444-555555555555",
   honeypot: "",
 });
 
 test("validateEnrolment: tên toàn khoảng trắng bị chặn", () => {
-  assert.equal(validateEnrolment({ parentName: "Chị Thảo", childName: "   ", phone: "0901234567", timeSlots: ["a"] }), "name");
+  assert.equal(validateEnrolment({ parentName: "Chị Thảo", childName: "   ", phone: "0901234567" }), "name");
 });
 
 test("validateEnrolment: SĐT 9 chữ số bị chặn", () => {
-  assert.equal(validateEnrolment({ parentName: "Chị Thảo", childName: "An", phone: "0901 234 56", timeSlots: ["a"] }), "phone");
+  assert.equal(validateEnrolment({ parentName: "Chị Thảo", childName: "An", phone: "0901 234 56" }), "phone");
 });
 
 test("validateEnrolment: SĐT có +84, dấu chấm, khoảng trắng vẫn hợp lệ", () => {
-  assert.equal(validateEnrolment({ parentName: "Chị Thảo", childName: "An", phone: "+84 901.234.567", timeSlots: ["a"] }), null);
-});
-
-test("validateEnrolment: thiếu khung giờ bị chặn", () => {
-  assert.equal(validateEnrolment({ parentName: "Chị Thảo", childName: "An", phone: "0901234567", timeSlots: [] }), "slots");
+  assert.equal(validateEnrolment({ parentName: "Chị Thảo", childName: "An", phone: "+84 901.234.567" }), null);
 });
 
 test("validateEnrolment: tên và SĐT cùng sai thì báo tên trước", () => {
-  assert.equal(validateEnrolment({ parentName: "Chị Thảo", childName: "", phone: "1", timeSlots: [] }), "name");
+  assert.equal(validateEnrolment({ parentName: "Chị Thảo", childName: "", phone: "1" }), "name");
 });
 
-test("buildEnrolmentPayload: đủ 17 khoá của spec 7.2", () => {
+test("buildEnrolmentPayload: đủ 13 khoá khớp Code.gs", () => {
   assert.deepEqual(Object.keys(buildEnrolmentPayload(baseInput())).sort(), [
-    "_hp", "branch", "branch_address", "child_age", "child_name", "format_code",
-    "format_label", "level_code", "level_label", "note", "parent_name", "phone",
-    "program", "sessions", "submission_id", "time_slots", "tuition_estimate",
+    "_hp", "branch", "branch_address", "child_age", "child_name", "level_code",
+    "level_label", "note", "parent_name", "phone", "program", "submission_id",
+    "tuition_estimate",
   ]);
 });
 
-test("buildEnrolmentPayload: SĐT chỉ còn chữ số, chuỗi được trim, khung giờ nối bằng '; '", () => {
+test("buildEnrolmentPayload: SĐT chỉ còn chữ số, chuỗi được trim", () => {
   const p = buildEnrolmentPayload(baseInput());
   assert.equal(p.phone, "84901234567");
   assert.equal(p.child_name, "Nguyễn Minh An");
   assert.equal(p.note, "");
-  assert.equal(p.time_slots, "Tối T2–T6; Sáng T7");
 });
 
 test("buildEnrolmentPayload: chưa chọn cấp thì level_code là 'auto'", () => {
@@ -71,9 +63,8 @@ test("buildEnrolmentPayload: chưa chọn cấp thì level_code là 'auto'", () 
   assert.equal(p.level_label, "Giáo viên xếp lớp sau ván thử");
 });
 
-test("buildEnrolmentPayload: sessions và tuition_estimate là number", () => {
+test("buildEnrolmentPayload: tuition_estimate là number", () => {
   const p = buildEnrolmentPayload(baseInput());
-  assert.equal(typeof p.sessions, "number");
   assert.equal(typeof p.tuition_estimate, "number");
 });
 
@@ -121,18 +112,18 @@ test("postEnrolment: lỗi mạng được ném ra cho nơi gọi", async () => 
 
 test("validateEnrolment: tên phụ huynh toàn khoảng trắng bị chặn (script sẽ từ chối và phụ huynh không biết)", () => {
   assert.equal(
-    validateEnrolment({ parentName: "   ", childName: "An", phone: "0901234567", timeSlots: ["a"] }),
+    validateEnrolment({ parentName: "   ", childName: "An", phone: "0901234567" }),
     "parent"
   );
 });
 
 test("validateEnrolment: thứ tự tên bé → phụ huynh → SĐT", () => {
   assert.equal(
-    validateEnrolment({ parentName: "", childName: "", phone: "1", timeSlots: [] }),
+    validateEnrolment({ parentName: "", childName: "", phone: "1" }),
     "name"
   );
   assert.equal(
-    validateEnrolment({ parentName: "", childName: "An", phone: "1", timeSlots: [] }),
+    validateEnrolment({ parentName: "", childName: "An", phone: "1" }),
     "parent"
   );
 });

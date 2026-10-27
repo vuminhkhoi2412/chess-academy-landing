@@ -46,9 +46,9 @@ access → Restricted**, chỉ thêm tài khoản của quản lý và chủ s�
 
 ## 5. Cách dùng hằng ngày
 
-Lần gửi đầu tiên script tự tạo tab **Đăng ký** với 18 cột. Mỗi dòng mới có Trạng thái là
+Lần gửi đầu tiên script tự tạo tab **Đăng ký** với 14 cột. Mỗi dòng mới có Trạng thái là
 `Mới`. Quản lý lọc cột Trạng thái, gọi lại phụ huynh, rồi đổi trạng thái (`Đã liên hệ`,
-`Đã đăng ký`, `Huỷ`). Cột **Mã gửi** (cột R) bị ẩn: script dùng nó để không ghi trùng khi
+`Đã đăng ký`, `Huỷ`). Cột **Mã gửi** (cột N) bị ẩn: script dùng nó để không ghi trùng khi
 phụ huynh bấm "Thử lại". Đừng xoá cột này.
 
 **Đừng đổi tên tab `Đăng ký`.** Script tìm tab theo tên; đổi tên thì lần gửi kế tiếp tạo một tab

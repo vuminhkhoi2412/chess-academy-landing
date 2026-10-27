@@ -4,7 +4,6 @@ import {
   TUITION_PROGRAMS,
   TUITION_LEVELS,
   BRANCHES,
-  FLEXIBLE_TIME_SLOTS,
   BRAND_INFO,
 } from "../data/courses";
 import { PUBLIC_GOOGLE_SHEETS_ENDPOINT } from "astro:env/client";
@@ -21,26 +20,8 @@ import {
   CheckCircle,
   AlertCircle,
   MapPin,
-  Clock,
 } from "lucide-react";
-
-// Hình thức học lấy từ bảng học phí chính thức. Lớp 1 kèm 1 / 1 kèm 2 tính
-// đơn giá mỗi buổi, nên có thêm lựa chọn số buổi đăng ký.
-type TuitionFormat = "group12" | "group24" | "oneOnOne" | "oneOnTwo";
-
-const FORMAT_OPTIONS: { value: TuitionFormat; label: string; short: string }[] = [
-  { value: "group12", label: "Lớp group — 12 buổi (1 buổi/tuần)", short: "12 buổi" },
-  { value: "group24", label: "Lớp group — 24 buổi (2 buổi/tuần)", short: "24 buổi" },
-  { value: "oneOnOne", label: "Lớp 1 kèm 1 — tính theo buổi", short: "1 kèm 1" },
-  { value: "oneOnTwo", label: "Lớp 1 kèm 2 — tính theo buổi", short: "1 kèm 2" },
-];
-
-const FORMAT_CODE: Record<TuitionFormat, string> = {
-  group12: "G12",
-  group24: "G24",
-  oneOnOne: "P11",
-  oneOnTwo: "P12",
-};
+import PieceIcon from "./PieceIcon";
 
 const FOCUSABLE_SELECTOR = [
   "a[href]",
@@ -58,17 +39,13 @@ type SubmitState = "form" | "sending" | "sent" | "error";
 export default function PricingAndCheckout() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedLevelCode, setSelectedLevelCode] = useState(TUITION_LEVELS[0].code);
-  const [tuitionFormat, setTuitionFormat] = useState<TuitionFormat>("group24");
-  const [privateSessions, setPrivateSessions] = useState(12);
   const [parentName, setParentName] = useState("");
   const [phone, setPhone] = useState("");
   const [childName, setChildName] = useState("");
   const [childAge, setChildAge] = useState("");
   const [selectedBranch, setSelectedBranch] = useState(BRANCHES[0].id);
-  const [selectedSlots, setSelectedSlots] = useState<string[]>([FLEXIBLE_TIME_SLOTS[1]]);
   const [honeypot, setHoneypot] = useState("");
   const [submitState, setSubmitState] = useState<SubmitState>("form");
-  const [slotError, setSlotError] = useState(false);
   const [phoneError, setPhoneError] = useState(false);
   const [nameError, setNameError] = useState(false);
   const [parentError, setParentError] = useState(false);
@@ -84,8 +61,8 @@ export default function PricingAndCheckout() {
   // bấm, vì sau khi mở hộp thoại thì document.activeElement đã đổi.
   const returnFocusRef = useRef<HTMLElement | null>(null);
 
-  // Suy ra cấp độ, chương trình và số tiền từ 3 lựa chọn: cấp độ, hình thức học
-  // (12/24 buổi hoặc 1-1/1-2) và số buổi nếu học kèm riêng.
+  // Suy ra chương trình và số tiền từ cấp độ đã chọn. Học phí tạm tính luôn là gói
+  // 24 buổi (2 buổi/tuần), cùng mức đang niêm yết ở bảng giá phía trên.
   const activeLevel =
     TUITION_LEVELS.find((level) => level.code === selectedLevelCode) || TUITION_LEVELS[0];
 
@@ -93,25 +70,7 @@ export default function PricingAndCheckout() {
     TUITION_PROGRAMS.find((program) => program.id === activeLevel.programId) ||
     TUITION_PROGRAMS[0];
 
-  const isPrivateFormat = tuitionFormat === "oneOnOne" || tuitionFormat === "oneOnTwo";
-
-  const privateRate =
-    tuitionFormat === "oneOnOne" ? activeLevel.oneOnOne : activeLevel.oneOnTwo;
-
-  const levelPrice = (level: (typeof TUITION_LEVELS)[number]) =>
-    isPrivateFormat
-      ? tuitionFormat === "oneOnOne"
-        ? level.oneOnOne
-        : level.oneOnTwo
-      : tuitionFormat === "group12"
-        ? level.group12
-        : level.group24;
-
-  const tuitionAmount = isPrivateFormat
-    ? privateRate * privateSessions
-    : levelPrice(activeLevel);
-
-  const activeFormat = FORMAT_OPTIONS.find((format) => format.value === tuitionFormat) || FORMAT_OPTIONS[1];
+  const tuitionAmount = activeLevel.group24;
 
   // Thẻ "Chọn cơ sở này" ở phần Hệ thống cơ sở bắn sự kiện này để mở sẵn đúng cơ sở.
   useEffect(() => {
@@ -187,13 +146,6 @@ export default function PricingAndCheckout() {
     if (submitState === "sent" || submitState === "error") resultRef.current?.focus();
   }, [submitState]);
 
-  const toggleSlot = (slot: string) => {
-    setSlotError(false);
-    setSelectedSlots((prev) =>
-      prev.includes(slot) ? prev.filter((s) => s !== slot) : [...prev, slot]
-    );
-  };
-
   // Mở hộp thoại luôn đưa về form trắng (không reset lúc đóng, để phụ huynh lỡ tay đóng
   // giữa chừng vẫn thấy phần đã gõ). Nếu không, form điền sẵn dữ liệu vừa gửi sẽ đẻ ra dòng thứ hai.
   const resetForm = () => {
@@ -202,12 +154,9 @@ export default function PricingAndCheckout() {
     setParentName("");
     setPhone("");
     setHoneypot("");
-    setSelectedSlots([FLEXIBLE_TIME_SLOTS[1]]);
-    setPrivateSessions(12);
     setNameError(false);
     setParentError(false);
     setPhoneError(false);
-    setSlotError(false);
     setSubmitState("form");
     payloadRef.current = null;
     attemptRef.current += 1;
@@ -221,7 +170,6 @@ export default function PricingAndCheckout() {
     const firstLevel = TUITION_LEVELS.find((level) => level.programId === program.id);
     returnFocusRef.current = trigger ?? null;
     if (firstLevel) setSelectedLevelCode(firstLevel.code);
-    setTuitionFormat("group24");
     resetForm();
     setIsModalOpen(true);
   };
@@ -243,11 +191,10 @@ export default function PricingAndCheckout() {
     e.preventDefault();
     if (submitState === "sending") return;
 
-    const problem = validateEnrolment({ childName, parentName, phone, timeSlots: selectedSlots });
+    const problem = validateEnrolment({ childName, parentName, phone });
     setNameError(problem === "name");
     setParentError(problem === "parent");
     setPhoneError(problem === "phone");
-    setSlotError(problem === "slots");
     if (problem) return;
 
     payloadRef.current = buildEnrolmentPayload({
@@ -258,10 +205,7 @@ export default function PricingAndCheckout() {
       branch: { name: currentBranchObj.name, address: currentBranchObj.address },
       program: activeProgram.name,
       level: { label: activeLevel.label, code: activeLevel.code },
-      format: { label: activeFormat.label, code: FORMAT_CODE[tuitionFormat] },
-      sessions: isPrivateFormat ? privateSessions : tuitionFormat === "group12" ? 12 : 24,
       tuitionEstimate: tuitionAmount,
-      timeSlots: selectedSlots,
       note: "",
       submissionId: newSubmissionId(),
       honeypot,
@@ -298,8 +242,8 @@ export default function PricingAndCheckout() {
           </h2>
         </div>
 
-        {/* 3 Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-6">
+        {/* Bảng giá: mỗi khóa một hàng, quân cờ làm biểu tượng của khóa. */}
+        <div className="border-b border-brand-600">
           {TUITION_PROGRAMS.map((program) => {
             const levels = TUITION_LEVELS.filter((level) => level.programId === program.id);
             const min12 = Math.min(...levels.map((level) => level.group12));
@@ -308,54 +252,45 @@ export default function PricingAndCheckout() {
             const multipleTiers = new Set(levels.map((level) => level.group24)).size > 1;
 
             return (
-              <div
-                key={program.id}
-                className={`rounded-card p-7 flex flex-col justify-between border transition ${
-                  program.popular
-                    ? "bg-brand-700 border-amber-500 shadow-lifted relative"
-                    : "bg-brand-700/40 border-brand-600 hover:border-brand-500"
-                }`}
-              >
-                {program.popular && (
-                  <span className="absolute -top-3.5 left-6 bg-amber-500 text-slate-950 text-xs font-bold px-3 py-1 rounded-control uppercase tracking-wide">
-                    Lộ trình tối ưu nhất
-                  </span>
-                )}
+              <article key={program.id} className={`gc-rate ${program.popular ? "gc-rate--pop" : ""}`}>
+                <div className="flex items-start gap-4">
+                  <div className="gc-rate__tile" aria-hidden="true">
+                    <PieceIcon programId={program.id} className="size-10 text-amber-400" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 font-display text-[1.375rem] font-extrabold leading-tight tracking-[-0.015em] text-white">
+                      {program.name}
+                      {program.popular && (
+                        <span className="rounded-md bg-amber-500 px-2.5 py-0.5 font-sans text-[11px] font-bold uppercase tracking-wide text-slate-950">
+                          Lộ trình tối ưu nhất
+                        </span>
+                      )}
+                    </h3>
+                    <p className="mt-1 text-sm text-brand-200">{program.subtitle}</p>
+                    <ul className="mt-3.5 grid gap-1.5 lg:grid-cols-2 lg:gap-x-6">
+                      {program.features.map((feat, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm leading-relaxed text-brand-100">
+                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" aria-hidden="true" />
+                          <span>{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
 
                 <div>
-                  <h3 className="text-xl font-bold text-white">{program.name}</h3>
-                  {/*
-                    Chừa đúng 2 dòng phụ đề để hàng giá của 3 thẻ luôn thẳng nhau.
-                    3.25em = 2 dòng × leading-relaxed (1.625), nên giá trị này ăn theo
-                    chính cỡ chữ của phụ đề thay vì một số rem đoán trước.
-                  */}
-                  <p className="text-brand-200 text-sm mt-1.5 leading-relaxed min-h-[3.25em]">
-                    {program.subtitle}
-                  </p>
-
-                  <div className="my-5 pb-5 border-b border-brand-600">
-                    <div className="text-brand-200 text-xs font-semibold uppercase tracking-wider">
-                      24 buổi (2 buổi/tuần)
-                    </div>
-                    <span className="text-3xl font-extrabold text-amber-400 tabular-nums">
-                      {multipleTiers ? "từ " : ""}
-                      {min24.toLocaleString("vi-VN")}đ
-                    </span>
-                    <div className="text-brand-200 text-xs mt-1.5 leading-relaxed">
-                      12 buổi: {min12.toLocaleString("vi-VN")}đ
-                      <br />
-                      1 kèm 1: từ {minOneOnOne.toLocaleString("vi-VN")}đ/buổi
-                    </div>
+                  <div className="text-xs font-semibold uppercase tracking-wider text-brand-200">
+                    24 buổi (2 buổi/tuần)
                   </div>
-
-                  <ul className="space-y-2.5 mb-8">
-                    {program.features.map((feat, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 text-sm text-brand-100 leading-relaxed">
-                        <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" aria-hidden="true" />
-                        <span>{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <span className="block font-display text-[2rem] font-extrabold leading-[1.1] tracking-[-0.02em] text-amber-400 tabular-nums">
+                    {multipleTiers ? "từ " : ""}
+                    {min24.toLocaleString("vi-VN")}đ
+                  </span>
+                  <div className="mt-2 text-[13px] leading-relaxed text-brand-200">
+                    12 buổi: {min12.toLocaleString("vi-VN")}đ
+                    <br />
+                    1 kèm 1: từ {minOneOnOne.toLocaleString("vi-VN")}đ/buổi
+                  </div>
                 </div>
 
                 <button
@@ -370,32 +305,9 @@ export default function PricingAndCheckout() {
                     <ArrowRight className="w-4 h-4" />
                   </span>
                 </button>
-              </div>
+              </article>
             );
           })}
-        </div>
-
-        {/*
-          Dải dữ kiện dùng chung. Ba thẻ học phí luôn phải đứng cạnh nhau để so sánh,
-          nhưng một hàng thông tin chung bên dưới làm dịu thế "3 tòa tháp".
-        */}
-        <div className="mt-10 rounded-card border border-brand-600 bg-brand-700/40 p-6 md:p-7">
-          <div className="text-amber-400 text-xs font-bold uppercase tracking-wider mb-5">
-            Mọi gói học phí đều bao gồm
-          </div>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              "Lớp group từ 2 học viên, hoặc 1 kèm 1 / 1 kèm 2",
-              "Ca tối trong tuần hoặc cuối tuần (T7 – CN)",
-              "Kiểm tra đánh giá định kỳ và cuối khóa",
-              "Tự chọn cơ sở trong 5 địa điểm tại TP.HCM",
-            ].map((item) => (
-              <li key={item} className="flex items-start gap-2.5 text-sm text-brand-100 leading-relaxed">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" aria-hidden="true" />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
 
@@ -596,102 +508,19 @@ export default function PricingAndCheckout() {
                     >
                       {TUITION_LEVELS.map((level) => (
                         <option key={level.code} value={level.code}>
-                          {level.label} — {levelPrice(level).toLocaleString("vi-VN")}đ
-                          {isPrivateFormat ? "/buổi" : ""}
+                          {level.label} — {level.group24.toLocaleString("vi-VN")}đ
                         </option>
                       ))}
                     </select>
                   </div>
                 </div>
 
-                {/* Hình thức học lấy từ bảng học phí: 12/24 buổi hoặc kèm riêng. */}
-                <div className={`grid gap-3 ${isPrivateFormat ? "sm:grid-cols-2" : ""}`}>
-                  <div>
-                    <label htmlFor="gc-format" className="block text-sm font-semibold text-slate-700 mb-1">
-                      Hình thức học *
-                    </label>
-                    <select
-                      id="gc-format"
-                      value={tuitionFormat}
-                      onChange={(e) => setTuitionFormat(e.target.value as TuitionFormat)}
-                      className="w-full px-3 py-2 text-sm font-semibold border border-slate-300 rounded-control focus:ring-2 focus:ring-amber-500 outline-none bg-white"
-                    >
-                      {FORMAT_OPTIONS.map((format) => (
-                        <option key={format.value} value={format.value}>
-                          {format.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  {isPrivateFormat && (
-                    <div>
-                      <label htmlFor="gc-private-sessions" className="block text-sm font-semibold text-slate-700 mb-1">
-                        Số buổi đăng ký *
-                      </label>
-                      <select
-                        id="gc-private-sessions"
-                        value={privateSessions}
-                        onChange={(e) => setPrivateSessions(Number(e.target.value))}
-                        className="w-full px-3 py-2 text-sm font-semibold border border-slate-300 rounded-control focus:ring-2 focus:ring-amber-500 outline-none bg-white"
-                      >
-                        {[12, 24].map((sessions) => (
-                          <option key={sessions} value={sessions}>
-                            {sessions} buổi — {(privateRate * sessions).toLocaleString("vi-VN")}đ
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-                </div>
-
-                {/* Chọn các khung thời gian rảnh */}
-                <fieldset>
-                  <legend className="text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-amber-600" aria-hidden="true" /> Khung giờ bé có thể tham gia (có thể chọn nhiều) *
-                  </legend>
-                  <div className="grid sm:grid-cols-2 gap-2">
-                    {FLEXIBLE_TIME_SLOTS.map((slot) => {
-                      const checked = selectedSlots.includes(slot);
-                      return (
-                        <button
-                          type="button"
-                          key={slot}
-                          onClick={() => toggleSlot(slot)}
-                          aria-pressed={checked}
-                          className={`text-left text-sm p-2.5 rounded-control border transition flex items-center gap-2 cursor-pointer active:scale-[0.99] ${
-                            checked
-                              ? "bg-amber-50 border-amber-500 text-slate-900 font-semibold"
-                              : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
-                          }`}
-                        >
-                          <span
-                            aria-hidden="true"
-                            className={`w-4 h-4 rounded flex items-center justify-center border shrink-0 ${
-                              checked ? "bg-amber-500 border-amber-500 text-white" : "border-slate-400"
-                            }`}
-                          >
-                            {checked && <Check className="w-3 h-3" />}
-                          </span>
-                          <span>{slot}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {slotError && (
-                    <p role="alert" className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-red-600">
-                      <AlertCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                      Vui lòng chọn ít nhất 1 khung thời gian rảnh của bé để trung tâm xếp lớp.
-                    </p>
-                  )}
-                </fieldset>
-
-                {/* Hộp hiển thị tổng tiền tự động cập nhật theo Cấp độ & Hình thức học */}
+                {/* Hộp hiển thị tổng tiền tự động cập nhật theo Cấp độ */}
                 <div className="bg-slate-50 p-3.5 rounded-control border border-slate-200 flex items-center justify-between">
                   <div>
                     <div className="text-sm text-slate-600 font-medium">Học phí tạm tính:</div>
                     <div className="text-sm text-amber-700 font-semibold">
-                      {activeLevel.label} • {activeLevel.sessionLength}/buổi • {activeFormat.short}
-                      {isPrivateFormat ? ` × ${privateSessions} buổi` : ""}
+                      {activeLevel.label} • 24 buổi
                     </div>
                   </div>
                   <span className="text-lg font-extrabold text-slate-900 tabular-nums">
@@ -765,7 +594,7 @@ export default function PricingAndCheckout() {
                     <p className="text-sm leading-relaxed text-slate-600">
                       Trung tâm đã nhận thông tin và sẽ liên hệ qua số{" "}
                       <span className="font-semibold tabular-nums text-slate-900">{phone.trim()}</span>{" "}
-                      để xếp lớp theo khung giờ của bé. Hẹn gặp bé trên bàn cờ!
+                      để trao đổi khung giờ và xếp lớp cho bé. Hẹn gặp bé trên bàn cờ!
                     </p>
                   </div>
                 </div>
@@ -786,38 +615,12 @@ export default function PricingAndCheckout() {
                       <dt className="text-xs font-semibold text-slate-500">Cấp độ</dt>
                       <dd className="mt-0.5 font-semibold text-slate-900">
                         {activeLevel.label}
-                        <span className="font-normal text-slate-600"> · {activeLevel.sessionLength}/buổi</span>
                       </dd>
                     </div>
                     <div>
                       <dt className="text-xs font-semibold text-slate-500">Cơ sở</dt>
                       <dd className="mt-0.5 font-semibold text-slate-900">{currentBranchObj.name}</dd>
                       <dd className="text-slate-600">{currentBranchObj.address}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs font-semibold text-slate-500">Hình thức học</dt>
-                      <dd className="mt-0.5 font-semibold text-slate-900">
-                        {activeFormat.short}
-                        {isPrivateFormat && (
-                          <span className="font-normal text-slate-600">
-                            {" "}× {privateSessions} buổi ({privateRate.toLocaleString("vi-VN")}đ/buổi)
-                          </span>
-                        )}
-                      </dd>
-                    </div>
-                    <div className="sm:col-span-2">
-                      <dt className="flex items-center gap-1 text-xs font-semibold text-slate-500">
-                        <Clock className="h-3.5 w-3.5 text-amber-600" aria-hidden="true" /> Khung giờ đã chọn
-                      </dt>
-                      <dd className="mt-1">
-                        <ul className="grid gap-x-6 gap-y-1 sm:grid-cols-2">
-                          {selectedSlots.map((slot) => (
-                            <li key={slot} className="border-l-2 border-amber-500 pl-2 text-slate-900">
-                              {slot}
-                            </li>
-                          ))}
-                        </ul>
-                      </dd>
                     </div>
                   </dl>
                   <div className="flex items-baseline justify-between gap-3 border-t border-dashed border-slate-300 bg-amber-50 px-4 py-3">

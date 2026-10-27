@@ -46,21 +46,6 @@ export const BRANCHES = [
   },
 ];
 
-export const FLEXIBLE_TIME_SLOTS = [
-  "Tối trong tuần (Thứ 2 - Thứ 6 | 17:30 - 20:30)",
-  "Sáng Thứ 7 / Chủ Nhật (08:00 - 11:30)",
-  "Chiều Thứ 7 / Chủ Nhật (14:00 - 17:30)",
-  "Tối Thứ 7 / Chủ Nhật (17:30 - 20:30)",
-];
-
-export const SESSION_TIMELINE = [
-  { time: "5 phút", title: "Ôn bài cũ", desc: "Nhắc lại kiến thức đã học buổi trước" },
-  { time: "15 phút", title: "Giảng bài mới", desc: "Giải thích nguyên lý & minh họa trực quan" },
-  { time: "20 phút", title: "Luyện tập", desc: "Giải bài tập tình huống trên giáo trình" },
-  { time: "15 phút", title: "Thực hành bàn cờ", desc: "Thi đấu áp dụng kiến thức vừa học" },
-  { time: "5 phút", title: "Nhận xét & Giao bài", desc: "Tổng kết lỗi sai, chuẩn bị bài buổi sau" },
-];
-
 export interface SubLevel {
   code: string;
   name: string;
@@ -405,38 +390,23 @@ export const TUITION_PROGRAMS: TuitionProgram[] = [
   {
     id: "happy-chess",
     name: "Happy Chess (Căn bản)",
-    subtitle: "3 Level × 24 buổi, dành cho bé từ 4 tuổi",
+    subtitle: "Happy Chess 1 - 3",
     popular: false,
-    features: [
-      "Happy Chess 1 – 3, mỗi Level 24 buổi",
-      "60 phút mỗi buổi",
-      "Lớp group từ 2 học viên",
-      "12 buổi (1 buổi/tuần) hoặc 24 buổi (2 buổi/tuần)",
-    ],
+    features: ["Học luật chơi cơ bản và tư duy chiến thuật"],
   },
   {
     id: "so-cap",
     name: "Global Chess Sơ cấp",
-    subtitle: "Global Chess 1 – 4, nền tảng khai cuộc và chiến thuật",
+    subtitle: "Global Chess 1 - 4",
     popular: true,
-    features: [
-      "Global Chess 1 – 4",
-      "60 phút (Global 1–2) • 90 phút (Global 3–4)",
-      "Lớp group từ 2 học viên",
-      "Luyện khai cuộc, chiến thuật và thi đấu",
-    ],
+    features: ["Luyện khai cuộc, chiến thuật và thi đấu"],
   },
   {
     id: "trung-cap",
     name: "Global Chess Trung cấp",
-    subtitle: "Global Chess 5 – 8, chiến thuật trung – tàn cuộc",
+    subtitle: "Global Chess 5 - 8",
     popular: false,
-    features: [
-      "Global Chess 5 – 8",
-      "90 phút mỗi buổi",
-      "Lớp group từ 2 học viên",
-      "Chiến thuật trung – tàn cuộc nâng cao",
-    ],
+    features: ["Chiến thuật trung - tàn cuộc nâng cao"],
   },
 ];
 
@@ -557,14 +527,9 @@ export const FAQS: FaqItem[] = [
 /**
  * Cách lớp học vận hành. Đây là điểm khác biệt thật so với lớp cờ tự phát, nên
  * mọi dòng ở đây đều phải bám vào dữ liệu vận hành đã có (giáo trình, khung giờ,
- * cấu trúc buổi học), không phải lời khen tự đánh giá.
+ * lịch thi đấu), không phải lời khen tự đánh giá.
  */
 export const OPERATING_POINTS = [
-  {
-    title: "Đúng 5 bước mỗi buổi",
-    desc: "Ôn bài cũ, giảng bài mới, luyện tập, thực hành bàn cờ, nhận xét và giao bài.",
-    icon: "steps",
-  },
   {
     title: "Giáo trình chuẩn hoá",
     desc: "24 buổi mỗi cấp độ, có sách và mục tiêu rõ ràng cho từng buổi.",

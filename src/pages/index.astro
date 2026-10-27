@@ -20,7 +20,6 @@ import {
   ArrowRight,
   Quote,
   BookOpen,
-  ListChecks,
   Clock,
   Trophy,
   HelpCircle,
@@ -427,7 +426,7 @@ const structuredData = {
     </section>
 
     <!--
-      Vận hành lớp học. Đây là phần "social proof" trung thực: bốn điểm khác biệt
+      Vận hành lớp học. Đây là phần "social proof" trung thực: ba điểm khác biệt
       đều lấy từ dữ liệu vận hành có thật trong src/data/courses.ts, không phải
       lời khen tự đánh giá hay con số bịa.
     -->
@@ -437,24 +436,18 @@ const structuredData = {
           <span class="gc-eyebrow">Vận hành lớp học</span>
           <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">Môi trường học tập</h2>
         </div>
-        <ul class="grid sm:grid-cols-2 lg:grid-cols-12 gap-5 mt-10 list-none">
-          {OPERATING_POINTS.map((point, idx) => {
-            const isWide = idx % 4 === 0 || idx % 4 === 3;
-            return (
-              <li class:list={["gc-op-card bg-cream rounded-card border border-slate-200/90 p-5", isWide ? "lg:col-span-7 lg:flex lg:items-start lg:gap-4" : "lg:col-span-5"]}>
-                <span class:list={["gc-op-icon inline-flex items-center justify-center rounded-control bg-brand-800 text-amber-400 shrink-0 mb-3 lg:mb-0", isWide ? "w-11 h-11" : "w-9 h-9"]} aria-hidden="true">
-                  {point.icon === "book" && <BookOpen className={isWide ? "w-5 h-5" : "w-4 h-4"} />}
-                  {point.icon === "steps" && <ListChecks className={isWide ? "w-5 h-5" : "w-4 h-4"} />}
-                  {point.icon === "clock" && <Clock className={isWide ? "w-5 h-5" : "w-4 h-4"} />}
-                  {point.icon === "trophy" && <Trophy className={isWide ? "w-5 h-5" : "w-4 h-4"} />}
-                </span>
-                <div>
-                  <h3 class:list={["font-bold text-slate-900", isWide ? "text-lg" : "text-base"]}>{point.title}</h3>
-                  <p class="text-base text-slate-600 mt-1.5 leading-relaxed">{point.desc}</p>
-                </div>
-              </li>
-            );
-          })}
+        <ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-10 list-none">
+          {OPERATING_POINTS.map((point) => (
+            <li class="gc-op-card bg-cream rounded-card border border-slate-200/90 p-5">
+              <span class="gc-op-icon inline-flex items-center justify-center rounded-control bg-brand-800 text-amber-400 shrink-0 mb-3 w-9 h-9" aria-hidden="true">
+                {point.icon === "book" && <BookOpen className="w-4 h-4" />}
+                {point.icon === "clock" && <Clock className="w-4 h-4" />}
+                {point.icon === "trophy" && <Trophy className="w-4 h-4" />}
+              </span>
+              <h3 class="font-bold text-slate-900 text-base">{point.title}</h3>
+              <p class="text-base text-slate-600 mt-1.5 leading-relaxed">{point.desc}</p>
+            </li>
+          ))}
         </ul>
       </div>
   </section>

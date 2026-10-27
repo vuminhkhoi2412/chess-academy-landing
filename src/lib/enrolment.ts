@@ -12,28 +12,24 @@ export interface EnrolmentInput {
   branch: { name: string; address: string };
   program: string;
   level: { label: string; code: string } | null;
-  format: { label: string; code: string };
-  sessions: number;
   tuitionEstimate: number;
-  timeSlots: string[];
   note: string;
   submissionId: string;
   honeypot: string;
 }
 
-export type EnrolmentError = "name" | "parent" | "phone" | "slots";
+export type EnrolmentError = "name" | "parent" | "phone";
 
 const digitsOnly = (value: string) => value.replace(/[^0-9]/g, "");
 
-// Thứ tự kiểm tra cũng là thứ tự báo lỗi: tên bé → phụ huynh → SĐT → khung giờ. Mọi trường
+// Thứ tự kiểm tra cũng là thứ tự báo lỗi: tên bé → phụ huynh → SĐT. Mọi trường
 // Code.gs coi là bắt buộc phải được chặn ở đây: script từ chối thì trình duyệt không biết.
 export function validateEnrolment(
-  input: Pick<EnrolmentInput, "childName" | "parentName" | "phone" | "timeSlots">
+  input: Pick<EnrolmentInput, "childName" | "parentName" | "phone">
 ): EnrolmentError | null {
   if (input.childName.trim() === "") return "name";
   if (input.parentName.trim() === "") return "parent";
   if (digitsOnly(input.phone).length < 10) return "phone";
-  if (input.timeSlots.length === 0) return "slots";
   return null;
 }
 
@@ -48,11 +44,7 @@ export function buildEnrolmentPayload(input: EnrolmentInput): Record<string, str
     program: input.program,
     level_label: input.level?.label ?? "Giáo viên xếp lớp sau ván thử",
     level_code: input.level?.code ?? "auto",
-    format_label: input.format.label,
-    format_code: input.format.code,
-    sessions: input.sessions,
     tuition_estimate: input.tuitionEstimate,
-    time_slots: input.timeSlots.join("; "),
     note: input.note.trim(),
     submission_id: input.submissionId,
     _hp: input.honeypot,
