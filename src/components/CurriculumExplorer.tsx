@@ -2,17 +2,11 @@
 import { useState } from "react";
 import { CURRICULUM_PROGRAMS, SESSION_TIMELINE } from "../data/courses";
 import type { MajorProgram } from "../data/courses";
-import {
-  Check,
-  ChevronDown,
-  GraduationCap,
-  Sparkles,
-} from "lucide-react";
-
 type ProgramStyle = {
   bar: string;
   barIdle: string;
-  chip: string;
+  color: string;
+  tint: string;
   band: string;
   bandTitle: string;
   bandMeta: string;
@@ -23,7 +17,8 @@ const PROGRAM_STYLES: Record<string, ProgramStyle> = {
   "happy-chess": {
     bar: "bg-brand-800",
     barIdle: "bg-brand-300",
-    chip: "bg-brand-50 text-brand-800 border-brand-200",
+    color: "#184268",
+    tint: "#eef5fb",
     band: "bg-brand-50/70 border-brand-200/70",
     bandTitle: "text-brand-900",
     bandMeta: "text-brand-700",
@@ -32,7 +27,8 @@ const PROGRAM_STYLES: Record<string, ProgramStyle> = {
   "so-cap": {
     bar: "bg-amber-700",
     barIdle: "bg-amber-300",
-    chip: "bg-amber-50 text-amber-800 border-amber-200",
+    color: "#b45309",
+    tint: "#fdf6ea",
     band: "bg-amber-50/70 border-amber-200/70",
     bandTitle: "text-amber-900",
     bandMeta: "text-amber-800",
@@ -41,7 +37,8 @@ const PROGRAM_STYLES: Record<string, ProgramStyle> = {
   "trung-cap": {
     bar: "bg-emerald-700",
     barIdle: "bg-emerald-300",
-    chip: "bg-emerald-50 text-emerald-800 border-emerald-200",
+    color: "#047857",
+    tint: "#eefaf4",
     band: "bg-emerald-50/70 border-emerald-200/70",
     bandTitle: "text-emerald-900",
     bandMeta: "text-emerald-800",
@@ -82,9 +79,49 @@ function bandMeta(program: MajorProgram): string {
     .join(" · ");
 }
 
+// Năm đoạn của một buổi học; số phút lấy từ SESSION_TIMELINE ("15 phút" → 15).
+const SESSION_STEPS = SESSION_TIMELINE.map((step) => ({ ...step, minutes: parseInt(step.time, 10) }));
+const SESSION_TOTAL = SESSION_STEPS.reduce((sum, step) => sum + step.minutes, 0);
+// Đoạn thứ tư (thực hành bàn cờ) dùng màu cam để nổi bật.
+const SESSION_COLORS = ["#2f6ba3", "#1f5285", "#184268", "#b45309", "#4d7fae"];
+
+// Ba bước xếp lớp: phụ huynh không tự chọn cấp độ, giáo viên chốt sau ván thử.
+const PLACEMENT_STEPS = [
+  "Bé chơi thử một ván với giáo viên.",
+  "Giáo viên chơi cùng, hỏi để hiểu và đánh giá trình độ.",
+  "Giáo viên chốt cấp độ phù hợp với bé.",
+];
+
+/**
+ * "Level 1 – Happy Chess 1" / "Global Chess Trung cấp – Quyển 1" → cấp độ lớn trước,
+ * Level/Quyển sau. Dữ liệu giữ nguyên; chỉ đảo thứ tự khi hiển thị.
+ */
+function splitLevelName(name: string) {
+  const [first, second = ""] = name.split(" – ");
+  return /^(Level|Quyển)\s/.test(first) ? { major: second, minor: first } : { major: first, minor: second };
+}
+
+/** Happy Chess ghi một dòng "Happy Chess 1 - Level 1"; Sơ cấp và Trung cấp dài hơn nên xuống dòng, không cần dấu gạch. */
+function LevelTitle({ name, programId }: { name: string; programId: string }) {
+  const { major, minor } = splitLevelName(name);
+  if (!minor) return <>{major}</>;
+  return programId === "happy-chess" ? (
+    <>
+      {major} - {minor}
+    </>
+  ) : (
+    <>
+      {major}
+      <span className="block">{minor}</span>
+    </>
+  );
+}
+
 export default function CurriculumExplorer() {
   const [selectedCode, setSelectedCode] = useState(LEVELS[0].code);
   const selected = LEVELS.find((level) => level.code === selectedCode) ?? LEVELS[0];
+  // Chỉ một khóa mở tại một thời điểm; bấm khóa đang mở thì gập lại.
+  const [openProgram, setOpenProgram] = useState<string | null>(CURRICULUM_PROGRAMS[0].id);
 
   return (
     <section id="curriculum" className="py-20 bg-cream">
@@ -182,117 +219,151 @@ export default function CurriculumExplorer() {
           })}
         </div>
 
-        {/* Nấc đang chọn: chỉ mục tiêu, không đổ cả giáo trình ra đây. */}
-        <div className="mt-6 grid gap-x-6 gap-y-2 rounded-card border border-slate-200 bg-white p-5 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:p-6" role="region" aria-live="polite" aria-atomic="true">
-          <div>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <span className={`rounded-control border px-2.5 py-1 text-xs font-bold ${selected.style.chip}`}>
-                {selected.program.title}
-              </span>
-              <span className="text-sm font-semibold text-slate-600 tabular-nums whitespace-nowrap">
-                {selected.duration}
-              </span>
-            </div>
-            <h3 className="mt-3 font-display text-2xl font-extrabold leading-tight tracking-tight text-slate-900 text-balance">
-              {selected.name}
-            </h3>
+        {/* Nấc đang chọn: bìa sách, gáy màu theo khóa. Chỉ mục tiêu, không đổ cả giáo trình ra đây. */}
+        <article
+          className="gc-book mt-6"
+          style={{ "--lc": selected.style.color } as React.CSSProperties}
+          role="region"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <div className="gc-book__spine">
+            <span className="gc-book__code">{selected.code}</span>
+            <span className="gc-book__prog">{SHORT_PROGRAM_NAMES[selected.program.id] ?? selected.program.title}</span>
           </div>
-          <p className="self-center text-base text-slate-700 leading-relaxed text-pretty">{selected.goal}</p>
-        </div>
-
-        {/* Cách xếp lớp: phụ huynh không tự chọn cấp độ, giáo viên chốt sau ván thử. */}
-        <div className="mt-4 flex items-start gap-3 rounded-card border border-slate-200 bg-white p-4 md:p-5">
-          <GraduationCap className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" aria-hidden="true" />
-          <div>
-            <p className="text-sm font-bold text-slate-900">Cách xếp lớp</p>
-            <p className="mt-1 text-sm text-slate-600 leading-relaxed">
-              Bé chơi thử một ván với giáo viên. Giáo viên chơi cùng, hỏi để hiểu và đánh
-              giá trình độ, rồi chốt cấp độ phù hợp. Phụ huynh không cần tự chọn cấp độ.
+          <div className="gc-book__page">
+            <h3 className="font-display text-[clamp(1.625rem,4.4vw,2.75rem)] font-extrabold leading-[1.08] tracking-[-0.02em] text-slate-900 text-balance max-w-[24ch]">
+              <LevelTitle name={selected.name} programId={selected.program.id} />
+            </h3>
+            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-500">
+              <b className="font-bold text-slate-900 tabular-nums">{selected.duration}</b>
+              <span>{selected.program.title}</span>
+            </div>
+            <p className="mt-6 max-w-[42ch] border-t border-slate-200 pt-5 text-lg leading-relaxed text-slate-700 text-pretty">
+              {selected.goal}
             </p>
           </div>
+          <div className="gc-book__side" aria-hidden="true">
+            <div className="gc-book__big tabular-nums">
+              {parseInt(selected.duration, 10)}
+              <small>buổi học trong cấp độ này</small>
+            </div>
+          </div>
+        </article>
+
+        {/* Cách xếp lớp: vé có đường xé. Phụ huynh không tự chọn cấp độ, giáo viên chốt sau ván thử. */}
+        <div className="gc-ticket mt-8">
+          <p className="gc-ticket__title">Cách xếp lớp</p>
+          <ol className="gc-ticket__steps">
+            {PLACEMENT_STEPS.map((step, i) => (
+              <li key={step}>
+                <b>{i + 1}</b>
+                <span>{step}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="gc-ticket__note">Phụ huynh không cần tự chọn cấp độ.</p>
         </div>
 
-        {/* Chi tiết giáo trình: gập sẵn để thang vẫn là phần chính. */}
-        <div className="mt-12">
-          <h3 className="text-lg font-bold text-slate-900">Chi tiết giáo trình từng cấp độ</h3>
-          <p className="mt-1 text-sm text-slate-600">
+        {/* Chi tiết giáo trình: bảng chỉ mục, gập sẵn để thang vẫn là phần chính. */}
+        <div className="mt-16">
+          <h3 className="font-display text-2xl font-extrabold tracking-[-0.015em] text-slate-900">
+            Chi tiết giáo trình từng cấp độ
+          </h3>
+          <p className="mt-1 text-slate-500">
             Nội dung bài học và kết quả đạt được, theo tài liệu của trung tâm.
           </p>
-          <div className="mt-4 space-y-2">
-            {CURRICULUM_PROGRAMS.map((program) => (
-              <details
-                key={program.id}
-                className="group rounded-card border border-slate-200 bg-white open:shadow-soft"
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 font-semibold text-slate-900 [&::-webkit-details-marker]:hidden">
-                  <span className="min-w-0">
-                    {program.title}{" "}
-                    <span className="font-normal text-slate-500">· {program.totalDuration}</span>
-                  </span>
-                  <ChevronDown
-                    className="h-4 w-4 shrink-0 text-slate-500 transition-transform group-open:rotate-180"
-                    aria-hidden="true"
-                  />
-                </summary>
+          <div className="gc-idx mt-6">
+            {CURRICULUM_PROGRAMS.map((program, index) => {
+              const style = PROGRAM_STYLES[program.id] ?? FALLBACK_STYLE;
+              return (
+                <details
+                  key={program.id}
+                  open={openProgram === program.id}
+                  style={{ "--lc": style.color, "--tint": style.tint } as React.CSSProperties}
+                >
+                  <summary
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setOpenProgram((current) => (current === program.id ? null : program.id));
+                    }}
+                  >
+                    <span className="gc-idx__n tabular-nums">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="gc-idx__title">
+                      {program.title}
+                      <small>{program.totalDuration}</small>
+                    </span>
+                    <span className="gc-idx__plus" aria-hidden="true" />
+                  </summary>
 
-                <div className="space-y-7 border-t border-slate-100 p-4 md:p-5">
-                  {program.subLevels.map((sub) => (
-                    <div key={sub.code}>
-                      <h4 className="text-sm font-bold text-slate-900">{sub.name}</h4>
-                      <p className="mt-1 text-sm text-slate-600 leading-relaxed">{sub.goal}</p>
+                  <div className="gc-idx__cols" style={{ "--n": program.subLevels.length } as React.CSSProperties}>
+                    {program.subLevels.map((sub) => (
+                      <article key={sub.code}>
+                        <h4>
+                          <LevelTitle name={sub.name} programId={program.id} />
+                        </h4>
+                        <p className="gc-idx__goal">{sub.goal}</p>
 
-                      <div className="mt-3">
-                        <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
-                          Nội dung chi tiết
-                        </div>
-                        <ul className="grid gap-1.5 list-none sm:grid-cols-2">
+                        <h5>Nội dung chi tiết</h5>
+                        <ul>
                           {sub.syllabus.map((item, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                              <span className="shrink-0 rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-xs font-bold text-slate-700 tabular-nums">
-                                {item.label}
-                              </span>
-                              <span className="leading-relaxed">{item.topic}</span>
+                            <li key={i}>
+                              <b className="tabular-nums">{item.label}</b>
+                              <span>{item.topic}</span>
                             </li>
                           ))}
                         </ul>
-                      </div>
 
-                      <div className="mt-3">
-                        <div className="mb-1.5 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-emerald-900">
-                          <Sparkles className="h-3.5 w-3.5 text-emerald-600" aria-hidden="true" />
-                          Kết quả đạt được sau {sub.duration}
-                        </div>
-                        <ul className="space-y-1 list-none">
-                          {sub.outcomes.map((outcome, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                              <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" aria-hidden="true" />
-                              <span className="leading-relaxed">{outcome}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </details>
-            ))}
+                        <aside className="gc-outcome">
+                          <h5>Kết quả sau {sub.duration}</h5>
+                          <ul>
+                            {sub.outcomes.map((outcome, i) => (
+                              <li key={i}>{outcome}</li>
+                            ))}
+                          </ul>
+                        </aside>
+                      </article>
+                    ))}
+                  </div>
+                </details>
+              );
+            })}
           </div>
         </div>
 
-        {/* Cấu trúc chuẩn 1 buổi học */}
-        <div className="mt-12 rounded-card bg-brand-800 px-6 py-7 text-white md:p-8">
-          <h3 className="font-display text-[1.375rem] font-bold tracking-[-0.015em]">Cấu trúc chuẩn mỗi buổi học</h3>
-          <p className="mt-1 text-sm text-brand-200">Phương pháp sư phạm: Lý thuyết – Bài tập – Thực chiến</p>
-          {/* Thời lượng là thông tin chính (5/15/20/15/5 phút) nên số phút đứng lớn trên một đường ray, thay cho 5 thẻ bằng nhau. */}
-          <ol className="gc-rail mt-7">
-            {SESSION_TIMELINE.map((step, idx) => (
-              <li key={idx} className="gc-rail__item">
-                <div className="gc-rail__num font-display text-4xl font-extrabold leading-none tracking-[-0.03em] text-amber-400 tabular-nums">
-                  {parseInt(step.time, 10)}
-                  <small className="ml-1 font-sans text-[0.8125rem] font-semibold tracking-normal text-brand-200">phút</small>
+        {/* Cấu trúc chuẩn 1 buổi học: thanh tỉ lệ, bề rộng mỗi đoạn theo số phút. */}
+        <div className="mt-16">
+          <h3 className="font-display text-2xl font-extrabold tracking-[-0.015em] text-slate-900">
+            Cấu trúc chuẩn mỗi buổi học
+          </h3>
+          <p className="mt-1 text-slate-500">Phương pháp sư phạm: Lý thuyết – Bài tập – Thực chiến</p>
+
+          <div
+            className="gc-strip mt-8"
+            role="img"
+            aria-label={`Một buổi ${SESSION_TOTAL} phút: ${SESSION_STEPS.map((step) => `${step.title} ${step.minutes} phút`).join(", ")}`}
+          >
+            {SESSION_STEPS.map((step, idx) => (
+              <span key={idx} style={{ "--m": step.minutes, "--c": SESSION_COLORS[idx] } as React.CSSProperties}>
+                {step.minutes}
+                <small>′</small>
+              </span>
+            ))}
+          </div>
+          <div className="mt-2 flex justify-between text-xs text-slate-500">
+            <span>0</span>
+            <span>{SESSION_TOTAL} phút</span>
+          </div>
+
+          <ol className="gc-strip-cols">
+            {SESSION_STEPS.map((step, idx) => (
+              <li key={idx} style={{ "--c": SESSION_COLORS[idx] } as React.CSSProperties}>
+                <div>
+                  <h4 className="font-display text-[1.0625rem] font-extrabold leading-tight tracking-[-0.01em] text-slate-900">
+                    {step.title}
+                  </h4>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">{step.desc}</p>
                 </div>
-                <h4 className="mt-2 text-[0.9375rem] font-bold">{step.title}</h4>
-                <p className="mt-1 text-sm leading-relaxed text-brand-200">{step.desc}</p>
               </li>
             ))}
           </ol>

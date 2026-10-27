@@ -180,74 +180,211 @@
     line-height: 1.08;
   }
 
+  /* Thẻ điểm vận hành: bóng mềm có độ lệch, nhấc nhẹ khi rê chuột. */
+  .gc-op-card {
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 6.8px 16.8px -8px rgb(15 23 42 / 0.14);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .gc-op-card h3 {
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .gc-op-card p {
+    text-wrap: pretty;
+  }
+
+  .gc-op-icon {
+    box-shadow: 0 0 0 4px rgb(251 191 36 / 0.16);
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .gc-op-card:hover {
+      transform: translateY(-3px);
+    }
+  }
+
   /*
-   * Đường ray thời lượng của một buổi học: mỗi bước là một chấm trên đường kẻ,
-   * số phút đứng trên chấm. Điện thoại chạy dọc bên trái, từ md trở lên chạy ngang.
+   * Nhận xét phụ huynh. Dưới lg là dải vuốt ngang tràn ra mép màn hình, mỗi thẻ rộng
+   * 84% để thẻ kế tiếp ló ra; từ lg trở lên thành lưới 3 cột.
    */
-  .gc-rail {
-    display: grid;
-    gap: 1.25rem;
+  .gc-quotes {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 1rem;
+    margin-inline: -1rem;
+    /* Chừa chỗ trên/dưới để bóng và cú nhấc khi rê chuột không bị overflow cắt. */
+    padding: 0.5rem 1rem 1.5rem;
+    scrollbar-width: none;
   }
 
-  .gc-rail__item {
-    position: relative;
-    padding-left: 2rem;
-  }
-
-  .gc-rail__item::before {
-    content: "";
-    position: absolute;
-    left: 0.3125rem;
-    top: 0.75rem;
-    bottom: -1.5rem;
-    width: 1px;
-    background-color: var(--color-brand-600);
-  }
-
-  .gc-rail__item:last-child::before {
+  .gc-quotes::-webkit-scrollbar {
     display: none;
   }
 
-  .gc-rail__item::after {
+  .gc-quotes:focus-visible {
+    outline: 2px solid var(--color-amber-400);
+    outline-offset: 2px;
+  }
+
+  .gc-quotes__card {
+    display: flex;
+    flex: 0 0 84%;
+    flex-direction: column;
+    scroll-snap-align: start;
+    /* Cùng bóng và chuyển động với .gc-op-card. */
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 6.8px 16.8px -8px rgb(15 23 42 / 0.14);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Thẻ navy: bỏ vạch sáng bên trong, chỉ giữ bóng đổ. */
+  .gc-quotes__card:first-child {
+    box-shadow: 0 6.8px 16.8px -8px rgb(15 23 42 / 0.3);
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .gc-quotes__card:hover {
+      transform: translateY(-3px);
+    }
+  }
+
+  .gc-quotes__card blockquote {
+    flex: 1;
+  }
+
+  @media (min-width: 1024px) {
+    .gc-quotes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.5rem;
+      margin-inline: 0;
+      overflow: visible;
+      padding: 0;
+    }
+
+    .gc-quotes__card {
+      flex: none;
+    }
+  }
+
+  /*
+   * Mở/đóng câu hỏi thường gặp. ::details-content cho phép chuyển chiều cao của
+   * <details> gốc mà không cần script; trình duyệt chưa hỗ trợ thì mở/đóng tức thì.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .gc-faq {
+      interpolate-size: allow-keywords;
+    }
+
+    .gc-faq::details-content {
+      block-size: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition:
+        block-size 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.25s ease-out,
+        content-visibility 0.4s allow-discrete;
+    }
+
+    .gc-faq[open]::details-content {
+      block-size: auto;
+      opacity: 1;
+    }
+
+    .gc-faq summary svg:last-child {
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  }
+
+  /*
+   * Cấu trúc buổi học: một thanh dài, mỗi bước chiếm bề rộng đúng theo số phút
+   * (flex-grow = --m) nên thấy ngay bước nào dài nhất. Góc vuông có chủ đích.
+   * Từ md, năm cột chữ nằm dưới thanh; dưới md chúng xếp dọc, mỗi dòng có ô màu
+   * khớp với đoạn trên thanh.
+   */
+  .gc-strip {
+    display: flex;
+    height: 4.5rem;
+  }
+
+  .gc-strip span {
+    display: flex;
+    flex: var(--m) 1 0;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    background: var(--c);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  .gc-strip span + span {
+    border-left: 2px solid var(--color-cream);
+  }
+
+  .gc-strip small {
+    margin-left: 0.125rem;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0.85;
+  }
+
+  .gc-strip-cols {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .gc-strip-cols li {
+    display: grid;
+    grid-template-columns: 1rem 1fr;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--c);
+  }
+
+  .gc-strip-cols li::before {
     content: "";
-    position: absolute;
-    left: 0;
-    top: 0.75rem;
-    width: 0.6875rem;
-    height: 0.6875rem;
-    border-radius: 50%;
-    border: 2px solid var(--color-amber-400);
-    background-color: var(--color-brand-800);
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.25rem;
+    background: var(--c);
+  }
+
+  @media (max-width: 47.99rem) {
+    .gc-strip {
+      height: 3.5rem;
+    }
+
+    .gc-strip span {
+      font-size: 1rem;
+    }
+
+    .gc-strip small {
+      display: none;
+    }
   }
 
   @media (min-width: 48rem) {
-    .gc-rail {
+    .gc-strip-cols {
       grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
 
-    .gc-rail__item {
-      padding-left: 0;
-      padding-top: 4rem;
+    .gc-strip-cols li {
+      grid-template-columns: 1fr;
+      gap: 0;
     }
 
-    .gc-rail__num {
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-
-    .gc-rail__item::before {
-      left: 0.6875rem;
-      right: -1.5rem;
-      top: 3.34rem;
-      bottom: auto;
-      width: auto;
-      height: 1px;
-    }
-
-    .gc-rail__item::after {
-      top: 3rem;
+    .gc-strip-cols li::before {
+      display: none;
     }
   }
 
@@ -499,6 +636,474 @@
 
     .gc-move:active {
       transform: none;
+    }
+  }
+
+  /*
+   * Bìa cấp độ: gáy màu theo khóa, trang nội dung, cột số buổi. Góc vuông có chủ
+   * đích để khác hẳn các thẻ bo tròn còn lại của trang. Dưới md gáy nằm ngang.
+   */
+  .gc-book {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    background: #fffdf9;
+    box-shadow: 0 1px 0 #fff inset, 0 18px 40px -22px rgb(15 23 42 / 0.35), 0 2px 6px -2px rgb(15 23 42 / 0.12);
+  }
+
+  .gc-book__spine {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.875rem 1.25rem;
+    background: var(--lc);
+    color: #fff;
+  }
+
+  .gc-book__code {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .gc-book__prog {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.9;
+  }
+
+  .gc-book__page {
+    padding: 1.5rem 1.25rem 2rem;
+  }
+
+  .gc-book__side {
+    display: none;
+  }
+
+  .gc-book__big {
+    font-family: var(--font-display);
+    font-size: 5.5rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+    color: var(--lc);
+  }
+
+  .gc-book__big small {
+    display: block;
+    margin-top: 0.5rem;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    color: #64748b;
+  }
+
+  @media (min-width: 48rem) {
+    .gc-book {
+      grid-template-columns: 5.5rem minmax(0, 1fr) 15rem;
+    }
+
+    .gc-book__spine {
+      flex-direction: column;
+      padding: 1.5rem 0.5rem;
+    }
+
+    .gc-book__code {
+      font-size: 1.875rem;
+    }
+
+    .gc-book__prog {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+    }
+
+    .gc-book__page {
+      padding: 2.5rem 2.75rem 3rem;
+    }
+
+    .gc-book__side {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2.5rem 1.75rem;
+      border-left: 1px dashed #cbd5e1;
+      background: repeating-linear-gradient(#0000 0 1.75rem, rgb(226 232 240 / 0.27) 1.75rem calc(1.75rem + 1px));
+    }
+  }
+
+  /*
+   * Vé xếp lớp: ba bước ngăn bằng đường xé. Từ md có hai khuyết tròn ở mép trên và
+   * dưới, đúng vị trí đường xé giữa tiêu đề và các bước.
+   */
+  .gc-ticket {
+    display: grid;
+    background: var(--color-brand-800);
+    color: #fff;
+  }
+
+  .gc-ticket__title {
+    padding: 1.25rem 1.25rem 0;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .gc-ticket__steps {
+    display: grid;
+    margin: 1rem 1.25rem 0;
+  }
+
+  .gc-ticket__steps li {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr;
+    gap: 0.75rem;
+    padding: 0.875rem 0;
+    border-top: 1px dashed rgb(255 255 255 / 0.27);
+    font-size: 0.9375rem;
+    color: var(--color-brand-100);
+  }
+
+  .gc-ticket__steps b {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--color-amber-400);
+  }
+
+  .gc-ticket__note {
+    padding: 1rem 1.25rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-amber-400);
+  }
+
+  @media (min-width: 48rem) {
+    .gc-ticket {
+      grid-template-columns: 15rem repeat(3, minmax(0, 1fr));
+      -webkit-mask: radial-gradient(circle 0.625rem at 15rem 0, #0000 98%, #000) top / 100% 51% no-repeat,
+        radial-gradient(circle 0.625rem at 15rem 100%, #0000 98%, #000) bottom / 100% 51% no-repeat;
+      mask: radial-gradient(circle 0.625rem at 15rem 0, #0000 98%, #000) top / 100% 51% no-repeat,
+        radial-gradient(circle 0.625rem at 15rem 100%, #0000 98%, #000) bottom / 100% 51% no-repeat;
+    }
+
+    .gc-ticket__title {
+      display: flex;
+      align-items: center;
+      padding: 1.75rem 1.5rem;
+      border-right: 2px dashed rgb(255 255 255 / 0.33);
+      font-size: 1.5rem;
+      line-height: 1.15;
+    }
+
+    .gc-ticket__steps {
+      display: contents;
+    }
+
+    .gc-ticket__steps li {
+      display: block;
+      padding: 1.75rem 1.5rem;
+      border-top: 0;
+    }
+
+    .gc-ticket__steps li + li {
+      border-left: 1px dashed rgb(255 255 255 / 0.2);
+    }
+
+    .gc-ticket__steps b {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 2rem;
+    }
+
+    .gc-ticket__note {
+      grid-column: 1 / -1;
+      padding: 0.875rem 1.5rem;
+      background: rgb(0 0 0 / 0.15);
+    }
+  }
+
+  /*
+   * Chỉ mục giáo trình: số thứ tự lớn theo màu khóa, hàng rê chuột thụt vào, dấu
+   * cộng xoay thành trừ. Mở ra là một cột cho mỗi cấp độ.
+   */
+  .gc-idx {
+    border-top: 3px solid var(--color-slate-900, #0f172a);
+  }
+
+  .gc-idx details {
+    border-bottom: 1px solid var(--color-slate-900, #0f172a);
+  }
+
+  .gc-idx summary {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr auto;
+    gap: 0.5rem 1rem;
+    align-items: center;
+    min-height: 4.5rem;
+    padding: 1.25rem 0;
+    cursor: pointer;
+    list-style: none;
+    transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), padding 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .gc-idx summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .gc-idx summary:hover {
+    background: rgb(15 23 42 / 0.03);
+    padding-inline: 0.75rem;
+  }
+
+  .gc-idx__n {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--lc);
+  }
+
+  .gc-idx__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.125rem, 3vw, 1.625rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: #0f172a;
+  }
+
+  .gc-idx__title small {
+    display: block;
+    margin-top: 0.25rem;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: #64748b;
+  }
+
+  .gc-idx__plus {
+    position: relative;
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .gc-idx__plus::before,
+  .gc-idx__plus::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1.125rem;
+    height: 2px;
+    background: #0f172a;
+    transform: translate(-50%, -50%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .gc-idx__plus::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+  .gc-idx details[open] .gc-idx__plus::after {
+    transform: translate(-50%, -50%) rotate(0);
+  }
+
+  .gc-idx__cols {
+    display: grid;
+    padding: 0.5rem 0 2.5rem;
+  }
+
+  .gc-idx__cols article {
+    padding: 1.25rem 0;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .gc-idx__cols h4 {
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    color: #0f172a;
+  }
+
+  .gc-idx__goal {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+
+  .gc-idx__cols h5 {
+    margin: 1.25rem 0 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+  }
+
+  .gc-idx__cols li {
+    display: flex;
+    gap: 0.625rem;
+    padding: 0.25rem 0;
+    font-size: 0.875rem;
+    color: #334155;
+  }
+
+  .gc-idx__cols li b {
+    flex: none;
+    min-width: 3.25rem;
+    padding-top: 0.1875rem;
+    font-size: 0.75rem;
+    color: var(--lc);
+  }
+
+  /*
+   * Chuyển động đóng/mở của chỉ mục giáo trình: chiều cao mở êm bằng ::details-content,
+   * từng cột trồi lên lần lượt, khung kết quả quét màu từ trái sang và gạch đầu dòng
+   * giãn ra. Số thứ tự đứng yên để khoảng cách với tiêu đề không đổi khi mở. Trình duyệt chưa hỗ trợ ::details-content vẫn mở đóng tức thì, nội dung
+   * vẫn hiện đủ.
+   */
+  @keyframes gc-rise {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+  }
+
+  @keyframes gc-wipe {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+  }
+
+  @keyframes gc-dash {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .gc-idx details {
+      interpolate-size: allow-keywords;
+    }
+
+    .gc-idx details::details-content {
+      block-size: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition:
+        block-size 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.3s ease-out,
+        content-visibility 0.55s allow-discrete;
+    }
+
+    .gc-idx details[open]::details-content {
+      block-size: auto;
+      opacity: 1;
+    }
+
+    .gc-idx details[open] .gc-idx__cols article {
+      animation: gc-rise 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .gc-idx details[open] .gc-idx__cols article:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .gc-idx details[open] .gc-idx__cols article:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .gc-idx details[open] .gc-idx__cols article:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .gc-idx details[open] .gc-outcome {
+      animation: gc-wipe 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
+    }
+
+    .gc-idx details[open] .gc-outcome li::before {
+      transform-origin: left;
+      animation: gc-dash 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.75s both;
+    }
+  }
+
+  /* Khung kết quả: nền nhạt theo màu khóa, gạch ngắn thay chấm đầu dòng. */
+  .gc-outcome {
+    margin-top: 1.5rem;
+    padding: 1.25rem 1.25rem 1.375rem;
+    background: var(--tint);
+  }
+
+  .gc-outcome h5 {
+    margin: 0 0 0.625rem;
+    color: var(--lc);
+  }
+
+  .gc-outcome li {
+    position: relative;
+    display: block;
+    padding: 0 0 0 1.25rem;
+    margin-top: 0.375rem;
+    font-size: 0.9375rem;
+    color: #334155;
+  }
+
+  .gc-outcome li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 0.5rem;
+    height: 2px;
+    background: var(--lc);
+  }
+
+  @media (min-width: 56rem) {
+    .gc-idx__cols {
+      grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+      padding-left: 4.5rem;
+    }
+
+    .gc-idx__cols article {
+      padding: 0.5rem 1.5rem 0;
+      border-top: 0;
+      border-left: 1px solid #e2e8f0;
+    }
+
+    .gc-idx__cols article:first-child {
+      padding-left: 0;
+      border-left: 0;
+    }
+
+    /*
+     * Mỗi cột chia chung năm hàng (tiêu đề, mục tiêu, nhãn, danh sách, khung kết quả)
+     * nên các khung kết quả cao bằng nhau và thẳng hàng dù số bài hay số dòng khác nhau.
+     */
+    .gc-idx__cols {
+      grid-template-rows: repeat(5, auto);
+    }
+
+    .gc-idx__cols article {
+      display: grid;
+      grid-row: span 5;
+      grid-template-rows: subgrid;
+    }
+
+    .gc-idx__cols article > ul {
+      margin-bottom: 1.5rem;
+    }
+
+    .gc-idx__cols .gc-outcome {
+      margin-top: 0;
     }
   }
 
