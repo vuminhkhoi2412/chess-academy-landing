@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global Chess - 3 hướng bố cục cho phần học phí</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,700..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --b50:#eef5fb;--b100:#d9e8f5;--b200:#b6d0e8;--b500:#2f6ba3;--b600:#1f5285;--b700:#1b4a76;--b800:#184268;--b900:#123350;--b950:#0b2136;
+  --amber-400:#fbbf24;--amber-500:#f59e0b;--emerald-400:#34d399;--slate-950:#020617;
+  --display:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;
+  --sans:"Be Vietnam Pro",system-ui,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--sans);background:var(--b800);color:#fff;line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--amber-400);outline-offset:3px}
+ul{list-style:none;padding:0}
+.num{font-variant-numeric:tabular-nums}
+
+/* khung xem trước */
+.bar{position:sticky;top:0;z-index:5;background:var(--b950);border-bottom:1px solid #ffffff22}
+.bar div{max-width:72rem;margin:0 auto;padding:.5rem 1rem;display:flex;gap:.25rem;align-items:center;flex-wrap:wrap}
+.bar b{font-family:var(--display);margin-right:auto;font-size:.9375rem}
+.bar button{padding:.5rem .875rem;font-size:.8125rem;font-weight:600;color:var(--b200);min-height:2.75rem;border-bottom:2px solid transparent}
+.bar button[aria-selected=true]{color:#fff;border-color:var(--amber-400)}
+main{max-width:72rem;margin:0 auto;padding:3.5rem 1rem 5rem}
+.head{text-align:center;max-width:42rem;margin:0 auto 2rem}
+.eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-400)}
+h2{font:800 clamp(1.875rem,4.5vw,3rem)/1.1 var(--display);letter-spacing:-.02em;margin-top:.75rem}
+.note{font-size:.8125rem;color:var(--b200);max-width:46rem;margin:0 auto 2.5rem;text-align:center}
+.note b{color:#fff}
+
+/* chung */
+.piece{width:2.25rem;height:2.25rem;flex:none;color:var(--amber-400);stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:color-mix(in srgb,currentColor 14%,transparent)}
+.tag{display:inline-block;background:var(--amber-500);color:var(--slate-950);font-size:.6875rem;font-weight:700;padding:.125rem .625rem;border-radius:.375rem;text-transform:uppercase;letter-spacing:.04em}
+.move{display:flex;min-height:3rem;border-radius:.5rem;overflow:hidden;font-size:.875rem;font-weight:700;width:100%}
+.move span:first-child{flex:1;display:flex;align-items:center;padding-inline:1.125rem;white-space:nowrap}
+.move span:last-child{width:3rem;display:grid;place-items:center}
+.move svg{width:1rem;height:1rem;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.move.amber{background:var(--amber-500);color:var(--slate-950)}
+.move.amber span:last-child{background:var(--b900);color:var(--amber-400)}
+.move.quiet{background:#fff;color:var(--b900)}
+.move.quiet span:last-child{border-left:1px solid #0f172a1a;color:var(--b800)}
+.chk{display:flex;gap:.5rem;font-size:.875rem;color:var(--b100);line-height:1.55}
+.chk svg{width:1rem;height:1rem;flex:none;margin-top:.2rem;stroke:var(--emerald-400);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.muted{color:var(--b200)}
+
+/* ===== A · Bảng giá dạng hàng, in trên nền giấy kem để nổi khỏi nền navy ===== */
+.a-list{background:#fffdf9;color:#0f172a;box-shadow:0 1px 0 #fff inset,0 24px 48px -24px rgb(0 0 0/.55)}
+.a-row{position:relative;display:grid;gap:1.25rem;padding:1.75rem 1.25rem 1.75rem 1.5rem;border-top:1px solid #e2e8f0}
+.a-row:first-child{border-top:0}
+.a-row.pop{background:#fdf6ea}
+.a-row.pop::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--amber-500)}
+.a-id{display:flex;gap:1rem;align-items:flex-start}
+.a-tile{width:4rem;height:4rem;flex:none;display:grid;place-items:center;background:var(--b800)}
+.a-tile .piece{width:2.5rem;height:2.5rem}
+.a-id h3{font:800 1.375rem/1.2 var(--display);letter-spacing:-.015em;display:flex;gap:.625rem;align-items:center;flex-wrap:wrap;color:#0f172a}
+.a-id p{font-size:.9375rem;margin-top:.25rem}
+.a-list .muted{color:#475569}
+.a-list .chk{color:#334155}
+.a-list .chk svg{stroke:#047857}
+.a-feat{display:grid;gap:.375rem;margin-top:.875rem}
+.a-price strong{display:block;font:800 2rem/1.1 var(--display);color:var(--b800);letter-spacing:-.02em}
+.a-price .k{font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.a-price small{display:block;font-size:.8125rem;margin-top:.5rem;line-height:1.6}
+/* nút phụ: thân navy, ô đích hổ phách (giống .gc-move--navy ngoài trang) */
+.a-list .move.quiet{background:var(--b800);color:#fff}
+.a-list .move.quiet span:last-child{background:var(--amber-400);color:var(--slate-950);border-left:0}
+@media(min-width:64rem){
+  .a-row{grid-template-columns:minmax(0,1fr) 15rem 11.5rem;gap:2.5rem;align-items:center;padding:1.75rem 1.75rem 1.75rem 2rem}
+  .a-feat{grid-template-columns:1fr 1fr;column-gap:1.5rem}
+}
+
+/* A gốc, chưa tăng tương phản: hàng trong suốt trên nền navy, để so với bản nền giấy. */
+.a-list.dark{background:none;color:inherit;box-shadow:none;border-bottom:1px solid var(--b600)}
+.a-list.dark .a-row{border-top:1px solid var(--b600);padding:1.75rem 0 1.75rem 1.25rem}
+/* Sơ cấp: vạch hổ phách + một lớp sáng rất nhẹ tỏa từ vạch vào trong hàng. */
+.a-list.dark .a-row.pop{background:radial-gradient(80% 170% at 0% 50%,rgb(245 158 11/.15),transparent 65%)}
+.a-list.dark .a-row.pop::before{width:4px;top:-1px}
+.a-list.dark .a-tile{background:var(--b900);border:1px solid var(--b600)}
+.a-list.dark .a-id h3{color:#fff}
+.a-list.dark .muted{color:var(--b200)}
+.a-list.dark .chk{color:var(--b100)}
+.a-list.dark .chk svg{stroke:var(--emerald-400)}
+.a-list.dark .a-price strong{color:var(--amber-400)}
+.a-list.dark .move.quiet{background:#fff;color:var(--b900)}
+.a-list.dark .move.quiet span:last-child{background:none;border-left:1px solid #0f172a1a;color:var(--b800)}
+@media(min-width:64rem){.a-list.dark .a-row{padding:1.75rem 0 1.75rem 1.75rem}}
+
+/* ===== B · Bảng so sánh ===== */
+.b-wrap{overflow-x:auto;margin:0 -1rem;padding:0 1rem}
+.b-table{width:100%;min-width:44rem;border-collapse:collapse;table-layout:fixed}
+.b-table col:first-child{width:11.5rem}
+.b-table th,.b-table td{padding:1rem 1.25rem;text-align:left;vertical-align:top;border-top:1px solid var(--b600)}
+.b-table thead th{border-top:0;padding-top:1.5rem;padding-bottom:1.25rem}
+.b-table tbody th{font-size:.8125rem;font-weight:600;color:var(--b200);line-height:1.4}
+.b-table tbody th small{display:block;font-weight:400;color:var(--b300,#8fb4d6)}
+.b-table td{font:700 1.125rem/1.3 var(--display)}
+.b-table td small{display:block;font:400 .8125rem var(--sans);color:var(--b200);margin-top:.125rem}
+.b-table .pop{background:#1b4a7699}
+.b-table thead .pop{border-top:3px solid var(--amber-500)}
+.b-table td.big{font-size:1.75rem;font-weight:800;color:var(--amber-400);letter-spacing:-.02em}
+.b-head{display:flex;gap:.75rem;align-items:center}
+.b-head h3{font:800 1.125rem/1.2 var(--display)}
+.b-head+p{font-size:.8125rem;margin-top:.5rem;font-weight:400;line-height:1.5}
+.b-table tfoot td{border-top:1px solid var(--b600);padding-block:1.25rem}
+
+/* ===== C · Chọn khóa, xem giá từng cấp ===== */
+.c-pick{display:grid;gap:.5rem;grid-template-columns:repeat(3,1fr)}
+.c-pick button{display:grid;justify-items:start;gap:.375rem;padding:1rem;border:1px solid var(--b600);background:#1b4a7633;text-align:left;transition:background .2s,border-color .2s}
+.c-pick button:hover{border-color:var(--b500)}
+.c-pick button[aria-pressed=true]{background:var(--b700);border-color:var(--amber-400)}
+.c-pick .piece{width:2rem;height:2rem}
+.c-pick b{font:800 1rem/1.2 var(--display)}
+.c-pick small{font-size:.75rem;color:var(--b200)}
+@media(max-width:39.99rem){.c-pick{grid-template-columns:1fr}.c-pick button{grid-template-columns:auto 1fr;align-items:center;column-gap:.75rem}.c-pick small{grid-column:2}}
+.c-panel{display:grid;gap:2rem;background:var(--b700);border:1px solid var(--b600);border-top:0;padding:1.75rem 1.25rem;animation:swap .35s var(--ease) both}
+@keyframes swap{from{opacity:0;translate:0 .75rem}}
+@media(prefers-reduced-motion:reduce){.c-panel{animation:none}}
+@media(min-width:56rem){.c-panel{grid-template-columns:minmax(0,5fr) minmax(0,7fr);padding:2.25rem 2rem;gap:3rem}}
+.c-panel h3{font:800 1.5rem/1.15 var(--display);letter-spacing:-.015em;display:flex;gap:.625rem;align-items:center;flex-wrap:wrap}
+.c-panel .lead{font-size:.9375rem;margin-top:.5rem}
+.c-panel ul{display:grid;gap:.5rem;margin:1.25rem 0 1.75rem}
+.c-lv{width:100%;border-collapse:collapse}
+.c-lv th,.c-lv td{padding:.75rem .5rem;text-align:right;border-bottom:1px solid var(--b600);white-space:nowrap}
+.c-lv th:first-child,.c-lv td:first-child{text-align:left;padding-left:0;white-space:normal}
+.c-lv thead th{font-size:.6875rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--b200);padding-top:0}
+.c-lv td{font-size:.9375rem;font-weight:600}
+.c-lv td:first-child{font-weight:700}
+.c-lv td.hl{color:var(--amber-400);font-weight:800}
+.c-cta{max-width:16rem}
+@media(max-width:39.99rem){.c-lv{font-size:.8125rem}.c-lv th,.c-lv td{padding-inline:.25rem}}
+</style>
+</head>
+<body>
+
+<div class="bar"><div role="tablist" aria-label="Hướng bố cục">
+  <b>Học phí · 3 hướng bố cục</b>
+  <button role="tab" aria-selected="false" data-v="a">A · Nền giấy kem</button>
+  <button role="tab" aria-selected="false" data-v="a0">A · Nền navy (chốt)</button>
+  <button role="tab" aria-selected="false" data-v="b">B · Bảng so sánh</button>
+  <button role="tab" aria-selected="false" data-v="c">C · Chọn khóa</button>
+</div></div>
+
+<main>
+  <div class="head"><span class="eyebrow">Đăng ký trực tuyến</span><h2>Tham khảo chi phí</h2></div>
+  <p class="note" id="note"></p>
+  <div id="stage"></div>
+</main>
+
+<script>
+const fmt = n => n.toLocaleString("vi-VN") + "đ";
+const PIECES = {
+  "happy-chess":'<path d="M12 3a3 3 0 0 1 3 3c0 1.113 -.6 2.482 -1.5 3l1.5 7h-6l1.5 -7c-.9 -.518 -1.5 -1.887 -1.5 -3a3 3 0 0 1 3 -3"/><path d="M8 9h8"/><path d="M6.684 16.772a1 1 0 0 0 -.684 .949v1.279a1 1 0 0 0 1 1h10a1 1 0 0 0 1 -1v-1.28a1 1 0 0 0 -.684 -.948l-2.316 -.772h-6l-2.316 .772"/>',
+  "so-cap":'<path d="M8 16l-1.447 .724a1 1 0 0 0 -.553 .894v2.382h12v-2.382a1 1 0 0 0 -.553 -.894l-1.447 -.724h-8"/><path d="M8 16l1 -9h6l1 9"/><path d="M6 4l.5 3h11l.5 -3"/><path d="M10 4v3"/><path d="M14 4v3"/>',
+  "trung-cap":'<path d="M8 16l-1.447 .724a1 1 0 0 0 -.553 .894v2.382h12v-2.382a1 1 0 0 0 -.553 -.894l-1.447 -.724h-8"/><path d="M8.5 16a3.5 3.5 0 1 1 3.163 -5h.674a3.5 3.5 0 1 1 3.163 5l-7 0"/><path d="M9 6h6"/><path d="M12 3v8"/>',
+};
+const piece = id => `<svg class="piece" viewBox="0 0 24 24" aria-hidden="true">${PIECES[id]}</svg>`;
+const check = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+const arrow = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+
+/* Dữ liệu thật từ src/data/courses.ts (TUITION_PROGRAMS, TUITION_LEVELS). */
+const P = [
+  {id:"happy-chess",name:"Happy Chess (Căn bản)",short:"Happy Chess",sub:"Happy Chess 1 - 3",pop:false,from:false,
+   feats:["Học luật chơi cơ bản và tư duy chiến thuật"]},
+  {id:"so-cap",name:"Global Chess Sơ cấp",short:"Sơ cấp",sub:"Global Chess 1 - 4",pop:true,from:true,
+   feats:["Luyện khai cuộc, chiến thuật và thi đấu"]},
+  {id:"trung-cap",name:"Global Chess Trung cấp",short:"Trung cấp",sub:"Global Chess 5 - 8",pop:false,from:true,
+   feats:["Chiến thuật trung - tàn cuộc nâng cao"]},
+];
+const LV = [
+  ["HC1","Happy Chess 1 (Level 1)","happy-chess",1800000,2700000,350000],
+  ["HC2","Happy Chess 2 (Level 2)","happy-chess",1800000,2700000,350000],
+  ["HC3","Happy Chess 3 (Level 3)","happy-chess",1800000,2700000,350000],
+  ["SC1","Sơ cấp 1 (Global 1, 2)","so-cap",2100000,3240000,400000],
+  ["SC2","Sơ cấp 2 (Global 3, 4)","so-cap",2700000,4860000,400000],
+  ["TC1","Trung cấp 1 (Global 5, 6)","trung-cap",3240000,5830000,450000],
+  ["TC2","Trung cấp 2 (Global 7, 8)","trung-cap",3888000,6996000,450000],
+].map(([code,label,prog,g12,g24,o11])=>({code,label,prog,g12,g24,o11}));
+P.forEach(p=>{const l=LV.filter(x=>x.prog===p.id); p.m12=Math.min(...l.map(x=>x.g12)); p.m24=Math.min(...l.map(x=>x.g24)); p.m1=Math.min(...l.map(x=>x.o11));});
+const cta = p => `<button class="move ${p.pop?"amber":"quiet"}" type="button"><span>Đăng ký ngay</span><span>${arrow}</span></button>`;
+
+/* ---------- A ---------- */
+const A = dark => `<div class="a-list${dark?" dark":""}">${P.map(p=>`
+  <article class="a-row${p.pop?" pop":""}">
+    <div class="a-id">
+      <div class="a-tile">${piece(p.id)}</div>
+      <div>
+        <h3>${p.name}${p.pop?'<span class="tag">Lộ trình tối ưu nhất</span>':""}</h3>
+        <p class="muted">${p.sub}</p>
+        <ul class="a-feat">${p.feats.map(f=>`<li class="chk">${check}<span>${f}</span></li>`).join("")}</ul>
+      </div>
+    </div>
+    <div class="a-price num">
+      <div class="k muted">24 buổi · 2 buổi/tuần</div>
+      <strong>${p.from?"từ ":""}${fmt(p.m24)}</strong>
+      <small class="muted">12 buổi: ${fmt(p.m12)}<br>1 kèm 1: từ ${fmt(p.m1)}/buổi</small>
+    </div>
+    ${cta(p)}
+  </article>`).join("")}</div>`;
+
+/* ---------- B ---------- */
+const B = () => {
+  const row = (th, sub, f, big) => `<tr><th scope="row">${th}${sub?`<small>${sub}</small>`:""}</th>${P.map(p=>`<td class="num${p.pop?" pop":""}${big?" big":""}">${f(p)}</td>`).join("")}</tr>`;
+  return `<div class="b-wrap"><table class="b-table">
+    <colgroup><col><col><col><col></colgroup>
+    <thead><tr><td></td>${P.map(p=>`<th scope="col" class="${p.pop?"pop":""}">
+      <div class="b-head">${piece(p.id)}<h3>${p.name}</h3></div>
+      <p class="muted">${p.sub}</p>${p.pop?'<p style="margin-top:.625rem"><span class="tag">Lộ trình tối ưu nhất</span></p>':""}</th>`).join("")}</tr></thead>
+    <tbody>
+      ${row("24 buổi","2 buổi/tuần",p=>`${p.from?"từ ":""}${fmt(p.m24)}`,true)}
+      ${row("12 buổi","1 buổi/tuần",p=>`${p.from?"từ ":""}${fmt(p.m12)}`)}
+      ${row("1 kèm 1","giá mỗi buổi",p=>`từ ${fmt(p.m1)}`)}
+      ${row("Số cấp độ","",p=>`${LV.filter(x=>x.prog===p.id).length} cấp<small>${LV.filter(x=>x.prog===p.id).length*24} buổi</small>`)}
+    </tbody>
+    <tfoot><tr><td></td>${P.map(p=>`<td class="${p.pop?"pop":""}">${cta(p)}</td>`).join("")}</tr></tfoot>
+  </table></div>`;
+};
+
+/* ---------- C ---------- */
+let sel = "so-cap";
+const C = () => {
+  const p = P.find(x=>x.id===sel), lv = LV.filter(x=>x.prog===sel);
+  return `<div class="c-pick" role="group" aria-label="Chọn khóa">${P.map(q=>`
+      <button type="button" aria-pressed="${q.id===sel}" data-prog="${q.id}">${piece(q.id)}<b>${q.short}</b><small>${q.pop?"Lộ trình tối ưu nhất":q.id==="happy-chess"?"72 buổi":"48 buổi"}</small></button>`).join("")}</div>
+    <div class="c-panel" aria-live="polite" key="${sel}">
+      <div>
+        <h3>${p.name}</h3>
+        <p class="lead muted">${p.sub}</p>
+        <ul>${p.feats.map(f=>`<li class="chk">${check}<span>${f}</span></li>`).join("")}</ul>
+        <div class="c-cta">${cta(p)}</div>
+      </div>
+      <div style="overflow-x:auto"><table class="c-lv num">
+        <thead><tr><th>Cấp độ</th><th>12 buổi</th><th>24 buổi</th><th>1 kèm 1</th></tr></thead>
+        <tbody>${lv.map(l=>`<tr><td>${l.label}</td><td>${fmt(l.g12)}</td><td class="hl">${fmt(l.g24)}</td><td>${fmt(l.o11)}<small class="muted"> /buổi</small></td></tr>`).join("")}</tbody>
+      </table></div>
+    </div>`;
+};
+
+const NOTES = {
+  a:"<b>A · Nền giấy kem (không chọn).</b> Bảng giá in trên nền giấy kem nên nổi hẳn khỏi nền navy: chữ tối trên nền sáng, giá màu navy, ô quân cờ navy với quân hổ phách. Hàng Sơ cấp có nền hổ phách nhạt và vạch hổ phách bên trái. Mobile xếp dọc.",
+  a0:"<b>A · Nền navy (đã chốt).</b> Hàng trong suốt trên nền navy, chữ sáng, giá hổ phách. Hàng Sơ cấp có vạch hổ phách và một lớp sáng hổ phách rất nhẹ tỏa từ vạch vào trong hàng (độ đậm tối đa 15%, tan hết ở khoảng 65% chiều rộng).",
+  b:"<b>B · Bảng so sánh.</b> Một bảng, ba cột khóa, hàng là các hình thức học. Đặt cạnh nhau là thấy ngay chênh lệch giá giữa 24 buổi, 12 buổi và 1 kèm 1. Cột Sơ cấp nền sáng hơn. Mobile cuộn ngang.",
+  c:"<b>C · Chọn khóa.</b> Chọn một khóa (có quân cờ), khung bên dưới hiện bảng giá từng cấp độ thật: Sơ cấp 1 khác Sơ cấp 2, nên không còn mơ hồ chữ “từ”. Cùng cách tương tác với phần Lộ trình ở trên, nhưng ít thấy cùng lúc ba khóa hơn.",
+};
+let view = "a0";
+function render(){
+  document.getElementById("note").innerHTML = NOTES[view];
+  document.getElementById("stage").innerHTML = {a:()=>A(false),a0:()=>A(true),b:B,c:C}[view]();
+  document.querySelectorAll(".bar [data-v]").forEach(b=>b.setAttribute("aria-selected", b.dataset.v===view));
+}
+document.querySelectorAll(".bar [data-v]").forEach(b=>b.addEventListener("click",()=>{view=b.dataset.v;render();}));
+document.getElementById("stage").addEventListener("click",e=>{const b=e.target.closest("[data-prog]"); if(!b)return; sel=b.dataset.prog; render(); document.querySelector(`[data-prog="${sel}"]`).focus();});
+render();
+</script>
+</body>
+</html>

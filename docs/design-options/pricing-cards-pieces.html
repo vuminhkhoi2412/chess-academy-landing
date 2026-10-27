@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global Chess – Thẻ học phí có quân cờ</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,700..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --b50:#eef5fb;--b100:#d9e8f5;--b200:#b6d0e8;--b600:#1f5285;--b700:#1b4a76;--b800:#184268;--b900:#123350;--b950:#0b2136;
+  --amber-400:#fbbf24;--amber-500:#f59e0b;--emerald-400:#34d399;--slate-950:#020617;
+  --display:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;
+  --sans:"Be Vietnam Pro",system-ui,sans-serif;
+  --card:1.125rem;--control:.5rem;
+}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--sans);background:var(--b800);color:#fff;line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--amber-400);outline-offset:3px}
+ul{list-style:none;padding:0}
+.num{font-variant-numeric:tabular-nums}
+
+/* khung xem trước */
+.bar{position:sticky;top:0;z-index:5;background:var(--b950);border-bottom:1px solid #ffffff22}
+.bar div{max-width:72rem;margin:0 auto;padding:.5rem 1rem;display:flex;gap:.25rem;align-items:center;flex-wrap:wrap}
+.bar b{font-family:var(--display);margin-right:auto;font-size:.9375rem}
+.bar button{padding:.5rem .875rem;font-size:.8125rem;font-weight:600;color:var(--b200);min-height:2.75rem;border-bottom:2px solid transparent}
+.bar button[aria-selected=true]{color:#fff;border-color:var(--amber-400)}
+
+main{max-width:72rem;margin:0 auto;padding:4rem 1rem 5rem}
+.head{text-align:center;max-width:42rem;margin:0 auto 3.5rem}
+.eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-400)}
+h2{font:800 clamp(1.875rem,4.5vw,3rem)/1.1 var(--display);letter-spacing:-.02em;margin-top:.75rem}
+.note{font-size:.8125rem;color:var(--b200);max-width:44rem;margin:0 auto 2.5rem;text-align:center}
+
+.cards{display:grid;gap:1.5rem}
+@media(min-width:48rem){.cards{grid-template-columns:repeat(3,1fr)}}
+.card{position:relative;border-radius:var(--card);padding:1.75rem;display:flex;flex-direction:column;justify-content:space-between;border:1px solid var(--b600);background:#1b4a7666;transition:border-color .2s}
+.card:hover{border-color:#2f6ba3}
+.card.pop{background:var(--b700);border-color:var(--amber-500);box-shadow:0 2px 4px rgb(68 55 43/.05),0 18px 36px -12px rgb(0 0 0/.35)}
+.badge{position:absolute;top:-.875rem;left:1.5rem;background:var(--amber-500);color:var(--slate-950);font-size:.75rem;font-weight:700;padding:.25rem .75rem;border-radius:var(--control);text-transform:uppercase;letter-spacing:.04em}
+.name{display:flex;align-items:center;gap:.75rem}
+.name h3{font-size:1.25rem;font-weight:700;line-height:1.25}
+.sub{color:var(--b200);font-size:.875rem;margin-top:.375rem;line-height:1.625;min-height:3.25em}
+.price{margin:1.25rem 0;padding-bottom:1.25rem;border-bottom:1px solid var(--b600)}
+.price .k{color:var(--b200);font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.price strong{display:block;font-size:1.875rem;font-weight:800;color:var(--amber-400)}
+.price small{display:block;color:var(--b200);font-size:.75rem;margin-top:.375rem;line-height:1.625}
+.feat{display:grid;gap:.625rem;margin-bottom:2rem}
+.feat li{display:flex;gap:.625rem;font-size:.875rem;color:var(--b100);line-height:1.625}
+.feat svg{width:1rem;height:1rem;flex:none;margin-top:.25rem;stroke:var(--emerald-400);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* nút: nhãn bên trái, ô đích bên phải */
+.move{display:flex;min-height:3rem;border-radius:var(--control);overflow:hidden;font-size:.875rem;font-weight:700;border:1px solid transparent}
+.move span:first-child{flex:1;display:flex;align-items:center;padding-inline:1.125rem}
+.move span:last-child{width:3rem;display:grid;place-items:center}
+.move svg{width:1rem;height:1rem;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.move.amber{background:var(--amber-500);color:var(--slate-950)}
+.move.amber span:last-child{background:var(--b900);color:var(--amber-400)}
+.move.quiet{background:#fff;color:var(--b900)}
+.move.quiet span:last-child{border-left:1px solid #0f172a1a;color:var(--b800)}
+
+/* quân cờ: nét viền + nền nhạt 14% cùng màu */
+.piece{width:2.25rem;height:2.25rem;flex:none;color:var(--amber-400);stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:color-mix(in srgb,currentColor 14%,transparent)}
+body[data-v=cur] .piece{display:none}
+</style>
+</head>
+<body data-v="new">
+
+<div class="bar"><div role="tablist" aria-label="Phiên bản">
+  <b>Thẻ học phí · xem trước</b>
+  <button role="tab" aria-selected="true" data-v="new">Mới · có quân cờ</button>
+  <button role="tab" aria-selected="false" data-v="cur">Hiện tại</button>
+</div></div>
+
+<main>
+  <div class="head">
+    <span class="eyebrow">Đăng ký trực tuyến</span>
+    <h2>Tham khảo chi phí</h2>
+  </div>
+  <p class="note" id="note"></p>
+  <div class="cards" id="cards"></div>
+</main>
+
+<script>
+/* Giá = mức thấp nhất của từng khóa trong TUITION_LEVELS; "từ" khi các cấp có giá khác nhau. */
+const fmt = n => n.toLocaleString("vi-VN") + "đ";
+const PROGRAMS = [
+  {id:"happy-chess",name:"Happy Chess (Căn bản)",sub:"3 Level × 24 buổi, dành cho bé từ 4 tuổi",pop:false,from:false,m24:2700000,m12:1800000,m1:350000,
+   feats:["Happy Chess 1 – 3, mỗi Level 24 buổi","60 phút mỗi buổi","Lớp group từ 2 học viên","12 buổi (1 buổi/tuần) hoặc 24 buổi (2 buổi/tuần)"],
+   piece:'<path d="M12 3a3 3 0 0 1 3 3c0 1.113 -.6 2.482 -1.5 3l1.5 7h-6l1.5 -7c-.9 -.518 -1.5 -1.887 -1.5 -3a3 3 0 0 1 3 -3"/><path d="M8 9h8"/><path d="M6.684 16.772a1 1 0 0 0 -.684 .949v1.279a1 1 0 0 0 1 1h10a1 1 0 0 0 1 -1v-1.28a1 1 0 0 0 -.684 -.948l-2.316 -.772h-6l-2.316 .772"/>'},
+  {id:"so-cap",name:"Global Chess Sơ cấp",sub:"Global Chess 1 – 4, nền tảng khai cuộc và chiến thuật",pop:true,from:true,m24:3240000,m12:2100000,m1:400000,
+   feats:["Global Chess 1 – 4","60 phút (Global 1–2) • 90 phút (Global 3–4)","Lớp group từ 2 học viên","Luyện khai cuộc, chiến thuật và thi đấu"],
+   piece:'<path d="M8 16l-1.447 .724a1 1 0 0 0 -.553 .894v2.382h12v-2.382a1 1 0 0 0 -.553 -.894l-1.447 -.724h-8"/><path d="M8 16l1 -9h6l1 9"/><path d="M6 4l.5 3h11l.5 -3"/><path d="M10 4v3"/><path d="M14 4v3"/>'},
+  {id:"trung-cap",name:"Global Chess Trung cấp",sub:"Global Chess 5 – 8, chiến thuật trung – tàn cuộc",pop:false,from:true,m24:5830000,m12:3240000,m1:450000,
+   feats:["Global Chess 5 – 8","90 phút mỗi buổi","Lớp group từ 2 học viên","Chiến thuật trung – tàn cuộc nâng cao"],
+   piece:'<path d="M8 16l-1.447 .724a1 1 0 0 0 -.553 .894v2.382h12v-2.382a1 1 0 0 0 -.553 -.894l-1.447 -.724h-8"/><path d="M8.5 16a3.5 3.5 0 1 1 3.163 -5h.674a3.5 3.5 0 1 1 3.163 5l-7 0"/><path d="M9 6h6"/><path d="M12 3v8"/>'},
+];
+const check='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+const arrow='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+document.getElementById("cards").innerHTML = PROGRAMS.map(p => `
+  <div class="card${p.pop?" pop":""}">
+    ${p.pop?'<span class="badge">Lộ trình tối ưu nhất</span>':""}
+    <div>
+      <div class="name"><svg class="piece" viewBox="0 0 24 24" aria-hidden="true">${p.piece}</svg><h3>${p.name}</h3></div>
+      <p class="sub">${p.sub}</p>
+      <div class="price">
+        <div class="k">24 buổi (2 buổi/tuần)</div>
+        <strong class="num">${p.from?"từ ":""}${fmt(p.m24)}</strong>
+        <small class="num">12 buổi: ${fmt(p.m12)}<br>1 kèm 1: từ ${fmt(p.m1)}/buổi</small>
+      </div>
+      <ul class="feat">${p.feats.map(f=>`<li>${check}<span>${f}</span></li>`).join("")}</ul>
+    </div>
+    <button class="move ${p.pop?"amber":"quiet"}" type="button"><span>Đăng ký ngay</span><span>${arrow}</span></button>
+  </div>`).join("");
+
+const NOTES = {
+  new:"<b>Mới.</b> Quân cờ đứng trước tên khóa: Tốt, Xe, Vua, cùng bộ Tabler và cùng kiểu nền nhạt với chart. Màu amber để nổi trên nền navy. Giá và nội dung lấy từ dữ liệu thật.",
+  cur:"<b>Hiện tại.</b> Thẻ chưa có quân cờ, để đối chiếu."
+};
+const setV = v => { document.body.dataset.v = v; document.getElementById("note").innerHTML = NOTES[v];
+  document.querySelectorAll(".bar [data-v]").forEach(b => b.setAttribute("aria-selected", b.dataset.v === v)); };
+document.querySelectorAll(".bar [data-v]").forEach(b => b.addEventListener("click", () => setV(b.dataset.v)));
+setV("new");
+</script>
+</body>
+</html>

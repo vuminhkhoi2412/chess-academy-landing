@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global Chess – Quân cờ Tabler cho ba khóa</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,700..800&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#faf8f5;--ink:#0f172a;--ink-3:#64748b;--rule:#e2e8f0;--navy:#0b2136;--display:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;--sans:"Be Vietnam Pro",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--sans);color:var(--ink);background:var(--cream);line-height:1.6;padding:2.5rem 1rem 4rem}
+main{max-width:64rem;margin:0 auto}
+h1{font:800 1.75rem var(--display);letter-spacing:-.02em}
+h2{font:800 1.125rem var(--display);margin:2.5rem 0 .25rem}
+p.n{font-size:.875rem;color:var(--ink-3);max-width:48rem}
+svg{display:block;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+.row{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));margin-top:1rem}
+.card{padding:1.25rem;background:#fff;border:1px solid var(--rule);display:grid;gap:1rem}
+.card.dark{background:var(--navy);border-color:var(--navy)}
+.card h3{font-size:.8125rem;font-weight:700;color:var(--c)}
+.dark h3{color:#fff}
+.sizes{display:flex;gap:1.25rem;align-items:flex-end;color:var(--c)}
+.dark .sizes{color:#fbbf24}
+/* thử thêm nền nhạt trong thân quân */
+.tint svg{fill:color-mix(in srgb,currentColor 14%,transparent)}
+/* mô phỏng đầu tab chi tiết giáo trình */
+.acc{border-top:2px solid var(--ink)}
+.acc div{display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;padding:1.125rem 0;border-bottom:1px solid var(--rule);color:var(--c)}
+.acc b{font:800 1.5rem var(--display);font-variant-numeric:tabular-nums;min-width:3rem}
+.acc span{font:800 1.25rem var(--display);color:var(--ink)}
+.acc small{font-size:.875rem;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Quân cờ cho ba khóa: Tốt · Xe · Vua</h1>
+  <p class="n">Bộ icon Tabler Icons (giấy phép MIT, © Paweł Kuna): <code>chess</code> = Tốt, <code>chess-rook</code> = Xe, <code>chess-king</code> = Vua. Chỉ có kiểu nét viền. Bên dưới: ba cỡ trên nền sáng và nền tối, bản thêm nền nhạt trong thân quân, và mô phỏng đầu tab thay cho số 01/02/03.</p>
+
+  <h2>1 · Nét viền, ba cỡ (24 · 48 · 96 px)</h2>
+  <div class="row" id="plain"></div>
+
+  <h2>2 · Nét viền + nền nhạt trong thân</h2>
+  <p class="n">Thân đặc nhẹ giúp quân nổi hơn ở cỡ lớn. Xe mở ở nét ngoài nên phần tô nhạt chỉ phủ vùng khép kín.</p>
+  <div class="row tint" id="tinted"></div>
+
+  <h2>3 · Đầu tab chi tiết giáo trình (thay 01/02/03)</h2>
+  <div class="acc" id="acc" style="margin-top:1rem"></div>
+
+  <h2>4 · Đầu tab có nền nhạt trong thân quân</h2>
+  <p class="n">Cùng mô phỏng như phần 3 nhưng quân có nền nhạt. Phía dưới là tiêu đề cụm chip ở cỡ 24px, để xem nền nhạt ở cỡ nhỏ.</p>
+  <div class="acc tint" id="acc-tint" style="margin-top:1rem"></div>
+  <div class="row tint" id="grp-tint"></div>
+</main>
+<script>
+const P=[
+ {t:"Happy Chess",s:"72 buổi · từ 4 tuổi",c:"#184268",n:"01",d:'<path d="M12 3a3 3 0 0 1 3 3c0 1.113 -.6 2.482 -1.5 3l1.5 7h-6l1.5 -7c-.9 -.518 -1.5 -1.887 -1.5 -3a3 3 0 0 1 3 -3"/><path d="M8 9h8"/><path d="M6.684 16.772a1 1 0 0 0 -.684 .949v1.279a1 1 0 0 0 1 1h10a1 1 0 0 0 1 -1v-1.28a1 1 0 0 0 -.684 -.948l-2.316 -.772h-6l-2.316 .772"/>'},
+ {t:"Global Chess Sơ Cấp",s:"48 buổi · từ 7 tuổi",c:"#b45309",n:"02",d:'<path d="M8 16l-1.447 .724a1 1 0 0 0 -.553 .894v2.382h12v-2.382a1 1 0 0 0 -.553 -.894l-1.447 -.724h-8"/><path d="M8 16l1 -9h6l1 9"/><path d="M6 4l.5 3h11l.5 -3"/><path d="M10 4v3"/><path d="M14 4v3"/>'},
+ {t:"Global Chess Trung Cấp",s:"48 buổi · từ 7 tuổi",c:"#047857",n:"03",d:'<path d="M8 16l-1.447 .724a1 1 0 0 0 -.553 .894v2.382h12v-2.382a1 1 0 0 0 -.553 -.894l-1.447 -.724h-8"/><path d="M8.5 16a3.5 3.5 0 1 1 3.163 -5h.674a3.5 3.5 0 1 1 3.163 5l-7 0"/><path d="M9 6h6"/><path d="M12 3v8"/>'},
+];
+const svg=(p,px,sw=2)=>`<svg width="${px}" height="${px}" viewBox="0 0 24 24" stroke-width="${sw}" aria-hidden="true">${p.d}</svg>`;
+const sizes=p=>`<div class="sizes">${[24,48,96].map(x=>svg(p,x)).join("")}</div>`;
+const cards=(dark)=>P.map(p=>`<div class="card${dark?" dark":""}" style="--c:${p.c}"><h3>${p.t}</h3>${sizes(p)}</div>`).join("");
+document.getElementById("plain").innerHTML=cards(false)+cards(true);
+document.getElementById("tinted").innerHTML=cards(false);
+document.getElementById("acc").innerHTML=P.map(p=>`<div style="--c:${p.c}">${svg(p,40,1.75)}<span>${p.t}</span><small>${p.s}</small></div>`).join("")
+document.getElementById("acc-tint").innerHTML=P.map(p=>`<div style="--c:${p.c}">${svg(p,40,1.75)}<span>${p.t}</span><small>${p.s}</small></div>`).join("");
+document.getElementById("grp-tint").innerHTML=P.map(p=>`<div class="card" style="--c:${p.c}"><div style="display:flex;gap:.5rem;align-items:center;color:var(--c);font-weight:800;font-size:.875rem">${svg(p,24)}${p.t}</div><div style="display:flex;gap:.375rem">${["1","2","3"].slice(0,p.n==="01"?3:2).map(i=>`<span style="flex:1;border:1px solid var(--rule);padding:.5rem;text-align:center;font:800 .9375rem var(--display)">${p.n==="01"?"HC":p.n==="02"?"SC":"TC"}${i}</span>`).join("")}</div></div>`).join("");
+document.getElementById("acc").innerHTML+='<p class="n" style="margin-top:1rem">Số cũ để so sánh:</p><div class="acc" style="margin-top:.5rem">'+P.map(p=>`<div style="--c:${p.c}"><b>${p.n}</b><span>${p.t}</span><small>${p.s}</small></div>`).join("")+"</div>";
+</script>
+</body>
+</html>
