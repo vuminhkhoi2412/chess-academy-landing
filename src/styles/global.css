@@ -180,6 +180,51 @@
     line-height: 1.08;
   }
 
+  /*
+   * Bảng giá dạng hàng: mỗi khóa một hàng chạy suốt chiều rộng. Hàng nổi bật có vạch
+   * hổ phách bên trái và một lớp sáng rất nhẹ tỏa từ vạch vào trong.
+   */
+  .gc-rate {
+    position: relative;
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.75rem 0 1.75rem 1.25rem;
+    border-top: 1px solid var(--color-brand-600);
+  }
+
+  .gc-rate__tile {
+    display: grid;
+    width: 4rem;
+    height: 4rem;
+    flex: none;
+    place-items: center;
+    background: var(--color-brand-900);
+    border: 1px solid var(--color-brand-600);
+  }
+
+  .gc-rate--pop {
+    background: radial-gradient(80% 170% at 0% 50%, rgb(245 158 11 / 0.15), transparent 65%);
+  }
+
+  .gc-rate--pop::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    bottom: 0;
+    left: 0;
+    width: 4px;
+    background: var(--color-amber-500);
+  }
+
+  @media (min-width: 64rem) {
+    .gc-rate {
+      grid-template-columns: minmax(0, 1fr) 15rem 11.5rem;
+      gap: 2.5rem;
+      align-items: center;
+      padding-left: 1.75rem;
+    }
+  }
+
   /* Thẻ điểm vận hành: bóng mềm có độ lệch, nhấc nhẹ khi rê chuột. */
   .gc-op-card {
     box-shadow: 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 6.8px 16.8px -8px rgb(15 23 42 / 0.14);
@@ -297,94 +342,6 @@
 
     .gc-faq summary svg:last-child {
       transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-  }
-
-  /*
-   * Cấu trúc buổi học: một thanh dài, mỗi bước chiếm bề rộng đúng theo số phút
-   * (flex-grow = --m) nên thấy ngay bước nào dài nhất. Góc vuông có chủ đích.
-   * Từ md, năm cột chữ nằm dưới thanh; dưới md chúng xếp dọc, mỗi dòng có ô màu
-   * khớp với đoạn trên thanh.
-   */
-  .gc-strip {
-    display: flex;
-    height: 4.5rem;
-  }
-
-  .gc-strip span {
-    display: flex;
-    flex: var(--m) 1 0;
-    align-items: center;
-    justify-content: center;
-    min-width: 0;
-    background: var(--c);
-    font-family: var(--font-display);
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: #fff;
-  }
-
-  .gc-strip span + span {
-    border-left: 2px solid var(--color-cream);
-  }
-
-  .gc-strip small {
-    margin-left: 0.125rem;
-    font-family: var(--font-sans);
-    font-size: 0.75rem;
-    font-weight: 600;
-    opacity: 0.85;
-  }
-
-  .gc-strip-cols {
-    display: grid;
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-  }
-
-  .gc-strip-cols li {
-    display: grid;
-    grid-template-columns: 1rem 1fr;
-    gap: 0.75rem;
-    padding-top: 1rem;
-    border-top: 2px solid var(--c);
-  }
-
-  .gc-strip-cols li::before {
-    content: "";
-    width: 1rem;
-    height: 1rem;
-    margin-top: 0.25rem;
-    background: var(--c);
-  }
-
-  @media (max-width: 47.99rem) {
-    .gc-strip {
-      height: 3.5rem;
-    }
-
-    .gc-strip span {
-      font-size: 1rem;
-    }
-
-    .gc-strip small {
-      display: none;
-    }
-  }
-
-  @media (min-width: 48rem) {
-    .gc-strip-cols {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 1.25rem;
-    }
-
-    .gc-strip-cols li {
-      grid-template-columns: 1fr;
-      gap: 0;
-    }
-
-    .gc-strip-cols li::before {
-      display: none;
     }
   }
 
@@ -680,6 +637,31 @@
     padding: 1.5rem 1.25rem 2rem;
   }
 
+  /*
+   * Đổi cấp độ: phần chữ được dựng lại (key theo mã cấp) nên mờ vào và trượt lên
+   * nhẹ; gáy chỉ đổi màu. Tắt hẳn khi người dùng chọn giảm chuyển động.
+   */
+  @keyframes gc-swap {
+    from {
+      opacity: 0;
+      /* `translate` riêng, không đụng `transform`: chữ dọc trên gáy đang xoay 180°. */
+      translate: 0 0.75rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .gc-book__spine {
+      transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .gc-book__code,
+    .gc-book__prog,
+    .gc-book__page,
+    .gc-book__side {
+      animation: gc-swap 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+  }
+
   .gc-book__side {
     display: none;
   }
@@ -863,11 +845,8 @@
   }
 
   .gc-idx__n {
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 6vw, 3.5rem);
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    line-height: 1;
+    width: clamp(2.25rem, 6vw, 3rem);
+    height: clamp(2.25rem, 6vw, 3rem);
     color: var(--lc);
   }
 

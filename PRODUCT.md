@@ -25,8 +25,7 @@ parent back — the page itself takes no payment.
 ## Positioning
 
 A standardised curriculum system delivered consistently across five campuses: every level is
-24 sessions with its own printed book, stated outcomes, and the same five-step lesson
-structure (ôn bài cũ → giảng bài mới → luyện tập → thực hành bàn cờ → nhận xét và giao bài).
+24 sessions with its own printed book and stated outcomes.
 A neighbouring centre can copy the marketing, not the published level-by-level syllabus and
 tuition grid.
 

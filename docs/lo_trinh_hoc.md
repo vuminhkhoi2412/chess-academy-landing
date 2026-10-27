@@ -119,26 +119,6 @@
 
 
 
-### Cấu trúc mỗi buổi học (60 – 90 phút):
-
-
-
-1. **5 phút:** Ôn bài cũ (nhắc lại kiến thức đã học).
-
-
-2. **15 phút:** Giảng bài mới (giải thích & minh họa).
-
-
-3. **20 phút:** Luyện tập (giải bài tập trên giáo trình).
-
-
-4. **15 phút:** Thực hành trên bàn cờ (áp dụng kiến thức).
-
-
-5. **5 phút:** Nhận xét & giao bài (ôn tập, chuẩn bị buổi sau).
-
-
-
 ### Tiêu chí đánh giá theo giai đoạn:
 
 
