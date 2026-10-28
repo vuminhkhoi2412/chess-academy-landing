@@ -58,7 +58,8 @@ const pageDescription =
   "Trung tâm cờ vua Global Chess cho trẻ 4–12 tuổi tại TP.HCM: lộ trình Happy Chess 72 buổi và Global Sơ cấp & Trung cấp 48 buổi, lớp tối trong tuần và cuối tuần tại 5 cơ sở.";
 
 // "0789.059.440" -> "+84789059440"
-const hotlineE164 = `+84${BRAND_INFO.hotlines[0].replace(/\./g, "").replace(/^0/, "")}`;
+const toE164 = (phone: string) => `+84${phone.replace(/\./g, "").replace(/^0/, "")}`;
+const hotlineE164 = toE164(BRAND_INFO.hotlines[0]);
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -72,8 +73,10 @@ const structuredData = {
   telephone: hotlineE164,
   areaServed: { "@type": "City", name: "TP.HCM" },
   department: BRANCHES.map((branch) => ({
-    "@type": "Place",
+    "@type": "EducationalOrganization",
     name: branch.name,
+    telephone: toE164(branch.phone),
+    hasMap: branch.mapUrl,
     address: {
       "@type": "PostalAddress",
       streetAddress: branch.address,

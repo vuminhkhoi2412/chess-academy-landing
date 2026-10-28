@@ -34,7 +34,9 @@ export const BRANCHES = [
     id: "CS3",
     name: "Cơ sở Tây Thạnh (Tân Phú)",
     district: "Tân Phú",
-    address: "93 đường T6, P. Tây Thạnh, TP.HCM",
+    address: "52 đường T6, P. Tây Thạnh, TP.HCM",
+    phone: "0963091208",
+    mapUrl: "https://maps.app.goo.gl/h9TdsGmB46TmNqEm6",
   },
   {
     id: "CS4",
