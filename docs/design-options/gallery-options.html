@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global Chess – 4 hướng thiết kế lại “Hình ảnh trung tâm”</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-950:#0b2136;--navy-900:#123350;--navy-800:#184268;--navy-200:#b6d0e8;--navy-50:#eef5fb;
+  --cream:#faf8f5;--ink:#0f172a;--ink-2:#334155;--ink-3:#64748b;--rule:#e2e8f0;
+  --amber:#fbbf24;--amber-700:#b45309;
+  --display:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;
+  --sans:"Be Vietnam Pro",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--sans);color:var(--ink);background:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--amber-700);outline-offset:3px}
+figure{margin:0}
+img{display:block}
+.wrap{max-width:72rem;margin:0 auto;padding:0 1rem}
+.num{font-variant-numeric:tabular-nums}
+
+/* khung xem trước */
+.bar{position:sticky;top:0;z-index:20;background:var(--navy-950);color:#fff}
+.bar .wrap{display:flex;gap:.25rem;align-items:center;flex-wrap:wrap;padding-block:.5rem}
+.bar b{font-family:var(--display);margin-right:auto;font-size:.9375rem}
+.bar button{padding:.5rem .875rem;font-size:.8125rem;font-weight:600;color:var(--navy-200);min-height:2.75rem;border-bottom:2px solid transparent}
+.bar button[aria-selected=true]{color:#fff;border-color:var(--amber)}
+.stage{padding:2.5rem 0 4rem}
+.note{font-size:.8125rem;color:var(--ink-3);max-width:52rem;margin-bottom:2rem}
+.note b{color:var(--ink)}
+
+/* tiêu đề mục: giống các mục khác của trang */
+.eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber-700)}
+.eyebrow::before{content:"";width:1.25rem;height:2px;background:var(--amber)}
+h2{font-family:var(--display);font-weight:800;font-size:clamp(1.75rem,4vw,3rem);letter-spacing:-.02em;line-height:1.1;margin-top:.75rem}
+.lede{color:var(--ink-3);font-size:1rem;line-height:1.65}
+.ph{border-radius:.75rem;overflow:hidden;background:#e2e8f0;box-shadow:0 0 0 1px #0f172a0d}
+.ph img{width:100%;height:auto}
+.fill img{height:100%;object-fit:cover}
+.consent{margin-top:1.5rem;font-size:.75rem;color:var(--ink-3);line-height:1.6}
+
+/* ---------- Hiện tại ---------- */
+.cur-head{display:grid;gap:1rem}
+@media(min-width:64rem){.cur-head{grid-template-columns:7fr 5fr;gap:2rem;align-items:end}.cur-head .lede{padding-bottom:.25rem}}
+.cur-cols{display:grid;gap:1rem;margin-top:2.5rem;align-items:start}
+@media(min-width:48rem){.cur-cols{grid-template-columns:1fr 1fr;gap:1.5rem}.cur-cols>div:last-child{padding-top:3rem}}
+.cur-cols>div{display:grid;gap:1rem}
+@media(min-width:48rem){.cur-cols>div{gap:1.5rem}}
+.cur-cta{background:var(--navy-800);color:#fff;border-radius:.75rem;padding:1.25rem}
+.cur-cta small{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber)}
+.cur-cta p{font-size:.875rem;color:var(--navy-200);margin-top:.25rem}
+.cur-cta b{display:block;margin-top:.375rem;font-size:.875rem}
+.cur-cta a{display:inline-flex;align-items:center;min-height:2.75rem;margin-top:.5rem;font-size:.875rem;font-weight:700;color:var(--amber)}
+
+/* ---------- A: hàng căn đều, không cắt ảnh ---------- */
+/* Mỗi ảnh có flex-grow = tỉ lệ khung của nó, nên cả hàng cao bằng nhau mà không phải cắt ảnh. */
+.a-head{display:grid;gap:1rem;margin-bottom:2rem}
+@media(min-width:64rem){.a-head{grid-template-columns:7fr 5fr;gap:2rem;align-items:end}.a-head .lede{padding-bottom:.25rem}}
+.a-rows{display:grid;gap:1rem}
+.a-row{display:grid;gap:1rem}
+@media(min-width:48rem){.a-rows{gap:1.25rem}.a-row{display:flex;gap:1.25rem}.a-row .ph{flex:var(--a) 1 0;min-width:0}}
+
+/* ---------- B: ảnh lớn có chú thích đè + dải ảnh nhỏ ---------- */
+.b-hero{position:relative;margin-top:2rem;border-radius:.75rem;overflow:hidden;aspect-ratio:4/3;background:#e2e8f0}
+@media(min-width:48rem){.b-hero{aspect-ratio:21/9}}
+.b-hero img{width:100%;height:100%;object-fit:cover;object-position:50% 38%}
+.b-hero figcaption{position:absolute;inset:auto 0 0 0;padding:3rem 1.25rem 1.25rem;background:linear-gradient(to top,rgb(11 33 54/.88),rgb(11 33 54/.55) 55%,transparent);color:#fff}
+.b-hero figcaption p{max-width:40rem;font-size:.9375rem;line-height:1.6;color:#e8f0f8}
+@media(min-width:48rem){.b-hero figcaption{padding:4rem 2rem 1.75rem}.b-hero figcaption p{font-size:1.0625rem}}
+.b-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-top:1rem}
+@media(min-width:48rem){.b-strip{grid-template-columns:repeat(4,1fr)}}
+.b-strip .ph{aspect-ratio:4/3}
+
+/* ---------- C: chữ bên trái, ảnh bên phải ---------- */
+.c-grid{display:grid;gap:2rem}
+@media(min-width:64rem){.c-grid{grid-template-columns:4fr 8fr;gap:3rem;align-items:start}.c-text{position:sticky;top:5.5rem}}
+.c-text .lede{margin-top:1rem;max-width:30rem}
+.c-imgs{display:grid;gap:1rem}
+@media(min-width:40rem){.c-imgs{grid-template-columns:1fr 1fr;gap:1.25rem}}
+.c-col{display:grid;gap:1rem;align-content:start}
+@media(min-width:40rem){.c-col{gap:1.25rem}}
+/* Cột phải ép tỉ lệ ~1.86:1 để tổng chiều cao ba ảnh cộng hai khe hở = chiều cao ảnh 3:2, ảnh vuông và một khe hở của cột trái. */
+.c-col.eq .ph{aspect-ratio:1.86/1}
+
+/* ---------- D: chọn ảnh ---------- */
+.d-head{text-align:center;max-width:44rem;margin:0 auto 2rem}
+.d-head .lede{margin-top:.75rem}
+.d-stage{position:relative;border-radius:.75rem;overflow:hidden;background:#e2e8f0;aspect-ratio:4/3;box-shadow:0 18px 40px -26px rgb(15 23 42/.4)}
+@media(min-width:48rem){.d-stage{aspect-ratio:16/9}}
+.d-stage img{width:100%;height:100%;object-fit:cover;animation:swap .35s cubic-bezier(.16,1,.3,1) both}
+@keyframes swap{from{opacity:.0;transform:scale(1.015)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.d-stage img{animation:none}}
+.d-cap{display:flex;justify-content:space-between;gap:1rem;align-items:baseline;margin-top:.875rem;padding-inline:.125rem}
+.d-cap p{font-size:1rem;color:var(--ink-2)}
+.d-cap span{font-size:.8125rem;font-weight:700;color:var(--ink-3);white-space:nowrap}
+.d-thumbs{display:grid;grid-template-columns:repeat(5,1fr);gap:.5rem;margin-top:1rem}
+@media(min-width:48rem){.d-thumbs{gap:.75rem}}
+.d-thumbs button{display:block;width:100%;aspect-ratio:4/3;border-radius:.5rem;overflow:hidden;opacity:.55;transition:opacity .2s,box-shadow .2s;box-shadow:0 0 0 0 var(--navy-800)}
+.d-thumbs button:hover{opacity:.9}
+.d-thumbs button[aria-pressed=true]{opacity:1;box-shadow:0 0 0 3px var(--cream),0 0 0 5px var(--navy-800)}
+.d-thumbs img{width:100%;height:100%;object-fit:cover}
+
+/* ---------- điều khiển xem trước ---------- */
+.ctl{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;align-items:center;margin:-.75rem 0 2rem;font-size:.8125rem;color:var(--ink-3)}
+.ctl fieldset{border:0;padding:0;margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:.25rem .75rem}
+.ctl legend{float:left;margin-right:.5rem;font-weight:700;color:var(--ink)}
+.ctl label{display:inline-flex;align-items:center;gap:.375rem;min-height:2.75rem;cursor:pointer}
+
+/* ---------- nút kêu gọi tuỳ chọn ---------- */
+.ctalink{display:inline-flex;align-items:center;gap:.25rem;margin-left:.5rem;min-height:2.75rem;font-weight:700;color:var(--navy-800);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.b-hero .ctalink{color:#fff}
+.ctabar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem 1.25rem;margin-top:1.5rem;padding:.75rem .75rem .75rem 1.25rem;background:#fff;border:1px solid var(--rule);border-radius:.875rem}
+.ctabar p{font-size:.9375rem;color:var(--ink-2)}
+.ctabar b{font-family:var(--display);font-weight:800;color:var(--ink)}
+.ctabar a{display:inline-flex;align-items:center;gap:.5rem;min-height:2.75rem;padding:0 1.125rem;background:var(--navy-800);color:#fff;font-weight:700;font-size:.875rem;border-radius:.625rem;text-decoration:none}
+.ctabar a:hover{background:var(--navy-900)}
+
+/* ---------- phóng to khi bấm ---------- */
+.lbon .ph img,.lbon .b-hero img{cursor:zoom-in}
+dialog.lb{margin:auto;border:0;padding:0;background:transparent;max-width:min(92vw,70rem);width:100%;color:#fff}
+dialog.lb::backdrop{background:rgb(11 33 54/.88)}
+.lb figure{display:grid;gap:.75rem}
+.lb img{width:100%;max-height:80vh;object-fit:contain;border-radius:.5rem}
+.lb figcaption{font-size:.9375rem;color:var(--navy-200)}
+.lb button{position:absolute;right:.5rem;top:.5rem;min-width:2.75rem;min-height:2.75rem;border-radius:50%;background:#0b2136cc;color:#fff;font-size:1.25rem}
+
+/* ---------- E: lưới bento 3 cột ---------- */
+/* Ảnh vuông chiếm hai hàng và quyết định chiều cao; các ô còn lại lấp đầy ô của mình (cắt ảnh). */
+.e-bento{display:grid;gap:1rem}
+@media(min-width:48rem){.e-bento{grid-template-columns:repeat(3,1fr);gap:1rem}.e-bento .hero{grid-row:span 2}}
+.e-bento .ph{position:relative;aspect-ratio:4/3}
+.e-bento .hero{aspect-ratio:1/1}
+/* Ảnh giáo viên-học viên: neo phía trên để giữ nguyên biển Global Chess khi bị cắt từ 3:2 xuống ~2:1. */
+.e-bento .ph:nth-child(2) img{object-position:50% 8%}
+.e-bento .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+@media(min-width:48rem){.e-bento .ph:not(.hero){aspect-ratio:auto}}
+
+/* ---------- F: ảnh chính + lưới 2×2 ---------- */
+.f-grid{display:grid;gap:1rem}
+@media(min-width:48rem){.f-grid{grid-template-columns:3fr 2fr;gap:1.25rem}}
+.f-main{position:relative;aspect-ratio:4/3;min-height:100%}
+.f-main img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.f-quad{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1rem}
+@media(max-width:47.99rem){.f-quad .ph{aspect-ratio:1/1}}
+@media(min-width:48rem){.f-quad{gap:1.25rem}}
+/* Ô lấp đầy hàng lưới chứ không ép vuông, để lưới 2×2 cao đúng bằng ảnh chính. */
+.f-quad .ph{position:relative;min-height:0}
+.f-quad .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap" role="tablist" aria-label="Phương án">
+  <b>Hình ảnh trung tâm</b>
+  <button role="tab" data-v="cur" aria-selected="true">Hiện tại</button>
+  <button role="tab" data-v="a" aria-selected="false">A · Hàng căn đều</button>
+  <button role="tab" data-v="b" aria-selected="false">B · Ảnh lớn + dải ảnh</button>
+  <button role="tab" data-v="c" aria-selected="false">C · Chữ bên trái</button>
+  <button role="tab" data-v="d" aria-selected="false">D · Chọn ảnh</button>
+  <button role="tab" data-v="e" aria-selected="false">E · Bento 3 cột</button>
+  <button role="tab" data-v="f" aria-selected="false">F · Ảnh chính + lưới 2×2</button>
+</div></header>
+
+<main class="stage"><div class="wrap">
+  <p class="note" id="note"></p>
+  <div class="ctl">
+    <fieldset><legend>Nút kêu gọi</legend>
+      <label><input type="radio" name="cta" value="none" checked> Không có</label>
+      <label><input type="radio" name="cta" value="bar"> Thanh mỏng dưới ảnh</label>
+      <label><input type="radio" name="cta" value="link"> Link ở tiêu đề</label>
+    </fieldset>
+    <label><input type="checkbox" id="lbToggle" checked> Bấm ảnh để phóng to</label>
+  </div>
+  <div id="stage"></div>
+</div></main>
+
+<dialog class="lb" id="lb" aria-label="Xem ảnh phóng to"><figure><figcaption></figcaption></figure><button type="button" aria-label="Đóng">×</button></dialog>
+<script>
+/* Ảnh dùng trực tiếp từ src/assets/images (đường dẫn tương đối từ docs/design-options). a = tỉ lệ rộng/cao của ảnh gốc. */
+const P = "../../src/assets/images/";
+const IMG = {
+  coach:      {f:"gallery-coach-student.jpg",    a:1.5,  alt:"Huấn luyện viên Global Chess hướng dẫn một học viên trong giờ học cờ vua.", cap:"Huấn luyện viên kèm học viên trong một ván cờ."},
+  classroom:  {f:"gallery-classroom.jpg",        a:1.5,  alt:"Phòng học cờ vua tại một cơ sở Global Chess, các học viên đang luyện tập.", cap:"Phòng học có màn hình chiếu và bảng lộ trình trên tường."},
+  classcoach: {f:"gallery-class-coach.jpg",      a:1.33, alt:"Giáo viên đứng lớp và theo dõi các học viên luyện tập cờ vua tại Global Chess.", cap:"Giáo viên theo dõi cả lớp trong buổi luyện tập."},
+  practice:   {f:"gallery-class-practice.jpg",   a:1.0,  alt:"Các học viên Global Chess đối kháng trên bàn cờ trong lớp học.", cap:"Học viên đối kháng trực tiếp trên bàn cờ."},
+  tournament: {f:"gallery-tournament-play.jpg",  a:1.5,  alt:"Học viên tập trung thi đấu trên bàn cờ trong giải đấu nội bộ Global Chess.", cap:"Học viên tập trung thi đấu trong giải nội bộ."},
+};
+const LEDE_TEXT = "Những khoảnh khắc trong lớp Happy Chess và Global Chess: huấn luyện viên kèm từng thế cờ, học viên luyện đối kháng và không gian học tại cơ sở.";
+const CONSENT_TEXT = `<p class="consent">Ảnh chụp tại lớp học và giải đấu nội bộ Global Chess. Phụ huynh của các học viên trong ảnh đã đồng ý cho trung tâm sử dụng trên website.</p>`;
+/* Đăng ký tư vấn dẫn tới #pricing. Không dẫn tới #branches vì mục cơ sở nằm ngay trên mục này. */
+let cta = "none", lbOn = true;
+const lede = () => LEDE_TEXT + (cta==="link" ? ` <a class="ctalink" href="#pricing">Đăng ký tư vấn →</a>` : "");
+const tail = () => (cta==="bar" ? `<div class="ctabar"><p><b>Muốn xếp lớp cho bé?</b> Đăng ký tư vấn, giáo vụ sẽ gọi lại.</p><a href="#pricing">Đăng ký tư vấn →</a></div>` : "") + CONSENT_TEXT;
+const img = (k, extra="") => `<img src="${P}${IMG[k].f}" alt="${IMG[k].alt}" loading="lazy" decoding="async" ${extra}>`;
+const ph = (k, cls="") => `<figure class="ph ${cls}" style="--a:${IMG[k].a}">${img(k)}</figure>`;
+const $ = s => document.querySelector(s);
+let view = "cur", sel = 0;
+const ORDER = ["coach","classroom","classcoach","practice","tournament"];
+
+const NOTES = {
+  cur:"<b>Hiện tại.</b> Để đối chiếu. Chú thích nằm bên phải, canh theo đáy hàng tiêu đề; cột ảnh bên phải bị đẩy thấp thêm 3rem (<code>md:pt-12</code>) nên giữa chú thích và ảnh đầu tiên của cột đó có một khoảng trống lớn. Ô navy “5 cơ sở” nằm trong cột ảnh và đọc như một ô ảnh bị thay bằng nút.",
+  a:"<b>A · Hàng căn đều.</b> Hai hàng ảnh, mỗi ảnh rộng tỉ lệ thuận với khung của nó nên cả hàng cao đúng bằng nhau mà <b>không cắt ảnh nào</b> và không có khoảng trống. Giữ nguyên bố cục tiêu đề trái / chú thích phải, vì lưới đã chữ nhật nên chú thích luôn cách ảnh một khoảng cố định. Ít thay đổi nhất, chỉ dùng CSS, không JS. Hàng trên hai ảnh lớn, hàng dưới ba ảnh nhỏ hơn.",
+  b:"<b>B · Ảnh lớn + dải ảnh.</b> Chú thích đi vào <b>bên trong</b> ảnh lớn (nền gradient navy), nên không còn chỗ nào để hở. Bốn ảnh còn lại là dải 4 ô cùng tỉ lệ 4:3. Có điểm nhấn rõ nhất, và ảnh đầu tiên có biển Global Chess làm “bìa” cho cả mục. Ảnh lớn bị cắt còn khoảng 21:9, ảnh nhỏ cắt nhẹ về 4:3.",
+  c:"<b>C · Chữ bên trái.</b> Eyebrow, tiêu đề và chú thích xếp dọc ở cột trái (dính khi cuộn trên màn rộng), ảnh ở hai cột bên phải. Chú thích nằm cạnh ảnh chứ không nằm trên đầu ảnh nên không có khoảng hở. Cột phải cắt ba ảnh về khoảng 1.86:1 để hai cột kết thúc cùng một đường. Khác các mục khác của trang (tiêu đề căn giữa hoặc trái trên đầu).",
+  e:"<b>E · Bento 3 cột (từ feedback, hướng 1).</b> Ảnh vuông đối kháng làm ảnh chính, chiếm hai hàng ở cột trái; bốn ảnh còn lại lấp hai cột sau, tạo một khối chữ nhật phẳng, khe hở đều. Trong feedback gọi đó là “ảnh dọc”, nhưng ảnh này thực ra vuông (1:1). Đổi lại, bốn ô còn lại bị cắt từ 3:2 xuống khoảng 2:1, nên ảnh giáo viên-học viên phải neo phía trên để giữ biển Global Chess, đổi lại mất đồng hồ và phần bàn cờ phía dưới.",
+  f:"<b>F · Ảnh chính + lưới 2×2 (từ feedback, hướng 3).</b> Ảnh giáo viên có biển Global Chess ở bên trái (60%), lưới 2×2 bốn ảnh bên phải (40%, gần vuông). Với đúng 5 ảnh, tỉ lệ này khớp gần hoàn hảo nên ảnh chính hầu như không bị cắt. Mình bỏ phần “+16 ảnh khác” và badge “Giải đấu nội bộ định kỳ” trong feedback, vì hiện chỉ có 5 ảnh và nguồn không ghi “định kỳ”.",
+  d:"<b>D · Chọn ảnh.</b> Cùng cơ chế với Lộ trình: một ảnh lớn đang chọn, dải 5 ô bên dưới để chọn, mỗi ảnh có chú thích riêng chỉ mô tả đúng điều nhìn thấy. Tiêu đề căn giữa như mục Lộ trình và Cơ sở. Gọn nhất về chiều cao, nhưng cần JS (một island nhỏ) và mỗi lúc chỉ thấy một ảnh; ảnh ra sau lượt bấm.",
+};
+
+const VIEWS = {
+  cur: () => `
+    <div class="cur-head"><div><span class="eyebrow">Thư viện hình ảnh</span><h2>Hình ảnh trung tâm</h2></div><p class="lede">${lede()}</p></div>
+    <div class="cur-cols">
+      <div>${ph("coach")}${ph("classroom")}${ph("classcoach")}</div>
+      <div>${ph("practice")}${ph("tournament")}
+        <div class="cur-cta"><small>5 cơ sở tại TP.HCM</small><b>Chọn cơ sở gần nhà</b><p>Lịch học trong tuần và cuối tuần, xếp lớp theo trình độ của học viên.</p><a href="#">Xem địa chỉ 5 cơ sở →</a></div>
+      </div>
+    </div>${tail()}`,
+
+  a: () => `
+    <div class="a-head"><div><span class="eyebrow">Thư viện hình ảnh</span><h2>Hình ảnh trung tâm</h2></div><p class="lede">${lede()}</p></div>
+    <div class="a-rows">
+      <div class="a-row">${ph("coach")}${ph("tournament")}</div>
+      <div class="a-row">${ph("classroom")}${ph("practice")}${ph("classcoach")}</div>
+    </div>${tail()}`,
+
+  b: () => `
+    <div><span class="eyebrow">Thư viện hình ảnh</span><h2>Hình ảnh trung tâm</h2></div>
+    <figure class="b-hero">${img("coach")}<figcaption><p>${lede()}</p></figcaption></figure>
+    <div class="b-strip">${["classroom","tournament","practice","classcoach"].map(k=>ph(k,"fill")).join("")}</div>${tail()}`,
+
+  c: () => `
+    <div class="c-grid">
+      <div class="c-text"><span class="eyebrow">Thư viện hình ảnh</span><h2>Hình ảnh trung tâm</h2><p class="lede">${lede()}</p></div>
+      <div class="c-imgs">
+        <div class="c-col">${ph("coach")}${ph("practice")}</div>
+        <div class="c-col eq">${["classroom","classcoach","tournament"].map(k=>`<figure class="ph fill">${img(k)}</figure>`).join("")}</div>
+      </div>
+    </div>${tail()}`,
+
+  e: () => `
+    <div class="a-head"><div><span class="eyebrow">Thư viện hình ảnh</span><h2>Hình ảnh trung tâm</h2></div><p class="lede">${lede()}</p></div>
+    <div class="e-bento">
+      ${ph("practice","hero")}${ph("coach")}${ph("tournament")}${ph("classroom")}${ph("classcoach")}
+    </div>${tail()}`,
+
+  f: () => `
+    <div class="a-head"><div><span class="eyebrow">Thư viện hình ảnh</span><h2>Hình ảnh trung tâm</h2></div><p class="lede">${lede()}</p></div>
+    <div class="f-grid">
+      <figure class="ph f-main">${img("coach")}</figure>
+      <div class="f-quad">${["classroom","tournament","practice","classcoach"].map(k=>ph(k)).join("")}</div>
+    </div>${tail()}`,
+
+  d: () => {
+    const k = ORDER[sel];
+    return `
+    <div class="d-head"><span class="eyebrow">Thư viện hình ảnh</span><h2>Hình ảnh trung tâm</h2><p class="lede">${lede()}</p></div>
+    <figure class="d-stage" aria-live="polite"><img key="${k}" src="${P}${IMG[k].f}" alt="${IMG[k].alt}"></figure>
+    <div class="d-cap"><p>${IMG[k].cap}</p><span class="num">${sel+1} / ${ORDER.length}</span></div>
+    <div class="d-thumbs" role="group" aria-label="Chọn ảnh">${ORDER.map((o,i)=>`<button type="button" data-i="${i}" aria-pressed="${i===sel}" aria-label="Ảnh ${i+1}: ${IMG[o].cap}"><img src="${P}${IMG[o].f}" alt="" loading="lazy"></button>`).join("")}</div>${tail()}`;
+  },
+};
+
+const dlg = document.getElementById("lb");
+function render(){
+  document.body.classList.toggle("lbon", lbOn && view !== "d");
+  $("#note").innerHTML = NOTES[view];
+  $("#stage").innerHTML = VIEWS[view]();
+}
+$("#stage").addEventListener("click", e => {
+  const z = e.target.closest("img");
+  if(z && lbOn && view !== "d" && !z.closest("[data-i]")){
+    const fig = dlg.querySelector("figure"), big = new Image();
+    big.src = z.src; big.alt = z.alt;
+    fig.querySelector("img")?.remove(); fig.prepend(big);
+    dlg.querySelector("figcaption").textContent = z.alt; dlg.showModal(); return;
+  }
+  const b = e.target.closest("[data-i]"); if(!b) return;
+  sel = +b.dataset.i; render(); $(`[data-i="${sel}"]`).focus();
+});
+document.querySelectorAll(".bar [data-v]").forEach(t => t.addEventListener("click", () => {
+  view = t.dataset.v;
+  document.querySelectorAll(".bar [data-v]").forEach(x => x.setAttribute("aria-selected", x === t));
+  render();
+}));
+document.querySelectorAll('input[name=cta]').forEach(r => r.addEventListener("change", () => { cta = r.value; render(); }));
+$("#lbToggle").addEventListener("change", e => { lbOn = e.target.checked; render(); });
+dlg.addEventListener("click", e => { if(e.target === dlg || e.target.tagName === "BUTTON") dlg.close(); });
+render();
+</script>
+</body>
+</html>
