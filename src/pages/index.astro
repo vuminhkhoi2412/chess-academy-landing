@@ -1,6 +1,7 @@
 ---
 // src/pages/index.astro
 import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
 import InteractivePuzzle from "../components/InteractivePuzzle";
 import CurriculumExplorer from "../components/CurriculumExplorer";
 import PricingAndCheckout from "../components/PricingAndCheckout";
@@ -14,10 +15,16 @@ import galleryClassCoach from "../assets/images/gallery-class-coach.jpg";
 import galleryTournamentPlay from "../assets/images/gallery-tournament-play.jpg";
 import galleryClassPractice from "../assets/images/gallery-class-practice.jpg";
 import galleryClassroom from "../assets/images/gallery-classroom.jpg";
+import branchBinhTan from "../assets/images/branch_images/Binh_Tan.jpg";
+import branchQuan6 from "../assets/images/branch_images/Quan_6.jpg";
+import branchTayThanh from "../assets/images/branch_images/Tay_Thanh_Tan_Phu.jpg";
+import branchNguyenSon from "../assets/images/branch_images/Nguyen_Son_Tan_Phu.jpg";
+import branchVinhomes from "../assets/images/branch_images/Vinhome.jpg";
 import {
   MapPin,
   Phone,
   ArrowRight,
+  ArrowUpRight,
   Quote,
   BookOpen,
   Clock,
@@ -26,6 +33,18 @@ import {
   ChevronDown,
   AlertTriangle,
 } from "lucide-react";
+
+// Ảnh từng cơ sở. Cơ sở nào chưa có ảnh thì thẻ rơi về ô bàn cờ có mã cơ sở.
+const BRANCH_PHOTOS: Record<string, { src: ImageMetadata; alt: string; pos?: string }> = {
+  CS1: { src: branchQuan6, alt: "Các học viên chơi cờ vua trong phòng học Global Chess." },
+  CS2: { src: branchBinhTan, alt: "Các học viên chơi cờ vua trong phòng học tại cơ sở Bình Tân." },
+  CS3: { src: branchTayThanh, alt: "Các học viên đang đấu cờ vua trong phòng học." },
+  CS4: { src: branchNguyenSon, alt: "Học viên chơi cờ vua cùng huấn luyện viên trong phòng học.", pos: "object-[50%_35%]" },
+  CS5: { src: branchVinhomes, alt: "Giải cờ vua thiếu nhi Vincom Kids Challenge 2026 tại Vincom Grand Park." },
+};
+
+/** "0963091208" → "0963 091 208" cho dễ đọc; số tel: vẫn giữ dạng liền. */
+const fmtPhone = (p: string) => p.replace(/(\d{4})(\d{3})(\d{3})/, "$1 $2 $3");
 
 // Domain lấy từ `site` trong astro.config.mjs.
 // Sửa một chỗ đó là canonical, og:url, sitemap.xml và robots.txt cùng đúng theo.
@@ -229,81 +248,99 @@ const structuredData = {
           </p>
         </div>
 
-        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {BRANCHES.map((branch, idx) => (
-            <div
-              class:list={[
-                "bg-cream p-5 rounded-card border border-slate-200/90 flex flex-col justify-between hover:border-amber-400 hover:shadow-soft transition",
-                // Bento: cơ sở đầu tiên trải 2 cột để lưới không còn là 6 ô đều nhau.
-                idx === 0 && "lg:col-span-2 relative overflow-hidden",
-              ]}
-            >
-              {idx === 0 && (
-                <span
-                  aria-hidden="true"
-                  class="gc-board-field pointer-events-none absolute -right-10 -bottom-12 h-48 w-48 rounded-full opacity-[0.06] [--gc-cell:1.5rem]"
-                >
-                </span>
-              )}
-              <div class="relative">
-                <div class="flex items-center justify-between mb-3">
-                  <span class="text-xs font-extrabold text-amber-800 bg-amber-100 px-2.5 py-1 rounded-md tabular-nums">
-                    Cơ sở {idx + 1}
-                  </span>
-                  {/* Nhãn riêng của từng cơ sở, thay cho nhãn trạng thái lặp 5 lần. */}
-                  <span class="text-xs font-semibold text-slate-600 border border-slate-300/80 px-2 py-0.5 rounded-control">
-                    {branch.district}
-                  </span>
+        {/*
+          Mỗi thẻ có khung ảnh 16:9. Cơ sở chưa có ảnh riêng dùng ô bàn cờ cùng tỉ lệ
+          để các thẻ vẫn đều chiều cao. Hotline ra khỏi lưới thành banner riêng để
+          không bị đọc nhầm là "Cơ sở 6".
+        */}
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {BRANCHES.map((branch, idx) => {
+            const photo = BRANCH_PHOTOS[branch.id];
+            const phone = branch.phone ?? BRAND_INFO.hotlines[0];
+            return (
+              <article class="flex flex-col overflow-hidden rounded-card border border-slate-200/90 bg-white transition hover:border-slate-300 hover:shadow-soft">
+                <div class="relative aspect-video overflow-hidden bg-brand-800">
+                  {photo ? (
+                    <Image
+                      src={photo.src}
+                      alt={photo.alt}
+                      widths={[400, 640, 960]}
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      quality={80}
+                      loading="lazy"
+                      decoding="async"
+                      class={`h-full w-full object-cover ${photo.pos ?? ""}`}
+                    />
+                  ) : (
+                    <>
+                      <span aria-hidden="true" class="gc-board-field absolute inset-0 opacity-[0.08] [--gc-cell:2.25rem] [--gc-cell-color:#fff]"></span>
+                      <span aria-hidden="true" class="absolute inset-0 grid place-items-center font-display text-5xl font-extrabold tracking-tight text-white/90">{branch.id}</span>
+                    </>
+                  )}
+                  <div class="absolute left-3 top-3 flex gap-1 text-xs font-bold">
+                    <span class="rounded-full bg-white px-2.5 py-0.5 text-slate-800 shadow-sm tabular-nums">Cơ sở {idx + 1}</span>
+                    <span class="rounded-full bg-white px-2.5 py-0.5 text-slate-600 shadow-sm">{branch.district}</span>
+                  </div>
                 </div>
-                <h3 class:list={["font-bold text-slate-900 mb-1", idx === 0 ? "text-lg" : "text-base"]}>{branch.name}</h3>
-                <p class="text-sm text-slate-600 flex items-start gap-1.5 leading-relaxed">
-                  <MapPin className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" aria-hidden="true" />
-                  <span>{branch.address}</span>
-                </p>
-              </div>
-              <div class="relative mt-4 border-t border-slate-200/70 pt-1">
-                {/*
-                  Nhãn đọc được phải chứa đúng chữ hiển thị "Chọn cơ sở này", nếu không
-                  trình đọc màn hình báo lệch nhãn. Tên cơ sở nối thêm để phân biệt
-                  5 thẻ giống hệt nhau.
-
-                  Lịch học chung đã nói một lần ở phần mô tả đầu mục, nên không lặp lại
-                  trên cả 5 thẻ. Nhờ vậy CTA giữ được một hàng và đủ 44px để bấm trên điện thoại.
-                */}
-                <a
-                  href="#pricing"
-                  data-branch={branch.id}
-                  class="js-choose-branch gc-choice"
-                  aria-label={`Chọn cơ sở này – ${branch.name}`}
-                >
-                  Chọn cơ sở này
-                  <span class="gc-choice__go" aria-hidden="true">
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </span>
-                </a>
-              </div>
-            </div>
-          ))}
-
-          <!-- Thẻ Hotline tư vấn xếp lớp nhanh: lấp nửa cuối hàng 2 của lưới bento -->
-          <div class="lg:col-span-2 bg-brand-800 text-white p-5 rounded-card flex flex-col justify-between">
-            <div>
-              <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Hỗ trợ xếp lớp nhanh</span>
-              <h3 class="font-bold text-base mt-1 mb-2">Cần tư vấn kiểm tra trình độ đầu vào?</h3>
-              <p class="text-sm text-brand-200 leading-relaxed">
-                Liên hệ trực tiếp Hotline để bộ phận giáo vụ kiểm tra ca học đang mở sát với trình độ và khu vực nhà bạn nhất.
-              </p>
-            </div>
-            <div class="mt-4 pt-3 border-t border-brand-600 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-bold text-amber-400">
-              <a href={`tel:${BRAND_INFO.hotlines[0].replace(/\./g, "")}`} class="inline-flex min-h-11 items-center gap-1.5 hover:underline tabular-nums">
-                <Phone className="w-3.5 h-3.5" aria-hidden="true" /> Hotline 1: {BRAND_INFO.hotlines[0]}
-              </a>
-              <a href={`tel:${BRAND_INFO.hotlines[1].replace(/\./g, "")}`} class="inline-flex min-h-11 items-center gap-1.5 hover:underline tabular-nums">
-                <Phone className="w-3.5 h-3.5" aria-hidden="true" /> Hotline 2: {BRAND_INFO.hotlines[1]}
-              </a>
-            </div>
-          </div>
+                <div class="flex flex-1 flex-col p-5">
+                  <h3 class="font-display text-lg font-extrabold leading-tight tracking-[-0.015em] text-slate-900">{branch.name}</h3>
+                  <p class="mt-2 flex items-start gap-2 text-sm leading-relaxed text-slate-600">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" aria-hidden="true" />
+                    <span>{branch.address}</span>
+                  </p>
+                  <p class="flex items-center gap-2 text-sm text-slate-600">
+                    <Phone className="h-4 w-4 shrink-0 text-amber-700" aria-hidden="true" />
+                    <a
+                      href={`tel:${phone}`}
+                      class="inline-flex min-h-11 items-center font-semibold text-slate-900 tabular-nums hover:underline"
+                      aria-label={`Gọi ${branch.name}`}
+                    >
+                      {fmtPhone(phone)}
+                    </a>
+                    {!branch.phone && <span class="text-xs text-slate-500">Hotline chung</span>}
+                  </p>
+                  <div class="mt-auto flex flex-wrap items-center gap-2 pt-3">
+                    <a
+                      href={branch.mapUrl ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(branch.address)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex min-h-11 items-center gap-1.5 rounded-control border border-slate-300 bg-white px-3.5 text-sm font-bold text-brand-800 transition hover:border-brand-800 hover:bg-brand-50"
+                      aria-label={`Chỉ đường đến ${branch.name} (mở tab mới)`}
+                    >
+                      Chỉ đường <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                    </a>
+                    {/* Nhãn đọc được phải chứa đúng chữ hiển thị "Chọn cơ sở này"; tên cơ sở nối thêm để phân biệt các thẻ. */}
+                    <a
+                      href="#pricing"
+                      data-branch={branch.id}
+                      class="js-choose-branch inline-flex min-h-11 items-center gap-1.5 rounded-control bg-brand-800 px-3.5 text-sm font-bold text-white transition hover:bg-brand-900"
+                      aria-label={`Chọn cơ sở này – ${branch.name}`}
+                    >
+                      Chọn cơ sở này <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                    </a>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </div>
+
+        {/* Hotline xếp lớp: một dòng kẻ mảnh, không hộp, để không tranh với lưới cơ sở. */}
+        <aside
+          aria-label="Tư vấn xếp lớp"
+          class="mt-10 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 border-y border-slate-200 py-2 text-center text-[15px]"
+        >
+          <b class="font-display font-extrabold tracking-[-0.01em] text-slate-900">Chưa chắc chọn cơ sở nào?</b>
+          <span class="text-slate-500">Gọi giáo vụ để được xếp lớp:</span>
+          {BRAND_INFO.hotlines.map((hotline) => (
+            <a
+              href={`tel:${hotline}`}
+              class="inline-flex min-h-11 items-center gap-1.5 font-bold text-brand-800 tabular-nums hover:underline"
+            >
+              <Phone className="h-3.5 w-3.5 text-amber-700" aria-hidden="true" /> {fmtPhone(hotline)}
+            </a>
+          ))}
+        </aside>
       </div>
     </section>
 

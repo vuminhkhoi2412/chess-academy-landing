@@ -19,12 +19,16 @@ export const BRANCHES = [
     name: "Cơ sở Bình Phú (Q.6)",
     district: "Q.6",
     address: "811 Hậu Giang, P. Bình Phú, TP.HCM",
+    phone: "0963091208",
+    mapUrl: "https://maps.app.goo.gl/YytEekrXpzGey3Vy8",
   },
   {
     id: "CS2",
     name: "Cơ sở Tên Lửa (Bình Tân)",
     district: "Bình Tân",
     address: "55 Tên Lửa, P. An Lạc, TP.HCM",
+    phone: "0789059440",
+    mapUrl: "https://maps.app.goo.gl/emm1odKW2LF5TRsBA",
   },
   {
     id: "CS3",
@@ -37,12 +41,16 @@ export const BRANCHES = [
     name: "Cơ sở Phú Thọ Hoà (Tân Phú)",
     district: "Tân Phú",
     address: "152 Nguyễn Sơn, P. Phú Thọ Hoà, TP.HCM",
+    phone: "0963091208",
+    mapUrl: "https://maps.app.goo.gl/KyoRwD1YNjijWu5A6",
   },
   {
     id: "CS5",
     name: "Cơ sở Vinhomes Grand Park (TP. Thủ Đức)",
     district: "Thủ Đức",
-    address: "Khu đô thị Vinhomes Grand Park, TP.HCM",
+    address: "26 Manhattan, Vinhomes Grand Park, P. Long Bình, TP.HCM",
+    phone: "0888083936",
+    mapUrl: "https://maps.app.goo.gl/dfYh6WSBjjmdyQT67",
   },
 ];
 
