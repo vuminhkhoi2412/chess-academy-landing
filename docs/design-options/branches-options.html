@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global Chess – Thiết kế lại “Hệ thống các cơ sở”</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-950:#0b2136;--navy-900:#123350;--navy-800:#184268;--navy-600:#1f5285;--navy-200:#b6d0e8;--navy-50:#eef5fb;
+  --cream:#faf8f5;--paper:#fffdf9;--ink:#0f172a;--ink-2:#334155;--ink-3:#64748b;--rule:#e2e8f0;
+  --amber:#fbbf24;--amber-700:#b45309;--amber-800:#92400e;
+  --display:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;
+  --sans:"Be Vietnam Pro",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--sans);color:var(--ink);background:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit}
+svg{display:block}
+:focus-visible{outline:2px solid var(--amber-700);outline-offset:3px}
+ul,ol{list-style:none;padding:0}
+.wrap{max-width:72rem;margin:0 auto;padding:0 1rem}
+.num{font-variant-numeric:tabular-nums}
+
+/* khung xem trước */
+.bar{position:sticky;top:0;z-index:20;background:var(--navy-950);color:#fff}
+.bar .wrap{display:flex;gap:.25rem;align-items:center;flex-wrap:wrap;padding-block:.5rem}
+.bar b{font-family:var(--display);margin-right:auto;font-size:.9375rem}
+.bar button{padding:.5rem .875rem;font-size:.8125rem;font-weight:600;color:var(--navy-200);min-height:2.75rem;border-bottom:2px solid transparent}
+.bar button[aria-selected=true]{color:#fff;border-color:var(--amber)}
+.stage{padding:2.5rem 0 4rem}
+.note{font-size:.8125rem;color:var(--ink-3);max-width:50rem;margin-bottom:1.5rem}
+.note b{color:var(--ink)}
+.head{text-align:center;max-width:46rem;margin:0 auto 2.25rem}
+.eyebrow{display:inline-flex;align-items:center;gap:.5rem;font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber-700)}
+.eyebrow::before{content:"";width:1.25rem;height:2px;background:var(--amber)}
+.head h2{font-family:var(--display);font-weight:800;font-size:clamp(1.75rem,4vw,3rem);letter-spacing:-.02em;line-height:1.1;margin-top:.75rem}
+.head p{color:var(--ink-3);font-size:.9375rem;margin-top:.75rem}
+.ok{display:inline-flex;align-items:center;gap:.375rem;margin-top:.75rem;font-size:.75rem;font-weight:600;color:#047857}
+.ok::before{content:"";width:.375rem;height:.375rem;border-radius:50%;background:#10b981}
+
+/* ---------- dùng chung: dòng thông tin, badge, nút ---------- */
+/* Mỗi thông tin một dòng có icon: địa chỉ, điện thoại. Chỉ đường là nút ở chân thẻ. */
+.ln{display:flex;gap:.5rem;align-items:flex-start;font-size:.9375rem;color:var(--ink-3);margin-top:.5rem;line-height:1.45}
+.ln svg{width:1rem;height:1rem;flex:none;margin-top:.2rem;color:var(--amber-700)}
+.ln.tl{align-items:center}
+.ln.tl svg{margin-top:0}
+.ln.tl a{display:inline-flex;align-items:center;min-height:2.75rem;margin-block:-.5rem;color:var(--ink);font-weight:600;text-decoration:none}
+.ln.tl a:hover{text-decoration:underline}
+.ln.tl em{font-style:normal;font-size:.75rem;color:var(--ink-3);margin-left:.375rem;font-weight:500}
+.tags{display:inline-flex;gap:.25rem;align-items:center}
+.pill{font-size:.75rem;font-weight:700;color:var(--ink-2);background:#eceff3;border-radius:999px;padding:.125rem .625rem;line-height:1.5}
+.pill.soft{background:transparent;border:1px solid #d3d9e0;font-weight:600;color:var(--ink-3)}
+.go{display:inline-flex;align-items:center;gap:.375rem;min-height:2.75rem;padding:0 .875rem;border:1px solid #cbd5e1;border-radius:.5rem;background:#fff;font-size:.875rem;font-weight:700;color:var(--navy-800);text-decoration:none;transition:border-color .2s,background .2s}
+.go:hover{border-color:var(--navy-800);background:var(--navy-50)}
+.go svg{width:.875rem;height:.875rem}
+.call{display:inline-flex;align-items:center;gap:.375rem;min-height:2.75rem;padding:0 .875rem;border-radius:.5rem;background:var(--navy-800);color:#fff;font-size:.875rem;font-weight:700;text-decoration:none;transition:background .2s}
+.call:hover{background:var(--navy-900)}
+.call svg{width:.875rem;height:.875rem}
+.pick{display:inline-flex;align-items:center;gap:.5rem;min-height:2.75rem;padding:0 1.125rem;background:var(--navy-800);color:#fff;font-size:.875rem;font-weight:700;text-decoration:none;transition:background .2s}
+.pick:hover{background:var(--navy-900)}
+.pick::after{content:"→";transition:transform .2s}.pick:hover::after{transform:translateX(3px)}
+.acts{display:flex;flex-wrap:wrap;gap:.5rem}
+.st{display:inline-flex;align-items:center;gap:.375rem;font-size:.75rem;font-weight:600;color:#047857}
+.st::before{content:"";width:.375rem;height:.375rem;border-radius:50%;background:#10b981}
+
+/* ---------- banner hotline: tách hẳn khỏi lưới cơ sở ---------- */
+.hot{margin-top:2.5rem;display:grid;gap:1.25rem;align-items:center;background:var(--navy-800);color:#fff;border-radius:1.25rem;padding:1.5rem;position:relative;overflow:hidden}
+.hot .ic{width:3.25rem;height:3.25rem;border-radius:50%;background:#ffffff1f;display:grid;place-items:center;color:var(--amber)}
+.hot .ic svg{width:1.5rem;height:1.5rem}
+.hot small{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber)}
+.hot h3{font:800 1.375rem/1.2 var(--display);letter-spacing:-.015em;margin-top:.25rem}
+.hot p{font-size:.9375rem;color:var(--navy-200);margin-top:.375rem;max-width:48ch}
+.hot .cta{display:flex;flex-direction:column;gap:.375rem}
+.hot .big{display:inline-flex;justify-content:center;align-items:center;gap:.625rem;min-height:3.25rem;padding:0 1.5rem;background:var(--amber);color:var(--navy-950);font-weight:800;border-radius:.75rem;text-decoration:none;transition:background .2s}
+.hot .big:hover{background:#f59e0b}
+.hot .big svg{width:1.125rem;height:1.125rem}
+.hot .alt{text-align:center;font-size:.8125rem;color:var(--navy-200)}
+.hot .alt a{color:#fff;font-weight:600;display:inline-flex;min-height:2.75rem;align-items:center}
+@media(min-width:56rem){.hot{grid-template-columns:auto 1fr auto;gap:1.75rem;padding:1.75rem 2.25rem}}
+
+/* ---------- hiện tại (đối chiếu, giữ nguyên) ---------- */
+.cur{display:grid;gap:1.25rem}
+@media(min-width:40rem){.cur{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:64rem){.cur{grid-template-columns:repeat(4,1fr)}}
+.cur article{background:var(--cream);border:1px solid #e2e8f0e6;border-radius:.75rem;padding:1.25rem;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 1px 2px #44372b0a}
+@media(min-width:64rem){.cur article:first-child{grid-column:span 2}}
+.cur .t{display:flex;justify-content:space-between;margin-bottom:.75rem}
+.cur .t b{font-size:.75rem;font-weight:800;color:var(--amber-800);background:#fef3c7;padding:.25rem .625rem;border-radius:.375rem}
+.cur .t span{font-size:.75rem;font-weight:600;color:var(--ink-3);border:1px solid #cbd5e1;padding:.125rem .5rem;border-radius:.25rem}
+.cur h3{font-size:1rem;font-weight:700}.cur p{font-size:.875rem;color:var(--ink-3);margin-top:.25rem}
+.cur .f{border-top:1px solid #e2e8f0b3;margin-top:1rem;padding-top:.25rem;display:flex;flex-wrap:wrap;gap:0 .5rem;align-items:center}
+.cur .f a{display:inline-flex;min-height:2.75rem;align-items:center;font-size:.875rem;font-weight:600;color:var(--amber-800);text-decoration:underline;text-underline-offset:3px}
+.cur .f a.t2{color:var(--ink-2);text-decoration:none}
+.cur-hot{background:var(--navy-800)!important;color:#fff;border:0!important;border-radius:.75rem}
+@media(min-width:64rem){.cur-hot{grid-column:span 2}}
+.cur-hot h3{margin-top:.25rem}.cur-hot p{color:var(--navy-200)}
+
+/* ---------- A: chip chọn cơ sở + bìa sách ---------- */
+.a-sel{display:grid;gap:1.25rem .75rem}
+@media(min-width:40rem){.a-sel{grid-template-columns:1fr 1fr 2fr 1fr}}
+.a-grp{border-top:2px solid var(--navy-800);padding-top:.625rem}
+.a-grp h4{font-size:.875rem;font-weight:800;color:var(--navy-900);display:flex;justify-content:space-between;gap:.5rem}
+.a-grp h4 small{font-weight:500;font-size:.75rem;color:var(--ink-3)}
+.a-grp ol{display:flex;gap:.375rem;margin-top:.625rem}
+.a-grp li{flex:1}
+.a-grp button{width:100%;min-height:3.5rem;padding:.375rem .5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--rule);background:#fff;color:var(--ink-2);transition:background .2s,color .2s,border-color .2s}
+.a-grp button b{font:800 .9375rem var(--display);letter-spacing:-.01em}
+.a-grp button span{font-size:.6875rem;line-height:1.2;opacity:.8}
+.a-grp button:hover{border-color:var(--navy-800);color:var(--navy-800)}
+.a-grp button[aria-pressed=true]{background:var(--navy-800);border-color:var(--navy-800);color:#fff}
+.book{margin-top:1.5rem;display:grid;background:var(--paper);box-shadow:0 18px 40px -22px rgb(15 23 42/.35),0 2px 6px -2px rgb(15 23 42/.12)}
+.book .spine{background:var(--navy-800);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:.875rem 1.25rem}
+.book .code{font:800 2.5rem var(--display);letter-spacing:-.03em;line-height:1}
+.book .prog{font-size:.8125rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.book .page{padding:1.5rem 1.25rem 2rem}
+.book h3{font:800 clamp(1.625rem,4.4vw,2.5rem)/1.08 var(--display);letter-spacing:-.02em;text-wrap:balance;max-width:20ch}
+.book .goal{margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--rule)}
+.book .side{padding:1.25rem;border-top:1px dashed #cbd5e1;background:repeating-linear-gradient(#0000 0 1.75rem,rgb(226 232 240/.27) 1.75rem calc(1.75rem + 1px));display:flex;flex-direction:column;justify-content:flex-end;gap:.75rem}
+.book .big{font:800 1.5rem var(--display);letter-spacing:-.02em;color:var(--ink)}
+.book .big small{display:block;font:500 .75rem var(--sans);color:var(--ink-3);letter-spacing:0}
+@media(min-width:48rem){
+  .book{grid-template-columns:5.5rem 1fr 15rem}
+  .book .spine{flex-direction:column;padding:1.5rem .5rem}
+  .book .code{font-size:1.875rem}
+  .book .prog{writing-mode:vertical-rl;transform:rotate(180deg)}
+  .book .page{padding:2.5rem 2.75rem 3rem}
+  .book .side{border-top:0;border-left:1px dashed #cbd5e1;padding:2.5rem 1.75rem}
+}
+
+/* ---------- B: bảng chỉ mục ---------- */
+.b-list{border-top:2px solid var(--navy-800)}
+.b-list li{display:grid;gap:.5rem 1.25rem;padding:1.25rem .25rem;border-bottom:1px solid var(--rule);transition:background .2s}
+.b-list li:hover{background:var(--navy-50)}
+.b-list .n{font:800 2rem/1 var(--display);letter-spacing:-.03em;color:var(--navy-800)}
+.b-list .d{font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--amber-700)}
+.b-list h3{font:800 1.25rem/1.2 var(--display);letter-spacing:-.015em;margin-top:.125rem}
+@media(min-width:48rem){
+  .b-list li{grid-template-columns:4rem 1fr auto;align-items:center;padding-inline:.5rem}
+  .b-list .acts{justify-content:flex-end}
+}
+
+/* ---------- C: vé (5 vé, hotline đã ra banner riêng) ---------- */
+.c-grid{display:grid;gap:1.25rem}
+@media(min-width:40rem){.c-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:64rem){.c-grid{grid-template-columns:repeat(3,1fr)}}
+.tk{display:flex;flex-direction:column;background:var(--paper);box-shadow:0 18px 40px -26px rgb(15 23 42/.4),0 2px 6px -2px rgb(15 23 42/.12)}
+.tk .stub{background:var(--navy-800);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:.75rem 1.25rem}
+.tk .stub b{font:800 1.75rem var(--display);letter-spacing:-.03em;line-height:1}
+.tk .stub span{font-size:.75rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.tk .tear{position:relative;height:0;border-top:1px dashed #cbd5e1}
+.tk .tear::before,.tk .tear::after{content:"";position:absolute;top:-.5rem;width:1rem;height:1rem;border-radius:50%;background:var(--cream)}
+.tk .tear::before{left:-.5rem}.tk .tear::after{right:-.5rem}
+.tk .body{padding:1.125rem 1.25rem 1.25rem;flex:1;display:flex;flex-direction:column}
+.tk h3{font:800 1.1875rem/1.2 var(--display);letter-spacing:-.015em}
+.tk .acts{margin-top:auto;padding-top:1rem}
+
+/* ---------- D: cột theo khu vực ---------- */
+.d-cols{display:grid;gap:2rem 1.5rem}
+@media(min-width:48rem){.d-cols{grid-template-columns:1fr 1fr 2fr 1fr}}
+.d-col{border-top:2px solid var(--navy-800);padding-top:.75rem}
+.d-col>h4{display:flex;justify-content:space-between;align-items:baseline;font:800 1.125rem var(--display);letter-spacing:-.01em;color:var(--navy-900)}
+.d-col>h4 small{font:500 .75rem var(--sans);color:var(--ink-3)}
+.d-in{display:grid;gap:1.25rem 1.5rem;margin-top:.75rem}
+@media(min-width:48rem){.d-col.two .d-in{grid-template-columns:1fr 1fr}}
+.d-br{padding-top:.75rem;border-top:1px solid var(--rule);display:flex;flex-direction:column}
+.d-br h5{font:700 1rem/1.3 var(--sans);margin-top:.5rem}
+.d-br .acts{margin-top:.75rem}
+
+/* ---------- E: thẻ có ảnh (Hướng 1) ---------- */
+.e-grid{display:grid;gap:1.25rem}
+@media(min-width:40rem){.e-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:64rem){.e-grid{grid-template-columns:repeat(3,1fr)}}
+.e-card{display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--rule);border-radius:1rem;overflow:hidden;box-shadow:0 1px 2px #44372b0a;transition:box-shadow .2s,border-color .2s}
+.e-card:hover{border-color:#cbd5e1;box-shadow:0 14px 30px -20px rgb(15 23 42/.35)}
+/* Chỗ đặt ảnh: chưa có ảnh thật gắn với từng cơ sở, nên đây là khung giữ chỗ 16:9, không phải ảnh stock. */
+.ph{position:relative;aspect-ratio:16/9;background:repeating-conic-gradient(#eef5fb 0 25%,#e2edf7 0 50%) 0 0/2.25rem 2.25rem;display:grid;place-items:center;color:var(--navy-600)}
+.ph span.l{font-size:.75rem;font-weight:600;background:#fffc;padding:.25rem .625rem;border-radius:999px}
+.ph .tg{position:absolute;left:.75rem;top:.75rem;display:flex;gap:.25rem}
+.ph .tg .pill{background:#fff;box-shadow:0 1px 2px #0f172a1f}
+.e-card .body{padding:1.125rem 1.25rem 1.25rem;display:flex;flex-direction:column;flex:1}
+.e-card h3{font:800 1.1875rem/1.2 var(--display);letter-spacing:-.015em;margin-top:.5rem}
+.e-card .acts{margin-top:auto;padding-top:1rem}
+
+/* ---------- F: bản đồ + danh sách (Hướng 2) ---------- */
+.f-wrap{display:grid;gap:1.5rem}
+@media(min-width:56rem){.f-wrap{grid-template-columns:2fr 3fr;align-items:start}}
+.f-list{display:flex;flex-direction:column;gap:.75rem}
+.f-item{border:1px solid var(--rule);border-radius:.875rem;background:#fff9;transition:border-color .2s,background .2s,box-shadow .2s}
+.f-item.on{border-color:var(--navy-800);background:#fff;box-shadow:0 12px 28px -20px rgb(15 23 42/.45)}
+.f-pick{display:block;width:100%;text-align:left;padding:.875rem 1rem .25rem}
+.f-pick h3{font:800 1.0625rem/1.25 var(--display);letter-spacing:-.01em;margin-top:.375rem}
+.f-item .in{padding:0 1rem .875rem}
+.f-item .acts{margin-top:.5rem}
+.f-map{border:0;width:100%;height:26rem;border-radius:1rem;background:var(--navy-50);box-shadow:0 1px 2px #44372b0a}
+@media(min-width:56rem){.f-map{position:sticky;top:4.5rem;height:34rem}}
+.f-cta{margin-top:.25rem;display:flex;gap:.875rem;align-items:center;background:var(--navy-800);color:#fff;border-radius:1rem;padding:1rem 1.125rem}
+.f-cta .ic{width:2.5rem;height:2.5rem;flex:none;border-radius:50%;background:#ffffff1f;display:grid;place-items:center;color:var(--amber)}
+.f-cta .ic svg{width:1.25rem;height:1.25rem}
+.f-cta b{display:block;font-size:.875rem}
+.f-cta a{display:inline-flex;align-items:center;min-height:2.75rem;color:var(--amber);font-weight:800;text-decoration:none}
+.f-cta a:hover{text-decoration:underline}
+
+/* ---------- G: banner hotline gọn ---------- */
+.g-item{margin-top:2rem}
+.g-item>h4{font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:.625rem}
+.g-item>h4 b{color:var(--ink)}
+.g-item .hot{margin-top:0}
+/* 1: thanh navy một hàng */
+.hb1{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem 1rem;background:var(--navy-800);color:#fff;border-radius:.875rem;padding:.75rem .75rem .75rem 1rem}
+.hb1 .ic{width:2.25rem;height:2.25rem;flex:none;border-radius:50%;background:#ffffff1f;display:grid;place-items:center;color:var(--amber)}
+.hb1 .ic svg{width:1.125rem;height:1.125rem}
+.hb1 .tx{flex:1 1 14rem;min-width:0}
+.hb1 b{display:block;font:800 1rem/1.25 var(--display);letter-spacing:-.01em}
+.hb1 small{display:block;font-size:.8125rem;color:var(--navy-200)}
+.hb1 .big{display:inline-flex;align-items:center;gap:.5rem;min-height:2.75rem;padding:0 1.125rem;background:var(--amber);color:var(--navy-950);font-weight:800;border-radius:.625rem;text-decoration:none}
+.hb1 .big:hover{background:#f59e0b}
+.hb1 .big svg{width:1rem;height:1rem}
+.hb1 .alt{display:inline-flex;align-items:center;min-height:2.75rem;font-size:.8125rem;color:var(--navy-200);text-decoration:underline}
+/* 2: nền sáng, viền amber, hai số là hai nút */
+.hb2{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem 1rem;background:#fff7e0;border:1px solid #f3dca0;border-radius:.875rem;padding:.875rem 1rem}
+.hb2 .ic{width:2.25rem;height:2.25rem;flex:none;border-radius:50%;background:var(--amber);display:grid;place-items:center;color:var(--navy-950)}
+.hb2 .ic svg{width:1.125rem;height:1.125rem}
+.hb2 .tx{flex:1 1 14rem}
+.hb2 b{display:block;font:800 1rem/1.25 var(--display);letter-spacing:-.01em}
+.hb2 small{display:block;font-size:.8125rem;color:var(--ink-3)}
+.hb2 a{display:inline-flex;align-items:center;gap:.5rem;min-height:2.75rem;padding:0 1rem;border-radius:.625rem;font-weight:700;font-size:.875rem;text-decoration:none;background:#fff;border:1px solid #e5cf8f;color:var(--ink)}
+.hb2 a:hover{border-color:var(--amber-700)}
+.hb2 a svg{width:.875rem;height:.875rem;color:var(--amber-700)}
+/* 3: một dòng, không hộp */
+.hb3{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.25rem 1.25rem;border-block:1px solid var(--rule);padding:.5rem 0;font-size:.9375rem;text-align:center}
+.hb3 b{font-family:var(--display);font-weight:800;letter-spacing:-.01em}
+.hb3 span{color:var(--ink-3)}
+.hb3 a{display:inline-flex;align-items:center;gap:.375rem;min-height:2.75rem;font-weight:700;color:var(--navy-800);text-decoration:none}
+.hb3 a:hover{text-decoration:underline}
+.hb3 a svg{width:.9375rem;height:.9375rem;color:var(--amber-700)}
+/* 4: viên thuốc ở giữa, dưới lưới */
+.hb4w{display:flex;justify-content:center}
+.hb4{display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:.5rem 1rem;background:var(--navy-800);color:#fff;border-radius:2rem;padding:.375rem .375rem .375rem 1.25rem}
+.hb4 b{font:800 .9375rem var(--display);letter-spacing:-.01em}
+.hb4 a{display:inline-flex;align-items:center;gap:.5rem;min-height:2.75rem;padding:0 1.125rem;background:var(--amber);color:var(--navy-950);font-weight:800;font-size:.9375rem;border-radius:2rem;text-decoration:none}
+.hb4 a:hover{background:#f59e0b}
+.hb4 a svg{width:1rem;height:1rem}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap" role="tablist" aria-label="Phương án">
+  <b>Hệ thống các cơ sở</b>
+  <button role="tab" data-v="cur" aria-selected="true">Hiện tại</button>
+  <button role="tab" data-v="a" aria-selected="false">A · Chip + bìa sách</button>
+  <button role="tab" data-v="b" aria-selected="false">B · Bảng chỉ mục</button>
+  <button role="tab" data-v="c" aria-selected="false">C · Vé</button>
+  <button role="tab" data-v="d" aria-selected="false">D · Cột khu vực</button>
+  <button role="tab" data-v="e" aria-selected="false">E · Thẻ có ảnh</button>
+  <button role="tab" data-v="f" aria-selected="false">F · Bản đồ + danh sách</button>
+  <button role="tab" data-v="g" aria-selected="false">G · Hotline gọn</button>
+</div></header>
+
+<main class="stage"><div class="wrap">
+  <p class="note" id="note"></p>
+  <div class="head">
+    <span class="eyebrow">Hệ thống phòng học tiêu chuẩn</span>
+    <h2>Hệ thống các cơ sở</h2>
+    <p>Các ca học trong tuần và cuối tuần được tổ chức linh hoạt theo trình độ của học viên tại từng cơ sở.</p>
+    <span class="ok">Cả 5 cơ sở đang tuyển sinh</span>
+  </div>
+  <div id="stage"></div>
+</div></main>
+
+<script>
+/* Dữ liệu lấy đúng từ src/data/courses.ts. CS3 (Tây Thạnh) chưa có SĐT riêng và link Maps. */
+const B = [
+  {id:"CS1",n:1,name:"Cơ sở Bình Phú (Q.6)",short:"Bình Phú",dist:"Q.6",addr:"811 Hậu Giang, P. Bình Phú, TP.HCM",phone:"0963091208",map:"https://maps.app.goo.gl/YytEekrXpzGey3Vy8"},
+  {id:"CS2",n:2,name:"Cơ sở Tên Lửa (Bình Tân)",short:"Tên Lửa",dist:"Bình Tân",addr:"55 Tên Lửa, P. An Lạc, TP.HCM",phone:"0789059440",map:"https://maps.app.goo.gl/emm1odKW2LF5TRsBA"},
+  {id:"CS3",n:3,name:"Cơ sở Tây Thạnh (Tân Phú)",short:"Tây Thạnh",dist:"Tân Phú",addr:"93 đường T6, P. Tây Thạnh, TP.HCM"},
+  {id:"CS4",n:4,name:"Cơ sở Phú Thọ Hoà (Tân Phú)",short:"Phú Thọ Hoà",dist:"Tân Phú",addr:"152 Nguyễn Sơn, P. Phú Thọ Hoà, TP.HCM",phone:"0963091208",map:"https://maps.app.goo.gl/KyoRwD1YNjijWu5A6"},
+  {id:"CS5",n:5,name:"Cơ sở Vinhomes Grand Park (TP. Thủ Đức)",short:"Grand Park",dist:"Thủ Đức",addr:"26 Manhattan, Vinhomes Grand Park, P. Long Bình, TP.HCM",phone:"0888083936",map:"https://maps.app.goo.gl/dfYh6WSBjjmdyQT67"},
+];
+const DISTS = ["Q.6","Bình Tân","Tân Phú","Thủ Đức"];
+const HOT = ["0789059440","0963848430"];
+
+const svg = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const I = {
+  pin:  svg('<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>'),
+  phone:svg('<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/>'),
+  ext:  svg('<path d="M7 17 17 7M8 7h9v9"/>'),
+  head: svg('<path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 16a2 2 0 0 1-2 2h-1v-6h3ZM3 16a2 2 0 0 0 2 2h1v-6H3Z"/><path d="M21 18v1a3 3 0 0 1-3 3h-4"/>'),
+};
+const fmt = p => p.replace(/(\d{4})(\d{3})(\d{3})/, "$1 $2 $3");
+const mapHref = b => b.map || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.addr)}`;
+
+/* Một dòng một thông tin. Cơ sở chưa có SĐT riêng thì hiện hotline chung, có ghi chú. */
+const addrLn  = b => `<p class="ln">${I.pin}<span>${b.addr}</span></p>`;
+const phoneLn = b => `<p class="ln tl">${I.phone}<a href="tel:${b.phone||HOT[0]}" class="num" aria-label="Gọi ${b.name}">${fmt(b.phone||HOT[0])}</a>${b.phone?"":"<em>Hotline chung</em>"}</p>`;
+const go   = b => `<a class="go" href="${mapHref(b)}" target="_blank" rel="noopener noreferrer" aria-label="Chỉ đường đến ${b.name} (mở tab mới)">Chỉ đường ${I.ext}</a>`;
+const call = b => `<a class="call num" href="tel:${b.phone||HOT[0]}" aria-label="Gọi ${b.name}">${I.phone} Gọi</a>`;
+const pick = b => `<a class="pick" href="#pricing" aria-label="Chọn cơ sở này – ${b.name}">Chọn cơ sở này</a>`;
+const tags = b => `<span class="tags"><span class="pill">Cơ sở ${b.n}</span><span class="pill soft">${b.dist}</span></span>`;
+
+/* Banner hotline: nằm ngoài lưới, to hơn thẻ cơ sở, có icon và nút gọi nổi để không nhầm là “cơ sở 6”. */
+const HOTBANNER = `<aside class="hot" aria-label="Tư vấn xếp lớp">
+  <div class="ic">${I.head}</div>
+  <div><small>Hỗ trợ xếp lớp nhanh</small><h3>Cần tư vấn kiểm tra trình độ đầu vào?</h3>
+    <p>Giáo vụ kiểm tra ca học đang mở sát với trình độ và khu vực nhà bạn nhất.</p></div>
+  <div class="cta"><a class="big num" href="tel:${HOT[0]}">${I.phone} Gọi hotline tư vấn ngay</a>
+    <span class="alt">Hotline 1: <a class="num" href="tel:${HOT[0]}">${fmt(HOT[0])}</a> · Hotline 2: <a class="num" href="tel:${HOT[1]}">${fmt(HOT[1])}</a></span></div></aside>`;
+
+const $ = s => document.querySelector(s);
+let view = "cur", sel = "CS1";
+
+const NOTES = {
+  cur:"<b>Hiện tại.</b> Để đối chiếu. Các vấn đề được nêu: thẻ hotline cùng cỡ và cùng hàng với thẻ cơ sở nên dễ nhầm là “cơ sở 6”; “Chỉ đường” và số điện thoại dính liền một dòng; không có ảnh.",
+  a:"<b>A · Chip + bìa sách.</b> Cơ chế của Lộ trình: chip chọn gom theo khu vực, bìa sách hiện cơ sở đang chọn. Địa chỉ, điện thoại tách dòng có icon; “Chỉ đường” là nút riêng. Hotline là banner riêng bên dưới. Đổi lại: mỗi lúc chỉ thấy đầy đủ một cơ sở.",
+  b:"<b>B · Bảng chỉ mục.</b> Mỗi cơ sở một hàng, số 01–05 lớn. Thấy hết 5 cơ sở cùng lúc; mỗi hàng có nút Chỉ đường và “Chọn cơ sở này”.",
+  c:"<b>C · Vé.</b> 5 tấm vé navy có đường xé. Vé hotline đã bị rút khỏi lưới (feedback #1), nên hàng dưới còn 2 vé và một khoảng trống bên phải; banner hotline nằm ngay dưới.",
+  d:"<b>D · Cột theo khu vực.</b> Gom theo quận (Q.6 · Bình Tân · Tân Phú · Thủ Đức), không thẻ. Badge “Cơ sở n” và quận đứng cạnh nhau, nền xám nhạt bo tròn.",
+  e:"<b>E · Thẻ có ảnh (Hướng 1).</b> Mỗi thẻ có khung ảnh 16:9, tag khu vực nổi ở góc ảnh, hai nút Chỉ đường / Gọi ở chân thẻ, và tag “Đang tuyển sinh”. <b>Khung ảnh đang là chỗ giữ chỗ</b>: hiện chưa có ảnh thật gắn với từng cơ sở (gallery hiện tại không ghi ảnh chụp ở đâu), nên cần trung tâm chụp hoặc gửi ảnh mặt tiền / phòng học từng cơ sở. Tag “Đang tuyển sinh” lặp ở cả 5 thẻ và đã được bỏ trước đây vì không thêm thông tin; ở đây theo feedback nên để lại để bạn quyết định.",
+  f:"<b>F · Bản đồ + danh sách (Hướng 2).</b> Trái 40%: danh sách 5 cơ sở; phải 60%: Google Maps. Bấm một cơ sở thì bản đồ chuyển tới địa chỉ đó. Bản nhúng này tìm theo địa chỉ chữ và chỉ hiện <b>một ghim tại một thời điểm</b>; ghim đủ 5 cơ sở trên cùng một bản đồ cần tạo My Maps hoặc dùng Maps JavaScript API (có khoá API). CTA hotline là hộp nhỏ ở chân danh sách.",
+  g:"<b>G · Box “Hỗ trợ xếp lớp nhanh” gọn hơn.</b> Hộp hiện tại cao ~170px vì có đoạn mô tả và hai số hotline phụ. Bốn hướng dưới đây đều bỏ đoạn mô tả (ý đã có ở tiêu đề), giữ một nút gọi chính; số thứ hai chuyển thành link nhỏ hoặc nút phụ. 1: thanh navy một hàng. 2: nền sáng, hai số là hai nút. 3: một dòng không hộp. 4: viên thuốc ở giữa. Các hướng được vẽ riêng, không đặt trong trang đầy đủ.",
+};
+const VIEWS = {
+  cur: () => `<div class="cur">${B.map(b=>`<article><div><div class="t"><b>Cơ sở ${b.n}</b><span>${b.dist}</span></div>
+      <h3>${b.name}</h3><p>${b.addr}</p></div><div class="f"><a href="${mapHref(b)}" target="_blank" rel="noopener noreferrer">Chỉ đường</a>${b.phone?`<a class="t2 num" href="tel:${b.phone}">${b.phone}</a>`:""}</div></article>`).join("")}
+    <article class="cur-hot"><div><small style="font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber)">Hỗ trợ xếp lớp nhanh</small>
+    <h3>Cần tư vấn kiểm tra trình độ đầu vào?</h3><p>Liên hệ Hotline để giáo vụ kiểm tra ca học đang mở.</p></div>
+    <div class="f" style="border-color:#5b8ec0">${HOT.map(h=>`<a class="num" style="color:var(--amber)" href="tel:${h}">${h}</a>`).join("")}</div></article></div>`,
+
+  a: () => {
+    const b = B.find(x=>x.id===sel);
+    return `<div class="a-sel">${DISTS.map(d=>`<div class="a-grp"><h4>${d}<small>${B.filter(x=>x.dist===d).length} cơ sở</small></h4><ol>${
+      B.filter(x=>x.dist===d).map(x=>`<li><button type="button" data-id="${x.id}" aria-pressed="${x.id===sel}"><b>${x.id}</b><span>${x.short}</span></button></li>`).join("")}</ol></div>`).join("")}</div>
+    <article class="book" aria-live="polite">
+      <div class="spine"><span class="code">${b.id}</span><span class="prog">${b.dist}</span></div>
+      <div class="page"><h3>${b.name}</h3>${addrLn(b)}${phoneLn(b)}<div class="goal">${go(b)}</div></div>
+      <div class="side"><div class="big num">${fmt(b.phone||HOT[0])}<small>${b.phone?"SĐT cơ sở":"Hotline chung (cơ sở chưa có SĐT riêng)"}</small></div>${pick(b)}</div>
+    </article>${HOTBANNER}`;
+  },
+
+  b: () => `<ol class="b-list">${B.map(b=>`<li><span class="n num">0${b.n}</span>
+      <div>${tags(b)}<h3>${b.name}</h3>${addrLn(b)}${phoneLn(b)}</div>
+      <div class="acts">${go(b)}${pick(b)}</div></li>`).join("")}</ol>${HOTBANNER}`,
+
+  c: () => `<div class="c-grid">${B.map(b=>`<article class="tk"><div class="stub"><b class="num">CS${b.n}</b><span>${b.dist}</span></div><div class="tear"></div>
+      <div class="body"><h3>${b.name}</h3>${addrLn(b)}${phoneLn(b)}<div class="acts">${go(b)}</div></div></article>`).join("")}</div>${HOTBANNER}`,
+
+  d: () => `<div class="d-cols">${DISTS.map(d=>{
+    const list = B.filter(x=>x.dist===d);
+    return `<section class="d-col${list.length>1?" two":""}"><h4>${d}<small>${list.length} cơ sở</small></h4><div class="d-in">${
+      list.map(b=>`<div class="d-br">${tags(b)}<h5>${b.name.replace(/^Cơ sở /,"").replace(/ \(.*\)$/,"")}</h5>${addrLn(b)}${phoneLn(b)}
+      <div class="acts">${go(b)}</div></div>`).join("")}</div></section>`;}).join("")}</div>${HOTBANNER}`,
+
+  e: () => `<div class="e-grid">${B.map(b=>`<article class="e-card">
+      <div class="ph" role="img" aria-label="Chỗ đặt ảnh ${b.name}"><div class="tg"><span class="pill">Cơ sở ${b.n}</span><span class="pill">${b.dist}</span></div><span class="l">Ảnh ${b.short} · chờ ảnh thật</span></div>
+      <div class="body"><span class="st">Đang tuyển sinh</span><h3>${b.name}</h3>${addrLn(b)}${phoneLn(b)}
+      <div class="acts">${go(b)}${call(b)}</div></div></article>`).join("")}</div>${HOTBANNER}`,
+
+  f: () => {
+    const b = B.find(x=>x.id===sel);
+    return `<div class="f-wrap"><div class="f-list"><ol class="f-list" style="gap:.75rem">${B.map(x=>`<li class="f-item${x.id===sel?" on":""}">
+        <button type="button" class="f-pick" data-id="${x.id}" aria-pressed="${x.id===sel}">${tags(x)}<h3>${x.name}</h3></button>
+        <div class="in">${addrLn(x)}${phoneLn(x)}<div class="acts">${go(x)}${call(x)}</div></div></li>`).join("")}</ol>
+      <div class="f-cta"><div class="ic">${I.head}</div><div><b>Cần tư vấn xếp lớp?</b><a class="num" href="tel:${HOT[0]}">Gọi ${fmt(HOT[0])}</a></div></div></div>
+      <iframe class="f-map" title="Bản đồ ${b.name}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+        src="https://maps.google.com/maps?q=${encodeURIComponent(b.addr)}&z=16&output=embed"></iframe></div>`;
+  },
+
+  g: () => `
+    <div class="g-item"><h4><b>Hiện tại</b> · banner đầy đủ</h4>${HOTBANNER}</div>
+    <div class="g-item"><h4><b>1</b> · Thanh navy một hàng</h4>
+      <div class="hb1"><span class="ic">${I.head}</span><div class="tx"><b>Cần tư vấn xếp lớp?</b><small>Giáo vụ chọn ca phù hợp trình độ và khu vực nhà bạn.</small></div>
+        <a class="big num" href="tel:${HOT[0]}">${I.phone} Gọi ${fmt(HOT[0])}</a><a class="alt num" href="tel:${HOT[1]}">hoặc ${fmt(HOT[1])}</a></div></div>
+    <div class="g-item"><h4><b>2</b> · Nền sáng, hai số là hai nút</h4>
+      <div class="hb2"><span class="ic">${I.head}</span><div class="tx"><b>Cần tư vấn xếp lớp?</b><small>Gọi giáo vụ để kiểm tra ca đang mở.</small></div>
+        <a class="num" href="tel:${HOT[0]}">${I.phone} Hotline 1 · ${fmt(HOT[0])}</a><a class="num" href="tel:${HOT[1]}">${I.phone} Hotline 2 · ${fmt(HOT[1])}</a></div></div>
+    <div class="g-item"><h4><b>3</b> · Một dòng, không hộp</h4>
+      <div class="hb3"><b>Chưa chắc chọn cơ sở nào?</b><span>Gọi giáo vụ để được xếp lớp:</span>
+        <a class="num" href="tel:${HOT[0]}">${I.phone} ${fmt(HOT[0])}</a><a class="num" href="tel:${HOT[1]}">${I.phone} ${fmt(HOT[1])}</a></div></div>
+    <div class="g-item"><h4><b>4</b> · Viên thuốc ở giữa, dưới lưới</h4>
+      <div class="hb4w"><div class="hb4"><b>Cần tư vấn xếp lớp?</b><a class="num" href="tel:${HOT[0]}">${I.phone} ${fmt(HOT[0])}</a></div></div></div>`,
+};
+
+function render(){
+  $("#note").innerHTML = NOTES[view];
+  $("#stage").innerHTML = VIEWS[view]();
+}
+$("#stage").addEventListener("click", e => {
+  const x = e.target.closest("[data-id]"); if(!x) return;
+  sel = x.dataset.id; render(); $(`[data-id="${sel}"]`).focus();
+});
+document.querySelectorAll(".bar [data-v]").forEach(t => t.addEventListener("click", () => {
+  view = t.dataset.v;
+  document.querySelectorAll(".bar [data-v]").forEach(x => x.setAttribute("aria-selected", x === t));
+  render();
+}));
+render();
+</script>
+</body>
+</html>
