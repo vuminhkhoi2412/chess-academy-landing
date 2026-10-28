@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global Chess – Xem trước sửa 4 lỗi mức High theo Apple HIG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-950:#0b2136;--navy-900:#123350;--navy-800:#184268;--navy-700:#1b4a76;--navy-600:#1f5285;--navy-300:#8fb4d6;--navy-200:#b6d0e8;--navy-100:#d9e8f5;--navy-50:#eef5fb;
+  --cream:#faf8f5;--ink:#0f172a;--ink-2:#334155;--ink-3:#475569;--ink-4:#64748b;--rule:#e2e8f0;
+  --amber-400:#fbbf24;--amber-500:#f59e0b;--amber-600:#d97706;--amber-700:#b45309;
+  --display:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;
+  --sans:"Be Vietnam Pro",system-ui,sans-serif;
+  --card:1.125rem;--ctl:.75rem;
+  --soft:0 1px 2px rgb(68 55 43/.04),0 8px 24px -12px rgb(68 55 43/.16);
+}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--sans);color:var(--ink);background:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit}
+.wrap{max-width:72rem;margin:0 auto;padding:0 1rem}
+
+/* ---- khung xem trước (không thuộc thiết kế) ---- */
+.bar{position:sticky;top:0;z-index:20;background:var(--navy-950);color:#fff}
+.bar .wrap{display:flex;gap:.25rem 1rem;align-items:center;flex-wrap:wrap;padding-block:.5rem}
+.bar b{font-family:var(--display);margin-right:auto;font-size:.9375rem}
+.bar button{padding:.5rem .875rem;font-size:.8125rem;font-weight:600;color:var(--navy-200);min-height:2.75rem;border-bottom:2px solid transparent}
+.bar button[aria-selected=true]{color:#fff;border-color:var(--amber-400)}
+.bar button:focus-visible{outline:2px solid var(--amber-400);outline-offset:2px}
+.note{font-size:.875rem;color:var(--ink-3);max-width:60rem;padding:1.5rem 0 1rem}
+.note b{color:var(--ink)}
+.note code,.snip{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8125rem}
+.note code{background:#f1ede6;padding:.05rem .35rem;border-radius:.3rem}
+.snip{background:var(--navy-950);color:var(--navy-100);border-radius:var(--ctl);padding:.875rem 1rem;overflow-x:auto;white-space:pre;line-height:1.55;margin-top:.75rem}
+h2.t{font-family:var(--display);font-weight:800;font-size:1.5rem;letter-spacing:-.02em;line-height:1.15;color:var(--ink)}
+.cmp{display:grid;gap:1.25rem;margin:1rem 0 2rem}
+@media(min-width:56rem){.cmp{grid-template-columns:1fr 1fr}}
+.col>h3{font-size:.8125rem;font-weight:700;letter-spacing:.02em;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;color:var(--ink-2)}
+.tag{font-size:.75rem;font-weight:700;padding:.25rem .75rem;border-radius:9999px}
+.tag.bad{background:#fee2e2;color:#991b1b}.tag.ok{background:#d1fae5;color:#065f46}
+.stage{border:1px solid var(--rule);border-radius:var(--card);overflow:hidden;background:#fff}
+.pad{padding:1.25rem}
+.m{font-size:.8125rem;color:var(--ink-3);margin-top:.5rem}
+.m b{color:var(--ink)}
+.pass{color:#047857;font-weight:700}.fail{color:#b91c1c;font-weight:700}
+.panel[hidden]{display:none}
+
+/* ---- thành phần mô phỏng trang thật ---- */
+.btn{display:inline-flex;align-items:center;min-height:2.75rem;padding:0 1rem;border-radius:var(--ctl);font-size:.875rem;font-weight:700;text-decoration:none;border:1px solid var(--rule);background:#fff;color:var(--navy-800)}
+.btn.navy{background:var(--navy-800);color:#fff;border-color:transparent}
+.btn.amber{background:var(--amber-500);color:#020617;border-color:transparent}
+.row{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center}
+.surf-cream{background:var(--cream)}.surf-white{background:#fff}.surf-navy{background:var(--navy-800);color:#fff}
+
+/* H1: vòng focus. --ring đặt theo từng phương án và từng nền. */
+.rings :is(.btn,a.lnk,.fld){outline:3px solid var(--ring);outline-offset:2px}   /* luôn hiện để so sánh */
+.rings.live :is(.btn,a.lnk,.fld){outline:none}
+.rings.live :is(.btn,a.lnk,.fld):focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+.cur-ring{--ring:var(--amber-500)}
+.new-ring{--ring:var(--navy-800)}
+.new-ring .surf-navy{--ring:var(--amber-400)}
+a.lnk{font-weight:600;color:var(--navy-800);text-underline-offset:3px}
+.fld{display:block;width:100%;max-width:16rem;min-height:2.75rem;padding:0 .75rem;border:1px solid #cbd5e1;border-radius:var(--ctl);font:inherit;font-size:.9375rem;background:#fff}
+.chk{display:flex;gap:1rem;flex-wrap:wrap;margin:.75rem 0 0}
+
+/* H2: chữ xám */
+.cap-cur{font-size:.75rem;line-height:1.6;color:var(--ink-4)}
+.cap-new{font-size:.8125rem;line-height:1.6;color:var(--ink-3)}
+
+/* H3: màu hổ phách */
+.eb{display:inline-flex;align-items:center;gap:.625rem;font-size:.9375rem;font-weight:600;letter-spacing:-.005em}
+.eb::before{content:"";width:1.75rem;height:2px;border-radius:999px}
+.cur-amb .eb{color:var(--amber-700)}.cur-amb .eb::before{background:var(--amber-500)}
+.new-amb .eb{color:var(--ink-2)}.new-amb .eb::before{background:var(--navy-300)}
+.mock h4{font-family:var(--display);font-weight:800;font-size:1.75rem;line-height:1.1;letter-spacing:-.02em;margin:.6rem 0 .75rem}
+.mock h4 .l2{display:block}
+.cur-amb .l2{color:var(--amber-600)}.new-amb .l2{color:var(--navy-600)}
+.info{display:grid;gap:.5rem;margin:1rem 0;font-size:.875rem;color:var(--ink-3)}
+.info p{display:flex;gap:.5rem;align-items:flex-start}
+.info svg{flex:none;width:1rem;height:1rem;margin-top:.2rem}
+.cur-amb .info svg{color:var(--amber-700)}.new-amb .info svg{color:var(--ink-4)}
+.faq{display:flex;gap:.5rem;align-items:flex-start;border-top:1px solid var(--rule);padding:.875rem 0;font-weight:700;font-size:.9375rem}
+.faq svg{flex:none;width:1rem;height:1rem;margin-top:.25rem}
+.cur-amb .faq svg:first-child{color:var(--amber-600)}.new-amb .faq svg:first-child{color:var(--ink-4)}
+.faq span{flex:1}
+.ribbon{font-size:.6875rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;background:var(--amber-500);color:#020617;border-radius:.375rem;padding:.25rem .75rem;margin-left:.5rem}
+.legend{display:flex;gap:.5rem 1rem;flex-wrap:wrap;margin-top:.75rem;font-size:.8125rem;color:var(--ink-3)}
+.legend i{display:inline-block;width:.75rem;height:.75rem;border-radius:3px;background:var(--amber-500);vertical-align:-1px;margin-right:.35rem}
+
+/* H4: giao diện tối / tương phản cao / giảm trong suốt.
+   Mọi giá trị đi qua biến; phần xem trước đổi bằng data-attr, trang thật dùng media query. */
+.pv{--bg:var(--cream);--card-bg:#fff;--tx:var(--ink);--tx2:var(--ink-3);--line:var(--rule);--hdr:rgb(250 248 245/.95);--blur:blur(12px);--accent-tx:var(--amber-700);--ring:var(--navy-800);--cta:var(--navy-800);--cta-tx:#fff;
+  background:var(--bg);color:var(--tx);border-radius:var(--card);overflow:hidden;border:1px solid var(--line);position:relative}
+.pv[data-dark=true]{--bg:#0e1b29;--card-bg:#14283c;--tx:#e8eff6;--tx2:var(--navy-200);--line:#24415c;--hdr:rgb(14 27 41/.9);--accent-tx:var(--amber-400);--ring:var(--amber-400);--cta:var(--amber-400);--cta-tx:#020617}
+.pv[data-contrast=true]{--tx2:var(--ink-2);--line:#64748b}
+.pv[data-dark=true][data-contrast=true]{--tx2:#e8eff6;--line:var(--navy-300)}
+.pv[data-solid=true]{--hdr:var(--bg);--blur:none}
+.pv-hdr{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem 1rem;background:var(--hdr);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-bottom:1px solid var(--line)}
+.pv-hdr b{font-family:var(--display);font-weight:800}
+.pv-hdr .btn{min-height:2.5rem;background:var(--cta);color:var(--cta-tx);border-color:transparent}
+.pv-body{padding:1.25rem 1rem 1.5rem;background-image:repeating-conic-gradient(rgb(24 66 104/.12) 0 90deg,transparent 90deg 180deg);background-size:3.5rem 3.5rem;background-position:0 0}
+.pv-body .eb{color:var(--accent-tx)}.pv-body .eb::before{background:var(--accent-tx)}
+.pv-card{margin-top:.75rem;padding:1rem;border-radius:var(--card);background:var(--card-bg);border:1px solid var(--line);box-shadow:var(--soft)}
+.pv-card p{color:var(--tx2);font-size:.9375rem}
+.pv-card a{color:var(--accent-tx);font-weight:700}
+.pv-card :focus-visible,.pv .btn:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+.pv-bar{position:relative;z-index:1;display:flex;gap:.5rem;padding:.5rem 1rem;background:var(--hdr);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-top:1px solid var(--line)}
+.pv-bar .btn{flex:1;justify-content:center;min-height:2.75rem}
+.pv-bar .btn.navy{background:var(--cta);color:var(--cta-tx)}
+.pv-bar .btn:not(.navy){background:var(--card-bg);color:var(--tx);border-color:var(--line)}
+.sw{display:flex;gap:.5rem 1.25rem;flex-wrap:wrap;margin:.25rem 0 1rem}
+.sw label{display:inline-flex;gap:.5rem;align-items:center;font-size:.875rem;min-height:2.75rem;cursor:pointer}
+.sw input{width:1.125rem;height:1.125rem;accent-color:var(--navy-800)}
+table{border-collapse:collapse;width:100%;font-size:.8125rem}
+th,td{text-align:left;padding:.4rem .6rem;border-bottom:1px solid var(--rule);vertical-align:top}
+th{color:var(--ink-3);font-weight:600}
+td.n{font-variant-numeric:tabular-nums;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="wrap" role="tablist" aria-label="Chọn mục cần xem">
+    <b>Global Chess – 4 lỗi mức High (Apple HIG)</b>
+    <button role="tab" aria-selected="true" data-tab="h1">H1 Vòng focus</button>
+    <button role="tab" aria-selected="false" data-tab="h2">H2 Chữ xám</button>
+    <button role="tab" aria-selected="false" data-tab="h3">H3 Màu hổ phách</button>
+    <button role="tab" aria-selected="false" data-tab="h4">H4 Chế độ hiển thị</button>
+  </div>
+</div>
+
+<main class="wrap">
+<p class="note"><b>Chỉ là bản xem trước, chưa sửa mã thật.</b> Mỗi mục đặt “Hiện tại” cạnh “Đề xuất” với đúng token của <code>global.css</code>. Tỉ lệ tương phản tính từ giá trị hex (Tailwind v4 định nghĩa màu bằng oklch nên số thật có thể lệch nhỏ). Chọn phương án nào thì mới áp vào <code>src/</code>.</p>
+
+<!-- ================= H1 ================= -->
+<section class="panel" id="h1">
+  <h2 class="t">H1 · Vòng focus bàn phím chỉ đạt khoảng 2:1</h2>
+  <p class="note" style="padding-top:.5rem">Hiện tại: <code>outline: 2px solid amber-500</code> cho mọi phần tử. Trên nền kem là <b>2.03:1</b>, trên trắng <b>2.15:1</b>, dưới 3:1 mà UI cần. Đề xuất: viền <b>navy-800</b> trên nền sáng (<b>9.82:1</b> trên kem, <b>10.41:1</b> trên trắng) và giữ <b>amber-400</b> trên nền navy (<b>6.23:1</b>). Vẫn là một quy tắc, chỉ thêm một dòng ghi đè cho khối navy.</p>
+  <div class="cmp">
+    <div class="col cur-ring">
+      <h3><span class="tag bad">Hiện tại</span> amber-500 mọi nơi</h3>
+      <div class="stage rings" id="r-cur">
+        <div class="pad surf-cream"><div class="row"><a class="btn navy" href="#h1">Đăng ký tư vấn</a><a class="lnk" href="#h1">Xem chi tiết lộ trình</a></div><p class="m">Nền kem: <span class="fail">2.03:1</span></p></div>
+        <div class="pad surf-white"><input class="fld" aria-label="Họ tên phụ huynh (mẫu)" value="Nguyễn Thị Lan"><p class="m">Nền trắng: <span class="fail">2.15:1</span></p></div>
+        <div class="pad surf-navy" style="--ring:var(--amber-500)"><div class="row"><a class="btn amber" href="#h1">Đăng ký tư vấn</a></div><p class="m" style="color:var(--navy-200)">Nền navy: amber-500 trên #184268 ≈ 4.6:1, đạt</p></div>
+      </div>
+    </div>
+    <div class="col new-ring">
+      <h3><span class="tag ok">Đề xuất</span> navy-800 trên sáng, amber-400 trên navy</h3>
+      <div class="stage rings" id="r-new">
+        <div class="pad surf-cream"><div class="row"><a class="btn navy" href="#h1">Đăng ký tư vấn</a><a class="lnk" href="#h1">Xem chi tiết lộ trình</a></div><p class="m">Nền kem: <span class="pass">9.82:1</span></p></div>
+        <div class="pad surf-white"><input class="fld" aria-label="Họ tên phụ huynh (mẫu)" value="Nguyễn Thị Lan"><p class="m">Nền trắng: <span class="pass">10.41:1</span></p></div>
+        <div class="pad surf-navy"><div class="row"><a class="btn amber" href="#h1">Đăng ký tư vấn</a></div><p class="m" style="color:var(--navy-200)">Nền navy: amber-400 <span style="color:#6ee7b7;font-weight:700">6.23:1</span></p></div>
+      </div>
+    </div>
+  </div>
+  <label class="sw"><input type="checkbox" id="live"> &nbsp;Tắt vòng tĩnh để thử bằng phím Tab thật</label>
+  <pre class="snip">/* global.css, @layer base */
+:focus-visible { outline: 2px solid var(--color-brand-800); outline-offset: 2px; }
+/* khối nền navy (pricing, footer, top bar, lightbox) */
+:where(.bg-brand-800, .bg-brand-900, .bg-brand-950) :focus-visible { outline-color: var(--color-amber-400); }</pre>
+</section>
+
+<!-- ================= H2 ================= -->
+<section class="panel" id="h2" hidden>
+  <h2 class="t">H2 · Chữ xám nhạt trên nền kem tụt dưới 4.5:1</h2>
+  <p class="note" style="padding-top:.5rem">Ghi chú đồng ý ảnh ở <code>#hinh-anh</code> dùng <code>text-xs text-slate-500</code> (12px) trên nền kem: <b>4.49:1</b>. Cùng màu đạt 4.76:1 trên trắng, nên lỗi nằm ở chỗ ghép nền, không phải token. Đề xuất: <code>slate-600</code> (<b>7.15:1</b> trên kem) và nâng cỡ lên 13px cho phụ huynh dễ đọc. Quy tắc gọn: <i>slate-500 chỉ dùng trên nền trắng</i>.</p>
+  <div class="cmp">
+    <div class="col">
+      <h3><span class="tag bad">Hiện tại</span> slate-500, 12px, nền kem</h3>
+      <div class="stage"><div class="pad surf-cream">
+        <div style="height:5.5rem;border-radius:var(--card);background:linear-gradient(135deg,var(--navy-200),var(--navy-100))"></div>
+        <p class="cap-cur" style="margin-top:1.25rem">Ảnh chụp tại lớp học và giải đấu nội bộ Global Chess. Phụ huynh của các học viên trong ảnh đã đồng ý cho trung tâm sử dụng trên website.</p>
+        <p class="m"><span class="fail">4.49:1</span> (cần 4.5:1)</p></div></div>
+    </div>
+    <div class="col">
+      <h3><span class="tag ok">Đề xuất</span> slate-600, 13px</h3>
+      <div class="stage"><div class="pad surf-cream">
+        <div style="height:5.5rem;border-radius:var(--card);background:linear-gradient(135deg,var(--navy-200),var(--navy-100))"></div>
+        <p class="cap-new" style="margin-top:1.25rem">Ảnh chụp tại lớp học và giải đấu nội bộ Global Chess. Phụ huynh của các học viên trong ảnh đã đồng ý cho trung tâm sử dụng trên website.</p>
+        <p class="m"><span class="pass">7.15:1</span></p></div></div>
+    </div>
+  </div>
+  <table>
+    <tr><th>Vị trí</th><th>Hiện tại</th><th>Nền</th><th>Đề xuất</th></tr>
+    <tr><td>Ghi chú ảnh <code>index.astro:428</code></td><td class="n"><span class="fail">4.49:1</span></td><td>kem</td><td>slate-600 + <code>text-[0.8125rem]</code></td></tr>
+    <tr><td>“Gọi giáo vụ để được xếp lớp” <code>index.astro:358</code></td><td class="n"><span class="fail">4.76:1 trên trắng, đạt</span> nhưng 15px; đứng trong khối trắng nên giữ</td><td>trắng</td><td>giữ nguyên</td></tr>
+    <tr><td><code>CurriculumExplorer.tsx:184, 219</code></td><td class="n">chưa xác minh nền</td><td>?</td><td>kiểm tra khi áp dụng; nếu là kem thì chuyển slate-600</td></tr>
+  </table>
+</section>
+
+<!-- ================= H3 ================= -->
+<section class="panel" id="h3" hidden>
+  <h2 class="t">H3 · Hổ phách đang gánh quá nhiều vai</h2>
+  <p class="note" style="padding-top:.5rem">Hôm nay hổ phách là nút bấm, vòng focus, nhãn mục, dòng thứ hai của H1, biểu tượng FAQ, biểu tượng bản đồ/điện thoại và băng “phổ biến”. Đề xuất: hổ phách chỉ còn <b>hai việc</b>: <b>hành động chính</b> (nút Đăng ký) và <b>trạng thái nổi bật</b> (băng “Phổ biến nhất”). Phần còn lại dùng navy hoặc xám. Vòng focus đã chuyển sang navy ở H1 nên không còn trùng nghĩa.</p>
+  <div class="cmp">
+    <div class="col cur-amb">
+      <h3><span class="tag bad">Hiện tại</span></h3>
+      <div class="stage mock"><div class="pad surf-cream">
+        <span class="eb">Đào tạo cờ vua trực tiếp (4 – 12 tuổi)</span>
+        <h4>Một Nước Đi,<span class="l2">Mở Tư Duy</span></h4>
+        <div class="row"><a class="btn amber" href="#h3">Đăng ký tư vấn</a><span class="ribbon" style="margin:0">Phổ biến nhất</span></div>
+        <div class="info">
+          <p><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>811 Hậu Giang, P. Bình Phú, TP.HCM</p>
+          <p><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>0963 091 208</p>
+        </div>
+        <div class="faq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg><span>Bé mấy tuổi thì tham gia được?</span></div>
+      </div></div>
+    </div>
+    <div class="col new-amb">
+      <h3><span class="tag ok">Đề xuất</span></h3>
+      <div class="stage mock"><div class="pad surf-cream">
+        <span class="eb">Đào tạo cờ vua trực tiếp (4 – 12 tuổi)</span>
+        <h4>Một Nước Đi,<span class="l2">Mở Tư Duy</span></h4>
+        <div class="row"><a class="btn amber" href="#h3">Đăng ký tư vấn</a><span class="ribbon" style="margin:0">Phổ biến nhất</span></div>
+        <div class="info">
+          <p><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>811 Hậu Giang, P. Bình Phú, TP.HCM</p>
+          <p><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>0963 091 208</p>
+        </div>
+        <div class="faq"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></svg><span>Bé mấy tuổi thì tham gia được?</span></div>
+      </div></div>
+    </div>
+  </div>
+  <table>
+    <tr><th>Phần tử</th><th>Hiện tại</th><th>Đề xuất</th><th>Tương phản trên kem</th></tr>
+    <tr><td>Nhãn mục (chữ + gạch)</td><td>amber-700 / amber-500</td><td>slate-700 / navy-300</td><td class="n"><span class="pass">9.77:1</span> (chữ)</td></tr>
+    <tr><td>H1 dòng 2 “Mở Tư Duy”</td><td>amber-600 (≈3.0:1, sát ngưỡng)</td><td>navy-600 (tiếp nối logo)</td><td class="n"><span class="pass">7.61:1</span></td></tr>
+    <tr><td>Biểu tượng bản đồ, điện thoại, FAQ</td><td>amber-600/700</td><td>slate-500</td><td class="n">biểu tượng trang trí, <code>aria-hidden</code></td></tr>
+    <tr><td>Nút “Đăng ký tư vấn”, băng “Phổ biến nhất”</td><td>amber</td><td>giữ nguyên</td><td class="n">chữ slate-950 trên amber-500: <span class="pass">9.39:1</span></td></tr>
+  </table>
+  <p class="m">Hệ quả cho <code>DESIGN.md</code>: mục “Accent” đổi thành “hổ phách = bấm được hoặc đang được chọn”. Link chữ trong nội dung (amber-700, 4.74:1) có thể giữ vì nó cũng là thứ bấm được.</p>
+</section>
+
+<!-- ================= H4 ================= -->
+<section class="panel" id="h4" hidden>
+  <h2 class="t">H4 · Chưa có đáp án cho chế độ tối, tương phản cao, giảm trong suốt</h2>
+  <p class="note" style="padding-top:.5rem">Trang hiện có 0 truy vấn <code>prefers-color-scheme</code>, <code>prefers-contrast</code> hay <code>prefers-reduced-transparency</code>. Thanh đầu trang và thanh liên hệ dưới đáy đều dùng <code>backdrop-blur</code>. Đề xuất chia ba bước độc lập, làm bước 1 và 2 trước, bước 3 khi sẵn sàng. Bật từng công tắc để xem; bản thật dùng media query nên chạy theo cài đặt của máy.</p>
+  <div class="sw">
+    <label><input type="checkbox" id="sw-solid"> 1 · Giảm trong suốt</label>
+    <label><input type="checkbox" id="sw-contrast"> 2 · Tương phản cao</label>
+    <label><input type="checkbox" id="sw-dark"> 3 · Giao diện tối</label>
+  </div>
+  <div class="cmp">
+    <div class="col">
+      <h3><span class="tag bad">Hiện tại</span> luôn sáng, luôn mờ kính</h3>
+      <div class="pv" style="--bg:var(--cream)">
+        <div class="pv-hdr"><b>Global Chess</b><a class="btn" href="#h4">Đăng ký tư vấn</a></div>
+        <div class="pv-body"><span class="eb">Lớp tối trong tuần</span><div class="pv-card"><p>Ba lộ trình chuẩn hóa cho trẻ 4–12 tuổi tại 5 cơ sở. <a href="#h4">Xem lộ trình</a></p></div></div>
+        <div class="pv-bar"><a class="btn navy" href="#h4">Gọi 0789 059 440</a><a class="btn" href="#h4">Nhắn Zalo</a></div>
+      </div>
+      <p class="m">Không có phản ứng với cài đặt hệ thống.</p>
+    </div>
+    <div class="col">
+      <h3><span class="tag ok">Đề xuất</span> theo cài đặt của người dùng</h3>
+      <div class="pv" id="pv">
+        <div class="pv-hdr"><b>Global Chess</b><a class="btn" href="#h4">Đăng ký tư vấn</a></div>
+        <div class="pv-body"><span class="eb">Lớp tối trong tuần</span><div class="pv-card"><p>Ba lộ trình chuẩn hóa cho trẻ 4–12 tuổi tại 5 cơ sở. <a href="#h4">Xem lộ trình</a></p></div></div>
+        <div class="pv-bar"><a class="btn navy" href="#h4">Gọi 0789 059 440</a><a class="btn" href="#h4">Nhắn Zalo</a></div>
+      </div>
+      <p class="m" id="pv-m">Chế độ sáng, mặc định.</p>
+    </div>
+  </div>
+  <table>
+    <tr><th>Cặp màu (chế độ tối)</th><th>Giá trị</th><th>Tỉ lệ</th></tr>
+    <tr><td>Chữ chính trên nền #0e1b29</td><td>#e8eff6</td><td class="n"><span class="pass">15.0:1</span></td></tr>
+    <tr><td>Chữ phụ trên thẻ #14283c</td><td>navy-200 #b6d0e8</td><td class="n"><span class="pass">9.42:1</span></td></tr>
+    <tr><td>Liên kết, nhãn mục trên nền</td><td>amber-400</td><td class="n"><span class="pass">10.42:1</span></td></tr>
+    <tr><td>Nút chính (chữ slate-950 trên amber-400)</td><td>#fbbf24</td><td class="n"><span class="pass">12.08:1</span></td></tr>
+    <tr><td>Vòng focus trên nền tối</td><td>amber-400</td><td class="n"><span class="pass">10.42:1</span></td></tr>
+  </table>
+  <pre class="snip">/* 1 · global.css – giảm trong suốt: header và thanh liên hệ thành nền đặc */
+@media (prefers-reduced-transparency: reduce) {
+  header.sticky, .gc-contact-bar { background: var(--color-cream); backdrop-filter: none; }
+}
+/* 2 · tương phản cao: chữ phụ đậm hơn, viền rõ hơn */
+@media (prefers-contrast: more) {
+  :root { --color-slate-500: var(--color-slate-700); --color-slate-600: var(--color-slate-800); }
+  .border-slate-200 { border-color: var(--color-slate-500); }
+}
+/* 3 · tối: đổi token, thêm color-scheme (làm sau cùng, ảnh thật không đổi) */
+:root { color-scheme: light dark; }
+@media (prefers-color-scheme: dark) {
+  @theme { --color-cream: #0e1b29; }  /* + surface, text, border theo bảng bên trên */
+}</pre>
+  <p class="m">Ghi chú phạm vi: bước 3 đụng gần như mọi lớp <code>bg-white</code>, <code>text-slate-*</code> và <code>border-slate-*</code> trong Tailwind (khoảng 160 chỗ). Nên làm bằng token ngữ nghĩa (<code>--surface</code>, <code>--text</code>) chứ không thêm <code>dark:</code> từng chỗ.</p>
+</section>
+</main>
+
+<script>
+// Chuyển tab
+const tabs=[...document.querySelectorAll('[data-tab]')];
+const show=id=>{
+  tabs.forEach(t=>t.setAttribute('aria-selected',String(t.dataset.tab===id)));
+  document.querySelectorAll('.panel').forEach(p=>p.hidden=p.id!==id);
+  try{history.replaceState(null,'','#'+id)}catch{}
+};
+tabs.forEach(t=>t.addEventListener('click',()=>show(t.dataset.tab)));
+const start=location.hash.slice(1);if(document.getElementById(start)?.classList.contains('panel'))show(start);
+
+// H1: tắt vòng tĩnh để Tab thật
+document.getElementById('live').addEventListener('change',e=>{
+  document.querySelectorAll('#r-cur,#r-new').forEach(el=>el.classList.toggle('live',e.target.checked));
+});
+
+// H4: công tắc mô phỏng
+const pv=document.getElementById('pv'),m=document.getElementById('pv-m');
+const set=()=>{
+  const s=sw=>document.getElementById(sw).checked;
+  pv.dataset.solid=s('sw-solid');pv.dataset.contrast=s('sw-contrast');pv.dataset.dark=s('sw-dark');
+  const on=[s('sw-solid')&&'nền đặc',s('sw-contrast')&&'tương phản cao',s('sw-dark')&&'tối'].filter(Boolean);
+  m.textContent=on.length?'Đang bật: '+on.join(', ')+'.':'Chế độ sáng, mặc định.';
+};
+['sw-solid','sw-contrast','sw-dark'].forEach(id=>document.getElementById(id).addEventListener('change',set));
+</script>
+</body>
+</html>

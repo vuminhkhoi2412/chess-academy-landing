@@ -72,13 +72,13 @@ place `slate-600` on navy.
 
 **Accent — the single accent color, amber/gold**
 
-- **Amber Gold** (`#f59e0b`, `amber-500`) — fill of the `.gc-move--amber` CTA (header and mobile menu), focus-visible outline, eyebrow tick mark, the "Most popular" ribbon
-- **Amber Deep** (`#b45309`, `amber-700`) — inline text links on light surfaces, eyebrow label text, icons
-- **Amber Bright** (`#fbbf24`, `amber-400`) — accent text and icons on navy surfaces, icon color inside navy tiles, CTA arrow glyph
+- **Amber Gold** (`#f59e0b`, `amber-500`) — fill of the `.gc-move--amber` CTA (header and mobile menu), eyebrow tick mark, the "Most popular" ribbon
+- **Amber Deep** (`#b45309`, `amber-700`) — inline text links on light surfaces and the second line of the hero H1 (4.74:1 on cream)
+- **Amber Bright** (`#fbbf24`, `amber-400`) — accent text and icons on navy surfaces, icon color inside navy tiles, CTA arrow glyph, focus ring on navy
 - **Amber Wash** (`#fef3c7` / `#fffbeb`, amber-100/50) — badge fills, selected pricing card border glow
 
 Two amber roles must not be confused: **amber-400 on navy**, **amber-700 on cream**.
-Amber-500 is reserved for the button fill and the focus ring.
+Amber-500 is reserved for the button fill, the eyebrow tick and the ribbon. Amber means "clickable or highlighted": eyebrow text, map/phone/FAQ icons and legal stamps are neutral (slate-700 / slate-500 / slate-600; brand-200 on navy). The H1's second line is the one deliberate exception.
 
 **Status color — used sparingly, meaning-carrying only**
 
@@ -116,7 +116,7 @@ Rules:
 
 - Hierarchy comes from size + weight + color, not from all-caps. Uppercase is reserved for micro-labels only: `text-xs` (or `text-[11px]`) combined with `tracking-wide`/`tracking-wider`, used on card group labels, the logo slogan, "cập nhật lần cuối" stamps, and the pricing ribbon. Never uppercase a heading, body copy, button, or an eyebrow label.
 - Body measure caps at `max-w-prose` / `max-w-xl` (≈65ch). Never a full-width paragraph on a wide screen.
-- Eyebrow labels: `0.9375rem`, `font-semibold`, `tracking-[-0.005em]`, amber-700 on light and amber-400 on navy, prefixed by a 1.75rem × 2px amber dash. Sentence case — never uppercase on light surfaces.
+- Eyebrow labels: `0.9375rem`, `font-semibold`, `tracking-[-0.005em]`, slate-700 on light and brand-200 on navy, prefixed by a 1.75rem × 2px amber dash (amber-500 on light, amber-400 on navy). Sentence case — never uppercase on light surfaces.
 - Numbers in stats and prices use `tabular-nums` with `whitespace-nowrap`; a value like `48 Buổi` must never break across lines.
 - Banned fonts: `Inter`, `Times New Roman`, `Georgia`, `Garamond`, `Palatino`, and any generic system serif. Bricolage Grotesque is the only display face that satisfies the Vietnamese requirement in this set.
 
@@ -160,7 +160,7 @@ Rules:
 **Inputs and forms**
 
 - Label above the control, `text-xs`–`text-sm`, neutral weight; helper or error text below in `text-sm`.
-- Field: `w-full px-3 py-2 text-sm border border-slate-300 rounded-control bg-white outline-none focus:ring-2 focus:ring-amber-500`.
+- Field: `w-full px-3 py-2 text-sm border border-slate-300 rounded-control bg-white outline-none focus:ring-2 focus:ring-brand-800`.
 - Selected / validated field: `border-amber-400 bg-amber-50/40 font-semibold`.
 - Invalid: red text plus a `bg-red-50` inline message. A `text-red-600 animate-pulse motion-reduce:animate-none` warning is reserved for the one blocking submit error.
 - No floating labels. No placeholder-only forms.
@@ -245,7 +245,7 @@ none should be introduced for a marketing page.
 - No pure black `#000000` — use `slate-950`, `brand-950`, or `brand-800`.
 - No second accent color. Amber is the only accent; navy and cream are structure.
 - No purple/blue neon, no gradient button fills, no outer glow shadows.
-- No fabric gradient text on large headers — headline color may differentiate lines (slate-900 / amber-600), nothing shinier.
+- No fabric gradient text on large headers — headline color may differentiate lines (slate-900 / amber-700), nothing shinier.
 - No custom mouse cursors.
 - No overlapping elements; no absolutely-positioned content stacking on top of text.
 - No new three-equal-card rows; no centered hero.
@@ -276,10 +276,10 @@ none should be introduced for a marketing page.
 --shadow-soft:   0 1px 2px rgb(68 55 43 / 0.04), 0 8px 24px -12px rgb(68 55 43 / 0.16)
 --shadow-lifted: 0 2px 4px rgb(68 55 43 / 0.05), 0 20px 44px -16px rgb(68 55 43 / 0.22)
 
-Accent:  amber-500 #f59e0b  (button fill, focus ring)
-         amber-700 #b45309  (text/icons on light)
-         amber-400 #fbbf24  (text/icons on navy)
+Accent:  amber-500 #f59e0b  (button fill, eyebrow tick, ribbon)
+         amber-700 #b45309  (links and H1 line 2 on light)
+         amber-400 #fbbf24  (text/icons and focus ring on navy)
 Status:  emerald-600 #059669 / emerald-700 #047857
 Neutral: slate-900 #0f172a, slate-600 #475569, slate-200 #e2e8f0
-Focus:   outline 2px solid var(--color-amber-500), offset 2px
+Focus:   outline 2px solid var(--color-brand-800), offset 2px (amber-400 on navy and in the lightbox)
 ```

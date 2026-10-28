@@ -75,10 +75,18 @@
     text-wrap: pretty;
   }
 
-  /* One visible focus treatment for every interactive element. */
+  /*
+   * One visible focus treatment for every interactive element. Navy on light
+   * surfaces (≈9.8:1 on cream); amber-500 was only ≈2:1 there. Dark surfaces
+   * keep amber, which is ≈6:1 on brand-800.
+   */
   :focus-visible {
-    outline: 2px solid var(--color-amber-500);
+    outline: 2px solid var(--color-brand-800);
     outline-offset: 2px;
+  }
+
+  :where(.bg-brand-800, .bg-brand-950, #gallery-lightbox) :focus-visible {
+    outline-color: var(--color-amber-400);
   }
 
   ::selection {
@@ -152,7 +160,7 @@
     font-size: 0.9375rem;
     font-weight: 600;
     letter-spacing: -0.005em;
-    color: var(--color-amber-700);
+    color: var(--color-slate-700);
   }
 
   .gc-eyebrow::before {
@@ -164,7 +172,7 @@
   }
 
   .gc-eyebrow-invert {
-    color: var(--color-amber-400);
+    color: var(--color-brand-200);
   }
 
   .gc-eyebrow-invert::before {

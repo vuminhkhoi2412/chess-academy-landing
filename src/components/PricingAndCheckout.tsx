@@ -388,7 +388,7 @@ export default function PricingAndCheckout() {
                       className={`w-full px-3 py-2 text-sm border rounded-control focus:ring-2 outline-none ${
                         nameError
                           ? "border-red-400 focus:ring-red-500 bg-red-50/40"
-                          : "border-slate-300 focus:ring-amber-500"
+                          : "border-slate-300 focus:ring-brand-800"
                       }`}
                     />
                     {nameError && (
@@ -409,7 +409,7 @@ export default function PricingAndCheckout() {
                       placeholder="VD: 2016 (10 tuổi)"
                       value={childAge}
                       onChange={(e) => setChildAge(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-control focus:ring-2 focus:ring-amber-500 outline-none"
+                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-control focus:ring-2 focus:ring-brand-800 outline-none"
                     />
                   </div>
                 </div>
@@ -435,7 +435,7 @@ export default function PricingAndCheckout() {
                       className={`w-full px-3 py-2 text-sm border rounded-control focus:ring-2 outline-none ${
                         parentError
                           ? "border-red-400 focus:ring-red-500 bg-red-50/40"
-                          : "border-slate-300 focus:ring-amber-500"
+                          : "border-slate-300 focus:ring-brand-800"
                       }`}
                     />
                     {parentError && (
@@ -465,7 +465,7 @@ export default function PricingAndCheckout() {
                       className={`w-full px-3 py-2 text-sm border rounded-control focus:ring-2 outline-none ${
                         phoneError
                           ? "border-red-400 focus:ring-red-500 bg-red-50/40"
-                          : "border-slate-300 focus:ring-amber-500"
+                          : "border-slate-300 focus:ring-brand-800"
                       }`}
                     />
                     {phoneError && (
@@ -480,13 +480,13 @@ export default function PricingAndCheckout() {
                 <div className="grid sm:grid-cols-2 gap-3">
                   <div>
                     <label htmlFor="gc-branch" className="text-sm font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-amber-600" aria-hidden="true" /> Chọn cơ sở Global Chess *
+                      <MapPin className="w-3.5 h-3.5 text-slate-500" aria-hidden="true" /> Chọn cơ sở Global Chess *
                     </label>
                     <select
                       id="gc-branch"
                       value={selectedBranch}
                       onChange={(e) => setSelectedBranch(e.target.value)}
-                      className="w-full px-3 py-2 text-sm font-medium border border-slate-300 rounded-control focus:ring-2 focus:ring-amber-500 outline-none bg-white"
+                      className="w-full px-3 py-2 text-sm font-medium border border-slate-300 rounded-control focus:ring-2 focus:ring-brand-800 outline-none bg-white"
                     >
                       {BRANCHES.map((b) => (
                         <option key={b.id} value={b.id}>
@@ -504,7 +504,7 @@ export default function PricingAndCheckout() {
                       id="gc-level"
                       value={selectedLevelCode}
                       onChange={(e) => setSelectedLevelCode(e.target.value)}
-                      className="w-full px-3 py-2 text-sm font-semibold border border-amber-400 rounded-control focus:ring-2 focus:ring-amber-500 outline-none bg-amber-50/40 text-slate-900"
+                      className="w-full px-3 py-2 text-sm font-semibold border border-amber-400 rounded-control focus:ring-2 focus:ring-brand-800 outline-none bg-amber-50/40 text-slate-900"
                     >
                       {TUITION_LEVELS.map((level) => (
                         <option key={level.code} value={level.code}>

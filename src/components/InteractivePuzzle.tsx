@@ -59,7 +59,7 @@ export default function InteractivePuzzle() {
   return (
     <div className="bg-white p-5 rounded-card shadow-lifted border border-slate-200 max-w-md mx-auto">
       <div className="flex items-center justify-between gap-3 mb-3">
-        <span className="inline-flex items-center gap-3 text-[0.9375rem] leading-6 font-semibold tracking-[-0.005em] text-amber-700">
+        <span className="inline-flex items-center gap-3 text-[0.9375rem] leading-6 font-semibold tracking-[-0.005em] text-slate-700">
           <span aria-hidden="true" className="h-0.5 w-7 bg-amber-500 rounded-full shrink-0"></span>
           Thử thách 10 giây cho bé
         </span>

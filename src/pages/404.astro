@@ -58,7 +58,7 @@ const pageDescription =
                   href={`tel:${hotline.replace(/\./g, "")}`}
                   class="inline-flex items-center gap-1.5 hover:text-amber-700 hover:underline tabular-nums w-fit"
                 >
-                  <Phone className="w-3.5 h-3.5 text-amber-600" aria-hidden="true" /> {hotline}
+                  <Phone className="w-3.5 h-3.5 text-slate-500" aria-hidden="true" /> {hotline}
                 </a>
               ))}
             </div>
@@ -68,7 +68,7 @@ const pageDescription =
             <ul class="space-y-1.5 text-slate-600 list-none">
               {BRANCHES.slice(0, 3).map((branch) => (
                 <li class="flex items-start gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" aria-hidden="true" />
+                  <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" aria-hidden="true" />
                   <span>{branch.name}</span>
                 </li>
               ))}

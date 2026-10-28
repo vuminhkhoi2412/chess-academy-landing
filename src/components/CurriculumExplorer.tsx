@@ -214,10 +214,10 @@ export default function CurriculumExplorer() {
         {/* Chi tiết giáo trình: bảng chỉ mục, gập sẵn để thang vẫn là phần chính. */}
         <div className="mt-16">
           <h3 className="font-display text-2xl font-extrabold tracking-[-0.015em] text-slate-900">
-            Chi tiết giáo trình từng cấp độ
+            Giáo trình chi tiết
           </h3>
-          <p className="mt-1 text-slate-500">
-            Nội dung bài học và kết quả đạt được, theo tài liệu của trung tâm.
+          <p className="mt-1 text-slate-600">
+            Nội dung bài học và kết quả đạt được sau từng cấp độ.
           </p>
           <div className="gc-idx mt-6">
             {CURRICULUM_PROGRAMS.map((program) => {

@@ -178,7 +178,7 @@ const structuredData = {
         <div class="md:col-span-6 lg:col-span-7 space-y-5">
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.9375rem] leading-6 font-semibold tracking-[-0.005em]">
             <span aria-hidden="true" class="h-0.5 w-7 bg-amber-500 rounded-full"></span>
-            <span class="text-amber-700">Đào tạo cờ vua trực tiếp <span class="tabular-nums whitespace-nowrap">(4 – 12 tuổi)</span></span>
+            <span class="text-slate-700">Đào tạo cờ vua trực tiếp <span class="tabular-nums whitespace-nowrap">(4 – 12 tuổi)</span></span>
           </div>
 
           <!--
@@ -187,7 +187,7 @@ const structuredData = {
           -->
           <h1 class="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight leading-[1.08]">
             <span class="block text-slate-900">Một Nước Đi,</span>
-            <span class="block text-amber-600">Mở Tư Duy</span>
+            <span class="block text-amber-700">Mở Tư Duy</span>
           </h1>
 
           <p class="text-slate-600 text-base leading-relaxed max-w-xl">
@@ -309,11 +309,11 @@ const structuredData = {
                 <div class="flex flex-1 flex-col p-5">
                   <h3 class="font-display text-lg font-extrabold leading-tight tracking-[-0.015em] text-slate-900">{branch.name}</h3>
                   <p class="mt-2 flex items-start gap-2 text-sm leading-relaxed text-slate-600">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" aria-hidden="true" />
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
                     <span>{branch.address}</span>
                   </p>
                   <p class="flex items-center gap-2 text-sm text-slate-600">
-                    <Phone className="h-4 w-4 shrink-0 text-amber-700" aria-hidden="true" />
+                    <Phone className="h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
                     <a
                       href={`tel:${phone}`}
                       class="inline-flex min-h-11 items-center font-semibold text-slate-900 tabular-nums hover:underline"
@@ -361,7 +361,7 @@ const structuredData = {
               href={`tel:${hotline}`}
               class="inline-flex min-h-11 items-center gap-1.5 font-bold text-brand-800 tabular-nums hover:underline"
             >
-              <Phone className="h-3.5 w-3.5 text-amber-700" aria-hidden="true" /> {fmtPhone(hotline)}
+              <Phone className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" /> {fmtPhone(hotline)}
             </a>
           ))}
         </aside>
@@ -425,7 +425,7 @@ const structuredData = {
           ))}
         </div>
 
-        <p class="mt-6 text-xs text-slate-500 leading-relaxed">
+        <p class="mt-6 text-[0.8125rem] text-slate-600 leading-relaxed">
           Ảnh chụp tại lớp học và giải đấu nội bộ Global Chess. Phụ huynh của các học viên trong ảnh đã đồng ý cho trung tâm sử dụng trên website.
         </p>
 
@@ -504,7 +504,7 @@ const structuredData = {
           {FAQS.map((item) => (
             <details class="gc-faq group border-t border-slate-200">
               <summary class="flex min-h-11 cursor-pointer list-none items-start gap-2 py-4 font-bold text-slate-900 text-base [&::-webkit-details-marker]:hidden">
-                <HelpCircle className="w-4 h-4 text-amber-600 shrink-0 mt-1" aria-hidden="true" />
+                <HelpCircle className="w-4 h-4 text-slate-500 shrink-0 mt-1" aria-hidden="true" />
                 <span class="flex-1">{item.q}</span>
                 <ChevronDown className="w-4 h-4 text-slate-500 shrink-0 mt-1 group-open:rotate-180" aria-hidden="true" />
               </summary>
