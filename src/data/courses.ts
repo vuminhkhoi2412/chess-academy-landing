@@ -448,13 +448,11 @@ export const INTERACTIVE_PUZZLE: InteractivePuzzleConfig = {
  * không tự viết thêm, không sửa lời trích dẫn. Cơ sở ghi theo tên chi nhánh
  * chính thức trong `BRANCHES`.
  *
- * Khi mảng còn rỗng, giao diện tự hiển thị ô trống TODO rất rõ nên không thể vô
- * tình đưa lên production. Có ít nhất 1 mục là giao diện chuyển sang bản thật.
+ * Mảng rỗng thì build báo lỗi (xem đầu index.astro), nên không thể vô tình đăng trang trống.
  */
 export interface Testimonial {
   quote: string;
   author: string;
-  role: string;
   branch: string;
 }
 
@@ -463,21 +461,18 @@ export const TESTIMONIALS: Testimonial[] = [
     quote:
       "Bé học tiến bộ lắm á thầy, chơi tốt hơn lúc chưa học, chiếu bí ba hoài luôn",
     author: "Phụ huynh bé Bảo Khang",
-    role: "Phụ huynh học viên",
     branch: "Cơ sở Bình Phú (Q.6)",
   },
   {
     quote:
       "Bé thích học ở đây lắm á thầy, có các bạn chơi chung và biết thêm được nhiều thế cờ hay",
     author: "Phụ huynh bé Kính Long",
-    role: "Phụ huynh học viên",
     branch: "Cơ sở Tên Lửa (Bình Tân)",
   },
   {
     quote:
       "Học ở Global Chess ngoài cờ vua ra bé còn học được robotics, đưa bé đến 1 chỗ mà học được nhiều môn, mẹ đỡ phải chạy đi chạy lại",
     author: "Phụ huynh bé Văn Minh",
-    role: "Phụ huynh học viên",
     branch: "Cơ sở Tên Lửa (Bình Tân)",
   },
 ];
@@ -533,26 +528,3 @@ export const FAQS: FaqItem[] = [
     a: "Việc học bù và bảo lưu tuỳ theo chính sách hiện hành của trung tâm. Vui lòng liên hệ giáo vụ qua hotline hoặc Zalo để được hướng dẫn cụ thể.",
   },
 ];
-
-/**
- * Cách lớp học vận hành. Đây là điểm khác biệt thật so với lớp cờ tự phát, nên
- * mọi dòng ở đây đều phải bám vào dữ liệu vận hành đã có (giáo trình, khung giờ,
- * lịch thi đấu), không phải lời khen tự đánh giá.
- */
-export const OPERATING_POINTS = [
-  {
-    title: "Giáo trình chuẩn hoá",
-    desc: "24 buổi mỗi cấp độ, có sách và mục tiêu rõ ràng cho từng buổi.",
-    icon: "book",
-  },
-  {
-    title: "Thực chiến và giải đấu",
-    desc: "Đấu thực hành trong buổi học và giải đấu nội bộ theo lộ trình.",
-    icon: "trophy",
-  },
-  {
-    title: "Lịch học linh hoạt",
-    desc: "Ca tối trong tuần và ba ca cuối tuần, chọn cơ sở theo khu vực nhà bạn.",
-    icon: "clock",
-  },
-] as const;

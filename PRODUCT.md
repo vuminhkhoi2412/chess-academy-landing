@@ -59,7 +59,7 @@ tuition grid.
   pricing + checkout); Tailwind CSS 4 via Vite; intended for Vercel. No server, no database.
 - Content is data-driven: `src/data/courses.ts` holds brand strings, branches (address, phone,
   Maps link), the three curriculum programmes, the seven tuition levels, the interactive puzzle, parent
-  quotes, FAQs and operating points.
+  quotes and FAQs.
 - Curriculum: Happy Chess 72 sessions (3 levels × 24), Global Chess Sơ cấp 48 (2 × 24),
   Global Chess Trung cấp 48 (2 × 24). Sessions run 60–90 minutes. Happy Chess takes children
   from age 4; Sơ cấp and Trung cấp from age 7. Placement follows actual ability, not age.

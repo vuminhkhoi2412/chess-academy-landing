@@ -24,8 +24,8 @@ paper and a single amber accent keep it friendly for parents of 4–12 year old 
   rhythm), relaxed card interiors, nothing cramped. Pricing is the one denser surface.
 - **Variance:** 6 / 10 — Offset Asymmetric. Hero is a deliberate 7/5 split, the branch
   cards carry a 16:9 photo and the `#hinh-anh` gallery is a bento (one square photo
-  spanning two rows beside four smaller ones). The branch and operating-point rows are
-  plain three-up grids on desktop.
+  spanning two rows beside four smaller ones). The branch row is a plain three-up
+  grid on desktop.
 - **Motion:** 3 / 10 — Static Restrained. The site informs; it does not perform. Motion is
   limited to CSS `transition`, tactile `active:scale`, and one `animate-pulse` on a
   form error. No scroll-jacking, no parallax, no entrance choreography.
@@ -143,7 +143,6 @@ Rules:
 - Icon tile: `bg-brand-800 text-amber-400`, `w-9 h-9` (compact) or `w-11 h-11` (wide), `rounded-control`, no shadow.
 - On hover a card may change border to `amber-400` and gain `shadow-soft`. No translate, no lift.
 - Branch card: `rounded-card border border-slate-200/90 bg-white`, an `aspect-video` photo on top (a branch without a photo falls back to a faded chessboard cell with its id) carrying two white pills ("Cơ sở n" and the district), then name, address, a `tel:` link and the two buttons above. Hover changes the border to `slate-300` and adds `shadow-soft`.
-- Operating-point card: `bg-cream rounded-card border border-slate-200/90 p-5`, icon tile, `h3`, one sentence.
 
 **Gallery**
 
@@ -169,7 +168,7 @@ Rules:
 **Loaders, empty and error states**
 
 - Skeletons must match the exact dimensions of the content they replace. No circular spinner.
-- `TESTIMONIALS` currently holds three real parent quotes, rendered as `.gc-quotes` cards (the first on `bg-brand-800`, the rest white). If the array is ever emptied, the section falls back to a heavy dashed `border-2 border-dashed border-amber-400` TODO panel with three skeleton slots, each showing `Tên phụ huynh: TODO` / `Cơ sở: TODO`. This is intentional design, not a temporary hack.
+- `TESTIMONIALS` (three real parent quotes) render as chat cards in `#phu-huynh`, straight after the gallery: a `bg-brand-800` header with a round `bg-brand-600` avatar holding the child's initials (BK, KL, VM) in `text-amber-400`, then the parent label and branch; a `bg-brand-50` body with the verbatim quote in a white bubble (square bottom-left corner) and a small right-aligned "Đã nhận" with a double check. Cards are equal height, 1 → 2 (`md`) → 3 (`lg`) columns. No ratings, no timestamps, no Zalo logo or colours, no child photos. An empty `TESTIMONIALS` fails the build instead of showing a TODO panel.
 - Error pages reuse the same cream + navy + amber vocabulary: the 404 shows a navy chessboard motif and a filled amber or navy return button.
 
 **Modal**
@@ -189,7 +188,7 @@ Rules:
 - Max-width containment: `max-w-6xl mx-auto px-4` for marketing sections. Document pages narrow to `max-w-3xl`.
 - **Grid-first.** Use CSS Grid with the 12-column or fractional track syntax. Never `calc()` percentage math, never flexbox width games.
 - Section rhythm: `py-16` for standard sections, `py-20` for the pricing band, `py-14 md:py-20` for the hero. Sections alternate `bg-cream` / `bg-white`, separated by `border-t border-slate-200`.
-- **Asymmetry is required.** Hero is `md:grid-cols-12` split 7/5. The photo gallery is the bento above. Branch grid is `sm:grid-cols-2 lg:grid-cols-3` (five cards, so the last row has two), followed by a thin ruled hotline line (`border-y`, no box). Known exception: the branch and operating-point grids are three equal columns on desktop.
+- **Asymmetry is required.** Hero is `md:grid-cols-12` split 7/5. The photo gallery is the bento above. Branch grid is `sm:grid-cols-2 lg:grid-cols-3` (five cards, so the last row has two), followed by a thin ruled hotline line (`border-y`, no box). Known exception: the branch grid is three equal columns on desktop.
 - Banned: centered hero (this is a variance-6 system, the hero stays left-aligned with the board island on the right). Do not add further three-equal-card rows.
 - Even centered headings are paired with a left-aligned eyebrow or a stat row so the composition never reads as a flat stack.
 - Depth layers sit behind content on `-z-10` with `pointer-events-none` and an `aria-hidden` attribute, and must fade out before the section edge (`mask-image: linear-gradient(to bottom, #000 58%, transparent 100%)`) so no hard band appears where the next section begins.
@@ -219,7 +218,7 @@ none should be introduced for a marketing page.
 - Headlines scale, they do not shrink-wrap: `text-5xl` → `lg:text-7xl` → `xl:text-8xl`. Body text never drops below `1rem` (`text-sm` only for metadata and labels, never for a paragraph a parent must read).
 - Touch targets: minimum 44px. Header icon button is `h-11 w-11`; mobile menu rows are `min-h-[3rem]`.
 - Desktop nav collapses below `md` into a toggle menu that closes on Escape, on outside click, and on link selection, and re-syncs `aria-expanded` when the viewport crosses 768px.
-- The branch and operating-points grids both go 1 → 2 (`sm`) → 3 (`lg`). The gallery goes 1 → 3 columns at `md`.
+- The branch grid goes 1 → 2 (`sm`) → 3 (`lg`). The gallery goes 1 → 3 columns at `md`.
 - Hero board island stacks below the headline on mobile and keeps its shadow ground plane.
 - Section gaps compress via `py-14 md:py-20` patterns; padding never collapses to zero.
 - Anchors use `scroll-padding-top: 5rem` to clear the 4rem sticky header.

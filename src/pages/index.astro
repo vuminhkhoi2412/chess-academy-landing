@@ -9,7 +9,7 @@ import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import MobileContactBar from "../components/MobileContactBar.astro";
 import Layout from "../layouts/Layout.astro";
-import { BRAND_INFO, BRANCHES, TUITION_PROGRAMS, TUITION_LEVELS, TESTIMONIALS, FAQS, OPERATING_POINTS } from "../data/courses";
+import { BRAND_INFO, BRANCHES, TUITION_PROGRAMS, TUITION_LEVELS, TESTIMONIALS, FAQS } from "../data/courses";
 import galleryCoachStudent from "../assets/images/gallery-coach-student.jpg";
 import galleryClassCoach from "../assets/images/gallery-class-coach.jpg";
 import galleryTournamentPlay from "../assets/images/gallery-tournament-play.jpg";
@@ -25,13 +25,9 @@ import {
   Phone,
   ArrowRight,
   ArrowUpRight,
-  Quote,
-  BookOpen,
-  Clock,
-  Trophy,
   HelpCircle,
   ChevronDown,
-  AlertTriangle,
+  CheckCheck,
 } from "lucide-react";
 
 // Ảnh gallery theo thứ tự trong lưới bento (ảnh đầu là ảnh vuông chiếm hai hàng).
@@ -57,6 +53,15 @@ const BRANCH_PHOTOS: Record<string, { src: ImageMetadata; alt: string; pos?: str
   CS3: { src: branchTayThanh, alt: "Các học viên đang đấu cờ vua trong phòng học." },
   CS4: { src: branchNguyenSon, alt: "Học viên chơi cờ vua cùng huấn luyện viên trong phòng học.", pos: "object-[50%_35%]" },
   CS5: { src: branchVinhomes, alt: "Giải cờ vua thiếu nhi Vincom Kids Challenge 2026 tại Vincom Grand Park." },
+};
+
+// Hết nhận xét thật thì không được đăng trang (thay cho ô TODO cũ).
+if (TESTIMONIALS.length === 0) throw new Error("TESTIMONIALS đang rỗng: cần ít nhất một nhận xét thật của phụ huynh.");
+
+/** "Phụ huynh bé Bảo Khang" → "BK" cho avatar. */
+const initials = (author: string) => {
+  const w = author.replace("Phụ huynh bé ", "").split(" ");
+  return (w[0][0] + w[w.length - 1][0]).toUpperCase();
 };
 
 /** "0963091208" → "0963 091 208" cho dễ đọc; số tel: vẫn giữ dạng liền. */
@@ -445,36 +450,8 @@ const structuredData = {
     </section>
 
     <!--
-      Vận hành lớp học. Đây là phần "social proof" trung thực: ba điểm khác biệt
-      đều lấy từ dữ liệu vận hành có thật trong src/data/courses.ts, không phải
-      lời khen tự đánh giá hay con số bịa.
-    -->
-    <section id="phuong-phap" class="py-16 bg-white">
-      <div class="max-w-6xl mx-auto px-4">
-        <div class="max-w-2xl">
-          <span class="gc-eyebrow">Vận hành lớp học</span>
-          <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">Môi trường học tập</h2>
-        </div>
-        <ul class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-10 list-none">
-          {OPERATING_POINTS.map((point) => (
-            <li class="gc-op-card bg-cream rounded-card border border-slate-200/90 p-5">
-              <span class="gc-op-icon inline-flex items-center justify-center rounded-control bg-brand-800 text-amber-400 shrink-0 mb-3 w-9 h-9" aria-hidden="true">
-                {point.icon === "book" && <BookOpen className="w-4 h-4" />}
-                {point.icon === "clock" && <Clock className="w-4 h-4" />}
-                {point.icon === "trophy" && <Trophy className="w-4 h-4" />}
-              </span>
-              <h3 class="font-bold text-slate-900 text-base">{point.title}</h3>
-              <p class="text-base text-slate-600 mt-1.5 leading-relaxed">{point.desc}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-  </section>
-
-    <!--
-      Nhận xét phụ huynh. Nội dung thật nằm trong TESTIMONIALS (src/data/courses.ts).
-      Nếu mảng rỗng, phần này tự hiển thị ô TODO rất rõ để không thể vô tình đưa
-      lên production.
+      Nhận xét phụ huynh: lời trích nguyên văn trong TESTIMONIALS (src/data/courses.ts),
+      dựng thành khung chat. Avatar là chữ viết tắt tên bé, không dùng ảnh trẻ em.
     -->
     <section id="phu-huynh" class="py-16 border-t border-slate-200">
       <div class="max-w-6xl mx-auto px-4">
@@ -488,61 +465,27 @@ const structuredData = {
           </p>
         </div>
 
-        {TESTIMONIALS.length === 0 ? (
-          <div class="rounded-card border-2 border-dashed border-amber-400 bg-amber-50/70 p-6 md:p-8">
-            <div class="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" aria-hidden="true" />
-              <div>
-                <p class="font-bold text-amber-900">
-                  Khu vực này chưa có nội dung thật — không đăng trang khi còn như vậy.
-                </p>
-                <p class="text-sm text-amber-900/80 mt-1.5 leading-relaxed">
-                  Xin câu trích dẫn thật từ phụ huynh (kèm tên và cơ sở), rồi điền vào mảng{" "}
-                  <code class="rounded bg-amber-200/70 px-1.5 py-0.5 font-mono text-[0.85em]">TESTIMONIALS</code> trong{" "}
-                  <code class="rounded bg-amber-200/70 px-1.5 py-0.5 font-mono text-[0.85em]">src/data/courses.ts</code>.
-                  Điền đủ 3 mục là phần này tự chuyển sang bản hoàn chỉnh.
-                </p>
-              </div>
-            </div>
-
-            <ul class="grid md:grid-cols-3 gap-5 mt-8 list-none">
-              {[1, 2, 3].map((slot) => (
-                <li class="rounded-card border-2 border-dashed border-amber-300 bg-white/70 p-5 flex flex-col justify-between min-h-[190px]">
-                  <div>
-                    <Quote className="w-6 h-6 text-amber-300" aria-hidden="true" />
-                    <p class="mt-3 text-sm font-semibold text-amber-900 italic">
-                      Chỗ dành cho nhận xét thật của phụ huynh #{slot}
-                    </p>
-                  </div>
-                  <div class="mt-4 pt-3 border-t border-dashed border-amber-300 text-xs text-amber-900 space-y-1">
-                    <div>Tên phụ huynh: <span class="font-bold">TODO</span></div>
-                    <div>Cơ sở: <span class="font-bold">TODO</span></div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          <div class="gc-quotes" role="region" aria-label="Nhận xét phụ huynh" tabindex="0">
-            {TESTIMONIALS.map((item, idx) => (
-              <figure
-                class:list={[
-                  "gc-quotes__card rounded-card p-6 lg:p-7",
-                  idx === 0 ? "bg-brand-800 text-white" : "border border-slate-200 bg-white",
-                ]}
-              >
-                <Quote className={idx === 0 ? "w-6 h-6 text-amber-400" : "w-6 h-6 text-amber-500"} aria-hidden="true" />
-                <blockquote class:list={["mt-4 text-base leading-relaxed lg:text-lg", idx === 0 ? "text-brand-100" : "text-slate-700"]}>
+        <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+          {TESTIMONIALS.map((item) => (
+            <figure class="flex flex-col overflow-hidden rounded-card border border-slate-200/90 bg-white shadow-soft">
+              <figcaption class="flex items-center gap-3 bg-brand-800 px-4 py-3.5 text-white">
+                <span aria-hidden="true" class="flex size-10 flex-none items-center justify-center rounded-full bg-brand-600 text-[0.8125rem] font-bold leading-none text-amber-400">{initials(item.author)}</span>
+                <div>
+                  <b class="block text-[0.9375rem] leading-snug">{item.author}</b>
+                  <span class="block text-[0.8125rem] leading-snug text-brand-200">{item.branch}</span>
+                </div>
+              </figcaption>
+              <div class="flex-1 bg-brand-50 px-4 pb-4 pt-5">
+                <blockquote class="max-w-[92%] rounded-[1.125rem_1.125rem_1.125rem_0.25rem] bg-white px-4 py-3 text-base leading-relaxed text-slate-900 shadow-sm">
                   {item.quote}
                 </blockquote>
-                <figcaption class:list={["mt-6 border-t pt-4", idx === 0 ? "border-brand-600" : "border-slate-200"]}>
-                  <div class:list={["font-bold", idx === 0 ? "text-white" : "text-sm text-slate-900"]}>{item.author}</div>
-                  <div class:list={["mt-0.5", idx === 0 ? "text-sm text-brand-200" : "text-xs text-slate-600"]}>{item.role} • {item.branch}</div>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        )}
+                <p class="mt-2 flex items-center justify-end gap-1 text-xs text-slate-600">
+                  <CheckCheck className="h-3.5 w-3.5 text-brand-500" aria-hidden="true" /> Đã nhận
+                </p>
+              </div>
+            </figure>
+          ))}
+        </div>
       </div>
     </section>
 

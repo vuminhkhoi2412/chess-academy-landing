@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global Chess – Phương án thiết kế lại “Nhận xét phụ huynh”</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-950:#0b2136;--navy-800:#184268;--navy-600:#1f5285;--navy-200:#b6d0e8;--navy-100:#d9e8f5;
+  --cream:#faf8f5;--ink:#0f172a;--ink-2:#334155;--ink-3:#475569;--rule:#e2e8f0;
+  --amber-400:#fbbf24;--amber-500:#f59e0b;--amber-700:#b45309;
+  --display:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;
+  --sans:"Be Vietnam Pro",system-ui,sans-serif;
+  --card:1.125rem;
+  --soft:0 1px 2px rgb(68 55 43/.04),0 8px 24px -12px rgb(68 55 43/.16);
+}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--sans);color:var(--ink);background:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--amber-500);outline-offset:2px}
+figure,blockquote{margin:0}
+.wrap{max-width:72rem;margin:0 auto;padding:0 1rem}
+
+/* khung xem trước (không thuộc thiết kế) */
+.bar{position:sticky;top:0;z-index:20;background:var(--navy-950);color:#fff}
+.bar .wrap{display:flex;gap:.25rem 1rem;align-items:center;flex-wrap:wrap;padding-block:.5rem}
+.bar b{font-family:var(--display);margin-right:auto;font-size:.9375rem}
+.bar button{padding:.5rem .875rem;font-size:.8125rem;font-weight:600;color:var(--navy-200);min-height:2.75rem;border-bottom:2px solid transparent}
+.bar button[aria-selected=true]{color:#fff;border-color:var(--amber-400)}
+.bar label{display:inline-flex;align-items:center;gap:.5rem;font-size:.8125rem;color:var(--navy-100);min-height:2.75rem}
+.note{font-size:.8125rem;color:var(--ink-3);max-width:56rem;padding:1.5rem 0 1.25rem}
+.note b{color:var(--ink)}
+.note ul{margin:.5rem 0 0 1.1rem;padding:0}
+.ctx{padding:1.25rem 0;border-top:1px solid var(--rule);font-size:.8125rem;color:var(--ink-3);text-align:center;background:repeating-linear-gradient(135deg,#f1ede6 0 8px,#f7f4ee 8px 16px)}
+
+/* ---------- các lớp dùng chung giống trang thật ---------- */
+.eyebrow{display:inline-flex;align-items:center;gap:.75rem;font-size:.9375rem;font-weight:600;letter-spacing:-.005em;color:var(--amber-700)}
+.eyebrow::before{content:"";width:1.75rem;height:2px;background:var(--amber-500);border-radius:9999px}
+h2{font-family:var(--display);font-weight:800;font-size:clamp(1.875rem,4vw,3rem);letter-spacing:-.02em;line-height:1.08;margin-top:.75rem;text-wrap:balance}
+.lede{color:#475569;font-size:1rem;line-height:1.65;text-wrap:pretty}
+section.sec{padding:4rem 0;border-top:1px solid var(--rule)}
+.head{display:grid;gap:1rem;margin-bottom:2.5rem}
+@media(min-width:64rem){.head{grid-template-columns:8fr 4fr;gap:2rem;align-items:end}.head .lede{text-align:right;padding-bottom:.25rem;font-size:.875rem}}
+.q-mark{width:1.5rem;height:1.5rem;flex:none}
+
+/* ---------- Hiện tại: dải vuốt ngang < lg, 3 cột đều ≥ lg ---------- */
+.cur{display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;margin-inline:-1rem;padding:.5rem 1rem 1rem}
+.cur>figure{display:flex;flex:0 0 84%;flex-direction:column;scroll-snap-align:start;border-radius:var(--card);padding:1.5rem;background:#fff;border:1px solid rgb(226 232 240/.9);box-shadow:var(--soft)}
+.cur>figure:first-child{background:var(--navy-800);color:#fff;border-color:transparent}
+.cur blockquote{flex:1;margin-top:1rem;font-size:1rem;line-height:1.65;color:#334155}
+.cur>figure:first-child blockquote{color:var(--navy-100)}
+.cur figcaption{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--rule)}
+.cur>figure:first-child figcaption{border-color:var(--navy-600)}
+.cur figcaption b{display:block;font-size:.875rem}
+.cur figcaption span{display:block;margin-top:.125rem;font-size:.75rem;color:#475569}
+.cur>figure:first-child figcaption span{color:var(--navy-200)}
+@media(min-width:64rem){.cur{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin:0;padding:0;overflow:visible}.cur>figure{flex:none}}
+
+/* ---------- Đề xuất: 12 cột lệch, không cuộn ngang ---------- */
+.prop{display:grid;gap:1rem}
+.pq{display:flex;flex-direction:column;border-radius:var(--card);padding:1.5rem;background:#fff;border:1px solid rgb(226 232 240/.9)}
+.pq blockquote{flex:1;margin-top:1rem;font-size:1.0625rem;line-height:1.65;color:#334155;text-wrap:pretty}
+.pq figcaption{margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--rule);font-size:.875rem;line-height:1.5}
+.pq figcaption b{font-weight:700;color:var(--ink)}
+.pq figcaption span{color:#475569}
+.pq svg{color:var(--amber-500)}
+.pq--lead{background:var(--navy-800);color:#fff;border-color:transparent;box-shadow:0 2px 4px rgb(68 55 43/.05),0 20px 44px -16px rgb(68 55 43/.22)}
+.pq--lead blockquote{color:#fff;font-family:var(--display);font-weight:600;font-size:clamp(1.25rem,2.4vw,1.75rem);line-height:1.35;letter-spacing:-.01em;text-wrap:balance}
+.pq--lead figcaption{border-color:var(--navy-600)}
+.pq--lead figcaption b{color:#fff}
+.pq--lead figcaption span{color:var(--navy-200)}
+.pq--lead svg{color:var(--amber-400)}
+.pq--lead.solo{grid-column:1/-1}
+.stack{display:grid;gap:1rem;align-content:start}
+@media(min-width:48rem){.prop{grid-template-columns:repeat(12,1fr);gap:1.5rem}.pq--lead{grid-column:span 7;padding:2rem}.stack{grid-column:span 5;gap:1.5rem}.stack.wide{grid-column:span 12;grid-template-columns:1fr 1fr}}
+@media(min-width:48rem){.pq--lead.solo{grid-column:span 12}}
+
+/* ---------- Hướng 2: khung chat, bong bóng tin nhắn ---------- */
+.chats{display:grid;gap:1.25rem}
+@media(min-width:48rem){.chats{grid-template-columns:repeat(2,1fr);gap:1.5rem}.chats>.chat:nth-child(3){grid-column:1/-1;max-width:calc(50% - .75rem)}}
+@media(min-width:64rem){.chats{grid-template-columns:repeat(3,1fr)}.chats>.chat:nth-child(3){grid-column:auto;max-width:none}}
+.chat{display:flex;flex-direction:column;border-radius:var(--card);background:#fff;border:1px solid rgb(226 232 240/.9);box-shadow:var(--soft);overflow:hidden}
+.chat-top{display:flex;align-items:center;gap:.75rem;padding:.875rem 1rem;background:var(--navy-800);color:#fff}
+.chat-av{flex:none;width:2.5rem;height:2.5rem;border-radius:9999px;background:var(--navy-600);color:var(--amber-400);display:flex;align-items:center;justify-content:center;font-size:.8125rem;font-weight:700;line-height:1;letter-spacing:0}
+.chat-top b{display:block;font-size:.9375rem;line-height:1.3}
+.chat-top span{display:block;font-size:.8125rem;color:var(--navy-200);line-height:1.3}
+.chat-body{flex:1;padding:1.25rem 1rem 1rem;background:#eef5fb}
+.recv{display:flex;justify-content:flex-end;align-items:center;gap:.25rem;margin-top:.5rem;font-size:.75rem;color:#475569}
+.recv svg{width:1.125rem;height:.75rem;color:#2f6ba3}
+/* ---------- Ba mẫu theo góp ý (có chi tiết bịa tạm) ---------- */
+/* Chi tiết chưa có trong nguồn: tô vàng + gạch chấm để không ai nhầm là dữ liệu thật. */
+.fake{background:#fef3c7;border-bottom:2px dotted var(--amber-700);padding-inline:.125rem;border-radius:.125rem}
+.fake-svg{outline:2px dotted var(--amber-700);outline-offset:3px;border-radius:.25rem}
+.tri{display:grid;gap:1rem}
+@media(min-width:64rem){.tri{grid-template-columns:repeat(3,1fr);gap:1.5rem;align-items:stretch}}
+.wc{display:flex;flex-direction:column;border-radius:var(--card);padding:1.5rem;background:#fff;border:1px solid rgb(226 232 240/.9);box-shadow:0 1px 2px rgb(15 23 42/.06);transition:box-shadow .15s}
+.wc:hover{box-shadow:0 8px 24px -12px rgb(68 55 43/.22)}
+.wc-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem}
+.stars{display:inline-flex;gap:.125rem;color:var(--amber-500)}
+.stars svg{width:1rem;height:1rem}
+.pill{display:inline-block;padding:.125rem .625rem;border-radius:9999px;background:#f1f5f9;color:#475569;font-size:.75rem;font-weight:600}
+.wc blockquote{flex:1;margin-top:1rem;font-size:1.0625rem;line-height:1.65;color:#334155;text-wrap:pretty}
+.wc-foot{display:flex;align-items:center;gap:.75rem;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--rule)}
+.wc-av{flex:none;width:2.5rem;height:2.5rem;border-radius:9999px;background:var(--navy-800);color:#fff;display:grid;place-items:center;font-size:.8125rem;font-weight:700;letter-spacing:.02em}
+.wc-foot b{display:block;font-size:.875rem;line-height:1.35}
+.wc-foot span.s{display:block;font-size:.8125rem;color:#475569;line-height:1.35}
+.wc--feat{background:var(--navy-800);color:#fff;border-color:transparent;box-shadow:0 20px 44px -16px rgb(68 55 43/.4)}
+.wc--feat blockquote{color:#fff}
+.wc--feat .wc-foot{border-color:var(--navy-600)}
+.wc--feat .wc-foot span.s{color:var(--navy-200)}
+.wc--feat .wc-av{background:var(--navy-600);color:var(--amber-400)}
+.wc--feat .pill{background:var(--navy-600);color:var(--navy-100)}
+.badge{align-self:flex-start;margin-bottom:.75rem;padding:.25rem .75rem;border-radius:9999px;background:var(--amber-500);color:var(--navy-950);font-size:.75rem;font-weight:700}
+@media(min-width:64rem){.wc--feat{transform:scale(1.04);z-index:1}}
+.zl{display:grid;gap:1rem}
+@media(min-width:64rem){.zl{grid-template-columns:repeat(3,1fr);gap:1.5rem;align-items:start}.zl>:nth-child(2){margin-top:2rem}}
+.zc{border-radius:var(--card);background:#fff;border:1px solid rgb(226 232 240/.9);box-shadow:var(--soft);padding:1.25rem 1rem 1rem}
+.zc-who{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
+.zc-who b{display:block;font-size:.9375rem;line-height:1.3}
+.zc-who span.s{display:block;font-size:.8125rem;color:#475569}
+.zc-bub{padding:.75rem 1rem;border-radius:1.125rem 1.125rem 1.125rem .25rem;background:#e8f1fb;color:var(--ink);font-size:1rem;line-height:1.6;text-wrap:pretty}
+.zc-meta{display:flex;flex-wrap:wrap;gap:.25rem .75rem;margin-top:.625rem;padding-left:.25rem;font-size:.75rem;color:#475569}
+.legend{display:inline-block;margin-top:.5rem}
+.bubble{position:relative;max-width:92%;padding:.75rem 1rem;border-radius:1.125rem 1.125rem 1.125rem .25rem;background:#fff;color:var(--ink);font-size:1rem;line-height:1.6;box-shadow:0 1px 2px rgb(15 23 42/.08);text-wrap:pretty}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="wrap">
+    <b>Nhận xét phụ huynh – phương án</b>
+    <button type="button" data-v="cur" aria-selected="false">Hiện tại</button>
+    <button type="button" data-v="prop" aria-selected="true">Đề xuất</button>
+    <button type="button" data-v="chat" aria-selected="false">Hướng 2: Bong bóng chat</button>
+    <button type="button" data-v="t1" aria-selected="false">Mẫu 1: Card trắng + avatar</button>
+    <button type="button" data-v="t2" aria-selected="false">Mẫu 2: Card xanh nổi bật</button>
+    <button type="button" data-v="t3" aria-selected="false">Mẫu 3: Khung tin nhắn Zalo</button>
+    <label><input type="checkbox" id="robo" checked> Giữ câu trích về robotics</label>
+  </div>
+</div>
+
+<div class="wrap"><p class="note" id="note"></p></div>
+
+<div class="ctx">… phần “Hình ảnh trung tâm” (gallery) …</div>
+<main id="stage"></main>
+<div class="ctx">… phần “Câu hỏi thường gặp” (FAQ) …</div>
+
+<script>
+const $ = s => document.querySelector(s);
+let view = "prop";
+
+// Nguyên văn từ TESTIMONIALS trong src/data/courses.ts, không sửa chữ nào.
+const Q = [
+  { q: "Bé học tiến bộ lắm á thầy, chơi tốt hơn lúc chưa học, chiếu bí ba hoài luôn", a: "Phụ huynh bé Bảo Khang", b: "Cơ sở Bình Phú (Q.6)", role: "Phụ huynh học viên" },
+  { q: "Bé thích học ở đây lắm á thầy, có các bạn chơi chung và biết thêm được nhiều thế cờ hay", a: "Phụ huynh bé Kính Long", b: "Cơ sở Tên Lửa (Bình Tân)", role: "Phụ huynh học viên" },
+  { q: "Học ở Global Chess ngoài cờ vua ra bé còn học được robotics, đưa bé đến 1 chỗ mà học được nhiều môn, mẹ đỡ phải chạy đi chạy lại", a: "Phụ huynh bé Văn Minh", b: "Cơ sở Tên Lửa (Bình Tân)", role: "Phụ huynh học viên", robo: true },
+];
+const quote = '<svg class="q-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.76-2-2-2H4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2h4M15 21c3 0 7-1 7-8V5c0-1.25-.76-2-2-2h-4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2h4"/></svg>';
+
+const NOTES = {
+  cur: "<b>Hiện tại.</b> Dải vuốt ngang trên mobile (thẻ kế tiếp ló ra 16%), lưới 3 cột đều từ 1024px. Chú thích hai dòng: tên rồi “Phụ huynh học viên • cơ sở”. Mã còn thêm ô TODO dự phòng khi mảng rỗng (không hiển thị ở đây).",
+  prop: "<b>Đề xuất.</b><ul><li>Bố cục lệch 7/5: trích dẫn đầu to, nền navy; hai câu còn lại xếp chồng bên phải. Mobile xếp dọc, <b>không cuộn ngang</b>.</li><li>Chú thích một dòng: <b>Phụ huynh bé …</b> · cơ sở. Bỏ dòng “Phụ huynh học viên” vì lặp lại tên.</li><li>Nằm ngay sau gallery, trước FAQ. Không còn khối “Môi trường học tập” ở giữa.</li><li>Bỏ ô TODO dự phòng trong giao diện; thay bằng kiểm tra lúc build.</li><li>Chữ trích giữ nguyên văn, chỉ đổi cỡ chữ của câu dẫn đầu. Bỏ tích ô “robotics” ở thanh trên để xem bố cục khi chỉ còn 2 câu (khi đó hai câu xếp 7/5 như nhau, không còn cột chồng).</li></ul>"
+};
+
+NOTES.chat = "<b>Hướng 2: bong bóng chat.</b><ul><li>Mỗi nhận xét là một khung chat nhỏ: đầu khung có avatar tròn nền navy, chữ viết tắt tên bé màu amber như BK, KL, VM (không dùng ảnh trẻ em), “Phụ huynh bé …” và cơ sở; bên dưới là một bong bóng chứa nguyên văn lời phụ huynh.</li><li>Dòng “✓✓ Đã nhận” ở góc phải dưới bong bóng cho giống Zalo. Kênh gửi là Zalo theo xác nhận của bạn (<code>trichdan.txt</code> không ghi, nên nên ghi lại nguồn này). Chưa dùng giờ gửi hay “Mẹ bé”. Khung chat không mang logo hay màu của Zalo.</li><li>Nếu trung tâm có ảnh chụp tin nhắn thật kèm đồng ý của phụ huynh, nên dùng ảnh đó thay cho bản dựng này.</li><li>Ba khung cao bằng nhau trên desktop (≥1024px); bong bóng nằm trên cùng, dòng “Đã nhận” luôn ở đáy khung.</li></ul>";
+
+const LEG = '<span class="fake legend">chi tiết bịa tạm</span>';
+const WARN = "<b>Bản thử có chi tiết BỊA, chỉ để duyệt giao diện.</b> Chi tiết nào chưa có trong nguồn đều tô vàng, gạch chấm (" + LEG + "). Chưa được đưa lên trang thật cho tới khi trung tâm cung cấp thông tin thật. ";
+NOTES.t1 = WARN + "<b>Mẫu 1 – 3 card trắng + avatar chữ cái.</b><ul><li><b>Bịa:</b> 5 sao vàng ở đầu card (nguồn không có điểm đánh giá nào; DESIGN.md cấm hiển thị rating tự đặt); “Mẹ bé …” (nguồn chỉ ghi “PH bé …”, chỉ trích dẫn 3 có chữ “mẹ” trong lời); “Học viên lớp Cơ bản” (không có thông tin lớp/cấp độ của từng bé).</li><li><b>Có thật:</b> lời trích, tên bé, cơ sở; nhãn quận lấy từ <code>BRANCHES</code>; chữ cái đầu của avatar suy ra từ tên bé.</li><li>Cả 3 card cùng nền trắng, bóng nhẹ; đây là hàng 3 thẻ bằng nhau, trái quy tắc trong DESIGN.md.</li></ul>";
+NOTES.t2 = WARN + "<b>Mẫu 2 – card xanh ở giữa làm tâm điểm.</b><ul><li><b>Bịa / tự chọn:</b> nhãn “Câu chuyện tiêu biểu” (nguồn không nói trích dẫn nào tiêu biểu hơn; thực chất là chủ ý biên tập); 5 sao; “Mẹ bé”; “Học viên lớp Cơ bản”, như Mẫu 1.</li><li>Card giữa nền navy, phóng to 4% trên desktop (≥1024px), có bóng đậm hơn. Khi tắt ô robotics chỉ còn 2 card, card xanh là card đầu.</li></ul>";
+NOTES.t3 = WARN + "<b>Mẫu 3 – khung tin nhắn kiểu Zalo.</b><ul><li><b>Bịa:</b> dòng “Đã gửi qua Zalo” và giờ gửi (nguồn không ghi kênh hay giờ); nhãn lớp (“Lớp Cờ vua &amp; Robotics”, “Lớp Cờ vua”) vì không biết bé học lớp nào; “Mẹ bé”.</li><li><b>Có thật:</b> lời trích, tên bé, cơ sở. Avatar dùng chữ cái đầu, không dùng ảnh trẻ em. Không dùng logo hay màu thương hiệu của Zalo.</li><li>Nếu trung tâm gửi được ảnh chụp tin nhắn thật kèm đồng ý của phụ huynh thì dùng ảnh đó sẽ đáng tin hơn bản dựng này.</li></ul>";
+
+const STAR = '<svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1.5l2.6 5.3 5.9.9-4.25 4.15 1 5.85L10 14.9l-5.25 2.8 1-5.85L1.5 7.7l5.9-.9z"/></svg>';
+const stars = () => `<span class="stars fake-svg" role="img" aria-label="5 sao (bịa tạm)">${STAR.repeat(5)}</span>`;
+const DIST = { "Bình Phú": "Q.6", "Tên Lửa": "Bình Tân" };
+const pill = x => `<span class="pill">${Object.entries(DIST).find(([k]) => x.b.includes(k))[1]}</span>`;
+const mom = a => a.replace("Phụ huynh bé", '<span class="fake">Mẹ bé</span>');
+const inits = a => { const w = a.replace("Phụ huynh bé ", "").split(" "); return (w[0][0] + w[w.length - 1][0]).toUpperCase(); };
+const LOP = ["Cơ bản", "Cơ bản", "Cờ vua &amp; Robotics"];
+
+function head(){
+  return `<div class="head"><div><span class="eyebrow">Nhận xét phụ huynh</span><h2>Phụ huynh nói gì về Global Chess</h2></div><p class="lede">Trích nguyên văn chia sẻ của phụ huynh, ghi theo cơ sở bé đang học.</p></div>`;
+}
+function list(){ return Q.filter(x => !x.robo || $("#robo").checked); }
+
+const VIEWS = {
+  cur: () => `<section class="sec"><div class="wrap">${head()}
+    <div class="cur" role="region" aria-label="Nhận xét phụ huynh" tabindex="0">${list().map(x => `
+      <figure>${quote}<blockquote>${x.q}</blockquote>
+      <figcaption><b>${x.a}</b><span>${x.role} • ${x.b}</span></figcaption></figure>`).join("")}</div></div></section>`,
+
+  t1: () => `<section class="sec"><div class="wrap">${head()}<div class="tri">${list().map(x => `
+    <figure class="wc"><div class="wc-top">${stars()}${pill(x)}</div>
+      <blockquote>“${x.q}”</blockquote>
+      <figcaption class="wc-foot"><span class="wc-av" aria-hidden="true">${inits(x.a)}</span>
+        <div><b>${mom(x.a)}</b><span class="s"><span class="fake">Học viên lớp ${LOP[Q.indexOf(x)] === "Cơ bản" ? "Cơ bản" : "Cờ vua"}</span> • ${x.b}</span></div></figcaption></figure>`).join("")}</div></div></section>`,
+
+  t2: () => {
+    const l = list(), mid = l.length === 3 ? 1 : 0;
+    return `<section class="sec"><div class="wrap">${head()}<div class="tri">${l.map((x, i) => `
+    <figure class="wc ${i === mid ? "wc--feat" : ""}">${i === mid ? '<span class="badge fake">✦ Câu chuyện tiêu biểu</span>' : ""}
+      <div class="wc-top">${stars()}${pill(x)}</div>
+      <blockquote>“${x.q}”</blockquote>
+      <figcaption class="wc-foot"><span class="wc-av" aria-hidden="true">${inits(x.a)}</span>
+        <div><b>${mom(x.a)}</b><span class="s"><span class="fake">Học viên lớp ${LOP[Q.indexOf(x)] === "Cơ bản" ? "Cơ bản" : "Cờ vua"}</span> • ${x.b}</span></div></figcaption></figure>`).join("")}</div></div></section>`;
+  },
+
+  t3: () => {
+    const TIME = ["18:42", "20:15", "21:08"];
+    return `<section class="sec"><div class="wrap">${head()}<div class="zl">${list().map(x => `
+    <figure class="zc"><figcaption class="zc-who"><span class="wc-av" aria-hidden="true">${inits(x.a)}</span>
+      <div><b>${mom(x.a)}</b><span class="s">${x.b}</span></div></figcaption>
+      <blockquote class="zc-bub">${x.q}</blockquote>
+      <div class="zc-meta"><span class="fake">✓ Đã gửi qua Zalo • ${TIME[Q.indexOf(x)]}</span><span class="fake">${LOP[Q.indexOf(x)] === "Cơ bản" ? "Lớp Cờ vua" : "Lớp Cờ vua &amp; Robotics"}</span></div></figure>`).join("")}</div></div></section>`;
+  },
+
+  chat: () => {
+    return `<section class="sec"><div class="wrap">${head()}<div class="chats">${list().map(x => `
+      <figure class="chat"><figcaption class="chat-top"><span class="chat-av" aria-hidden="true">${inits(x.a)}</span>
+        <div><b>${x.a}</b><span>${x.b}</span></div></figcaption>
+        <div class="chat-body"><blockquote class="bubble">${x.q}</blockquote>
+        <div class="recv"><svg viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 6.5l3.5 3.5L11 2.5M7 10l.5.5L16 2.5"/></svg>Đã nhận</div></div></figure>`).join("")}</div></div></section>`;
+  },
+
+  prop: () => {
+    const l = list(), [lead, ...rest] = l;
+    const card = (x, cls = "") => `<figure class="pq ${cls}">${quote}<blockquote>${x.q}</blockquote>
+      <figcaption><b>${x.a}</b> <span>· ${x.b}</span></figcaption></figure>`;
+    // Còn 1 câu: thẻ dẫn đầu chiếm trọn hàng. Còn 2 câu: 7/5. Đủ 3 câu: 7 + cột chồng 5.
+    const body = l.length === 1 ? card(lead, "pq--lead solo")
+      : `${card(lead, "pq--lead")}<div class="stack">${rest.map(x => card(x)).join("")}</div>`;
+    return `<section class="sec"><div class="wrap">${head()}<div class="prop">${body}</div></div></section>`;
+  }
+};
+
+function render(){ $("#note").innerHTML = NOTES[view]; $("#stage").innerHTML = VIEWS[view](); }
+document.querySelectorAll(".bar [data-v]").forEach(t => t.addEventListener("click", () => {
+  view = t.dataset.v;
+  document.querySelectorAll(".bar [data-v]").forEach(x => x.setAttribute("aria-selected", x === t));
+  render();
+}));
+$("#robo").addEventListener("change", render);
+render();
+</script>
+</body>
+</html>
