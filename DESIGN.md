@@ -23,16 +23,17 @@ paper and a single amber accent keep it friendly for parents of 4–12 year old 
 - **Density:** 4 / 10 — Daily App Balanced. Generous section padding (16 = 4rem vertical
   rhythm), relaxed card interiors, nothing cramped. Pricing is the one denser surface.
 - **Variance:** 6 / 10 — Offset Asymmetric. Hero is a deliberate 7/5 split, the branch
-  grid is bento (first card spans two columns), the operating points grid runs the
-  7-5-5-7 rhythm on 12 columns. No three-equal-cards rows.
+  cards carry a 16:9 photo and the `#hinh-anh` gallery is a bento (one square photo
+  spanning two rows beside four smaller ones). The branch and operating-point rows are
+  plain three-up grids on desktop.
 - **Motion:** 3 / 10 — Static Restrained. The site informs; it does not perform. Motion is
   limited to CSS `transition`, tactile `active:scale`, and one `animate-pulse` on a
   form error. No scroll-jacking, no parallax, no entrance choreography.
 
 The signature move is **geometry for atmosphere, real photos for proof**: the hero
 builds depth from a perspective-rotated chessboard plane, a warm/cool radial mesh and a
-fine SVG grain; the `#hinh-anh` gallery then shows only real center photos, used with
-parents' consent. Never stock photos or AI-generated children.
+fine SVG grain; the branch cards and the `#hinh-anh` gallery then show real photos only,
+the gallery ones used with parents' consent. Never stock photos or AI-generated children.
 
 ---
 
@@ -71,7 +72,7 @@ place `slate-600` on navy.
 
 **Accent — the single accent color, amber/gold**
 
-- **Amber Gold** (`#f59e0b`, `amber-500`) — primary CTA fill (filled button on the header and in the mobile menu uses amber-500 with `slate-950` text), focus-visible outline, eyebrow tick mark, the "Most popular" ribbon
+- **Amber Gold** (`#f59e0b`, `amber-500`) — fill of the `.gc-move--amber` CTA (header and mobile menu), focus-visible outline, eyebrow tick mark, the "Most popular" ribbon
 - **Amber Deep** (`#b45309`, `amber-700`) — inline text links on light surfaces, eyebrow label text, icons
 - **Amber Bright** (`#fbbf24`, `amber-400`) — accent text and icons on navy surfaces, icon color inside navy tiles, CTA arrow glyph
 - **Amber Wash** (`#fef3c7` / `#fffbeb`, amber-100/50) — badge fills, selected pricing card border glow
@@ -125,11 +126,13 @@ Rules:
 
 **Buttons**
 
-- Primary on light: `bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 font-bold`, `rounded-control`, `px-4 py-2.5`, `text-xs md:text-sm`, `shadow-soft`.
-- Primary on navy: `bg-brand-800 hover:bg-brand-700 active:bg-brand-900 text-white font-bold`, `px-6 py-3.5`, `shadow-lifted`, with the trailing arrow glyph in `amber-400`.
-- Secondary: `bg-white/80 hover:bg-white backdrop-blur-sm border border-slate-300 text-slate-800 font-semibold`, `shadow-soft`.
-- Tertiary: text link in `amber-700 hover:amber-800 hover:underline`, with a `group-hover:translate-x-0.5` arrow.
-- All buttons: `active:scale-[0.98]` (or `0.99` on full width, `0.95` on icon-only). No outer glow ever.
+- Main actions are `.gc-move` "moves" (defined in `global.css`): a left-aligned label plus a separate square target cell holding an arrow, `rounded-control`, `font-bold`, `min-height: 3rem` (`.gc-move--lg`: 3.5rem, used in the hero and the submit step).
+  - `.gc-move--navy` (hero): navy body, `amber-400` target cell.
+  - `.gc-move--amber` (header, mobile menu): `amber-500` body, `slate-950` text; `.gc-move--block` makes it full width.
+  - `.gc-move--quiet`: secondary, border only.
+- Reference link `.gc-ref`: unframed text link with an arrow (hero "Xem chi tiết lộ trình").
+- In branch cards: "Chỉ đường" is `border-slate-300 bg-white text-brand-800`; "Chọn cơ sở này" is `bg-brand-800 hover:bg-brand-900 text-white`; both `min-h-11 rounded-control text-sm font-bold`.
+- Buttons use `active:scale-[0.99]` (`0.95` on icon-only). No outer glow ever.
 - Minimum tap target 44px on mobile; the header CTA hides below `sm` rather than shrinking.
 
 **Cards**
@@ -139,16 +142,20 @@ Rules:
 - Navy card: `bg-brand-800 text-white p-5 rounded-card`; inner sub-panels use `bg-brand-700/60 border border-brand-600`.
 - Icon tile: `bg-brand-800 text-amber-400`, `w-9 h-9` (compact) or `w-11 h-11` (wide), `rounded-control`, no shadow.
 - On hover a card may change border to `amber-400` and gain `shadow-soft`. No translate, no lift.
-- Bento is preferred over equal grids: the first branch card spans two columns and carries a faded chessboard circle at 6% opacity as its badge of rank.
+- Branch card: `rounded-card border border-slate-200/90 bg-white`, an `aspect-video` photo on top (a branch without a photo falls back to a faded chessboard cell with its id) carrying two white pills ("Cơ sở n" and the district), then name, address, a `tel:` link and the two buttons above. Hover changes the border to `slate-300` and adds `shadow-soft`.
+- Operating-point card: `bg-cream rounded-card border border-slate-200/90 p-5`, icon tile, `h3`, one sentence.
 
 **Gallery**
 
-- `#hinh-anh` is a two-column offset collage: left column is lead → classroom → coach,
-  right column starts lower (`md:pt-12`) with practice → tournament → branches note.
-  Mobile stacks to one column.
-- Figures: `rounded-card overflow-hidden bg-slate-100 ring-1 ring-slate-900/5`; images are
-  `w-full h-auto`. No text overlay, tilt, hover zoom or fake polaroid frame.
-- Only real photos from the center, with consent. Alt text describes what is visible;
+- `#hinh-anh` is a 3-column bento from `md`: the first photo is square and spans two rows
+  (`md:row-span-2`) and sets the height; the other four fill the remaining two columns,
+  cropped with `object-cover`. Mobile stacks to one column in DOM order.
+- Figures: `relative overflow-hidden rounded-card bg-slate-100 ring-1 ring-slate-900/5`, the
+  image absolutely filling the frame. No text overlay, tilt or fake polaroid frame.
+- Each photo links to a larger copy (max 1600px). JS opens it in a native `<dialog>`
+  (`#gallery-lightbox`, `backdrop:bg-brand-950/90`, caption from the alt text, round `size-11`
+  close button); without JS the link opens the image itself.
+- Only real photos from the center; gallery photos have recorded parent consent. Alt text describes what is visible;
   never invent a branch name, student name, event result or award.
 
 **Inputs and forms**
@@ -162,12 +169,12 @@ Rules:
 **Loaders, empty and error states**
 
 - Skeletons must match the exact dimensions of the content they replace. No circular spinner.
-- When `TESTIMONIALS` is empty, the testimonial section renders a heavy dashed `border-2 border-dashed border-amber-400` TODO panel with three skeleton quote slots, each showing `Tên phụ huynh: TODO` / `Cơ sở: TODO`. This is intentional design, not a temporary hack. With real quotes present, it switches to filled cards automatically.
+- `TESTIMONIALS` currently holds three real parent quotes, rendered as `.gc-quotes` cards (the first on `bg-brand-800`, the rest white). If the array is ever emptied, the section falls back to a heavy dashed `border-2 border-dashed border-amber-400` TODO panel with three skeleton slots, each showing `Tên phụ huynh: TODO` / `Cơ sở: TODO`. This is intentional design, not a temporary hack.
 - Error pages reuse the same cream + navy + amber vocabulary: the 404 shows a navy chessboard motif and a filled amber or navy return button.
 
 **Modal**
 
-- `fixed inset-0 z-50 bg-brand-950/85 backdrop-blur-sm`, content `bg-white rounded-card max-w-xl w-full p-6 md:p-8 shadow-2xl my-8`. Close button top-right, `active:scale-95`, hover `bg-slate-100`.
+- `fixed inset-0 z-50 bg-brand-950/85 backdrop-blur-sm`, content `bg-white rounded-card max-w-xl w-full my-8 flex flex-col overflow-hidden max-h-[calc(100dvh-6rem)] shadow-2xl`. Close button top-right, `active:scale-95`, hover `bg-slate-100`. The gallery lightbox is a separate native `<dialog>` (see Gallery).
 
 **Sticky chrome**
 
@@ -182,8 +189,8 @@ Rules:
 - Max-width containment: `max-w-6xl mx-auto px-4` for marketing sections. Document pages narrow to `max-w-3xl`.
 - **Grid-first.** Use CSS Grid with the 12-column or fractional track syntax. Never `calc()` percentage math, never flexbox width games.
 - Section rhythm: `py-16` for standard sections, `py-20` for the pricing band, `py-14 md:py-20` for the hero. Sections alternate `bg-cream` / `bg-white`, separated by `border-t border-slate-200`.
-- **Asymmetry is required.** Hero is `md:grid-cols-12` split 7/5. Operating points run `lg:grid-cols-12` as 7-5-5-7. Branch grid is `sm:grid-cols-2 lg:grid-cols-4` bento with a 2-column lead card and a 2-column navy hotline card closing the row. The photo gallery is a two-column offset collage, not an equal grid.
-- Banned: three equal cards in a row; centered hero (this is a variance-6 system, the hero stays left-aligned with the board island on the right).
+- **Asymmetry is required.** Hero is `md:grid-cols-12` split 7/5. The photo gallery is the bento above. Branch grid is `sm:grid-cols-2 lg:grid-cols-3` (five cards, so the last row has two), followed by a thin ruled hotline line (`border-y`, no box). Known exception: the branch and operating-point grids are three equal columns on desktop.
+- Banned: centered hero (this is a variance-6 system, the hero stays left-aligned with the board island on the right). Do not add further three-equal-card rows.
 - Even centered headings are paired with a left-aligned eyebrow or a stat row so the composition never reads as a flat stack.
 - Depth layers sit behind content on `-z-10` with `pointer-events-none` and an `aria-hidden` attribute, and must fade out before the section edge (`mask-image: linear-gradient(to bottom, #000 58%, transparent 100%)`) so no hard band appears where the next section begins.
 - Full-height surfaces use `min-h-dvh` (or `min-h-[100dvh]`), never `h-screen`.
@@ -212,7 +219,7 @@ none should be introduced for a marketing page.
 - Headlines scale, they do not shrink-wrap: `text-5xl` → `lg:text-7xl` → `xl:text-8xl`. Body text never drops below `1rem` (`text-sm` only for metadata and labels, never for a paragraph a parent must read).
 - Touch targets: minimum 44px. Header icon button is `h-11 w-11`; mobile menu rows are `min-h-[3rem]`.
 - Desktop nav collapses below `md` into a toggle menu that closes on Escape, on outside click, and on link selection, and re-syncs `aria-expanded` when the viewport crosses 768px.
-- The branch grid goes 1 → 2 (`sm`) → 4-bento (`lg`). The operating-points grid goes 1 → 2 (`sm`) → 12-column asymmetric (`lg`); the horizontal icon-beside-text layout switches on only at `lg`, when the card is genuinely wide.
+- The branch and operating-points grids both go 1 → 2 (`sm`) → 3 (`lg`). The gallery goes 1 → 3 columns at `md`.
 - Hero board island stacks below the headline on mobile and keeps its shadow ground plane.
 - Section gaps compress via `py-14 md:py-20` patterns; padding never collapses to zero.
 - Anchors use `scroll-padding-top: 5rem` to clear the 4rem sticky header.
@@ -223,7 +230,7 @@ none should be introduced for a marketing page.
 
 - Vietnamese, with correct diacritics, throughout. Never ship diacritic-stripped or English placeholder text.
 - Tone: plain, factual, addressing a parent. Explain operational reality (session counts, schedules, branch addresses, how to pay) instead of praising the school.
-- Real numbers only: 72 sessions, 48 sessions, 60–90 minutes, 5 campuses, two hotlines. Prices are VND amounts as integers.
+- Real numbers only: 72 sessions, 48 sessions, 60–90 minutes, 5 campuses, two central hotlines plus one phone per campus. Prices are VND amounts as integers.
 - Banned wording: "Elevate", "Seamless", "Unleash", "Next-Gen", "transform your child", "world-class", "best in Vietnam", self-awarded superlatives, invented awards, invented alumni outcomes.
 - Banned filler UI text: "Scroll to explore", "Swipe down", "Learn more" as a lonely secondary link, bouncing chevrons, scroll arrows.
 - No generic placeholder identities: no "John Doe", "Acme", "Nexus", "Lorem ipsum" in visible copy. Placeholder slots are labeled TODO in Vietnamese instead.
@@ -242,8 +249,8 @@ none should be introduced for a marketing page.
 - No fabric gradient text on large headers — headline color may differentiate lines (slate-900 / amber-600), nothing shinier.
 - No custom mouse cursors.
 - No overlapping elements; no absolutely-positioned content stacking on top of text.
-- No three-equal-card rows; no centered hero.
-- No stock or AI photography of classrooms or children, and no fake image links. Only real center photos with parents' consent, in the `#hinh-anh` gallery; never invent captions, branch names or results. Where imagery is missing, draw geometry (chessboard plane, mesh, grain) or leave a labeled TODO.
+- No new three-equal-card rows; no centered hero.
+- No stock or AI photography of classrooms or children, and no fake image links. Only real photos: the `#hinh-anh` gallery (with parents' consent) and the branch-card photos; never invent captions, branch names or results. Where imagery is missing, draw geometry (chessboard plane, mesh, grain) or leave a labeled TODO.
 - No fabricated testimonials, ratings, student counts, or awards.
 - No `h-screen`; no `calc()` percentage layout hacks; no animating layout properties.
 - No emoji, no decorative confetti, no bouncing arrows.

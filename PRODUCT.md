@@ -32,17 +32,19 @@ tuition grid.
 ## Operating Context
 
 - Vietnamese-facing, TP.HCM only. Families choose a campus by district, then a weekly slot.
-- Schedule slots: weekday evenings (Mon–Fri 17:30–20:30) and three weekend slots (Sat/Sun
-  morning 08:00–11:30, afternoon 14:00–17:30, evening 17:30–20:30).
+- Schedule slots: a weekday evening slot (Mon–Fri) and three weekend slots (Sat/Sun morning,
+  afternoon, evening). The page states no clock times; none are in the code or the sources.
 - Enrolment is a form on the page. It calculates an estimated tuition, then POSTs the answers
   to a Google Apps Script web app that appends one row to the centre's Google Sheet; the parent
   sees a confirmation that the centre will contact them soon. There is no payment of any kind,
   no account, no server of our own.
-- Two hotlines and one Zalo number are the only contact channels:
-  0789.059.440, 0963.848.430, Zalo 0789059440.
-- Five campuses: 811 Hậu Giang, P. Bình Phú (Q.6) · 55 Tên Lửa, P. An Lạc (Bình Tân) ·
-  93 đường T6, P. Tây Thạnh (Tân Phú) · 152 Nguyễn Sơn, P. Phú Thọ Hoà (Tân Phú) ·
-  Vinhomes Grand Park (TP. Thủ Đức).
+- Contact channels: two central hotlines and one Zalo number (0789.059.440, 0963.848.430,
+  Zalo 0789059440), plus one direct phone per campus (listed on each branch card and in the
+  schema.org `department` data).
+- Five campuses, each with its own phone and Google Maps link in `BRANCHES`:
+  811 Hậu Giang, P. Bình Phú (Q.6) · 55 Tên Lửa, P. An Lạc (Bình Tân) ·
+  52 đường T6, P. Tây Thạnh (Tân Phú) · 152 Nguyễn Sơn, P. Phú Thọ Hoà (Tân Phú) ·
+  26 Manhattan, Vinhomes Grand Park, P. Long Bình (TP. Thủ Đức).
 - The page is also the destination for the centre's Facebook/Zalo links, so it must read
   correctly on a phone with no app installed.
 - Global Chess also teaches robotics at the same campuses, but no robotics curriculum,
@@ -55,8 +57,8 @@ tuition grid.
   per-course or per-campus pages. Multi-page expansion is not planned yet.
 - Static Astro 7 build with three hydrated React islands (puzzle board, curriculum explorer,
   pricing + checkout); Tailwind CSS 4 via Vite; intended for Vercel. No server, no database.
-- Content is data-driven: `src/data/courses.ts` holds brand strings, branches, slot list,
-  the three curriculum programmes, the seven tuition levels, the interactive puzzle, parent
+- Content is data-driven: `src/data/courses.ts` holds brand strings, branches (address, phone,
+  Maps link), the three curriculum programmes, the seven tuition levels, the interactive puzzle, parent
   quotes, FAQs and operating points.
 - Curriculum: Happy Chess 72 sessions (3 levels × 24), Global Chess Sơ cấp 48 (2 × 24),
   Global Chess Trung cấp 48 (2 × 24). Sessions run 60–90 minutes. Happy Chess takes children
@@ -73,7 +75,8 @@ tuition grid.
   visible to anyone; a honeypot field (`_hp`) deflects naive bots, and the sheet owner deletes
   junk rows. The Apps Script source is `google-apps-script/Code.gs`; setup is in
   `docs/google-sheets-setup.md`.
-- The production domain is still a placeholder (`site` in `astro.config.mjs`, marked TODO);
+- The production domain is still unconfirmed (`site` in `astro.config.mjs` is
+  `https://globalchess.vn`, marked TODO);
   canonical URLs, `robots.txt`, `og:url` and the sitemap all derive from it.
 - Vietnamese only, with correct diacritics everywhere. Fonts must ship a Vietnamese subset.
 
@@ -86,8 +89,10 @@ tuition grid.
   superlatives, no "elevate/seamless/world-class", no invented awards or alumni outcomes.
 - The logo is the real centre mark (shield); source file is `assets/logo.jpg`, never published
   as-is. This is the only brand mark; no new logo concepts.
-- Real photography only: the five classroom photos with parent consent, never stock or AI
-  images of children or classrooms.
+- Real photography only: the five classroom photos with parent consent (gallery) and one real
+  photo per campus (branch cards), never stock or AI images of children or classrooms.
+  Consent is recorded only for the five gallery photos; the branch photos have no consent
+  note yet.
 
 ## Evidence on Hand
 
@@ -97,10 +102,12 @@ tuition grid.
   name and branch label; do not edit, extend or reword them.
 - `assets/nguon/hinh-anh/` — five original photos plus `NGUON.md` recording Drive IDs and the
   consent confirmation dated 2026-10-22; cropped copies live in `src/assets/images/`.
+- `src/assets/images/branch_images/` — one photo per campus, shown on the branch cards.
+  Their source and consent are not documented.
 - `assets/logo.jpg` — source logo (920×813, white background, no alpha).
 - Absent, and therefore not to be fabricated: student counts, ratings or review scores,
-  awards or tournament results, teacher/coach bios or credentials, campus exterior/interior
-  photos per branch, usable horizontal video, online reviews, and any robotics material.
+  awards or tournament results, teacher/coach bios or credentials, campus exterior photos,
+  usable horizontal video, online reviews, and any robotics material.
 
 ## Product Principles
 
