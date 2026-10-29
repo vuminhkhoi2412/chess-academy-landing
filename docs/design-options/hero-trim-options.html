@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global Chess – Xem trước hero rút gọn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-950:#0b2136;--navy-900:#123350;--navy-800:#184268;--navy-700:#1b4a76;--navy-600:#1f5285;--navy-200:#b6d0e8;--navy-100:#d9e8f5;--navy-50:#eef5fb;
+  --cream:#faf8f5;--ink:#0f172a;--ink-2:#334155;--ink-3:#475569;--rule:#e2e8f0;
+  --amber-400:#fbbf24;--amber-500:#f59e0b;--amber-700:#b45309;
+  --display:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;
+  --sans:"Be Vietnam Pro",system-ui,sans-serif;
+  --card:1.125rem;--ctl:.75rem;
+  --soft:0 1px 2px rgb(68 55 43/.04),0 8px 24px -12px rgb(68 55 43/.16);
+  --lifted:0 2px 4px rgb(68 55 43/.05),0 20px 44px -16px rgb(68 55 43/.22);
+}
+*{box-sizing:border-box;margin:0}
+html,body{overflow-x:clip}
+body{font-family:var(--sans);color:var(--ink);background:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--navy-800);outline-offset:2px}
+.wrap{max-width:72rem;margin:0 auto;padding:0 1rem}
+
+/* ---- khung xem trước (không thuộc thiết kế) ---- */
+.bar{position:sticky;top:0;z-index:20;background:var(--navy-950);color:#fff}
+.bar .wrap{display:flex;gap:.25rem 1rem;align-items:center;flex-wrap:wrap;padding-block:.5rem}
+.bar b{font-family:var(--display);margin-right:auto;font-size:.9375rem}
+.bar button{padding:.5rem .875rem;font-size:.8125rem;font-weight:600;color:var(--navy-200);min-height:2.75rem;border-bottom:2px solid transparent}
+.bar button[aria-selected=true]{color:#fff;border-color:var(--amber-400)}
+.bar button:focus-visible{outline-color:var(--amber-400)}
+.note{font-size:.875rem;color:var(--ink-3);max-width:60rem;padding:1.5rem 0 1rem}
+.note b{color:var(--ink)}
+.diff{display:grid;gap:.5rem;margin:.75rem 0 0;font-size:.8125rem}
+.diff div{padding:.5rem .75rem;border-radius:var(--ctl);background:#fff;border:1px solid var(--rule)}
+.diff s{color:#991b1b}.diff ins{color:#065f46;text-decoration:none;font-weight:600}
+.panel[hidden]{display:none}
+.frame{border:1px solid var(--rule);border-radius:var(--card);overflow:hidden;background:var(--cream);margin:1rem 0 2rem;box-shadow:var(--soft)}
+.frame>h3{font-size:.8125rem;font-weight:700;padding:.5rem 1rem;background:#fff;border-bottom:1px solid var(--rule);color:var(--ink-2)}
+.vp{height:800px;overflow:hidden;position:relative}
+.vp::after{content:"";position:absolute;inset:auto 0 0 0;border-bottom:2px dashed #dc2626;opacity:.0}
+
+/* ---- thành phần mô phỏng trang thật ---- */
+.top{background:var(--navy-800);color:var(--navy-100);font-size:.75rem;padding:.5rem 1rem}
+.top .in{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;gap:.5rem;justify-content:space-between}
+.top .hl{color:var(--amber-400);font-weight:500}
+header.nav{background:rgb(250 248 245/.95);border-bottom:1px solid rgb(226 232 240/.8);height:4rem}
+header.nav .in{max-width:72rem;margin:0 auto;padding:0 1rem;height:100%;display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+.logo{display:flex;align-items:center;gap:.625rem;font-weight:800;font-size:1.125rem;letter-spacing:-.01em;text-decoration:none}
+.logo img{width:2.5rem;height:2.5rem}
+.logo small{display:block;font-size:.6875rem;font-weight:600;color:var(--amber-700);margin-top:.125rem}
+.links a{text-decoration:none}
+.links{display:none;gap:2rem;font-size:.875rem;font-weight:600;color:#475569}
+@media(min-width:48rem){.links{display:flex}}
+.move{display:inline-flex;align-items:stretch;min-height:3rem;border-radius:var(--ctl);overflow:hidden;font-weight:700;font-size:.875rem;text-decoration:none}
+.move .l{display:inline-flex;align-items:center;padding-inline:1.125rem}
+.move .g{display:inline-flex;align-items:center;justify-content:center;width:2.75rem}
+.move.amber{background:var(--amber-500);color:#0b1220}.move.amber .g{background:var(--navy-900);color:var(--amber-400)}
+.move.navy{background:var(--navy-800);color:#fff;min-height:3.5rem;box-shadow:var(--lifted);font-size:.9375rem}
+.move.navy .l{padding-inline:1.375rem}.move.navy .g{background:var(--amber-400);color:#0b1220;width:3.25rem}
+.ref{display:inline-flex;align-items:center;gap:.4rem;min-height:2.75rem;font-weight:700;font-size:.875rem;color:var(--amber-700);text-decoration:underline;text-decoration-color:#fcd34d;text-underline-offset:6px}
+
+.hero{position:relative;isolation:isolate;overflow:hidden;padding:3.5rem 0 5rem}
+@media(min-width:48rem){.hero{padding-block:5rem}}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;background:
+  radial-gradient(120% 100% at 88% 2%,var(--navy-50) 0%,transparent 50%),
+  radial-gradient(90% 78% at 2% 74%,#fdf2e0 0%,transparent 60%)}
+.hero .grid{max-width:72rem;margin:0 auto;padding:0 1rem;display:grid;gap:2.5rem;align-items:center}
+@media(min-width:48rem){.hero .grid{grid-template-columns:repeat(12,minmax(0,1fr));gap:2rem}.hero .txt{grid-column:span 6}.hero .pz{grid-column:span 6}}
+@media(min-width:64rem){.hero .grid{gap:3rem}.hero .txt{grid-column:span 7}.hero .pz{grid-column:span 5}}
+.txt{display:grid;gap:1.25rem;min-width:0}
+.eyebrow{display:flex;align-items:center;gap:.75rem;font-size:.9375rem;font-weight:600;color:var(--ink-2)}
+.eyebrow i{width:1.75rem;height:2px;border-radius:9999px;background:var(--amber-500)}
+h1{font-family:var(--display);font-weight:800;line-height:1.08;letter-spacing:-.025em;font-size:clamp(3rem,7vw,6rem);overflow-wrap:break-word;min-width:0;text-wrap:balance}
+h1 span{display:block}h1 .a{color:var(--amber-700)}
+.lede{color:#475569;font-size:1rem;line-height:1.7;max-width:36rem}
+.lede strong{color:var(--ink-2)}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1.5rem;padding-top:.5rem}
+dl.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr)) auto;gap:1rem;padding-top:1.25rem;border-top:1px solid rgb(203 213 225/.7);max-width:32rem}
+dl.stats dt{font-size:.75rem;color:#475569}
+dl.stats dd{font-family:var(--display);font-size:1.5rem;font-weight:800;white-space:nowrap}
+
+/* bàn cờ mô phỏng */
+.pz .card{background:#fff;padding:1.25rem;border-radius:var(--card);box-shadow:var(--lifted);border:1px solid var(--rule);max-width:28rem;margin-inline:auto}
+.pz .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;font-size:.9375rem;font-weight:600;color:var(--ink-2)}
+.pz .hd span{display:inline-flex;gap:.75rem;align-items:center}.pz .hd i{width:1.75rem;height:2px;background:var(--amber-500);border-radius:9999px}
+.pz .hd em{font-style:normal;font-size:.875rem;color:#64748b;font-weight:400}
+.pz h2{font-size:1rem;font-weight:700;margin-bottom:.25rem;font-family:var(--display)}
+.pz p.h{font-size:.875rem;color:#475569;margin-bottom:.75rem}
+.board{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));aspect-ratio:1;max-width:21.25rem;margin-inline:auto;border:2px solid var(--navy-900);border-radius:var(--ctl);overflow:hidden}
+.board b{font-family:'DejaVu Sans','Segoe UI Symbol','Noto Sans Symbols 2','Apple Symbols',sans-serif;display:grid;place-items:center;font-size:clamp(1.25rem,3.4vw,1.9rem);line-height:1;font-weight:400}
+.board .d{background:#1f5285}.board .l{background:#f7f3ed}
+.board .w{color:#fff;-webkit-text-stroke:1px #0b1220;paint-order:stroke fill}
+.board .k{color:#0b1220}
+.pz .st{margin-top:.75rem;text-align:center;font-size:.875rem;font-style:italic;color:#64748b}
+</style>
+</head>
+<body>
+<div class="bar"><div class="wrap">
+  <b>Hero rút gọn: xem trước trước khi sửa trang thật</b>
+  <div role="tablist" aria-label="Chế độ xem">
+    <button role="tab" aria-selected="true" data-p="cmp">Trước / Sau</button>
+    <button role="tab" aria-selected="false" data-p="old">Hiện tại</button>
+    <button role="tab" aria-selected="false" data-p="new">Sau khi rút gọn</button>
+    <button role="tab" aria-selected="false" data-p="two">2 câu, không eyebrow</button>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div class="note">
+    <p><b>Thay đổi duy nhất:</b> đoạn mô tả 40 từ rút còn <b>một câu 12 từ</b>, và bỏ cụm ba số liệu (48 buổi, 60–90 phút, 5 địa điểm). Mọi thứ khác (eyebrow, tiêu đề, hai nút, bàn cờ, thanh trên cùng) giữ nguyên để so sánh công bằng.</p>
+    <div class="diff">
+      <div><s>Ba lộ trình chuẩn hóa Happy Chess (72 buổi) và Global Chess Sơ Cấp &amp; Trung Cấp (48 buổi) giúp trẻ đi từ luật chơi cơ bản đến làm chủ các hệ thống khai cuộc và đòn chiến thuật trung – tàn cuộc.</s> (40 từ)</div>
+      <div><ins>Ba lộ trình chuẩn hóa đưa trẻ từ luật chơi đến chiến thuật.</ins> (12 từ)</div>
+      <div>Các con số bị lược vẫn còn trên trang thật: 72 và 48 buổi ở mục Lộ trình, 5 cơ sở ở mục Hệ thống cơ sở và thanh trên cùng, thời lượng 60–90 phút ở mục Lộ trình. Riêng "4–12 tuổi" chỉ còn trong meta description, không còn trong hero.</div>
+    </div>
+  </div>
+
+  <div class="panel" id="cmp">
+    <div class="frame"><h3>Hiện tại (1280 × 800)</h3><div class="vp" data-clone="old"></div></div>
+    <div class="frame"><h3>Sau khi rút gọn (1280 × 800)</h3><div class="vp" data-clone="new"></div></div>
+  </div>
+  <div class="panel" id="old" hidden><div class="frame"><h3>Hiện tại</h3><div class="vp" data-clone="old"></div></div></div>
+  <div class="panel" id="new" hidden><div class="frame"><h3>Sau khi rút gọn</h3><div class="vp" data-clone="new"></div></div></div>
+  <div class="panel" id="two" hidden>
+    <div class="note"><p><b>Cả hai bản:</b> đã gỡ eyebrow và cụm số liệu; tiêu đề, hai nút, bàn cờ, thanh trên cùng giữ nguyên. Chỉ khác câu giới thiệu.</p></div>
+    <div class="frame"><h3>Phương án 1: "Trung tâm cờ vua cho trẻ em, 5 cơ sở tại TP.HCM." (12 từ)</h3><div class="vp" data-clone="a"></div></div>
+    <div class="frame"><h3>Phương án 2: "Trung tâm cờ vua cho trẻ em, học trực tiếp và online." (12 từ)</h3><div class="vp" data-clone="b"></div></div>
+  </div>
+</div>
+
+<!-- Mẫu: nhân bản bằng JS để hai bản chỉ khác đúng phần cần so sánh. -->
+<template id="tpl">
+  <div class="top"><div class="in"><span class="hl">Lớp tối trong tuần &amp; cuối tuần • 5 cơ sở tại TP.HCM</span><span>Hotline: <strong>0789059440</strong> – <strong>0963848430</strong></span></div></div>
+  <header class="nav"><div class="in">
+    <a class="logo" href="#"><img src="../../public/brand/mark-128.png" alt=""><span>GLOBAL CHESS<small>MỘT NƯỚC ĐI, MỞ TƯ DUY</small></span></a>
+    <nav class="links" aria-label="Điều hướng mẫu"><a href="#">Lộ trình</a><a href="#">Hệ thống trung tâm</a><a href="#">Đăng ký &amp; học phí</a></nav>
+    <a class="move amber" href="#"><span class="l">Đăng ký tư vấn</span><span class="g" aria-hidden="true">→</span></a>
+  </div></header>
+  <section class="hero"><div class="grid">
+    <div class="txt">
+      <div class="eyebrow"><i></i><span>Đào tạo cờ vua trực tiếp và online</span></div>
+      <h1><span>Một Nước Đi,</span><span class="a">Mở Tư Duy</span></h1>
+      <p class="lede" data-slot="lede"></p>
+      <div class="actions">
+        <a class="move navy" href="#"><span class="l">Đăng ký tư vấn</span><span class="g" aria-hidden="true">→</span></a>
+        <a class="ref" href="#">Xem chi tiết lộ trình →</a>
+      </div>
+      <dl class="stats" data-slot="stats">
+        <div><dt>Lộ trình Global</dt><dd>48 Buổi</dd></div>
+        <div><dt>Mỗi buổi học</dt><dd>60–90 phút</dd></div>
+        <div><dt>Cơ sở tại TP.HCM</dt><dd>5 Địa Điểm</dd></div>
+      </dl>
+    </div>
+    <div class="pz"><div class="card">
+      <div class="hd"><span><i></i>Thử thách ngày hôm nay</span><em>↺ Chơi lại</em></div>
+      <h2>Trắng đi trước: Làm sao để bắt Xe của Đen?</h2>
+      <p class="h">Gợi ý: Kéo quân <strong>Mã trắng (ở ô g5)</strong> để tung đòn "Chĩa đôi".</p>
+      <div class="board" role="img" aria-label="Thế cờ mẫu, ảnh tĩnh"></div>
+      <p class="st">Hãy kéo và thả quân cờ trên bàn cờ để giải đố...</p>
+    </div></div>
+  </div></section>
+</template>
+
+<script>
+const LEDE_OLD = 'Ba lộ trình chuẩn hóa <strong>Happy Chess (72 buổi)</strong> và <strong>Global Chess Sơ Cấp &amp; Trung Cấp (48 buổi)</strong> giúp trẻ đi từ luật chơi cơ bản đến làm chủ các hệ thống khai cuộc và đòn chiến thuật trung – tàn cuộc.';
+const LEDE_NEW = 'Ba lộ trình chuẩn hóa đưa trẻ từ luật chơi đến chiến thuật.';
+const LEDE = {old:LEDE_OLD,new:LEDE_NEW,a:'Trung tâm cờ vua cho trẻ em, 5 cơ sở tại TP.HCM.',b:'Trung tâm cờ vua cho trẻ em, học trực tiếp và online.'};
+// Thế cờ thật của bài đố (src/data/courses.ts), vẽ tĩnh bằng ký tự quân cờ.
+const FEN = '3r3k/ppp2ppp/8/4p1N1/8/8/PPPP1PPP/R1BQK2R';
+// Glyph đặc cho cả hai bên; quân trắng chỉ khác màu (tránh glyph rỗng thiếu trong vài font).
+const G = {K:'♚',Q:'♛',R:'♜',B:'♝',N:'♞',P:'♟︎',k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟︎'};
+function board(el){
+  let h='';
+  FEN.split('/').forEach((row,r)=>{let f=0;for(const ch of row){
+    if(/\d/.test(ch)){for(let i=0;i<+ch;i++){h+=cell(r,f++,'')}}else{h+=cell(r,f++,ch)}}});
+  el.innerHTML=h;
+  function cell(r,f,ch){const dark=(r+f)%2===1;const w=ch&&ch===ch.toUpperCase();
+    return `<b class="${dark?'d':'l'} ${ch?(w?'w':'k'):''}">${ch?G[ch]:''}</b>`}
+}
+const tpl=document.getElementById('tpl');
+document.querySelectorAll('[data-clone]').forEach(vp=>{
+  const v=vp.dataset.clone,f=tpl.content.cloneNode(true);
+  f.querySelector('[data-slot=lede]').innerHTML = LEDE[v];
+  if(v!=='old') f.querySelector('[data-slot=stats]').remove();
+  if(v==='a'||v==='b') f.querySelector('.eyebrow').remove();
+  board(f.querySelector('.board'));
+  vp.appendChild(f);
+});
+const tabs=[...document.querySelectorAll('[role=tab]')];
+tabs.forEach(t=>t.addEventListener('click',()=>{
+  tabs.forEach(x=>x.setAttribute('aria-selected',x===t));
+  document.querySelectorAll('.panel').forEach(p=>p.hidden=p.id!==t.dataset.p);
+}));
+</script>
+</body>
+</html>
