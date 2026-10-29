@@ -7,9 +7,11 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   buildEnrolmentPayload,
+  formatAge,
   newSubmissionId,
   postEnrolment,
   validateEnrolment,
+  validateEnrolmentFields,
 } from "../src/lib/enrolment.ts";
 
 const baseInput = () => ({
@@ -158,4 +160,66 @@ test("newSubmissionId: vẫn sinh mã khác nhau khi không có crypto.randomUUI
   } finally {
     Object.defineProperty(crypto, "randomUUID", { value: original, configurable: true });
   }
+});
+
+const filled = () => ({
+  childName: "An",
+  childAge: "2016",
+  parentName: "Chị Thảo",
+  phone: "0901234567",
+  mode: "Học online",
+  branchId: "CS1",
+});
+
+test("validateEnrolmentFields: form đủ thông tin thì không có lỗi", () => {
+  assert.deepEqual(validateEnrolmentFields(filled()), []);
+});
+
+test("validateEnrolmentFields: trả về mọi lỗi theo thứ tự trên màn hình", () => {
+  assert.deepEqual(
+    validateEnrolmentFields({
+      childName: "",
+      childAge: " ",
+      parentName: "",
+      phone: "1",
+      mode: "",
+      branchId: "",
+    }),
+    ["name", "age", "parent", "phone", "mode", "branch"]
+  );
+});
+
+test("validateEnrolmentFields: ô không được truyền vào thì không bị coi là thiếu", () => {
+  assert.deepEqual(
+    validateEnrolmentFields({ childName: "An", parentName: "Chị Thảo", phone: "0901234567" }),
+    []
+  );
+});
+
+test("validateEnrolment: vẫn chỉ trả lỗi đầu tiên khi có nhiều lỗi", () => {
+  assert.equal(validateEnrolment({ ...filled(), childAge: "", mode: "" }), "age");
+});
+
+test("formatAge: năm sinh được trừ ra tuổi", () => {
+  assert.equal(formatAge("2016", 2026), "10 tuổi");
+  assert.equal(formatAge(" 2017 ", 2026), "9 tuổi");
+});
+
+test("formatAge: số 1-2 chữ số được coi là tuổi", () => {
+  assert.equal(formatAge("8", 2026), "8 tuổi");
+  assert.equal(formatAge("08", 2026), "8 tuổi");
+});
+
+test("formatAge: chuỗi đã có chữ tuổi hoặc không nhận ra thì giữ nguyên", () => {
+  assert.equal(formatAge("2016 (10 tuổi)", 2026), "2016 (10 tuổi)");
+  assert.equal(formatAge("10 tuổi", 2026), "10 tuổi");
+  assert.equal(formatAge("abc", 2026), "abc");
+});
+
+test("formatAge: năm sinh ở tương lai không bị trừ ra tuổi âm", () => {
+  assert.equal(formatAge("2031", 2026), "2031");
+});
+
+test("formatAge: năm sinh nằm trong câu vẫn nhận ra", () => {
+  assert.equal(formatAge("sinh năm 2018", 2026), "8 tuổi");
 });

@@ -171,9 +171,14 @@ Rules:
 - `TESTIMONIALS` (three real parent quotes) render as chat cards in `#phu-huynh`, straight after the gallery: a `bg-brand-800` header with a round `bg-brand-600` avatar holding the child's initials (BK, KL, VM) in `text-amber-400`, then the parent label and branch; a `bg-brand-50` body with the verbatim quote in a white bubble (square bottom-left corner) and a small right-aligned "Đã nhận" with a double check. Cards are equal height, 1 → 2 (`md`) → 3 (`lg`) columns. No ratings, no timestamps, no Zalo logo or colours, no child photos. An empty `TESTIMONIALS` fails the build instead of showing a TODO panel.
 - Error pages reuse the same cream + navy + amber vocabulary: the 404 shows a navy chessboard motif and a filled amber or navy return button.
 
-**Modal**
+**Enrolment form and confirmation ticket**
 
-- `fixed inset-0 z-50 bg-brand-950/85 backdrop-blur-sm`, content `bg-white rounded-card max-w-xl w-full my-8 flex flex-col overflow-hidden max-h-[calc(100dvh-6rem)] shadow-2xl`. Close button top-right, `active:scale-95`, hover `bg-slate-100`. The gallery lightbox is a separate native `<dialog>` (see Gallery).
+- The form (`EnrolmentForm`, anchor `#dang-ky`) sits inline under the tuition table as a paper ticket: a kraft stub on the left (`.gc-enrol__stub`) that fills in as the parent types, ruled paper on the right (`.gc-enrol__main`) with the inputs, round notches at the tear line. Learning mode is three radio cards (`.gc-mode`), never a select. Campus and learning mode start unselected so the stub never shows something the parent did not choose.
+- After sending, the whole form is replaced by `EnrolmentTicket` (`.gc-pass`): peach paper, a centre seal (`CentreStamp`, logo shield in ink `#A3141C`) in place of any illustration, parent-entered data in blue ink, a brown-earth stub (`#8f4a30`) with the child's name, "XÁC NHẬN" and two tags (learning mode, "Miễn Phí"). It uses Cormorant SC, Roboto, Roboto Condensed and Oswald, loaded only on the homepage. It invents no ticket number.
+
+**Modal (retired for enrolment)**
+
+- Enrolment no longer uses a modal. The pattern below remains the reference if one is needed again: `fixed inset-0 z-50 bg-brand-950/85 backdrop-blur-sm`, content `bg-white rounded-card max-w-xl w-full my-8 flex flex-col overflow-hidden max-h-[calc(100dvh-6rem)] shadow-2xl`. Close button top-right, `active:scale-95`, hover `bg-slate-100`. The gallery lightbox is a separate native `<dialog>` (see Gallery).
 
 **Sticky chrome**
 

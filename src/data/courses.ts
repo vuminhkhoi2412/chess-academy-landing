@@ -56,6 +56,13 @@ export const BRANCHES = [
   },
 ];
 
+// Hình thức học trong form đăng ký. `short` là nhãn ngắn cho thẻ nhỏ ở cuống vé xác nhận.
+export const LEARNING_MODES = [
+  { value: "Học tại trung tâm", short: "Tại trung tâm" },
+  { value: "Học online", short: "Online" },
+  { value: "Học kèm 1-1", short: "Kèm 1-1" },
+] as const;
+
 export interface SubLevel {
   code: string;
   name: string;

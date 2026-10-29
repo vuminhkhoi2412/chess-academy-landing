@@ -18,19 +18,46 @@ export interface EnrolmentInput {
   honeypot: string;
 }
 
-export type EnrolmentError = "name" | "parent" | "phone";
+export type EnrolmentError = "name" | "age" | "parent" | "phone" | "mode" | "branch";
 
 const digitsOnly = (value: string) => value.replace(/[^0-9]/g, "");
 
-// Thứ tự kiểm tra cũng là thứ tự báo lỗi: tên bé → phụ huynh → SĐT. Mọi trường
-// Code.gs coi là bắt buộc phải được chặn ở đây: script từ chối thì trình duyệt không biết.
-export function validateEnrolment(
-  input: Pick<EnrolmentInput, "childName" | "parentName" | "phone">
-): EnrolmentError | null {
-  if (input.childName.trim() === "") return "name";
-  if (input.parentName.trim() === "") return "parent";
-  if (digitsOnly(input.phone).length < 10) return "phone";
-  return null;
+// Mọi trường Code.gs coi là bắt buộc (tên bé, phụ huynh, SĐT) phải được chặn ở đây: script
+// từ chối thì trình duyệt không biết. Năm sinh/tuổi, hình thức học và cơ sở là các ô form bắt
+// buộc nhưng Code.gs không đòi; chỉ kiểm tra khi nơi gọi truyền vào (undefined = bỏ qua).
+export type EnrolmentFields = Pick<EnrolmentInput, "childName" | "parentName" | "phone"> & {
+  childAge?: string;
+  mode?: string;
+  branchId?: string;
+};
+
+// Trả về TẤT CẢ lỗi, theo thứ tự trên màn hình: tên bé → tuổi → phụ huynh → SĐT → hình thức → cơ sở.
+export function validateEnrolmentFields(input: EnrolmentFields): EnrolmentError[] {
+  const errors: EnrolmentError[] = [];
+  if (input.childName.trim() === "") errors.push("name");
+  if (input.childAge !== undefined && input.childAge.trim() === "") errors.push("age");
+  if (input.parentName.trim() === "") errors.push("parent");
+  if (digitsOnly(input.phone).length < 10) errors.push("phone");
+  if (input.mode !== undefined && input.mode === "") errors.push("mode");
+  if (input.branchId !== undefined && input.branchId === "") errors.push("branch");
+  return errors;
+}
+
+// Lỗi đầu tiên (hoặc null). Giữ nguyên hành vi cũ cho nơi chỉ cần một lỗi.
+export function validateEnrolment(input: EnrolmentFields): EnrolmentError | null {
+  return validateEnrolmentFields(input)[0] ?? null;
+}
+
+// Phụ huynh có thể gõ năm sinh (2016) hoặc tuổi (10). Năm sinh được đổi thành tuổi bằng
+// năm hiện tại trừ năm sinh, chưa tính tháng sinh nên có thể lệch một tuổi. Chuỗi đã có chữ
+// "tuổi", hoặc không nhận ra được, được giữ nguyên như đã gõ.
+export function formatAge(raw: string, year = new Date().getFullYear()): string {
+  const value = raw.trim();
+  if (/tuổi/i.test(value)) return value;
+  const born = value.match(/\b(?:19|20)\d{2}\b/)?.[0];
+  if (born && Number(born) <= year) return `${year - Number(born)} tuổi`;
+  if (/^\d{1,2}$/.test(value)) return `${Number(value)} tuổi`;
+  return value;
 }
 
 export function buildEnrolmentPayload(input: EnrolmentInput): Record<string, string | number> {

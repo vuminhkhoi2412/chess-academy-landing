@@ -34,9 +34,12 @@ tuition grid.
 - Vietnamese-facing, TP.HCM only. Families choose a campus by district, then a weekly slot.
 - Schedule slots: a weekday evening slot (Mon–Fri) and three weekend slots (Sat/Sun morning,
   afternoon, evening). The page states no clock times; none are in the code or the sources.
-- Enrolment is a form on the page. It calculates an estimated tuition, then POSTs the answers
-  to a Google Apps Script web app that appends one row to the centre's Google Sheet; the parent
-  sees a confirmation that the centre will contact them soon. There is no payment of any kind,
+- Enrolment is a free-trial form placed inline under the tuition table (no modal). It POSTs the
+  answers to a Google Apps Script web app that appends one row to the centre's Google Sheet; the
+  parent then sees a confirmation ticket (stamped with the centre seal) saying the centre will
+  contact them soon. The form asks for child name, birth year or age, parent name, Zalo phone,
+  learning mode (at centre / online / 1-on-1) and campus. It no longer asks for a course or
+  level and shows no price; the learning mode is stored in the sheet's Ghi chú column. There is no payment of any kind,
   no account, no server of our own.
 - Contact channels: two central hotlines and one Zalo number (0789.059.440, 0963.848.430,
   Zalo 0789059440), plus one direct phone per campus (listed on each branch card and in the

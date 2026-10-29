@@ -1,0 +1,1531 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global Chess - Form đăng ký đặt thẳng trên trang</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Roboto+Condensed:wght@700&family=Roboto:ital,wght@0,500;0,700;1,700&family=Caveat:wght@600&family=Cormorant+SC:wght@600;700&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,700..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --b50:#eef5fb;--b100:#d9e8f5;--b200:#b6d0e8;--b500:#2f6ba3;--b600:#1f5285;--b700:#1b4a76;--b800:#184268;--b900:#123350;--b950:#0b2136;
+  --amber-400:#fbbf24;--amber-500:#f59e0b;--emerald-600:#059669;--emerald-700:#047857;--slate-950:#020617;
+  --paper:#fffdf9;--ink:#0f172a;--ink2:#475569;--line:#cbd5e1;--err:#b91c1c;
+  --display:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;
+  --sans:"Be Vietnam Pro",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--sans);background:var(--b800);color:#fff;line-height:1.6;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--amber-400);outline-offset:3px}
+.num{font-variant-numeric:tabular-nums}
+
+/* khung xem trước */
+.bar{position:sticky;top:0;z-index:5;background:var(--b950);border-bottom:1px solid #ffffff22}
+.bar div{max-width:72rem;margin:0 auto;padding:.5rem 1rem;display:flex;gap:.25rem;align-items:center;flex-wrap:wrap}
+.bar b{font-family:var(--display);margin-right:auto;font-size:.9375rem}
+.bar button{padding:.5rem .875rem;font-size:.8125rem;font-weight:600;color:var(--b200);min-height:2.75rem;border-bottom:2px solid transparent}
+.bar button[aria-pressed=true]{color:#fff;border-color:var(--amber-400)}
+.bar i{width:1px;height:1.5rem;background:#ffffff33;margin:0 .5rem}
+.note{max-width:46rem;margin:2rem auto 0;padding:0 1rem;font-size:.8125rem;color:var(--b200);text-align:center}
+.note b{color:#fff}
+#stage{margin:0 auto;transition:max-width .25s}
+#stage.phone{max-width:24.375rem;border-inline:1px dashed #ffffff44}
+main{padding:2.5rem 1rem 5rem}
+.wrap{max-width:60rem;margin:0 auto}
+
+.eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-400)}
+h2{font:800 clamp(1.75rem,5vw,2.75rem)/1.1 var(--display);letter-spacing:-.02em;margin-top:.5rem}
+.head{margin-bottom:1.5rem}
+
+/* ===== phiếu đăng ký ===== */
+.form{background:var(--paper);color:var(--ink);box-shadow:0 24px 48px -24px rgb(0 0 0/.55);display:grid;scroll-margin-top:4rem}
+.sum{background:var(--b900);color:#fff;padding:1.5rem 1.25rem;border-bottom:4px solid var(--amber-500)}
+.sum .k{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--b200)}
+.sum dl{margin-top:1rem;display:grid;gap:.75rem;font-size:.875rem}
+.sum dt{font-size:.75rem;color:var(--b200)}
+.sum dd{font-weight:600;overflow-wrap:anywhere}
+.sum [hidden]{display:none}
+.sum .empty{margin-top:.75rem;font-size:.875rem;color:var(--b200)}
+.sum .empty[hidden]{display:none}
+.body{padding:1.5rem 1.25rem}
+.body h3{font:800 1.25rem/1.2 var(--display);letter-spacing:-.01em}
+.body > p.sub{font-size:.875rem;color:var(--ink2);margin-top:.25rem}
+.grid{display:grid;gap:1rem;margin-top:1.25rem}
+.f label{display:block;font-size:.875rem;font-weight:600;color:#334155;margin-bottom:.375rem}
+.f .opt-hint{font-weight:400;color:var(--ink2)}
+.f input,.f select{width:100%;min-height:3rem;padding:.625rem .875rem;font-size:1rem;background:#fff;border:1px solid #64748b;border-radius:.75rem}
+.f input::placeholder{color:#64748b}
+.f input:focus-visible,.f select:focus-visible{outline:2px solid var(--b800);outline-offset:1px;border-color:var(--b800)}
+.f.bad input{border-color:var(--err);background:#fef2f2}
+.f .err{display:none;margin-top:.375rem;font-size:.8125rem;font-weight:600;color:var(--err)}
+.f.bad .err{display:block}
+.modes{border:0;padding:0;min-width:0;display:grid;gap:.5rem}
+.modes legend{font-size:.875rem;font-weight:600;color:#334155;margin-bottom:.375rem;padding:0}
+.modes label{position:relative;margin:0}
+.modes input{position:absolute;opacity:0;inset:0;width:100%;height:100%;min-height:0;margin:0;cursor:pointer}
+.modes span{display:flex;align-items:center;gap:.75rem;min-height:3rem;padding:.625rem .875rem;font-weight:600;background:#fff;border:1px solid #64748b;border-radius:.75rem}
+.modes span::before{content:"";width:1.125rem;height:1.125rem;flex:none;border:2px solid #64748b;border-radius:50%;background:#fff}
+.modes input:checked+span{border-color:var(--b800);background:var(--b50);box-shadow:0 0 0 1px var(--b800) inset}
+.modes input:checked+span::before{border-color:var(--b800);background:radial-gradient(var(--b800) 0 45%,#fff 50%)}
+.modes input:focus-visible+span{outline:2px solid var(--b800);outline-offset:2px}
+@media(min-width:48rem){#stage:not(.phone) .modes{grid-template-columns:repeat(3,1fr)}#stage:not(.phone) .modes legend{grid-column:1/-1}}
+.hint{font-size:.8125rem;color:var(--ink2);margin-top:.375rem}
+.move{display:flex;min-height:3.5rem;border-radius:.5rem;overflow:hidden;font-size:1rem;font-weight:700;width:100%;margin-top:1.5rem;background:var(--b800);color:#fff;text-decoration:none}
+.move span:first-child{flex:1;display:flex;align-items:center;padding-inline:1.25rem;text-align:left}
+.move span:last-child{width:3.5rem;display:grid;place-items:center;background:var(--amber-400);color:var(--slate-950)}
+.move svg{width:1.125rem;height:1.125rem;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.move:hover{background:var(--b700)}
+.move.zalo{background:#0068ff}
+.move.zalo span:last-child{background:#fff;color:#0068ff}
+.move.ghost{background:#fff;color:var(--b900);border:1px solid var(--line)}
+.move.ghost span:last-child{background:var(--b800);color:#fff}
+.privacy{font-size:.8125rem;color:var(--ink2);margin-top:.875rem;text-align:center}
+
+/* trạng thái */
+[data-state]{display:none}
+.show-form [data-state=form],.show-bad [data-state=form],.show-sent [data-state=sent],.show-net [data-state=net]{display:block}
+.show-bad .err-banner{display:flex}
+.err-banner{display:none;gap:.625rem;align-items:flex-start;margin-top:1rem;padding:.75rem 1rem;border-left:4px solid var(--err);background:#fef2f2;color:var(--err);font-size:.875rem;font-weight:600}
+.show-bad .f.bad-on input{border-color:var(--err);background:#fef2f2}
+.show-bad .f.bad-on .err{display:block}
+.ok{display:flex;gap:.875rem;align-items:flex-start}
+.ok .badge{width:2.5rem;height:2.5rem;flex:none;display:grid;place-items:center;background:var(--emerald-600);border-radius:.75rem}
+.ok .badge svg{width:1.25rem;height:1.25rem;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.ok p:first-child{font:700 1.125rem/1.35 var(--display)}
+.ok p+p{font-size:.875rem;color:var(--ink2);margin-top:.375rem}
+.slip{margin-top:1.25rem;border:1px solid var(--line);font-size:.875rem}
+.slip dl{display:grid;gap:.75rem 1.5rem;padding:1rem}
+.slip dt{font-size:.75rem;font-weight:600;color:#64748b}
+.slip dd{font-weight:600}
+.slip .foot{display:flex;justify-content:space-between;gap:1rem;align-items:baseline;padding:.75rem 1rem;border-top:1px dashed var(--line);background:#fdf6ea}
+.slip .foot strong{font:800 1.25rem var(--display)}
+
+@media(min-width:48rem){
+  .form{grid-template-columns:17rem 1fr}
+  .sum{border-bottom:0;border-right:4px solid var(--amber-500);padding:2rem 1.5rem}
+  .body{padding:2rem}
+  .grid.two{grid-template-columns:1fr 1fr}
+  #stage:not(.phone) .full{grid-column:1/-1}
+}
+#stage.phone .form{grid-template-columns:1fr}
+#stage.phone .sum{border-right:0;border-bottom:4px solid var(--amber-500);padding:1.5rem 1.25rem}
+#stage.phone .body{padding:1.5rem 1.25rem}
+#stage.phone .grid.two{grid-template-columns:1fr}
+
+/* ===== Tab "Vé xé rời": vé giấy có cuống, khuyết tròn ở đường xé (cùng kiểu vé "Cách xếp lớp") =====
+   Không dùng container-type / filter trên tổ tiên của cuống: cả hai giam phần tử con, cuống sẽ không bay ra khỏi vé được. */
+#d-ticket [hidden]{display:none!important}
+#d-ticket,#d-confirm{--n:.625rem;--kraft:#f1e8d6} /* trên tổ tiên chung: cuống chuyển ra lớp phủ vẫn phải thấy biến */
+.tk{display:grid}
+.tk-half{filter:drop-shadow(0 22px 22px rgb(0 0 0/.35))}
+.tk-stub,.tk-main{color:var(--ink);height:100%}
+.tk-stub{position:relative;background:var(--kraft);padding:1.25rem 1.25rem 1.5rem;border-bottom:2px dashed rgb(15 23 42/.3);
+  -webkit-mask:radial-gradient(circle var(--n) at 0 100%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--n) at 100% 100%,#0000 98%,#000) right/51% 100% no-repeat;
+  mask:radial-gradient(circle var(--n) at 0 100%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--n) at 100% 100%,#0000 98%,#000) right/51% 100% no-repeat}
+.tk-main{background:var(--paper);padding:1.5rem 1.25rem;
+  -webkit-mask:radial-gradient(circle var(--n) at 0 0,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--n) at 100% 0,#0000 98%,#000) right/51% 100% no-repeat;
+  mask:radial-gradient(circle var(--n) at 0 0,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle var(--n) at 100% 0,#0000 98%,#000) right/51% 100% no-repeat}
+.tk-stub.is-torn{border-color:transparent;padding-bottom:3.5rem}
+.tk-k{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--b700)}
+.tk-brand{font:800 1.5rem/1.1 var(--display);letter-spacing:-.015em;color:var(--b800);margin-top:.25rem}
+.tk-free{display:inline-block;margin-top:.5rem;padding:.125rem .625rem;background:var(--b800);color:#fff;font:700 .75rem var(--sans);letter-spacing:.06em;text-transform:uppercase}
+.tk-empty{margin-top:.875rem;font-size:.875rem;color:var(--ink2)}
+.tk-stub dl{margin-top:1rem;display:grid;grid-template-columns:1fr 1fr;gap:.75rem 1rem;font-size:.875rem}
+.tk-stub dt{font-size:.75rem;font-weight:600;color:#475569}
+.tk-stub dd{font-weight:600;overflow-wrap:anywhere}
+.tk-stamp{position:absolute;right:1rem;bottom:.75rem;padding:.125rem .625rem;border:2px solid var(--emerald-700);color:var(--emerald-700);font:800 .9375rem var(--display);letter-spacing:.1em;text-transform:uppercase;opacity:0;transform:scale(1.8) rotate(-10deg);transition:opacity .2s,transform .35s cubic-bezier(.16,1,.3,1)}
+.tk-stub.stamped .tk-stamp{opacity:1;transform:rotate(-10deg)}
+.tk-grid{display:grid;gap:1rem;margin-top:1.25rem}
+.tk-alert{margin-top:1rem;padding:.75rem 1rem;border-left:4px solid var(--err);background:#fef2f2;color:var(--err);font-size:.875rem;font-weight:600}
+.f.bad .err,.modes.bad .err{display:block}
+.modes.bad span{border-color:var(--err);background:#fef2f2}
+#tk-done .move{margin-top:1.5rem}
+/* cuống đã trả về chỗ cũ sau khi đóng xác nhận: lệch nhẹ để còn thấy là đã xé */
+@media(prefers-reduced-motion:no-preference){.tk-half.settled{transform:translate(-.5rem,.5rem) rotate(-2deg)}}
+.tk-half.settled{margin:0 .5rem .5rem 0}
+
+/* lớp xác nhận */
+.tk-ov{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:1rem}
+.tk-bd{position:absolute;inset:0;background:rgb(11 33 54/.86);opacity:0;transition:opacity .4s}
+.tk-col{position:relative;display:grid;gap:1.25rem;justify-items:center;max-width:26rem;width:100%;text-align:center}
+.tk-slot{max-width:100%}
+.tk-msg{width:100%;opacity:0;transform:translateY(.75rem);transition:opacity .4s,transform .4s;outline:0}
+.tk-msg h3{font:800 1.25rem/1.3 var(--display);letter-spacing:-.01em}
+.tk-msg p{margin-top:.5rem;font-size:.875rem;color:var(--b100)}
+.tk-msg .move{margin-top:1rem;text-align:left}
+.tk-msg .move.zalo{margin-top:1.25rem}
+.tk-ov.on .tk-bd{opacity:1}
+.tk-ov.on .tk-msg{opacity:1;transform:none;transition-delay:.55s}
+.tk-ov .tk-half{position:fixed;z-index:2;margin:0}
+
+@media(min-width:48rem){
+  #stage:not(.phone) .tk{grid-template-columns:15rem 1fr}
+  #stage:not(.phone) .tk-stub{padding:1.75rem 1.5rem;border-bottom:0;border-right:2px dashed rgb(15 23 42/.3);
+    -webkit-mask:radial-gradient(circle var(--n) at 100% 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle var(--n) at 100% 100%,#0000 98%,#000) bottom/100% 51% no-repeat;
+    mask:radial-gradient(circle var(--n) at 100% 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle var(--n) at 100% 100%,#0000 98%,#000) bottom/100% 51% no-repeat}
+  #stage:not(.phone) .tk-stub.is-torn{border-right-color:transparent;padding-bottom:3.5rem}
+  #stage:not(.phone) .tk-main{padding:2rem;
+    -webkit-mask:radial-gradient(circle var(--n) at 0 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle var(--n) at 0 100%,#0000 98%,#000) bottom/100% 51% no-repeat;
+    mask:radial-gradient(circle var(--n) at 0 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle var(--n) at 0 100%,#0000 98%,#000) bottom/100% 51% no-repeat}
+  #stage:not(.phone) .tk-stub dl{grid-template-columns:1fr}
+  #stage:not(.phone) .tk-grid{grid-template-columns:1fr 1fr}
+  #stage:not(.phone) .tk-full{grid-column:1/-1}
+  #stage:not(.phone) .tk .modes .err{grid-column:1/-1}
+}
+
+/* ===== Tab "Vé tàu": vẽ lại vé trong ảnh mẫu. Mọi kích thước tính theo tọa độ ảnh gốc 636×275 (1 đơn vị = --u) ===== */
+.head[hidden],#d-train[hidden]{display:none!important}
+.tt-wrap{container-type:inline-size;max-width:60rem;margin:0 auto}
+.tt{--u:calc(100cqw/636);--tt-ink:#4a2a20;--tt-blue:#2a3a9c;--tt-paper:#f6ae87;position:relative;aspect-ratio:636/275;color:var(--tt-ink);filter:drop-shadow(0 18px 20px rgb(0 0 0/.3))}
+.tt>*:not(.tt-paper){position:absolute;margin:0;white-space:nowrap;line-height:1}
+.tt-paper{position:absolute;inset:0;width:100%;height:100%;display:block}
+.tt-flo{width:calc(var(--u)*50);height:calc(var(--u)*12);top:calc(var(--u)*26)}
+.tt-flo svg{display:block;width:100%;height:100%}
+.tt-flo-l{left:calc(var(--u)*62)}.tt-flo-r{left:calc(var(--u)*208)}
+.tt-railway{left:0;width:calc(var(--u)*319);text-align:center;top:calc(var(--u)*22);font:600 calc(var(--u)*17)/1 "Cinzel",serif;letter-spacing:.2em;padding-left:.2em}
+.tt-station{left:0;width:calc(var(--u)*319);text-align:center;top:calc(var(--u)*50);font:700 calc(var(--u)*43)/1 "Cinzel",serif;letter-spacing:.04em}
+.tt-rule{display:block;top:calc(var(--u)*113.5);width:calc(var(--u)*31);height:calc(var(--u)*1.5);background:var(--tt-ink)}
+.tt-south{left:0;width:calc(var(--u)*319);text-align:center;top:calc(var(--u)*107);font:600 calc(var(--u)*12)/1 "Cinzel",serif;letter-spacing:.12em;padding-left:.12em}
+.tt-loco{left:calc(var(--u)*47);top:calc(var(--u)*133);width:calc(var(--u)*252);height:calc(var(--u)*122);color:var(--tt-ink)}
+.tt-city{left:calc(var(--u)*340);top:calc(var(--u)*35);font:700 calc(var(--u)*14)/1 "Roboto Condensed",sans-serif;letter-spacing:.08em}
+.tt-no{left:calc(var(--u)*334);top:calc(var(--u)*57);width:calc(var(--u)*145);height:calc(var(--u)*23);display:flex;align-items:center;padding-left:calc(var(--u)*8);background:#fde3cf;font:700 calc(var(--u)*12.5)/1 "Roboto",sans-serif;letter-spacing:.04em;color:#7a2e2a}
+.tt-zone-l,.tt-car-l{top:calc(var(--u)*98);font:500 calc(var(--u)*8.5)/1 "Roboto",sans-serif;color:#7a4a3a}
+.tt-zone-l{left:calc(var(--u)*340)}.tt-car-l{left:calc(var(--u)*402)}
+.tt-zone{left:calc(var(--u)*338);top:calc(var(--u)*106);font:700 calc(var(--u)*46)/1 "Roboto Condensed",sans-serif}
+.tt-car{left:calc(var(--u)*402);top:calc(var(--u)*112);font:600 calc(var(--u)*23)/1 "Caveat",cursive;color:var(--tt-blue);transform:rotate(-4deg);transform-origin:left center}
+.tt-tbl{left:calc(var(--u)*334);top:calc(var(--u)*152);width:calc(var(--u)*145);height:calc(var(--u)*45);display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;border:calc(var(--u)*1) solid var(--tt-ink)}
+.tt-tbl div{display:flex;align-items:center;gap:calc(var(--u)*6);padding-left:calc(var(--u)*6);font:500 calc(var(--u)*8)/1 "Roboto",sans-serif;color:#7a4a3a}
+.tt-tbl div:nth-child(odd){border-right:calc(var(--u)*1) solid var(--tt-ink)}
+.tt-tbl div:nth-child(-n+2){border-bottom:calc(var(--u)*1) solid var(--tt-ink)}
+.tt-tbl b{font:700 calc(var(--u)*9)/1 "Roboto",sans-serif;color:var(--tt-blue);letter-spacing:.04em}
+.tt-fare{left:calc(var(--u)*342);top:calc(var(--u)*207);display:flex;align-items:baseline;gap:calc(var(--u)*16)}
+.tt-fare span{font:500 calc(var(--u)*11.5)/1 "Roboto",sans-serif;letter-spacing:.14em}
+.tt-fare b{font:700 calc(var(--u)*15)/1 "Roboto",sans-serif;color:var(--tt-blue);letter-spacing:.06em}
+.tt-adult{left:calc(var(--u)*340);top:calc(var(--u)*236);font:italic 700 calc(var(--u)*10)/1 "Roboto",sans-serif;letter-spacing:.05em}
+.tt-stub{left:calc(var(--u)*512);top:calc(var(--u)*28);width:calc(var(--u)*90);height:calc(var(--u)*215);background:#dc5a4b;overflow:hidden}
+.tt-ctl{position:absolute;left:calc(var(--u)*8);top:0;width:calc(var(--u)*36);height:100%;display:flex;align-items:center;justify-content:center}
+.tt-ctl span{display:block;writing-mode:vertical-rl;transform:rotate(180deg);font:700 calc(var(--u)*21)/1 "Roboto Condensed",sans-serif;letter-spacing:.14em;color:#fde3d0;text-indent:calc(var(--u)*-14)}
+.tt-ser{position:absolute;left:calc(var(--u)*62);top:calc(var(--u)*118);width:calc(var(--u)*118);height:calc(var(--u)*22);display:flex;align-items:center;justify-content:center;border:calc(var(--u)*1.5) solid var(--tt-ink);font:700 calc(var(--u)*11)/1 "Roboto",sans-serif;letter-spacing:.06em;color:var(--tt-ink);transform:translate(-50%,0) rotate(-78deg);transform-origin:center}
+
+/* ===== Tab "Vé xác nhận": cuống vé tĩnh trong form, gửi xong thì ra vé tàu đã điền ===== */
+#d-confirm [hidden]{display:none!important}
+.tk-hint{margin-top:1rem;font-size:.8125rem;color:var(--ink2)}
+#cf-done{margin-top:.5rem}
+.cv-wrap{container-type:inline-size;max-width:60rem;margin:0 auto}
+.cv{--ink:#4a2a20;--tt-paper:#f6ae87;--blue:#2a3a9c;--band:5rem;--r:.6rem;color:var(--ink);filter:drop-shadow(0 18px 20px rgb(0 0 0/.3))}
+@media(prefers-reduced-motion:no-preference){.cv-wrap{animation:cvIn .5s cubic-bezier(.16,1,.3,1)}}
+@keyframes cvIn{from{opacity:0;transform:translateY(.75rem)}}
+.cv-paper{display:grid;background-color:#f6ae87;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .3 0 0 0 0 .2 0 0 0 .9 -.32'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E"),radial-gradient(ellipse at 18% 28%,rgb(255 222 188/.5),#0000 55%),radial-gradient(ellipse at 82% 72%,rgb(255 222 188/.4),#0000 50%);
+  clip-path:polygon(0 0,100% 0,100% calc(100% - var(--band) - .55rem),calc(100% - .95rem) calc(100% - var(--band)),100% calc(100% - var(--band) + .55rem),100% 100%,0 100%,0 calc(100% - var(--band) + .55rem),.95rem calc(100% - var(--band)),0 calc(100% - var(--band) - .55rem));
+  -webkit-mask:radial-gradient(circle var(--r) at 0 10%,#0000 98%,#000),radial-gradient(circle var(--r) at 0 38%,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 10%,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 38%,#0000 98%,#000);
+  -webkit-mask-composite:source-in;mask:radial-gradient(circle var(--r) at 0 10%,#0000 98%,#000),radial-gradient(circle var(--r) at 0 38%,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 10%,#0000 98%,#000),radial-gradient(circle var(--r) at 100% 38%,#0000 98%,#000);mask-composite:intersect}
+.cv p,.cv h3{margin:0}
+.cv-brand{display:grid;justify-items:center;gap:.5rem;padding:1.5rem 1.25rem 1rem;text-align:center}
+.cv-kick{display:flex;align-items:center;gap:.5rem;font:700 .8125rem/1 "Cormorant SC",serif;letter-spacing:.24em}
+.cv-kick svg{width:2.25rem;height:.6rem}
+.cv-title{font:700 clamp(2rem,9cqw,3.25rem)/1 "Cormorant SC",serif;letter-spacing:.03em}
+.cv-sub{display:flex;align-items:center;gap:.75rem;font:700 .875rem/1 "Cormorant SC",serif;letter-spacing:.16em}
+.cv-sub i{width:1.75rem;height:2px;background:var(--ink)}
+.cv-loco{width:min(100%,15.5rem);margin-top:.5rem}
+.cv-loco svg{display:block;width:100%;height:auto;color:var(--ink)}
+.cv-info{display:grid;gap:.75rem;padding:1.25rem;border-top:1px dashed rgb(74 42 32/.6);align-content:start}
+.cv-branch{font:700 1rem/1.1 "Roboto Condensed",sans-serif;letter-spacing:.08em;text-transform:uppercase;overflow-wrap:anywhere}
+.cv-phone{padding:.4rem .6rem;background:#fde3cf;color:#7a2e2a;font:700 .8125rem/1.2 "Roboto",sans-serif;letter-spacing:.04em;overflow-wrap:anywhere}
+.cv small{display:block;font:500 .75rem/1 "Roboto",sans-serif;color:#7a4a3a;margin-bottom:.25rem}
+.cv-who{display:grid;grid-template-columns:auto 1fr;gap:.75rem;align-items:end}
+.cv-big{display:block;font:700 2.75rem/.9 "Roboto Condensed",sans-serif}
+.cv-hand{display:block;font:700 1.25rem/1.2 "Roboto",sans-serif;letter-spacing:.03em;color:var(--blue);overflow-wrap:anywhere}
+.cv-tbl{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--ink)}
+.cv-tbl div{padding:.4rem .5rem;min-width:0}
+.cv-tbl div:nth-child(odd){border-right:1px solid var(--ink)}
+.cv-tbl div:nth-child(-n+2){border-bottom:1px solid var(--ink)}
+.cv-tbl small{margin-bottom:.2rem}
+.cv-tbl b{display:block;font:700 .8125rem/1.15 "Roboto",sans-serif;color:var(--blue);letter-spacing:.03em;overflow-wrap:anywhere}
+.cv-mode{display:flex;flex-wrap:wrap;align-items:baseline;gap:.25rem .75rem;font:500 .75rem/1.2 "Roboto",sans-serif;letter-spacing:.12em}
+.cv-mode b{font:700 .9375rem/1.2 "Roboto",sans-serif;color:var(--blue);letter-spacing:.03em}
+.cv-next{font:italic 700 .75rem/1.3 "Roboto",sans-serif;letter-spacing:.05em}
+.cv-ctl{height:var(--band);display:grid;padding:.75rem 1rem}
+.cv-red{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:0 .75rem;background:#dc5a4b;overflow:hidden}
+.cv-ctl-t{flex:1;min-width:0;overflow:hidden;white-space:nowrap;font:700 1.0625rem/1 "Roboto Condensed",sans-serif;letter-spacing:.14em;color:#fde3d0}
+.cv-ser{flex:none;max-width:45%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:.3rem .5rem;border:1.5px solid var(--ink);font:700 .75rem/1 "Roboto",sans-serif;letter-spacing:.06em;text-transform:uppercase;transform:rotate(-3deg)}
+
+@container (min-width:40rem){
+  .cv-paper{grid-template-columns:319fr 177fr 140fr;
+    clip-path:polygon(0 0,calc(78% - .55rem) 0,78% .95rem,calc(78% + .55rem) 0,100% 0,100% 100%,calc(78% + .55rem) 100%,78% calc(100% - .95rem),calc(78% - .55rem) 100%,0 100%);
+    --r:.6rem}
+  .cv-brand{padding:1.5rem 1.25rem 1.25rem;align-content:space-between}
+  .cv-info{border-top:0;border-left:1px dashed rgb(74 42 32/.6);padding:1.25rem 1rem}
+  .cv-ctl{height:auto;padding:1.5rem .9rem;border-left:1px dashed rgb(74 42 32/.6)}
+  .cv-paper{min-height:19rem}
+  .cv-red{position:relative;padding:0}
+  /* chữ dọc đặt tuyệt đối để độ dài chữ không kéo cao tấm vé */
+  .cv-ctl-t{position:absolute;top:0;bottom:0;left:14%;width:1.6rem;flex:none;writing-mode:vertical-rl;transform:rotate(180deg);font-size:1.25rem;text-indent:-.9rem}
+  .cv-ser{position:absolute;left:68%;top:50%;writing-mode:vertical-rl;transform:translate(-50%,-50%) rotate(168deg);max-width:none;max-height:80%;text-overflow:clip;padding:.5rem .3rem}
+}
+.cv-msg{max-width:26rem;margin:1.5rem auto 0;text-align:center;color:#fff;outline:0}
+.cv-msg h3{font:800 1.25rem/1.3 var(--display);letter-spacing:-.01em}
+.cv-msg p{margin-top:.5rem;font-size:.875rem;color:var(--b100)}
+.cv-msg .move{margin-top:1rem;text-align:left}
+.cv-msg .move.zalo{margin-top:1.25rem}
+
+/* ===== Tab "Minh họa vé": so ba hướng hình minh họa trên vé xác nhận ===== */
+#d-art [hidden]{display:none!important}
+
+
+/* ===== Tab "Con dấu": hai bản con dấu tròn trên vé xác nhận ===== */
+#d-stamp [hidden]{display:none!important}
+.st-tabs{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem}
+.st-tabs button{min-height:2.75rem;padding:.5rem 1rem;border:1px solid var(--b600);color:var(--b100);font-size:.875rem;font-weight:600}
+.st-tabs button:hover{background:#ffffff0d}
+.st-tabs button[aria-selected=true]{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+#d-stamp{--st-ink:#184268}
+.cv-brand{position:relative}
+.cv-stamp{position:absolute;right:1.25rem;bottom:.75rem;width:9.5rem;height:auto;color:var(--st-ink);transform:rotate(-12deg);mix-blend-mode:multiply;opacity:.92;pointer-events:none}
+@container (max-width:39.99rem){.cv-stamp{width:6.5rem;right:.75rem;bottom:.5rem}}
+.st-ink{display:flex;flex-wrap:wrap;gap:.5rem;margin:-.5rem 0 1.5rem}
+.st-ink button{display:inline-flex;align-items:center;gap:.5rem;min-height:2.75rem;padding:.5rem 1rem;border:1px solid var(--b600);color:var(--b100);font-size:.875rem;font-weight:600}
+.st-ink button i{width:1rem;height:1rem;border-radius:50%;border:2px solid #fff6}
+.st-ink button:hover{background:#ffffff0d}
+.st-ink button[aria-checked=true]{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.st-cap{max-width:46rem;margin:1.25rem auto 0;font-size:.875rem;color:var(--b100)}
+.st-cap b{color:#fff}
+.st-zoom{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;max-width:46rem;margin:1.25rem auto 0}
+.st-zoom .sw{width:14rem;aspect-ratio:1;display:grid;place-items:center;background:#f6ae87}
+.st-zoom .sw svg{width:90%;height:auto;color:var(--st-ink);mix-blend-mode:multiply;opacity:.92}
+.st-zoom p{flex:1;min-width:12rem;font-size:.875rem;color:var(--b100)}
+
+/* ===== Tab "Cuống vé": các hướng cho phần cuống bên phải ===== */
+#d-stub [hidden]{display:none!important}
+#d-stub{--st-ink:#A3141C}
+.cv.v1 .cv-red{background:rgb(255 244 232/.35);border:1.5px solid rgb(74 42 32/.75);outline:1px solid rgb(74 42 32/.55);outline-offset:-5px}
+.cv.v1 .cv-ctl-t{color:var(--ink)}
+.cv-ctl-t.solo{text-indent:0;text-align:center;letter-spacing:.3em}
+.cv.v2 .cv-red{background:#184268}
+.cv.v2 .cv-ctl-t{color:#f6e7d3}
+.cv.v2 .cv-ser{border-color:#f6e7d3;color:#f6e7d3}
+.cv.v3 .cv-red{position:relative;background:rgb(255 244 232/.3)}
+.cv.v3 .cv-ctl-t{color:var(--ink)}
+.cv-chk{position:absolute;background:repeating-conic-gradient(var(--ink) 0 25%,#0000 0 50%) 0 0/24px 24px}
+.cv-chk.a{left:0;right:0;top:0;height:12px}
+.cv-chk.b{left:0;right:0;bottom:0;height:12px}
+@container (min-width:40rem){
+  .cv-chk.a{right:auto;bottom:0;width:24px;height:auto}
+  .cv-chk.b{left:auto;top:0;width:24px;height:auto}
+  .cv.v3 .cv-ctl-t{left:30%}
+  .cv.v3 .cv-ser{left:70%}
+}
+
+/* ===== Tab "Cuống mới": cuống màu đặc theo mẫu vé tàu (nhãn tối, chữ lớn, thẻ nhỏ) ===== */
+#d-stub2 [hidden]{display:none!important}
+#d-stub2{--stubc:#8F4A30;--st-ink:#A3141C}
+.cv.s2{--band:10rem}
+.cv.s2 .cv-ctl{padding:0}
+.cs{height:100%;display:flex;flex-direction:column;justify-content:space-between;gap:.5rem;padding:.75rem 1rem;background:var(--stubc);color:#f6e7d3;overflow:hidden}
+.cs p{margin:0}
+.cs-pill{align-self:flex-start;max-width:100%;padding:.35rem .6rem;background:#2a1d19;font:500 .75rem/1.3 "Oswald","Be Vietnam Pro",sans-serif;letter-spacing:.2em;text-transform:uppercase;overflow-wrap:anywhere}
+.cs-big{font:700 2.25rem/1 "Oswald","Be Vietnam Pro",sans-serif;text-transform:uppercase;letter-spacing:.01em}
+.cs-big span{display:inline}
+.cs-tags{display:flex;flex-wrap:nowrap;gap:.3rem}
+.cs-tags span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:.25rem .4rem;background:#2a1d19;font:500 .75rem/1.2 "Oswald","Be Vietnam Pro",sans-serif;letter-spacing:.04em;text-transform:uppercase}
+.cs-tags span:last-child{flex:none}
+@container (min-width:40rem){
+  .cv.s2 .cv-ctl{padding:0}
+  .cs{gap:1rem;padding:1.25rem .9rem}
+  .cs-big{flex:1;display:flex;flex-direction:column;justify-content:center;font-size:clamp(2.75rem,8cqw,3.75rem);line-height:.98}
+  .cs-big span{display:block}
+}
+
+/* ===== Tab "Vị trí dấu": ba cách đặt con dấu ===== */
+#d-place [hidden]{display:none!important}
+#d-place{--st-ink:#A3141C;--stubc:#8F4A30}
+.cv-loco .pl-c{display:block;width:10.5rem;height:auto;margin:0 auto;color:var(--st-ink);transform:rotate(-8deg);mix-blend-mode:multiply;opacity:.92}
+.cv-stamp.corner{left:-2.25rem;right:auto;bottom:-2.25rem;width:10.5rem;transform:rotate(-14deg)}
+.cv-stamp.wm{left:50%;right:auto;top:54%;bottom:auto;width:15.5rem;transform:translate(-50%,-50%) rotate(-10deg);opacity:.15}
+.cv.pl3 .cv-brand>*:not(.cv-stamp){position:relative;z-index:1}
+@container (max-width:39.99rem){
+  .cv-stamp.corner{left:-1.5rem;bottom:-1.5rem;width:7.5rem}
+  .cv-stamp.wm{width:12rem}
+  .cv-loco .pl-c{width:8.5rem}
+}
+
+/* ===== Tab "Bảng màu vé": cùng một vé, năm bảng màu ===== */
+#d-pal [hidden]{display:none!important}
+.pal-item{margin-bottom:2.5rem}
+.pal-sw{display:flex;gap:.5rem;align-items:center;margin-bottom:.75rem;flex-wrap:wrap}
+.pal-sw i{width:1.25rem;height:1.25rem;border-radius:50%;border:2px solid #fff6}
+.pal-sw b{font-size:.9375rem;margin-right:.5rem}
+.cv.pal{--ink:var(--p-ink);--blue:var(--p-data);--st-ink:var(--p-seal)}
+.cv.pal .cv-paper{background-color:var(--p-paper);background-image:none}
+.cv.pal .cv-info,.cv.pal .cv-ctl{border-color:var(--p-line)}
+.cv.pal .cv-brand{border-color:var(--p-line)}
+.cv.pal small{color:var(--p-small)}
+.cv.pal .cv-phone{background:var(--p-chip);color:var(--p-chipt)}
+.cv.pal .cs{background:var(--p-stub);color:var(--p-stubt)}
+.cv.pal .cs-pill,.cv.pal .cs-tags span{background:var(--p-tag);color:var(--p-tagt)}
+.cv.pal .cs-tags span:last-child{background:var(--p-free);color:var(--p-freet)}
+.cv.pal .cv-loco .pl-c{color:var(--p-seal);mix-blend-mode:var(--p-blend,multiply)}
+.pal-a{--p-paper:#faf8f5;--p-ink:#123350;--p-data:#1b4a76;--p-small:#475569;--p-line:rgb(24 66 104/.35);--p-chip:#eef5fb;--p-chipt:#184268;--p-stub:#184268;--p-stubt:#fff;--p-tag:#0b2136;--p-tagt:#d9e8f5;--p-free:#fbbf24;--p-freet:#020617;--p-seal:#a3141c}
+.pal-b{--p-paper:#eef5fb;--p-ink:#0b2136;--p-data:#1f5285;--p-small:#475569;--p-line:rgb(18 51 80/.3);--p-chip:#fff;--p-chipt:#123350;--p-stub:#123350;--p-stubt:#fff;--p-tag:#184268;--p-tagt:#fff;--p-free:#fbbf24;--p-freet:#020617;--p-seal:#a3141c}
+.pal-c{--p-paper:#faf8f5;--p-ink:#0f172a;--p-data:#184268;--p-small:#475569;--p-line:rgb(15 23 42/.28);--p-chip:#fef3c7;--p-chipt:#0f172a;--p-stub:#f59e0b;--p-stubt:#020617;--p-tag:#0f172a;--p-tagt:#fff;--p-free:#fff;--p-freet:#0f172a;--p-seal:#a3141c}
+.pal-d{--p-paper:#1b4a76;--p-ink:#fff;--p-data:#fbbf24;--p-small:#b6d0e8;--p-line:rgb(255 255 255/.3);--p-chip:#123350;--p-chipt:#fff;--p-stub:#f59e0b;--p-stubt:#020617;--p-tag:#020617;--p-tagt:#fff;--p-free:#fff;--p-freet:#020617;--p-seal:#fbbf24;--p-blend:normal}
+.pal-d .cv-paper{outline:1px solid #2f6ba3;outline-offset:-1px}
+.pal-d .cv-tbl,.pal-d .cv-tbl div{border-color:rgb(255 255 255/.45)}
+.pal-d .cv-initial{color:#fff}
+
+/* ===== Tab "Cuống rõ hơn": ba cách tách cuống navy khỏi nền trang (bản A) ===== */
+#d-ring [hidden]{display:none!important}
+/* Cách 1: viền sáng 1px bên trong cuống và bóng đổ tối, đậm hơn bản gốc */
+.cv.r1{filter:drop-shadow(0 14px 22px rgb(2 6 23/.7))}
+.cv.r1 .cs{box-shadow:inset 0 0 0 1px rgb(255 255 255/.3)}
+/* Cách 2: cuống dùng brand-600, sáng hơn nền trang brand-800 một bậc rõ rệt */
+.cv.pal-a.r2{--p-stub:#1f5285;--p-tag:#0b2136}
+/* Cách 3: cuống nâu đất như vé đầu tiên, chữ kem, thẻ tối ấm */
+.cv.pal-a.r3{--p-stub:#8f4a30;--p-stubt:#f6e7d3;--p-tag:#2a1d19;--p-tagt:#f6e7d3}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="bar"><div>
+  <b>Form đăng ký đặt thẳng trên trang</b>
+  <button type="button" data-view="desktop" aria-pressed="true">Máy tính</button>
+  <button type="button" data-view="phone" aria-pressed="false">Điện thoại</button>
+  <i></i>
+  <button type="button" data-st="form" aria-pressed="true">Điền form</button>
+  <button type="button" data-st="bad" aria-pressed="false">Thiếu thông tin</button>
+  <button type="button" data-st="net" aria-pressed="false">Gửi lỗi mạng</button>
+  <button type="button" data-st="sent" aria-pressed="false">Đã gửi</button>
+  <i></i>
+  <button type="button" id="bar-tk" aria-pressed="false">Vé xé rời</button>
+  <button type="button" id="bar-train" aria-pressed="false">Vé tàu</button>
+  <button type="button" id="bar-cf" aria-pressed="false">Vé xác nhận</button>
+  <button type="button" id="bar-art" aria-pressed="false">Minh họa vé</button>
+  <button type="button" id="bar-stamp" aria-pressed="false">Con dấu</button>
+  <button type="button" id="bar-stub" aria-pressed="false">Cuống vé</button>
+  <button type="button" id="bar-stub2" aria-pressed="false">Cuống mới</button>
+  <button type="button" id="bar-place" aria-pressed="false">Vị trí dấu</button>
+  <button type="button" id="bar-pal" aria-pressed="false">Bảng màu vé</button>
+  <button type="button" id="bar-ring" aria-pressed="false">Cuống rõ hơn</button>
+</div></div>
+
+<div id="stage">
+<main>
+<div class="wrap">
+  <div class="head">
+    <span class="eyebrow">Đăng ký trực tuyến</span>
+    <h2>Đăng ký học thử miễn phí</h2>
+  </div>
+
+  <div id="d-old">
+  <form class="form show-form" id="form" novalidate onsubmit="return false">
+    <aside class="sum" aria-live="polite">
+      <div class="k">Thông tin đã điền</div>
+      <p class="empty" id="s-empty">Thông tin ba mẹ điền sẽ hiện ở đây.</p>
+      <dl>
+        <div data-f="child" hidden><dt>Học viên</dt><dd></dd></div>
+        <div data-f="age" hidden><dt>Năm sinh / tuổi</dt><dd></dd></div>
+        <div data-f="parent" hidden><dt>Phụ huynh</dt><dd></dd></div>
+        <div data-f="phone" hidden><dt>Số điện thoại Zalo</dt><dd class="num"></dd></div>
+        <div data-f="mode" hidden><dt>Hình thức học</dt><dd></dd></div>
+        <div data-f="branch" hidden><dt>Cơ sở</dt><dd></dd></div>
+      </dl>
+    </aside>
+
+    <div class="body">
+      <!-- 1. đang điền -->
+      <div data-state="form">
+        <h3>Thông tin liên hệ</h3>
+        <p class="sub">Trung tâm sẽ gọi hoặc nhắn Zalo để xếp lớp và khung giờ cho bé.</p>
+        <div class="err-banner" role="alert">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="flex:none;margin-top:.15rem"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.500v.01"/></svg>
+          Còn 2 ô chưa đúng, ba mẹ xem lại phần báo đỏ bên dưới.
+        </div>
+
+        <div class="grid two">
+          <div class="f bad-on"><label for="child">Họ tên bé</label><input id="child" autocomplete="off" placeholder="VD: Nguyễn Minh An"><p class="err">Vui lòng nhập họ tên của bé.</p></div>
+          <div class="f"><label for="age">Năm sinh hoặc tuổi <span class="opt-hint">(4–12 tuổi)</span></label><input id="age" inputmode="numeric" autocomplete="off" placeholder="VD: 2016"></div>
+          <div class="f"><label for="parent">Họ tên phụ huynh</label><input id="parent" autocomplete="name" placeholder="VD: Chị Thảo"></div>
+          <div class="f bad-on" id="f-phone"><label for="phone">Số điện thoại Zalo</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="VD: 0901234567" aria-describedby="phone-err"><p class="err" id="phone-err">Số điện thoại cần ít nhất 10 chữ số. Vui lòng kiểm tra lại.</p></div>
+          <fieldset class="f full modes"><legend>Hình thức học</legend>
+            <label><input type="radio" name="mode" value="Học tại trung tâm"><span>Học tại trung tâm</span></label>
+            <label><input type="radio" name="mode" value="Học online"><span>Học online</span></label>
+            <label><input type="radio" name="mode" value="Học kèm 1-1"><span>Học kèm 1-1</span></label>
+          </fieldset>
+          <div class="f full"><label for="branch">Cơ sở học</label><select id="branch">
+            <option value="" selected disabled>Chọn cơ sở</option>
+            <option value="Bình Phú (Q.6)">Bình Phú (Q.6) · 811 Hậu Giang, P. Bình Phú</option>
+            <option value="Tên Lửa (Bình Tân)">Tên Lửa (Bình Tân) · 55 Tên Lửa, P. An Lạc</option>
+            <option value="Tây Thạnh (Tân Phú)">Tây Thạnh (Tân Phú) · 52 đường T6, P. Tây Thạnh</option>
+            <option value="Phú Thọ Hoà (Tân Phú)">Phú Thọ Hoà (Tân Phú) · 152 Nguyễn Sơn, P. Phú Thọ Hoà</option>
+          </select></div>
+        </div>
+        <button type="submit" class="move" id="submit"><span>Gửi đăng ký</span><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+        <p class="privacy">Chỉ dùng để liên hệ xếp lớp, không chia sẻ cho bên thứ ba.</p>
+      </div>
+
+      <!-- 2. gửi lỗi mạng -->
+      <div data-state="net">
+        <h3>Chưa gửi được</h3>
+        <div class="err-banner" style="display:flex" role="alert">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="flex:none;margin-top:.15rem"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.500v.01"/></svg>
+          Chưa gửi được thông tin. Ba mẹ kiểm tra kết nối mạng và thử lại. Thông tin đã điền vẫn còn nguyên.
+        </div>
+        <button type="button" class="move"><span>Thử lại</span><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+        <a class="move zalo" href="#"><span>Nhắn Zalo trung tâm (0789059440)</span><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+      </div>
+
+      <!-- 3. đã gửi: thay đúng chỗ form, không cần đóng popup -->
+      <div data-state="sent">
+        <div class="ok">
+          <span class="badge"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></span>
+          <div>
+            <p>Cảm ơn ba mẹ đã tin tưởng gửi gắm bé <span class="sl-name">Minh An</span> cho Global Chess.</p>
+            <p>Trung tâm đã nhận thông tin và sẽ liên hệ qua số <b class="num sl-phone" style="color:var(--ink)">0901234567</b> để trao đổi khung giờ và xếp lớp cho bé.</p>
+          </div>
+        </div>
+        <div class="slip">
+          <dl>
+            <div><dt>Học viên</dt><dd class="sl-child">Nguyễn Minh An · 2016</dd></div>
+            <div><dt>Hình thức học</dt><dd class="md">Học tại trung tâm</dd></div>
+            <div><dt>Cơ sở</dt><dd class="br">Bình Phú (Q.6)</dd></div>
+          </dl>
+        </div>
+        <a class="move zalo" href="#"><span>Nhắn Zalo trung tâm ngay</span><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+        <button type="button" class="move ghost" data-st="form"><span>Đăng ký thêm cho bé khác</span><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></button>
+      </div>
+    </div>
+  </form>
+
+  <p class="note"><b>Phiếu bên trái</b> chỉ hiện những ô đã điền, ô nào trống thì chưa có dòng. Hình thức học và cơ sở không chọn sẵn để không hiện thay phụ huynh. Gửi xong, lời cảm ơn thay đúng chỗ form.</p>
+  </div>
+
+  <section id="d-ticket" hidden>
+    <form class="tk" id="tk" novalidate>
+      <div class="tk-half" id="tk-stubw">
+        <aside class="tk-stub" aria-live="polite">
+          <div class="tk-k">Vé học thử</div>
+          <p class="tk-brand">Global Chess</p>
+          <p class="tk-free">Miễn phí</p>
+          <p class="tk-empty" id="tk-empty">Thông tin ba mẹ điền sẽ hiện ở đây.</p>
+          <dl>
+            <div data-f="child" hidden><dt>Học viên</dt><dd></dd></div>
+            <div data-f="age" hidden><dt>Năm sinh / tuổi</dt><dd></dd></div>
+            <div data-f="parent" hidden><dt>Phụ huynh</dt><dd></dd></div>
+            <div data-f="phone" hidden><dt>Số điện thoại Zalo</dt><dd class="num"></dd></div>
+            <div data-f="mode" hidden><dt>Hình thức học</dt><dd></dd></div>
+            <div data-f="branch" hidden><dt>Cơ sở</dt><dd></dd></div>
+          </dl>
+          <span class="tk-stamp" aria-hidden="true">Đã gửi</span>
+        </aside>
+      </div>
+
+      <div class="tk-half" id="tk-mainw">
+        <div class="tk-main">
+          <div id="tk-fill">
+            <h3>Điền thông tin để nhận vé</h3>
+            <p class="sub">Trung tâm sẽ gọi hoặc nhắn Zalo để xếp lớp và khung giờ cho bé.</p>
+            <div class="tk-alert" id="tk-alert" role="alert" hidden></div>
+            <div class="tk-grid">
+              <div class="f"><label for="tk-child">Họ tên bé</label><input id="tk-child" data-k="child" autocomplete="off" placeholder="VD: Nguyễn Minh An"><p class="err">Vui lòng nhập họ tên của bé.</p></div>
+              <div class="f"><label for="tk-age">Năm sinh hoặc tuổi <span class="opt-hint">(4–12 tuổi)</span></label><input id="tk-age" data-k="age" inputmode="numeric" autocomplete="off" placeholder="VD: 2016"><p class="err">Vui lòng nhập năm sinh hoặc tuổi của bé.</p></div>
+              <div class="f"><label for="tk-parent">Họ tên phụ huynh</label><input id="tk-parent" data-k="parent" autocomplete="name" placeholder="VD: Chị Thảo"><p class="err">Vui lòng nhập họ tên phụ huynh.</p></div>
+              <div class="f"><label for="tk-phone">Số điện thoại Zalo</label><input id="tk-phone" data-k="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="VD: 0901234567"><p class="err">Số điện thoại cần ít nhất 10 chữ số. Vui lòng kiểm tra lại.</p></div>
+              <fieldset class="f modes tk-full" data-k="mode"><legend>Hình thức học</legend>
+                <label><input type="radio" name="tk-mode" value="Học tại trung tâm"><span>Học tại trung tâm</span></label>
+                <label><input type="radio" name="tk-mode" value="Học online"><span>Học online</span></label>
+                <label><input type="radio" name="tk-mode" value="Học kèm 1-1"><span>Học kèm 1-1</span></label>
+                <p class="err">Vui lòng chọn hình thức học.</p>
+              </fieldset>
+              <div class="f tk-full"><label for="tk-branch">Cơ sở học</label><select id="tk-branch" data-k="branch">
+                <option value="" selected disabled>Chọn cơ sở</option>
+                <option value="Bình Phú (Q.6)">Bình Phú (Q.6) · 811 Hậu Giang, P. Bình Phú</option>
+                <option value="Tên Lửa (Bình Tân)">Tên Lửa (Bình Tân) · 55 Tên Lửa, P. An Lạc</option>
+                <option value="Tây Thạnh (Tân Phú)">Tây Thạnh (Tân Phú) · 52 đường T6, P. Tây Thạnh</option>
+                <option value="Phú Thọ Hoà (Tân Phú)">Phú Thọ Hoà (Tân Phú) · 152 Nguyễn Sơn, P. Phú Thọ Hoà</option>
+              </select><p class="err">Vui lòng chọn cơ sở.</p></div>
+            </div>
+            <button type="submit" class="move"><span>Gửi đăng ký</span><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+            <p class="privacy">Chỉ dùng để liên hệ xếp lớp, không chia sẻ cho bên thứ ba.</p>
+          </div>
+
+          <div id="tk-done" hidden>
+            <div class="ok">
+              <span class="badge"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></span>
+              <div>
+                <p>Đã gửi đăng ký của bé <span class="tk-nm"></span>.</p>
+                <p>Trung tâm sẽ liên hệ qua số <b class="num tk-tel" style="color:var(--ink)"></b>. Cuống vé bên cạnh là biên nhận ba mẹ giữ lại.</p>
+              </div>
+            </div>
+            <button type="button" class="move ghost" id="tk-again"><span>Đăng ký thêm cho bé khác</span><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- Xác nhận: cuống vé bay ra giữa màn hình, lời cảm ơn hiện bên dưới -->
+    <div class="tk-ov" id="tk-ov" role="dialog" aria-modal="true" aria-labelledby="tk-msg-h" hidden>
+      <div class="tk-bd"></div>
+      <div class="tk-col">
+        <div class="tk-slot" id="tk-slot" aria-hidden="true"></div>
+        <div class="tk-msg" id="tk-msg" tabindex="-1">
+          <h3 id="tk-msg-h">Cảm ơn ba mẹ đã tin tưởng gửi gắm bé <span class="tk-nm"></span> cho Global Chess.</h3>
+          <p>Trung tâm đã nhận thông tin và sẽ liên hệ qua số <b class="num tk-tel"></b> để trao đổi khung giờ và xếp lớp cho bé.</p>
+          <a class="move zalo" href="#"><span>Nhắn Zalo trung tâm ngay</span><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+          <button type="button" class="move ghost" id="tk-close"><span>Đóng</span><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></span></button>
+        </div>
+      </div>
+    </div>
+    <p class="note"><b>Vé xé rời:</b> bấm gửi, cuống vé bị xé khỏi vé (mép răng cưa), bay ra giữa màn hình và đóng dấu "Đã gửi". Bấm Đóng, nền tối hoặc Esc thì cuống bay ngược về chỗ cũ. Thử bấm gửi khi còn trống để xem báo lỗi.</p>
+  </section>
+
+  <section id="d-confirm" hidden>
+    <div id="cf-formwrap">
+    <form class="tk"  id="cf" novalidate>
+      <div class="tk-half" id="cf-stubw">
+        <aside class="tk-stub" aria-live="polite">
+          <div class="tk-k">Vé học thử</div>
+          <p class="tk-brand">Global Chess</p>
+          <p class="tk-free">Miễn phí</p>
+          <p class="tk-empty" id="cf-empty">Thông tin ba mẹ điền sẽ hiện ở đây.</p>
+          <dl>
+            <div data-f="child" hidden><dt>Học viên</dt><dd></dd></div>
+            <div data-f="age" hidden><dt>Năm sinh / tuổi</dt><dd></dd></div>
+            <div data-f="parent" hidden><dt>Phụ huynh</dt><dd></dd></div>
+            <div data-f="phone" hidden><dt>Số điện thoại Zalo</dt><dd class="num"></dd></div>
+            <div data-f="mode" hidden><dt>Hình thức học</dt><dd></dd></div>
+            <div data-f="branch" hidden><dt>Cơ sở</dt><dd></dd></div>
+          </dl>
+          <p class="tk-hint" id="cf-hint" hidden>Ba mẹ kiểm tra lại thông tin rồi bấm Gửi đăng ký.</p>
+          
+        </aside>
+      </div>
+
+      <div class="tk-half" id="cf-mainw">
+        <div class="tk-main">
+          <div id="cf-fill">
+            <h3>Điền thông tin để nhận vé</h3>
+            <p class="sub">Trung tâm sẽ gọi hoặc nhắn Zalo để xếp lớp và khung giờ cho bé.</p>
+            <div class="tk-alert" id="cf-alert" role="alert" hidden></div>
+            <div class="tk-grid">
+              <div class="f"><label for="cf-child">Họ tên bé</label><input id="cf-child" data-k="child" autocomplete="off" placeholder="VD: Nguyễn Minh An"><p class="err">Vui lòng nhập họ tên của bé.</p></div>
+              <div class="f"><label for="cf-age">Năm sinh hoặc tuổi <span class="opt-hint">(4–12 tuổi)</span></label><input id="cf-age" data-k="age" inputmode="numeric" autocomplete="off" placeholder="VD: 2016"><p class="err">Vui lòng nhập năm sinh hoặc tuổi của bé.</p></div>
+              <div class="f"><label for="cf-parent">Họ tên phụ huynh</label><input id="cf-parent" data-k="parent" autocomplete="name" placeholder="VD: Chị Thảo"><p class="err">Vui lòng nhập họ tên phụ huynh.</p></div>
+              <div class="f"><label for="cf-phone">Số điện thoại Zalo</label><input id="cf-phone" data-k="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="VD: 0901234567"><p class="err">Số điện thoại cần ít nhất 10 chữ số. Vui lòng kiểm tra lại.</p></div>
+              <fieldset class="f modes tk-full" data-k="mode"><legend>Hình thức học</legend>
+                <label><input type="radio" name="cf-mode" value="Học tại trung tâm"><span>Học tại trung tâm</span></label>
+                <label><input type="radio" name="cf-mode" value="Học online"><span>Học online</span></label>
+                <label><input type="radio" name="cf-mode" value="Học kèm 1-1"><span>Học kèm 1-1</span></label>
+                <p class="err">Vui lòng chọn hình thức học.</p>
+              </fieldset>
+              <div class="f tk-full"><label for="cf-branch">Cơ sở học</label><select id="cf-branch" data-k="branch">
+                <option value="" selected disabled>Chọn cơ sở</option>
+                <option value="Bình Phú (Q.6)">Bình Phú (Q.6) · 811 Hậu Giang, P. Bình Phú</option>
+                <option value="Tên Lửa (Bình Tân)">Tên Lửa (Bình Tân) · 55 Tên Lửa, P. An Lạc</option>
+                <option value="Tây Thạnh (Tân Phú)">Tây Thạnh (Tân Phú) · 52 đường T6, P. Tây Thạnh</option>
+                <option value="Phú Thọ Hoà (Tân Phú)">Phú Thọ Hoà (Tân Phú) · 152 Nguyễn Sơn, P. Phú Thọ Hoà</option>
+              </select><p class="err">Vui lòng chọn cơ sở.</p></div>
+            </div>
+            <button type="submit" class="move"><span>Gửi đăng ký</span><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+            <p class="privacy">Chỉ dùng để liên hệ xếp lớp, không chia sẻ cho bên thứ ba.</p>
+          </div>
+
+        </div>
+      </div>
+    </form>
+    <p class="note"><b>Vé xác nhận:</b> cuống vé nằm yên bên trái để ba mẹ kiểm tra lại thông tin. Bấm gửi thì cả form được thay bằng tấm vé tàu đã điền thông tin, không có hiệu ứng xé cuống.</p>
+    </div>
+
+    <div id="cf-done" hidden>
+      <div class="cv-wrap">
+        <article class="cv" id="cv" aria-label="Vé xác nhận học thử Global Chess">
+          <div class="cv-paper">
+            <section class="cv-brand">
+              <div class="cv-kick"><svg viewBox="0 0 50 12" aria-hidden="true"><path d="M1 9C8 1 15 12 25 6S40 9 49 3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span>VÉ XÁC NHẬN</span><svg viewBox="0 0 50 12" aria-hidden="true" style="transform:scaleX(-1)"><path d="M1 9C8 1 15 12 25 6S40 9 49 3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+              <h3 class="cv-title">GLOBAL CHESS</h3>
+              <p class="cv-sub"><i></i><span>HỌC THỬ MIỄN PHÍ</span><i></i></p>
+              <div class="cv-loco" aria-hidden="true"></div>
+            </section>
+            <section class="cv-info">
+              <p class="cv-branch" id="cv-branch"></p>
+              <p class="cv-phone"><span>SĐT.</span> <b id="cv-phone"></b></p>
+              <div class="cv-who">
+                <div><small>Học viên:</small><span class="cv-big" id="cv-initial"></span></div>
+                <div><small>Họ tên bé:</small><span class="cv-hand" id="cv-name"></span></div>
+              </div>
+              <div class="cv-tbl">
+                <div><small>Phụ huynh:</small><b id="cv-parent"></b></div><div><small>Tuổi:</small><b id="cv-age"></b></div>
+                <div><small>Ngày:</small><b id="cv-date"></b></div><div><small>Giờ:</small><b id="cv-time"></b></div>
+              </div>
+              <p class="cv-mode"><span>HÌNH THỨC:</span> <b id="cv-mode"></b></p>
+              <p class="cv-next">TRUNG TÂM SẼ LIÊN HỆ XẾP LỚP</p>
+            </section>
+            <aside class="cv-ctl" aria-hidden="true">
+              <div class="cv-red"><span class="cv-ctl-t">XÁC NHẬN - XÁC NHẬN - XÁC NHẬN</span><span class="cv-ser" id="cv-ser"></span></div>
+            </aside>
+          </div>
+        </article>
+        <div class="cv-msg" id="cv-msg" tabindex="-1">
+          <h3>Cảm ơn ba mẹ đã tin tưởng gửi gắm bé <span id="cv-m-name"></span> cho Global Chess.</h3>
+          <p>Trung tâm đã nhận thông tin và sẽ liên hệ qua số <b class="num" id="cv-m-tel"></b> để trao đổi khung giờ và xếp lớp cho bé. Ba mẹ có thể chụp màn hình tấm vé này để giữ lại.</p>
+          <a class="move zalo" href="#"><span>Nhắn Zalo trung tâm ngay</span><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+          <button type="button" class="move ghost" id="cf-again"><span>Đăng ký thêm cho bé khác</span><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="d-art" hidden>
+    <div class="head" style="margin-bottom:1.5rem"><span class="eyebrow">Vé xác nhận</span><h2>Một quân mã lớn</h2></div>
+    <div id="art-p3"></div>
+    <p class="note"><b>Dữ liệu trong vé là dữ liệu mẫu.</b> Quân mã lấy từ bộ icon lucide đang cài trong dự án, vì PieceIcon hiện chỉ có Tốt, Xe và Vua.</p>
+  </section>
+
+  <section id="d-stamp" hidden>
+    <div class="head" style="margin-bottom:1.5rem"><span class="eyebrow">Vé xác nhận</span><h2>Con dấu trung tâm</h2></div>
+    <div class="st-tabs" role="tablist" aria-label="Bản con dấu">
+      <button type="button" role="tab" aria-selected="true" aria-controls="st-p1" id="st-t1">Bản A · Từ file logo</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="st-p2" id="st-t2" tabindex="-1">Bản B · Tự vẽ</button>
+    </div>
+    <div class="st-ink" role="radiogroup" aria-label="Màu mực">
+      <button type="button" role="radio" aria-checked="true" data-ink="#184268"><i style="background:#184268"></i>Mực navy</button>
+      <button type="button" role="radio" aria-checked="false" data-ink="#CF0002"><i style="background:#CF0002"></i>Đỏ sáng · #CF0002</button>
+      <button type="button" role="radio" aria-checked="false" data-ink="#A3141C"><i style="background:#A3141C"></i>Đỏ đậm · #A3141C</button>
+    </div>
+    <div id="st-p1" role="tabpanel" aria-labelledby="st-t1"></div>
+    <div id="st-p2" role="tabpanel" aria-labelledby="st-t2" hidden></div>
+    <p class="note"><b>Dữ liệu trong vé là dữ liệu mẫu.</b> Dấu được đặt chồng mép dưới bên phải của phần tên trung tâm, hơi nghiêng, mực ép lên giấy. Hàng màu phía trên áp dụng cho cả bản A và bản B.</p>
+  </section>
+
+  <section id="d-stub" hidden>
+    <div class="head" style="margin-bottom:1.5rem"><span class="eyebrow">Vé xác nhận</span><h2>Phần cuống bên phải</h2></div>
+    <div class="st-tabs" role="tablist" aria-label="Hướng thiết kế cuống">
+      <button type="button" role="tab" aria-selected="true" aria-controls="sb-p0" id="sb-t0">Hiện tại</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="sb-p1" id="sb-t1" tabindex="-1">Ý 1 · Cuống giấy</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="sb-p2" id="sb-t2" tabindex="-1">Ý 2 · Dải navy</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="sb-p3" id="sb-t3" tabindex="-1">Ý 3 · Dải ô bàn cờ</button>
+    </div>
+    <div class="st-ink" role="radiogroup" aria-label="Màu con dấu">
+      <button type="button" role="radio" aria-checked="false" data-ink="#184268"><i style="background:#184268"></i>Dấu navy</button>
+      <button type="button" role="radio" aria-checked="false" data-ink="#CF0002"><i style="background:#CF0002"></i>Dấu đỏ sáng</button>
+      <button type="button" role="radio" aria-checked="true" data-ink="#A3141C"><i style="background:#A3141C"></i>Dấu đỏ đậm</button>
+    </div>
+    <div id="sb-p0" role="tabpanel" aria-labelledby="sb-t0"></div>
+    <div id="sb-p1" role="tabpanel" aria-labelledby="sb-t1" hidden></div>
+    <div id="sb-p2" role="tabpanel" aria-labelledby="sb-t2" hidden></div>
+    <div id="sb-p3" role="tabpanel" aria-labelledby="sb-t3" hidden></div>
+    <p class="note"><b>Dữ liệu trong vé là dữ liệu mẫu.</b> Các hướng chỉ khác nhau ở cuống bên phải. Con dấu bản A để cạnh quân mã, đổi màu dấu ở hàng phía trên để xem dấu và cuống hợp nhau thế nào.</p>
+  </section>
+
+  <section id="d-stub2" hidden>
+    <div class="head" style="margin-bottom:1.5rem"><span class="eyebrow">Vé xác nhận</span><h2>Cuống theo mẫu vé tàu</h2></div>
+    <div class="st-ink" role="radiogroup" aria-label="Màu tấm cuống" data-var="--stubc">
+      <button type="button" role="radio" aria-checked="true" data-ink="#8F4A30"><i style="background:#8F4A30"></i>Nâu đất</button>
+      <button type="button" role="radio" aria-checked="false" data-ink="#4A2A20"><i style="background:#4A2A20"></i>Nâu mực</button>
+      <button type="button" role="radio" aria-checked="false" data-ink="#184268"><i style="background:#184268"></i>Navy logo</button>
+    </div>
+    <div class="st-ink" role="radiogroup" aria-label="Màu con dấu" data-var="--st-ink">
+      <button type="button" role="radio" aria-checked="false" data-ink="#184268"><i style="background:#184268"></i>Dấu navy</button>
+      <button type="button" role="radio" aria-checked="false" data-ink="#CF0002"><i style="background:#CF0002"></i>Dấu đỏ sáng</button>
+      <button type="button" role="radio" aria-checked="true" data-ink="#A3141C"><i style="background:#A3141C"></i>Dấu đỏ đậm</button>
+    </div>
+    <div id="s2-host"></div>
+    <p class="st-cap"><b>Cuống theo mẫu vé tàu.</b> Tấm cuống màu đặc chiếm hết chiều cao, ngăn với thân vé bằng nét đứt. Trên cùng là nhãn tối ghi tên bé, ở giữa là hai dòng chữ lớn "XÁC NHẬN", dưới đáy là hai thẻ tối nhỏ cùng một hàng (hình thức học và "Miễn Phí"). Đổi màu tấm cuống và màu con dấu ở hai hàng phía trên.</p>
+    <p class="note"><b>Dữ liệu trong vé là dữ liệu mẫu.</b></p>
+  </section>
+
+  <section id="d-place" hidden>
+    <div class="head" style="margin-bottom:1.5rem"><span class="eyebrow">Vé xác nhận</span><h2>Đặt con dấu ở đâu</h2></div>
+    <div class="st-tabs" role="tablist" aria-label="Vị trí con dấu">
+      <button type="button" role="tab" aria-selected="true" aria-controls="pl-p1" id="pl-t1">Ý 1 · Thay quân mã</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="pl-p2" id="pl-t2" tabindex="-1">Ý 2 · Tràn góc dưới trái</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="pl-p3" id="pl-t3" tabindex="-1">Ý 3 · Dấu chìm sau quân mã</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="pl-p4" id="pl-t4" tabindex="-1">Ý 4 · Không dấu</button>
+    </div>
+    <div class="st-ink" role="radiogroup" aria-label="Màu con dấu">
+      <button type="button" role="radio" aria-checked="false" data-ink="#184268"><i style="background:#184268"></i>Dấu navy</button>
+      <button type="button" role="radio" aria-checked="false" data-ink="#CF0002"><i style="background:#CF0002"></i>Dấu đỏ sáng</button>
+      <button type="button" role="radio" aria-checked="true" data-ink="#A3141C"><i style="background:#A3141C"></i>Dấu đỏ đậm</button>
+    </div>
+    <div id="pl-p1" role="tabpanel" aria-labelledby="pl-t1"></div>
+    <div id="pl-p2" role="tabpanel" aria-labelledby="pl-t2" hidden></div>
+    <div id="pl-p3" role="tabpanel" aria-labelledby="pl-t3" hidden></div>
+    <div id="pl-p4" role="tabpanel" aria-labelledby="pl-t4" hidden></div>
+    <p class="note"><b>Dữ liệu trong vé là dữ liệu mẫu.</b> Cả bốn dùng cuống kiểu mới. Đổi màu dấu ở hàng phía trên.</p>
+  </section>
+
+  <section id="d-pal" hidden>
+    <div class="head" style="margin-bottom:1.5rem"><span class="eyebrow">Vé xác nhận</span><h2>Bảng màu đồng bộ với trang</h2></div>
+    <div id="pal-host"></div>
+    <p class="note"><b>Dữ liệu trong vé là dữ liệu mẫu.</b> Cả năm dùng cùng bố cục (con dấu thay quân mã, cuống kiểu mới), chỉ khác màu. Phông chữ vé (Cormorant SC có chân) giữ nguyên ở mọi bản.</p>
+  </section>
+
+  <section id="d-ring" hidden>
+    <div class="head" style="margin-bottom:1.5rem"><span class="eyebrow">Vé xác nhận · bản A</span><h2>Làm cuống phải rõ hơn</h2></div>
+    <div class="st-tabs" role="tablist" aria-label="Cách làm rõ cuống">
+      <button type="button" role="tab" aria-selected="true" aria-controls="rg-p1" id="rg-t1">Cách 1 · Viền mảnh và bóng đổ</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="rg-p2" id="rg-t2" tabindex="-1">Cách 2 · Navy sáng hơn</button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="rg-p3" id="rg-t3" tabindex="-1">Cách 3 · Nâu đất</button>
+    </div>
+    <div id="rg-p1" role="tabpanel" aria-labelledby="rg-t1"></div>
+    <div id="rg-p2" role="tabpanel" aria-labelledby="rg-t2" hidden></div>
+    <div id="rg-p3" role="tabpanel" aria-labelledby="rg-t3" hidden></div>
+    <p class="note"><b>Dữ liệu trong vé là dữ liệu mẫu.</b> Thân vé giữ nguyên bản A, chỉ phần cuống bên phải đổi.</p>
+  </section>
+
+
+
+
+
+
+
+
+</div>
+</main>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const form=$("#form");
+const val={
+  child:()=>$("#child").value.trim(),
+  age:()=>$("#age").value.trim(),
+  parent:()=>$("#parent").value.trim(),
+  phone:()=>$("#phone").value.trim(),
+  mode:()=>$('input[name=mode]:checked')?.value||"",
+  branch:()=>$("#branch").value
+};
+function sync(){
+  let any=false;
+  $$("[data-f]").forEach(row=>{
+    const v=val[row.dataset.f]();
+    row.hidden=!v;any||=!!v;
+    row.querySelector("dd").textContent=v;
+  });
+  $("#s-empty").hidden=any;
+  // phiếu đã gửi: dùng dữ liệu thật, trống thì giữ chữ mẫu để xem trước
+  const c=val.child(),a=val.age();
+  if(c)$(".sl-child").textContent=c+(a?" · "+a:"");
+  if(c)$(".sl-name").textContent=c;
+  if(val.phone())$(".sl-phone").textContent=val.phone();
+  if(val.mode())$(".md").textContent=val.mode();
+  if(val.branch())$(".br").textContent=val.branch();
+}
+function setState(s){
+  form.className="form show-"+s;
+  $$(".bar [data-st]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.st===s));
+}
+form.addEventListener("input",sync);form.addEventListener("change",sync);
+$$("[data-st]").forEach(b=>b.addEventListener("click",()=>setState(b.dataset.st)));
+$$("[data-view]").forEach(b=>b.addEventListener("click",()=>{
+  $("#stage").classList.toggle("phone",b.dataset.view==="phone");
+  $$("[data-view]").forEach(x=>x.setAttribute("aria-pressed",x===b));
+}));
+$("#submit").addEventListener("click",()=>setState("sent"));
+sync();
+</script>
+
+<section id="d-train" hidden>
+    <div class="tt-wrap">
+      <div class="tt" role="img" aria-label="Vé tàu hỏa Railway Station, South Station, số 65087-001, vé người lớn một chiều">
+        <svg class="tt-paper" viewBox="0 0 636 275" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <path id="tt-shape" d="M0 0H489L496 13L503 0H636V27A9 9 0 0 0 636 45V128.5A9 9 0 0 0 636 146.5V230A9 9 0 0 0 636 248V275H503L496 262L489 275H0V248A9 9 0 0 0 0 230V146.5A9 9 0 0 0 0 128.5V45A9 9 0 0 0 0 27Z"/>
+            <clipPath id="tt-clip"><use href="#tt-shape"/></clipPath>
+            <filter id="tt-grain" x="0" y="0" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4"/>
+              <feColorMatrix values="0 0 0 0 .55  0 0 0 0 .3  0 0 0 0 .2  0 0 0 .9 -.32"/>
+            </filter>
+            <filter id="tt-blot" x="0" y="0" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency=".012 .02" numOctaves="3" seed="9"/>
+              <feColorMatrix values="0 0 0 0 1  0 0 0 0 .86  0 0 0 0 .72  0 0 0 1.3 -.55"/>
+            </filter>
+          </defs>
+          <use href="#tt-shape" fill="#f6ae87"/>
+          <g clip-path="url(#tt-clip)">
+            <rect width="636" height="275" filter="url(#tt-blot)" opacity=".55"/>
+            <rect width="636" height="275" filter="url(#tt-grain)" opacity=".55"/>
+          </g>
+          <path d="M496 17V258" stroke="#4a2a20" stroke-opacity=".6" stroke-width="1" stroke-dasharray="3 3" fill="none"/>
+          <path d="M319 24V251" stroke="#4a2a20" stroke-opacity=".6" stroke-width="1" stroke-dasharray="3 3" fill="none"/>
+        </svg>
+
+        <!-- trái: tên ga + đầu máy -->
+        <div class="tt-flo tt-flo-l"><svg viewBox="0 0 50 12"><path d="M1 9C8 1 15 12 25 6S40 9 49 3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+        <div class="tt-flo tt-flo-r"><svg viewBox="0 0 50 12" style="transform:scaleX(-1)"><path d="M1 9C8 1 15 12 25 6S40 9 49 3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+        <div class="tt-railway">RAILWAY</div>
+        <div class="tt-station">STATION</div>
+        <i class="tt-rule" style="left:calc(var(--u)*58)"></i><i class="tt-rule" style="left:calc(var(--u)*242)"></i>
+        <div class="tt-south">SOUTH STATION</div>
+
+        <svg class="tt-loco" viewBox="0 0 252 122" aria-hidden="true">
+          <g fill="currentColor">
+            <rect x="0" y="12" width="60" height="9" rx="1"/>
+            <rect x="4" y="21" width="50" height="62"/>
+            <rect x="52" y="38" width="138" height="46" rx="4"/>
+            <rect x="188" y="40" width="20" height="44" rx="9"/>
+            <path d="M172 42V20h-5v-7h30v7h-5v22z"/>
+            <rect x="203" y="22" width="12" height="12"/>
+            <path d="M203 22l6-8 6 8z"/>
+            <ellipse cx="100" cy="36" rx="14" ry="8"/>
+            <ellipse cx="136" cy="34" rx="11" ry="9"/>
+            <rect x="119" y="26" width="7" height="12"/>
+            <rect x="30" y="83" width="182" height="8"/>
+            <rect x="158" y="86" width="34" height="16" rx="2"/>
+            <path d="M206 100h46l-14 18h-32z"/>
+          </g>
+          <g fill="var(--tt-paper)"><rect x="12" y="28" width="16" height="22"/><rect x="31" y="28" width="16" height="22"/></g>
+          <g stroke="var(--tt-paper)" stroke-width="1.6" fill="none"><path d="M60 52h126M60 66h126" stroke-opacity=".5"/><path d="M214 106l8 10M224 106l8 10M234 106l8 10" stroke-opacity=".7"/></g>
+          <g stroke="currentColor" fill="var(--tt-paper)">
+            <circle cx="70" cy="98" r="20" stroke-width="5"/><circle cx="112" cy="98" r="20" stroke-width="5"/><circle cx="154" cy="98" r="20" stroke-width="5"/>
+            <circle cx="196" cy="106" r="11" stroke-width="4"/>
+          </g>
+          <g stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M70 80v36M52 98h36M57 85l26 26M83 85L57 111M112 80v36M94 98h36M99 85l26 26M125 85L99 111M154 80v36M136 98h36M141 85l26 26M167 85l-26 26M196 98v16M188 106h16"/>
+          </g>
+          <g fill="currentColor"><circle cx="70" cy="98" r="5"/><circle cx="112" cy="98" r="5"/><circle cx="154" cy="98" r="5"/><circle cx="196" cy="106" r="3"/></g>
+          <path d="M70 98L154 98" stroke="currentColor" stroke-width="5"/>
+        </svg>
+
+        <!-- giữa: thông tin chuyến -->
+        <div class="tt-city">INDIANA -S.ST</div>
+        <div class="tt-no">Nº. 65087-001</div>
+        <div class="tt-zone-l">Zone:</div>
+        <div class="tt-zone">B2</div>
+        <div class="tt-car-l">Carriage:</div>
+        <div class="tt-car">A45/630</div>
+        <div class="tt-tbl">
+          <div><span>Seat:</span><b>25A</b></div><div><span>Date:</span><b>17FEB</b></div>
+          <div><span>Wagon:</span><b>01</b></div><div><span>Time:</span><b>13.00</b></div>
+        </div>
+        <div class="tt-fare"><span>FARE PAID:</span><b>3.75</b></div>
+        <div class="tt-adult">ADULT SINGLE TICKET</div>
+
+        <!-- phải: cuống kiểm soát -->
+        <div class="tt-stub">
+          <div class="tt-ctl"><span>CONTROL - CONTROL - CONTROL</span></div>
+          <div class="tt-ser">Nº. 65087-001</div>
+        </div>
+      </div>
+    </div>
+    <p class="note"><b>Vé tàu:</b> vẽ lại theo ảnh mẫu bằng HTML, CSS và SVG, chữ và số giữ nguyên như ảnh, không lấy dữ liệu nào từ form. Vé co giãn theo chiều rộng khung.</p>
+  </section>
+
+            
+<script>
+/* Tab "Vé xé rời": tách riêng, không đụng logic của các tab cũ. */
+(()=>{
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const tk=$("#tk"),fill=$("#tk-fill"),done=$("#tk-done"),ov=$("#tk-ov"),slot=$("#tk-slot"),msg=$("#tk-msg");
+  const stubw=$("#tk-stubw"),stub=stubw.firstElementChild,mainw=$("#tk-mainw"),main=mainw.firstElementChild;
+  const reduce=()=>matchMedia("(prefers-reduced-motion:reduce)").matches;
+  const el=k=>tk.querySelector(`[data-k=${k}]`);
+  const val={
+    child:()=>el("child").value.trim(),age:()=>el("age").value.trim(),
+    parent:()=>el("parent").value.trim(),phone:()=>el("phone").value.trim(),
+    mode:()=>tk.querySelector("input[name=tk-mode]:checked")?.value||"",
+    branch:()=>el("branch").value
+  };
+  const rules={child:v=>!!v,age:v=>!!v,parent:v=>!!v,phone:v=>v.replace(/\D/g,"").length>=10,mode:v=>!!v,branch:v=>!!v};
+  const box=k=>el(k).closest(".f");
+  let ph=null,anim=null,closing=false,edge="right";
+
+  function sync(){
+    let any=false;
+    $$("#d-ticket [data-f]").forEach(row=>{
+      const v=val[row.dataset.f]();
+      row.hidden=!v;any||=!!v;row.querySelector("dd").textContent=v;
+    });
+    $("#tk-empty").hidden=any;
+  }
+  function validate(){
+    const bad=[];
+    for(const k in rules){const ok=rules[k](val[k]());box(k).classList.toggle("bad",!ok);if(!ok)bad.push(k);}
+    const a=$("#tk-alert");
+    a.hidden=!bad.length;
+    a.textContent=bad.length?`Còn ${bad.length} ô chưa đúng, ba mẹ xem lại phần báo đỏ bên dưới.`:"";
+    return bad;
+  }
+
+  /* Mép rách răng cưa: hai mảnh có răng khớp nhau (mảnh này lồi thì mảnh kia lõm). */
+  function zig(node,edge){
+    const w=node.offsetWidth,h=node.offsetHeight,d=5,vert=edge==="left"||edge==="right";
+    const L=vert?h:w,n=Math.max(6,Math.round(L/10)),at=i=>i*L/n,pts=[];
+    if(edge==="right"){pts.push([0,0]);for(let i=0;i<=n;i++)pts.push([w-(i%2?d:0),at(i)]);pts.push([0,h]);}
+    if(edge==="left"){for(let i=0;i<=n;i++)pts.push([i%2?0:d,at(i)]);pts.push([w,h],[w,0]);}
+    if(edge==="bottom"){pts.push([0,0],[w,0]);for(let i=n;i>=0;i--)pts.push([at(i),h-(i%2?d:0)]);}
+    if(edge==="top"){pts.push([0,h],[w,h]);for(let i=n;i>=0;i--)pts.push([at(i),i%2?0:d]);}
+    node.style.clipPath="polygon("+pts.map(([x,y])=>x+"px "+y+"px").join(",")+")";
+  }
+
+  function tear(){
+    $$(".tk-nm").forEach(x=>x.textContent=val.child());
+    $$(".tk-tel").forEach(x=>x.textContent=val.phone());
+    stub.classList.add("is-torn");
+    const r=stubw.getBoundingClientRect();
+    const desk=mainw.getBoundingClientRect().left>=r.right-2;
+
+    // giữ chỗ cho cuống trong lưới, rồi chuyển cuống ra lớp phủ
+    ph=document.createElement("div");
+    ph.style.cssText=`width:${r.width}px;height:${r.height}px`;
+    tk.insertBefore(ph,stubw);
+    fill.hidden=true;done.hidden=false;
+    stubw.style.cssText=`left:${r.left}px;top:${r.top}px;width:${r.width}px;height:auto`; // cao vừa nội dung, không kéo dài theo thân vé
+    ov.hidden=false; // phải hiện trước khi đo răng cưa, ẩn thì kích thước bằng 0
+    ov.appendChild(stubw);
+    const rh=stubw.offsetHeight;
+    edge=desk?"right":"bottom";
+    zig(stub,edge);zig(main,desk?"left":"top"); // sau khi cuống rời lưới, kích thước mới đúng
+
+    // đích đến: khe giữa màn hình, chừa chỗ cho lời cảm ơn bên dưới
+    const s=Math.max(.6,Math.min(1.2,(innerHeight-32-msg.offsetHeight-20)/rh,(innerWidth-32)/r.width));
+    slot.style.width=r.width*s+"px";slot.style.height=rh*s+"px";
+    const t=slot.getBoundingClientRect();
+    const dx=t.left+t.width/2-(r.left+r.width/2),dy=t.top+t.height/2-(r.top+rh/2);
+    const peel=desk?[-18,0,-6]:[0,-18,-3];
+
+    anim=stubw.animate([
+      {transform:"translate(0,0) rotate(0deg) scale(1)",easing:"cubic-bezier(.3,0,.4,1)"},
+      {transform:`translate(${peel[0]}px,${peel[1]}px) rotate(${peel[2]}deg) scale(1.03)`,offset:.2,easing:"cubic-bezier(.16,1,.3,1)"},
+      {transform:`translate(${dx}px,${dy}px) rotate(0deg) scale(${s})`}
+    ],{duration:reduce()?1:1000,fill:"forwards"});
+
+    ov.offsetWidth; // chốt trạng thái ẩn trước khi chạy chuyển tiếp
+    ov.classList.add("on");
+    setTimeout(()=>stub.classList.add("stamped"),reduce()?0:850);
+    setTimeout(()=>msg.focus({preventScroll:true}),reduce()?0:150);
+  }
+
+  function closeOv(){
+    if(!anim||closing)return;
+    closing=true;
+    ov.classList.remove("on");
+    anim.onfinish=()=>{
+      anim.cancel();anim=null;
+      stubw.removeAttribute("style");stubw.classList.add("settled");
+      tk.insertBefore(stubw,ph);ph.remove();ph=null;
+      zig(stub,edge); // về lưới thì cuống cao bằng cả vé, răng cưa phải tính lại
+      ov.hidden=true;closing=false;
+      $("#tk-again").focus();
+    };
+    anim.reverse();
+  }
+
+  tk.addEventListener("input",e=>{sync();const f=e.target.closest(".f");if(f)f.classList.remove("bad");});
+  tk.addEventListener("change",e=>{sync();const f=e.target.closest(".f");if(f)f.classList.remove("bad");});
+  tk.addEventListener("submit",e=>{
+    e.preventDefault();
+    if(anim||stub.classList.contains("is-torn"))return;
+    const bad=validate();
+    if(bad.length){const f=el(bad[0]);(f.matches("fieldset")?f.querySelector("input"):f).focus();return;}
+    tear();
+  });
+  $("#tk-close").addEventListener("click",closeOv);
+  ov.querySelector(".tk-bd").addEventListener("click",closeOv);
+  document.addEventListener("keydown",e=>{
+    if(ov.hidden)return;
+    if(e.key==="Escape")closeOv();
+    if(e.key==="Tab"){ // khóa Tab trong hộp xác nhận
+      const f=[...msg.querySelectorAll("a,button")],i=f.indexOf(document.activeElement);
+      if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus();}
+      else if(!e.shiftKey&&i===f.length-1){e.preventDefault();f[0].focus();}
+    }
+  });
+  $("#tk-again").addEventListener("click",()=>{
+    tk.reset();
+    stubw.classList.remove("settled");stub.classList.remove("is-torn","stamped");
+    stub.style.clipPath=main.style.clipPath="";
+    done.hidden=true;fill.hidden=false;
+    $$("#tk .bad").forEach(x=>x.classList.remove("bad"));$("#tk-alert").hidden=true;sync();
+  });
+
+  function showDesign(d){
+    $("#d-old").hidden=d==="ticket";$("#d-ticket").hidden=d!=="ticket";
+    $("#bar-tk").setAttribute("aria-pressed",d==="ticket");
+    if(d==="ticket")$$(".bar [data-st]").forEach(b=>b.setAttribute("aria-pressed","false"));
+  }
+  $("#bar-tk").addEventListener("click",()=>showDesign("ticket"));
+  $$(".bar [data-st]").forEach(b=>b.addEventListener("click",()=>showDesign("old")));
+  sync();
+})();
+</script>
+<script>
+/* Tab "Vé tàu": tĩnh, chỉ bật/tắt hiển thị. */
+(()=>{
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const sec=$("#d-train"),head=$(".head");
+  function show(on){
+    sec.hidden=!on;head.hidden=on;
+    $("#bar-train").setAttribute("aria-pressed",on);
+    if(on){
+      $("#d-old").hidden=true;$("#d-ticket").hidden=true;
+      $("#bar-tk").setAttribute("aria-pressed","false");
+      $$(".bar [data-st]").forEach(b=>b.setAttribute("aria-pressed","false"));
+    }
+  }
+  $("#bar-train").addEventListener("click",()=>show(true));
+  $$(".bar [data-st], #bar-tk").forEach(b=>b.addEventListener("click",()=>show(false)));
+})();
+</script>
+<script>
+/* Tab "Vé xác nhận": cuống vé tĩnh trong form; gửi xong thì thay form bằng vé tàu đã điền. */
+(()=>{
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const sec=$("#d-confirm"),f=$("#cf"),formWrap=$("#cf-formwrap"),done=$("#cf-done"),msg=$("#cv-msg");
+  const el=k=>f.querySelector(`[data-k=${k}]`);
+  const val={
+    child:()=>el("child").value.trim(),age:()=>el("age").value.trim(),
+    parent:()=>el("parent").value.trim(),phone:()=>el("phone").value.trim(),
+    mode:()=>f.querySelector("input[name=cf-mode]:checked")?.value||"",
+    branch:()=>el("branch").value
+  };
+  const rules={child:v=>!!v,age:v=>!!v,parent:v=>!!v,phone:v=>v.replace(/\D/g,"").length>=10,mode:v=>!!v,branch:v=>!!v};
+  const box=k=>el(k).closest(".f");
+
+  // đầu máy lấy lại từ tab "Vé tàu", không vẽ lại
+  const loco=$(".tt-loco").cloneNode(true);loco.removeAttribute("class");$(".cv-loco").appendChild(loco);
+
+  function sync(){
+    let any=false;
+    $$("#cf [data-f]").forEach(row=>{
+      const v=val[row.dataset.f]();
+      row.hidden=!v;any||=!!v;row.querySelector("dd").textContent=v;
+    });
+    $("#cf-empty").hidden=any;$("#cf-hint").hidden=!any;
+  }
+  function validate(){
+    const bad=[];
+    for(const k in rules){const ok=rules[k](val[k]());box(k).classList.toggle("bad",!ok);if(!ok)bad.push(k);}
+    const a=$("#cf-alert");
+    a.hidden=!bad.length;
+    a.textContent=bad.length?`Còn ${bad.length} ô chưa đúng, ba mẹ xem lại phần báo đỏ bên dưới.`:"";
+    return bad;
+  }
+  const pad=n=>String(n).padStart(2,"0");
+  // Điền năm sinh thì trừ ra tuổi; điền số 1–2 chữ số thì coi là tuổi. Chưa tính tháng sinh nên có thể lệch 1 tuổi.
+  function ageText(v){
+    v=v.trim();
+    if(/tuổi/i.test(v))return v;
+    const y=(v.match(/\b(?:19|20)\d{2}\b/)||[])[0],now=new Date().getFullYear();
+    if(y&&+y<=now)return `${now-y} tuổi`;
+    if(/^\d{1,2}$/.test(v))return `${+v} tuổi`;
+    return v;
+  }
+  window.gcAgeText=ageText;
+  function fillTicket(){
+    const c=val.child(),now=new Date(),T=(id,v)=>{$(id).textContent=v};
+    T("#cv-branch",val.branch());T("#cv-phone",val.phone());
+    T("#cv-initial",(c.split(/\s+/).pop()[0]||"").toLocaleUpperCase("vi"));
+    T("#cv-name",c);T("#cv-age",ageText(val.age()));T("#cv-parent",val.parent());
+    T("#cv-date",`${pad(now.getDate())}/${pad(now.getMonth()+1)}/${String(now.getFullYear()).slice(-2)}`);
+    T("#cv-time",`${pad(now.getHours())}:${pad(now.getMinutes())}`);
+    T("#cv-mode",val.mode());T("#cv-ser",c);
+    T("#cv-m-name",c);T("#cv-m-tel",val.phone());
+  }
+  f.addEventListener("input",e=>{sync();const g=e.target.closest(".f");if(g)g.classList.remove("bad");});
+  f.addEventListener("change",e=>{sync();const g=e.target.closest(".f");if(g)g.classList.remove("bad");});
+  f.addEventListener("submit",e=>{
+    e.preventDefault();
+    const bad=validate();
+    if(bad.length){const g=el(bad[0]);(g.matches("fieldset")?g.querySelector("input"):g).focus();return;}
+    fillTicket();
+    formWrap.hidden=true;done.hidden=false;
+    $(".cv-wrap").style.animation="none";$(".cv-wrap").offsetWidth;$(".cv-wrap").style.animation=""; // chạy lại hiệu ứng hiện
+    msg.focus({preventScroll:true});$(".cv").scrollIntoView({block:"center",behavior:"auto"});
+  });
+  $("#cf-again").addEventListener("click",()=>{
+    f.reset();done.hidden=true;formWrap.hidden=false;
+    $$("#cf .bad").forEach(x=>x.classList.remove("bad"));$("#cf-alert").hidden=true;sync();
+  });
+
+  const head=$(".head");
+  function show(on){
+    sec.hidden=!on;$("#bar-cf").setAttribute("aria-pressed",on);
+    if(on){
+      head.hidden=false;
+      ["#d-old","#d-ticket","#d-train"].forEach(i=>$(i).hidden=true);
+      ["#bar-tk","#bar-train"].forEach(i=>$(i).setAttribute("aria-pressed","false"));
+      $$(".bar [data-st]").forEach(b=>b.setAttribute("aria-pressed","false"));
+    }
+  }
+  $("#bar-cf").addEventListener("click",()=>show(true));
+  $$(".bar [data-st], #bar-tk, #bar-train").forEach(b=>b.addEventListener("click",()=>show(false)));
+  sync();
+})();
+</script>
+<script>
+/* Tab "Minh họa vé": nhân bản vé xác nhận, điền dữ liệu mẫu, thay hình minh họa bằng quân mã. */
+(()=>{
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const sec=$("#d-art"),head=$(".head");
+  const INK="currentColor";
+  // đường vẽ lấy từ lucide-react đã cài trong dự án
+  const knight=`<g fill="${INK}" stroke="${INK}" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><path d="M16.5 18c1-2 2.5-5 2.5-9a7 7 0 0 0-7-7H6.635a1 1 0 0 0-.768 1.64L7 5l-2.32 5.802a2 2 0 0 0 .95 2.526l2.87 1.456"/></g>
+    <g fill="none" stroke="var(--tt-paper)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5 1.425-1.425"/><path d="m17 8 1.53-1.53"/><path d="M9.713 12.185 7 18"/></g>`;
+  const src=$("#cv").closest(".cv-wrap");
+  const sample={"#cv-branch":"Phú Thọ Hoà (Tân Phú)","#cv-phone":"0901234567","#cv-initial":"A","#cv-name":"Nguyễn Minh An","#cv-age":window.gcAgeText("2016"),"#cv-parent":"Chị Thảo","#cv-date":"29/10/26","#cv-time":"13:05","#cv-mode":"Học tại trung tâm","#cv-ser":"Nguyễn Minh An"};
+  const c=src.cloneNode(true);
+  c.querySelector(".cv-msg").remove();
+  for(const k in sample)c.querySelector(k).textContent=sample[k];
+  c.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));
+  c.querySelector(".cv-loco").innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true" style="height:9rem;width:auto;margin:0 auto">${knight}</svg>`;
+  $("#art-p3").append(c);
+
+  function show(on){
+    sec.hidden=!on;$("#bar-art").setAttribute("aria-pressed",on);
+    if(on){
+      head.hidden=true;
+      ["#d-old","#d-ticket","#d-train","#d-confirm"].forEach(i=>$(i).hidden=true);
+      ["#bar-tk","#bar-train","#bar-cf"].forEach(i=>$(i).setAttribute("aria-pressed","false"));
+      $$(".bar [data-st]").forEach(b=>b.setAttribute("aria-pressed","false"));
+    }
+  }
+  $("#bar-art").addEventListener("click",()=>show(true));
+  $$(".bar [data-st], #bar-tk, #bar-train, #bar-cf").forEach(b=>b.addEventListener("click",()=>show(false)));
+})();
+</script>
+<script>
+/* Tab "Con dấu": hai bản con dấu tròn. A dùng lá chắn cắt từ assets/logo.jpg (đã tách nền, nhúng base64); B tự vẽ. */
+(()=>{
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const sec=$("#d-stamp"),head=$(".head");
+  const LOGO="data:image/png;base64,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";
+
+  // bộ lọc làm mực dập không đều: khoét lỗ nhỏ ngẫu nhiên
+  document.body.insertAdjacentHTML("beforeend",`<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <filter id="st-rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  12 0 0 0 -3" result="a"/>
+      <feComposite in="SourceGraphic" in2="a" operator="in"/>
+    </filter></defs></svg>`);
+
+  const star=(x,y,r=5)=>{const p=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,k=i%2?r*.42:r;p.push((x+k*Math.cos(a)).toFixed(1)+","+(y+k*Math.sin(a)).toFixed(1));}return `<polygon points="${p.join(" ")}" fill="currentColor"/>`;};
+  const ring=id=>`
+    <circle cx="100" cy="100" r="95" fill="none" stroke="currentColor" stroke-width="4"/>
+    <circle cx="100" cy="100" r="88.5" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    <circle cx="100" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="2"/>
+    <path id="${id}-t" d="M31 100A69 69 0 0 1 169 100" fill="none"/>
+    <path id="${id}-b" d="M21 100A79 79 0 0 0 179 100" fill="none"/>
+    ${star(25.8,100,4.5)}${star(174.2,100,4.5)}`;
+  const arcText=(id,top,bottom)=>`
+    <text font-family="'Cormorant SC',serif" font-weight="700" font-size="17" letter-spacing="2" fill="currentColor" text-anchor="middle"><textPath href="#${id}-t" startOffset="50%">${top}</textPath></text>
+    <text font-family="'Cormorant SC',serif" font-weight="700" font-size="15" letter-spacing="1.4" fill="currentColor" text-anchor="middle"><textPath href="#${id}-b" startOffset="50%">${bottom}</textPath></text>`;
+
+  // Bản A: vòng chữ + lá chắn từ logo
+  // id phải duy nhất mỗi lần dựng: textPath/mask trỏ tới id, trùng id thì dấu trong tab đang ẩn có thể mất chữ
+  let uid=0;
+  // lá chắn dùng ảnh làm mặt nạ alpha rồi tô currentColor, nên đổi được màu mực
+  const stampA=cls=>{const id="sa"+uid++;return `<svg class="${cls}" viewBox="0 0 200 200" role="img" aria-label="Con dấu Global Chess"><g filter="url(#st-rough)">${ring(id)}${arcText(id,"GLOBAL CHESS","MỘT NƯỚC ĐI · MỞ TƯ DUY")}
+    <mask id="${id}-m" style="mask-type:alpha"><image href="${LOGO}" x="61" y="60.4" width="78" height="85.3" preserveAspectRatio="xMidYMid meet"/></mask>
+    <rect x="61" y="60.4" width="78" height="85.3" fill="currentColor" mask="url(#${id}-m)"/></g></svg>`;};
+  window.gcStampA=stampA; // tab "Cuống vé" dùng lại
+
+  // Bản B: tự vẽ, quân Vua nét đơn, dải chữ "ĐÃ NHẬN" và hàng ô bàn cờ
+  const kingBody='<path d="m6.7 18-1-1C4.35 15.682 3 14.09 3 12a5 5 0 0 1 4.95-5c1.584 0 2.7.455 4.05 1.818C13.35 7.455 14.466 7 16.05 7A5 5 0 0 1 21 12c0 2.082-1.359 3.673-2.7 5l-1 1"/><path d="M10 4h4"/><path d="M12 2v6.818"/><path d="M4 20a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/>';
+  let checker="";for(let i=0;i<6;i++)checker+=`<rect x="${64+i*12}" y="128" width="12" height="11" fill="currentColor" fill-opacity="${i%2?.25:1}"/>`;
+  const stampB=cls=>{const id="sb"+uid++;return `<svg class="${cls}" viewBox="0 0 200 200" role="img" aria-label="Con dấu Global Chess, đã nhận"><g filter="url(#st-rough)">${ring(id)}${arcText(id,"GLOBAL CHESS","HỌC THỬ MIỄN PHÍ")}
+    <g transform="translate(73.5 44) scale(2.2)" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${kingBody}</g>
+    <path d="M62 104h76" stroke="currentColor" stroke-width="1.2"/>
+    <text x="100" y="121" font-family="'Cormorant SC',serif" font-weight="700" font-size="14" letter-spacing="2.2" fill="currentColor" text-anchor="middle">ĐÃ NHẬN</text>
+    ${checker}
+    </g></svg>`;};
+
+  const src=$("#cv").closest(".cv-wrap");
+  const sample={"#cv-branch":"Phú Thọ Hoà (Tân Phú)","#cv-phone":"0901234567","#cv-initial":"A","#cv-name":"Nguyễn Minh An","#cv-age":window.gcAgeText("2016"),"#cv-parent":"Chị Thảo","#cv-date":"29/10/26","#cv-time":"13:05","#cv-mode":"Học tại trung tâm","#cv-ser":"Nguyễn Minh An"};
+  const knight=`<g fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><path d="M16.5 18c1-2 2.5-5 2.5-9a7 7 0 0 0-7-7H6.635a1 1 0 0 0-.768 1.64L7 5l-2.32 5.802a2 2 0 0 0 .95 2.526l2.87 1.456"/></g><g fill="none" stroke="var(--tt-paper)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5 1.425-1.425"/><path d="m17 8 1.53-1.53"/><path d="M9.713 12.185 7 18"/></g>`;
+  const variants=[
+    {mk:stampA,t:"Bản A · Từ file logo.",d:"Lá chắn cùng quân Vua và Hậu cắt từ assets/logo.jpg, tách nền trắng thành nền trong suốt rồi tô cùng màu mực với vòng chữ (mặc định navy #184268, đổi ở hàng màu phía trên), đặt trong vòng chữ GLOBAL CHESS và khẩu hiệu. Giữ đúng dấu hiệu thương hiệu, không vẽ lại."},
+    {mk:stampB,t:"Bản B · Tự vẽ.",d:"Vòng chữ GLOBAL CHESS và HỌC THỬ MIỄN PHÍ, ở giữa là quân Vua nét đơn và hàng ô bàn cờ. Đây là con dấu xác nhận, không phải logo mới."}
+  ];
+  variants.forEach((v,i)=>{
+    const c=src.cloneNode(true);
+    c.querySelector(".cv-msg").remove();
+    for(const k in sample)c.querySelector(k).textContent=sample[k];
+    c.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));
+    c.querySelector(".cv-loco").innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true" style="height:9rem;width:auto;margin:0 auto;color:var(--ink)">${knight}</svg>`;
+    c.querySelector(".cv-brand").insertAdjacentHTML("beforeend",v.mk("cv-stamp"));
+    const cap=document.createElement("p");cap.className="st-cap";cap.innerHTML="<b></b> ";cap.firstChild.textContent=v.t;cap.append(v.d);
+    const zoom=document.createElement("div");zoom.className="st-zoom";
+    zoom.innerHTML=`<div class="sw">${v.mk("")}</div><p>Dấu phóng to trên nền giấy vé để xem nét và vết mực không đều.</p>`;
+    $("#st-p"+(i+1)).append(c,cap,zoom);
+  });
+
+  const tabs=$$(".st-tabs [role=tab]");
+  function select(i){tabs.forEach((t,j)=>{t.setAttribute("aria-selected",i===j);t.tabIndex=i===j?0:-1;$("#st-p"+(j+1)).hidden=i!==j;});}
+  tabs.forEach((t,i)=>{
+    t.addEventListener("click",()=>select(i));
+    t.addEventListener("keydown",e=>{const k={ArrowRight:1,ArrowLeft:-1}[e.key];if(!k)return;const n=(i+k+tabs.length)%tabs.length;select(n);tabs[n].focus();});
+  });
+
+  const inks=$$(".st-ink [role=radio]");
+  inks.forEach(b=>b.addEventListener("click",()=>{
+    sec.style.setProperty("--st-ink",b.dataset.ink);
+    inks.forEach(x=>x.setAttribute("aria-checked",x===b));
+  }));
+
+  function show(on){
+    sec.hidden=!on;$("#bar-stamp").setAttribute("aria-pressed",on);
+    if(on){
+      head.hidden=true;
+      ["#d-old","#d-ticket","#d-train","#d-confirm","#d-art"].forEach(i=>$(i).hidden=true);
+      ["#bar-tk","#bar-train","#bar-cf","#bar-art"].forEach(i=>$(i).setAttribute("aria-pressed","false"));
+      $$(".bar [data-st]").forEach(b=>b.setAttribute("aria-pressed","false"));
+    }
+  }
+  $("#bar-stamp").addEventListener("click",()=>show(true));
+  $$(".bar [data-st], #bar-tk, #bar-train, #bar-cf, #bar-art").forEach(b=>b.addEventListener("click",()=>show(false)));
+})();
+</script>
+<script>
+/* Tab "Cuống vé": nhân bản vé xác nhận (quân mã + dấu bản A), mỗi bản một kiểu cuống bên phải. */
+(()=>{
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const sec=$("#d-stub"),head=$(".head");
+  const knight=`<g fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><path d="M16.5 18c1-2 2.5-5 2.5-9a7 7 0 0 0-7-7H6.635a1 1 0 0 0-.768 1.64L7 5l-2.32 5.802a2 2 0 0 0 .95 2.526l2.87 1.456"/></g><g fill="none" stroke="var(--tt-paper)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5 1.425-1.425"/><path d="m17 8 1.53-1.53"/><path d="M9.713 12.185 7 18"/></g>`;
+  const sample={"#cv-branch":"Phú Thọ Hoà (Tân Phú)","#cv-phone":"0901234567","#cv-initial":"A","#cv-name":"Nguyễn Minh An","#cv-age":window.gcAgeText("2016"),"#cv-parent":"Chị Thảo","#cv-date":"29/10/26","#cv-time":"13:05","#cv-mode":"Học tại trung tâm","#cv-ser":"Nguyễn Minh An"};
+  const variants=[
+    {cls:"",t:"Hiện tại.",d:"Khối đỏ cam phẳng, chữ XÁC NHẬN lặp lại bị cắt ở hai đầu. Đỏ cam này chói và tranh với con dấu đỏ nằm ngay bên cạnh."},
+    {cls:"v1",t:"Ý 1 · Cuống giấy.",d:"Bỏ khối màu, cuống cùng màu giấy với vé, viền kẻ đôi và chữ màu mực nâu. Nhẹ nhất, con dấu là mảng màu duy nhất trên vé."},
+    {cls:"v2",t:"Ý 2 · Dải navy.",d:"Dải navy #184268 đúng màu logo, chữ và khung tên màu kem. Gắn vé với màu thương hiệu, con dấu đỏ nổi lên trên giấy đào."},
+    {cls:"v3",t:"Ý 3 · Dải ô bàn cờ.",d:"Hai dải ô đen trắng chạy dọc hai mép cuống, chữ ở giữa. Gợi cờ vua, vẫn giữ cuống nhẹ như giấy."}
+  ];
+  const src=$("#cv").closest(".cv-wrap");
+  variants.forEach((v,i)=>{
+    const c=src.cloneNode(true);
+    c.querySelector(".cv-msg").remove();
+    for(const k in sample)c.querySelector(k).textContent=sample[k];
+    c.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));
+    c.querySelector(".cv-loco").innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true" style="height:9rem;width:auto;margin:0 auto;color:var(--ink)">${knight}</svg>`;
+    c.querySelector(".cv-brand").insertAdjacentHTML("beforeend",window.gcStampA("cv-stamp"));
+    const cv=c.querySelector(".cv");if(v.cls)cv.classList.add(v.cls);
+    if(v.cls==="v1"||v.cls==="v3"){const t=c.querySelector(".cv-ctl-t");t.textContent="XÁC NHẬN";t.classList.add("solo");} // hai kiểu nhẹ: một chữ, không cắt
+    if(v.cls==="v3")c.querySelector(".cv-red").insertAdjacentHTML("afterbegin",'<i class="cv-chk a"></i><i class="cv-chk b"></i>');
+    const cap=document.createElement("p");cap.className="st-cap";cap.innerHTML="<b></b> ";cap.firstChild.textContent=v.t;cap.append(v.d);
+    $("#sb-p"+i).append(c,cap);
+  });
+
+  const tabs=$$("#d-stub .st-tabs [role=tab]");
+  function select(i){tabs.forEach((t,j)=>{t.setAttribute("aria-selected",i===j);t.tabIndex=i===j?0:-1;$("#sb-p"+j).hidden=i!==j;});}
+  tabs.forEach((t,i)=>{
+    t.addEventListener("click",()=>select(i));
+    t.addEventListener("keydown",e=>{const k={ArrowRight:1,ArrowLeft:-1}[e.key];if(!k)return;const n=(i+k+tabs.length)%tabs.length;select(n);tabs[n].focus();});
+  });
+  const inks=$$("#d-stub .st-ink [role=radio]");
+  inks.forEach(b=>b.addEventListener("click",()=>{
+    sec.style.setProperty("--st-ink",b.dataset.ink);
+    inks.forEach(x=>x.setAttribute("aria-checked",x===b));
+  }));
+
+  function show(on){
+    sec.hidden=!on;$("#bar-stub").setAttribute("aria-pressed",on);
+    if(on){
+      head.hidden=true;
+      ["#d-old","#d-ticket","#d-train","#d-confirm","#d-art","#d-stamp"].forEach(i=>$(i).hidden=true);
+      ["#bar-tk","#bar-train","#bar-cf","#bar-art","#bar-stamp"].forEach(i=>$(i).setAttribute("aria-pressed","false"));
+      $$(".bar [data-st]").forEach(b=>b.setAttribute("aria-pressed","false"));
+    }
+  }
+  $("#bar-stub").addEventListener("click",()=>show(true));
+  $$(".bar [data-st], #bar-tk, #bar-train, #bar-cf, #bar-art, #bar-stamp").forEach(b=>b.addEventListener("click",()=>show(false)));
+})();
+</script>
+<script>
+/* Tab "Cuống mới": nhân bản vé xác nhận (quân mã + dấu bản A), thay cuống bên phải bằng tấm màu đặc theo mẫu vé tàu. */
+(()=>{
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const sec=$("#d-stub2"),head=$(".head");
+  const knight=`<g fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><path d="M16.5 18c1-2 2.5-5 2.5-9a7 7 0 0 0-7-7H6.635a1 1 0 0 0-.768 1.64L7 5l-2.32 5.802a2 2 0 0 0 .95 2.526l2.87 1.456"/></g><g fill="none" stroke="var(--tt-paper)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5 1.425-1.425"/><path d="m17 8 1.53-1.53"/><path d="M9.713 12.185 7 18"/></g>`;
+  const sample={"#cv-branch":"Phú Thọ Hoà (Tân Phú)","#cv-phone":"0901234567","#cv-initial":"A","#cv-name":"Nguyễn Minh An","#cv-age":window.gcAgeText("2016"),"#cv-parent":"Chị Thảo","#cv-date":"29/10/26","#cv-time":"13:05","#cv-mode":"Học tại trung tâm"};
+  const c=$("#cv").closest(".cv-wrap").cloneNode(true);
+  c.querySelector(".cv-msg").remove();
+  for(const k in sample)c.querySelector(k).textContent=sample[k];
+  c.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));
+  c.querySelector(".cv-loco").innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true" style="height:9rem;width:auto;margin:0 auto;color:var(--ink)">${knight}</svg>`;
+  c.querySelector(".cv-brand").insertAdjacentHTML("beforeend",window.gcStampA("cv-stamp"));
+  c.querySelector(".cv").classList.add("s2");
+  // cuống mới: nhãn tên, chữ lớn, thẻ nhỏ
+  const ctl=c.querySelector(".cv-ctl");ctl.removeAttribute("aria-hidden");
+  ctl.innerHTML=`<div class="cs"><p class="cs-pill"></p><p class="cs-big"><span>XÁC</span> <span>NHẬN</span></p><p class="cs-tags"><span>Tại trung tâm</span><span>Miễn Phí</span></p></div>`;
+  ctl.querySelector(".cs-pill").textContent="Nguyễn Minh An";
+  $("#s2-host").append(c);
+
+  $$("#d-stub2 .st-ink").forEach(g=>{
+    const btns=[...g.querySelectorAll("[role=radio]")];
+    btns.forEach(b=>b.addEventListener("click",()=>{
+      sec.style.setProperty(g.dataset.var,b.dataset.ink);
+      btns.forEach(x=>x.setAttribute("aria-checked",x===b));
+    }));
+  });
+
+  function show(on){
+    sec.hidden=!on;$("#bar-stub2").setAttribute("aria-pressed",on);
+    if(on){
+      head.hidden=true;
+      ["#d-old","#d-ticket","#d-train","#d-confirm","#d-art","#d-stamp","#d-stub"].forEach(i=>$(i).hidden=true);
+      ["#bar-tk","#bar-train","#bar-cf","#bar-art","#bar-stamp","#bar-stub"].forEach(i=>$(i).setAttribute("aria-pressed","false"));
+      $$(".bar [data-st]").forEach(b=>b.setAttribute("aria-pressed","false"));
+    }
+  }
+  $("#bar-stub2").addEventListener("click",()=>show(true));
+  $$(".bar [data-st], #bar-tk, #bar-train, #bar-cf, #bar-art, #bar-stamp, #bar-stub").forEach(b=>b.addEventListener("click",()=>show(false)));
+})();
+</script>
+<script>
+/* Tab "Vị trí dấu": cùng một vé (cuống kiểu mới), ba chỗ đặt con dấu bản A. */
+(()=>{
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const sec=$("#d-place"),head=$(".head");
+  const knight=`<g fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><path d="M16.5 18c1-2 2.5-5 2.5-9a7 7 0 0 0-7-7H6.635a1 1 0 0 0-.768 1.64L7 5l-2.32 5.802a2 2 0 0 0 .95 2.526l2.87 1.456"/></g><g fill="none" stroke="var(--tt-paper)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5 1.425-1.425"/><path d="m17 8 1.53-1.53"/><path d="M9.713 12.185 7 18"/></g>`;
+  const sample={"#cv-branch":"Phú Thọ Hoà (Tân Phú)","#cv-phone":"0901234567","#cv-initial":"A","#cv-name":"Nguyễn Minh An","#cv-age":window.gcAgeText("2016"),"#cv-parent":"Chị Thảo","#cv-date":"29/10/26","#cv-time":"13:05","#cv-mode":"Học tại trung tâm"};
+  const variants=[
+    {t:"Ý 1 · Thay quân mã.",d:"Bỏ quân mã, con dấu to ở giữa nửa trái vé và là hình duy nhất ở đó. Ít thứ nhất, dấu trở thành điểm nhấn thương hiệu."},
+    {t:"Ý 2 · Tràn góc dưới trái.",d:"Quân mã giữ nguyên ở giữa. Con dấu đóng lệch ra mép vé nên bị cắt một phần, như dấu thật đóng chưa ngay ngắn."},
+    {t:"Ý 3 · Dấu chìm sau quân mã.",d:"Con dấu lớn, mờ khoảng 15%, nằm sau quân mã như hoa văn nền. Không chiếm chỗ của chữ, nhưng nếu giấy quá sáng thì dấu có thể trông như vết bẩn."},
+    {t:"Ý 4 · Không dấu.",d:"Bỏ hẳn con dấu, chỉ còn quân mã ở giữa nửa trái vé. Dùng để so với ba bản có dấu."}
+  ];
+  const src=$("#cv").closest(".cv-wrap");
+  variants.forEach((v,i)=>{
+    const c=src.cloneNode(true);
+    c.querySelector(".cv-msg").remove();
+    for(const k in sample)c.querySelector(k).textContent=sample[k];
+    c.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));
+    const loco=c.querySelector(".cv-loco"),brand=c.querySelector(".cv-brand"),cv=c.querySelector(".cv");
+    cv.classList.add("s2");
+    if(i===0){loco.innerHTML=window.gcStampA("pl-c");}
+    else{
+      loco.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true" style="height:9rem;width:auto;margin:0 auto;color:var(--ink)">${knight}</svg>`;
+      if(i<3)brand.insertAdjacentHTML("beforeend",window.gcStampA("cv-stamp "+(i===1?"corner":"wm")));
+      if(i===2)cv.classList.add("pl3");
+    }
+    const ctl=c.querySelector(".cv-ctl");ctl.removeAttribute("aria-hidden");
+    ctl.innerHTML=`<div class="cs"><p class="cs-pill"></p><p class="cs-big"><span>XÁC</span> <span>NHẬN</span></p><p class="cs-tags"><span>Tại trung tâm</span><span>Miễn Phí</span></p></div>`;
+    ctl.querySelector(".cs-pill").textContent="Nguyễn Minh An";
+    const cap=document.createElement("p");cap.className="st-cap";cap.innerHTML="<b></b> ";cap.firstChild.textContent=v.t;cap.append(v.d);
+    $("#pl-p"+(i+1)).append(c,cap);
+  });
+
+  const tabs=$$("#d-place .st-tabs [role=tab]");
+  function select(i){tabs.forEach((t,j)=>{t.setAttribute("aria-selected",i===j);t.tabIndex=i===j?0:-1;$("#pl-p"+(j+1)).hidden=i!==j;});}
+  tabs.forEach((t,i)=>{
+    t.addEventListener("click",()=>select(i));
+    t.addEventListener("keydown",e=>{const k={ArrowRight:1,ArrowLeft:-1}[e.key];if(!k)return;const n=(i+k+tabs.length)%tabs.length;select(n);tabs[n].focus();});
+  });
+  const inks=$$("#d-place .st-ink [role=radio]");
+  inks.forEach(b=>b.addEventListener("click",()=>{
+    sec.style.setProperty("--st-ink",b.dataset.ink);
+    inks.forEach(x=>x.setAttribute("aria-checked",x===b));
+  }));
+
+  function show(on){
+    sec.hidden=!on;$("#bar-place").setAttribute("aria-pressed",on);
+    if(on){
+      head.hidden=true;
+      ["#d-old","#d-ticket","#d-train","#d-confirm","#d-art","#d-stamp","#d-stub","#d-stub2"].forEach(i=>$(i).hidden=true);
+      ["#bar-tk","#bar-train","#bar-cf","#bar-art","#bar-stamp","#bar-stub","#bar-stub2"].forEach(i=>$(i).setAttribute("aria-pressed","false"));
+      $$(".bar [data-st]").forEach(b=>b.setAttribute("aria-pressed","false"));
+    }
+  }
+  $("#bar-place").addEventListener("click",()=>show(true));
+  $$(".bar [data-st], #bar-tk, #bar-train, #bar-cf, #bar-art, #bar-stamp, #bar-stub, #bar-stub2").forEach(b=>b.addEventListener("click",()=>show(false)));
+})();
+</script>
+<script>
+/* Tab "Bảng màu vé": nhân bản vé xác nhận (con dấu thay quân mã, cuống mới) và áp năm bảng màu. */
+(()=>{
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const sec=$("#d-pal"),head=$(".head");
+  const sample={"#cv-branch":"Phú Thọ Hoà (Tân Phú)","#cv-phone":"0901234567","#cv-initial":"A","#cv-name":"Nguyễn Minh An","#cv-age":window.gcAgeText("2016"),"#cv-parent":"Chị Thảo","#cv-date":"29/10/26","#cv-time":"13:05","#cv-mode":"Học tại trung tâm"};
+  const pals=[
+    {cls:"",name:"Hiện tại",sw:["#f6ae87","#8f4a30","#4a2a20"],d:"Giấy đào, cuống nâu đất, mực nâu. Ấm và hoài cổ, không có màu nào trùng với trang."},
+    {cls:"pal-a",name:"A · Kem và navy",sw:["#faf8f5","#184268","#fbbf24"],d:"Giấy kem đúng màu nền trang (#faf8f5), cuống navy logo, thẻ Miễn Phí hổ phách. Gần với phần còn lại của trang nhất."},
+    {cls:"pal-b",name:"B · Xanh nhạt và navy đậm",sw:["#eef5fb","#123350","#fbbf24"],d:"Giấy xanh nhạt (brand-50), cuống navy đậm. Mát và hiện đại hơn A, nhưng giấy nhạt dễ lẫn vào nền navy xung quanh."},
+    {cls:"pal-c",name:"C · Kem và hổ phách",sw:["#faf8f5","#f59e0b","#0f172a"],d:"Giấy kem, cuống hổ phách đặc với chữ đen đậm. Nổi nhất trong năm bản. Hổ phách dùng cho cả mảng lớn, trong khi trang chỉ dùng nó làm điểm nhấn nhỏ."},
+    {cls:"pal-d",name:"D · Navy sáng, giống vé Cách xếp lớp",sw:["#1b4a76","#f59e0b","#fbbf24"],d:"Giấy navy sáng (brand-700) cùng ngôn ngữ với vé Cách xếp lớp trên trang. Dữ liệu màu hổ phách, con dấu đổi sang hổ phách vì đỏ không đọc được trên navy. Vé ít nổi hơn vì nằm trên nền navy."}
+  ];
+  const src=$("#cv").closest(".cv-wrap");
+  pals.forEach(v=>{
+    const c=src.cloneNode(true);
+    c.querySelector(".cv-msg").remove();
+    for(const k in sample)c.querySelector(k).textContent=sample[k];
+    c.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));
+    const cv=c.querySelector(".cv");cv.classList.add("s2");
+    if(v.cls)cv.classList.add("pal",v.cls);
+    c.querySelector(".cv-loco").innerHTML=window.gcStampA("pl-c");
+    const ctl=c.querySelector(".cv-ctl");ctl.removeAttribute("aria-hidden");
+    ctl.innerHTML=`<div class="cs"><p class="cs-pill"></p><p class="cs-big"><span>XÁC</span> <span>NHẬN</span></p><p class="cs-tags"><span>Tại trung tâm</span><span>Miễn Phí</span></p></div>`;
+    ctl.querySelector(".cs-pill").textContent="Nguyễn Minh An";
+    if(!v.cls){ // bản hiện tại giữ màu cũ, dấu đỏ đậm như đã chọn
+      cv.style.setProperty("--st-ink","#A3141C");cv.style.setProperty("--stubc","#8F4A30");
+    }
+    const item=document.createElement("div");item.className="pal-item";
+    const sw=document.createElement("div");sw.className="pal-sw";
+    const b=document.createElement("b");b.textContent=v.name;sw.append(b);
+    v.sw.forEach(col=>{const i=document.createElement("i");i.style.background=col;sw.append(i);});
+    const cap=document.createElement("p");cap.className="st-cap";cap.style.margin=".75rem 0 0";cap.textContent=v.d;
+    item.append(sw,c,cap);
+    $("#pal-host").append(item);
+  });
+
+  const all=["#d-old","#d-ticket","#d-train","#d-confirm","#d-art","#d-stamp","#d-stub","#d-stub2","#d-place"];
+  function show(on){
+    sec.hidden=!on;$("#bar-pal").setAttribute("aria-pressed",on);
+    if(on){
+      head.hidden=true;
+      all.forEach(i=>$(i).hidden=true);
+      $$(".bar button").forEach(b=>{if(b.id!=="bar-pal")b.setAttribute("aria-pressed","false");});
+    }
+  }
+  $("#bar-pal").addEventListener("click",()=>show(true));
+  $$(".bar button:not(#bar-pal)").forEach(b=>b.addEventListener("click",()=>show(false)));
+})();
+</script>
+<script>
+/* Tab "Cuống rõ hơn": cùng vé bản A, ba cách làm rõ cuống bên phải. */
+(()=>{
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const sec=$("#d-ring"),head=$(".head");
+  const sample={"#cv-branch":"Phú Thọ Hoà (Tân Phú)","#cv-phone":"0901234567","#cv-initial":"A","#cv-name":"Nguyễn Minh An","#cv-age":window.gcAgeText("2016"),"#cv-parent":"Chị Thảo","#cv-date":"29/10/26","#cv-time":"13:05","#cv-mode":"Học tại trung tâm"};
+  const variants=[
+    {cls:"r1",t:"Cách 1 · Viền mảnh và bóng đổ.",d:"Giữ nguyên màu navy của cuống, thêm viền sáng 1px (trắng 30%) chạy sát mép trong và làm bóng đổ phía sau đậm hơn. Giữ nguyên màu thương hiệu. Vì nền trang cũng là navy nên bóng đổ tối ít thấy, phần làm việc chính là đường viền."},
+    {cls:"r2",t:"Cách 2 · Navy sáng hơn.",d:"Cuống dùng brand-600 (#1f5285) thay cho #184268, sáng hơn nền trang một bậc rõ rệt. Vẫn trong dải xanh của logo, không thêm màu mới vào trang."},
+    {cls:"r3",t:"Cách 3 · Nâu đất.",d:"Cuống dùng lại nâu đất #8f4a30 của vé đầu tiên, chữ kem. Tách mạnh nhất, ăn với con dấu đỏ, nhưng thêm một màu nâu không có ở phần còn lại của trang."}
+  ];
+  const src=$("#cv").closest(".cv-wrap");
+  variants.forEach((v,i)=>{
+    const c=src.cloneNode(true);
+    c.querySelector(".cv-msg").remove();
+    for(const k in sample)c.querySelector(k).textContent=sample[k];
+    c.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));
+    const cv=c.querySelector(".cv");cv.classList.add("s2","pal","pal-a",v.cls);
+    c.querySelector(".cv-loco").innerHTML=window.gcStampA("pl-c");
+    const ctl=c.querySelector(".cv-ctl");ctl.removeAttribute("aria-hidden");
+    ctl.innerHTML=`<div class="cs"><p class="cs-pill"></p><p class="cs-big"><span>XÁC</span> <span>NHẬN</span></p><p class="cs-tags"><span>Tại trung tâm</span><span>Miễn Phí</span></p></div>`;
+    ctl.querySelector(".cs-pill").textContent="Nguyễn Minh An";
+    const cap=document.createElement("p");cap.className="st-cap";cap.innerHTML="<b></b> ";cap.firstChild.textContent=v.t;cap.append(v.d);
+    $("#rg-p"+(i+1)).append(c,cap);
+  });
+
+  const tabs=$$("#d-ring .st-tabs [role=tab]");
+  function select(i){tabs.forEach((t,j)=>{t.setAttribute("aria-selected",i===j);t.tabIndex=i===j?0:-1;$("#rg-p"+(j+1)).hidden=i!==j;});}
+  tabs.forEach((t,i)=>{
+    t.addEventListener("click",()=>select(i));
+    t.addEventListener("keydown",e=>{const k={ArrowRight:1,ArrowLeft:-1}[e.key];if(!k)return;const n=(i+k+tabs.length)%tabs.length;select(n);tabs[n].focus();});
+  });
+
+  const all=["#d-old","#d-ticket","#d-train","#d-confirm","#d-art","#d-stamp","#d-stub","#d-stub2","#d-place","#d-pal"];
+  function show(on){
+    sec.hidden=!on;$("#bar-ring").setAttribute("aria-pressed",on);
+    if(on){
+      head.hidden=true;
+      all.forEach(i=>$(i).hidden=true);
+      $$(".bar button").forEach(b=>{if(b.id!=="bar-ring")b.setAttribute("aria-pressed","false");});
+    }
+  }
+  $("#bar-ring").addEventListener("click",()=>show(true));
+  $$(".bar button:not(#bar-ring)").forEach(b=>b.addEventListener("click",()=>show(false)));
+})();
+</script>
+</body>
+</html>

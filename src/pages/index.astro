@@ -131,6 +131,15 @@ const structuredData = {
   robots="index, follow, max-image-preview:large"
   bodyClass="pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:pb-0"
 >
+  {/*
+    Phông riêng của vé xác nhận (chỉ trang chủ có vé). Trình duyệt chỉ tải tệp phông khi chữ dùng nó
+    xuất hiện trên trang, nên khi chưa gửi đăng ký thì chỉ tải phần CSS khai báo. Đều có tập con tiếng Việt.
+  */}
+  <link
+    slot="head"
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@700&family=Oswald:wght@500;700&family=Roboto:ital,wght@0,500;0,700;1,700&family=Roboto+Condensed:wght@700&display=swap"
+  />
   <script
     slot="head"
     type="application/ld+json"
@@ -335,7 +344,7 @@ const structuredData = {
                     </a>
                     {/* Nhãn đọc được phải chứa đúng chữ hiển thị "Chọn cơ sở này"; tên cơ sở nối thêm để phân biệt các thẻ. */}
                     <a
-                      href="#pricing"
+                      href="#dang-ky"
                       data-branch={branch.id}
                       class="js-choose-branch inline-flex min-h-11 items-center gap-1.5 rounded-control bg-brand-800 px-3.5 text-sm font-bold text-white transition hover:bg-brand-900"
                       aria-label={`Chọn cơ sở này – ${branch.name}`}
@@ -524,8 +533,8 @@ const structuredData = {
     <MobileContactBar />
 
     <script is:inline>
-      // Progressive enhancement: clicking a branch card opens the checkout modal
-      // with that branch already selected. Without JS the anchor still jumps to #pricing.
+      // Progressive enhancement: clicking a branch card selects that branch in the enrolment form
+      // (the anchor itself scrolls to #dang-ky). Without JS the anchor still jumps to the form.
       // Phóng to ảnh gallery: bấm ảnh mở hộp #gallery-lightbox; bấm nền hoặc nút × để đóng.
       // Không có JS thì link của ảnh mở thẳng bản lớn.
       document.addEventListener("click", (event) => {

@@ -1003,6 +1003,406 @@
     }
   }
 
+  /*
+   * Form đăng ký dạng vé. Cuống kraft bên trái là bản xem trước những gì đang điền; giấy bên
+   * phải là các ô nhập. Hai khuyết tròn ở đường xé: dưới md cuống nằm trên và đường xé nằm
+   * ngang, từ md cuống nằm trái và đường xé dựng đứng. Bóng đổ đặt ở khối ngoài vì mặt nạ
+   * khuyết tròn sẽ cắt luôn bóng nếu đặt trên từng nửa.
+   */
+  .gc-enrol {
+    --gc-n: 0.625rem;
+    display: grid;
+    color: var(--color-slate-900);
+    filter: drop-shadow(0 22px 22px rgb(11 33 54 / 0.55));
+  }
+
+  .gc-enrol__stub {
+    height: 100%;
+    padding: 1.25rem 1.25rem 1.5rem;
+    background: var(--color-brand-600);
+    color: #fff;
+    border-bottom: 2px dashed rgb(255 255 255 / 0.4);
+    -webkit-mask:
+      radial-gradient(circle var(--gc-n) at 0 100%, #0000 98%, #000) left / 51% 100% no-repeat,
+      radial-gradient(circle var(--gc-n) at 100% 100%, #0000 98%, #000) right / 51% 100% no-repeat;
+    mask:
+      radial-gradient(circle var(--gc-n) at 0 100%, #0000 98%, #000) left / 51% 100% no-repeat,
+      radial-gradient(circle var(--gc-n) at 100% 100%, #0000 98%, #000) right / 51% 100% no-repeat;
+  }
+
+  .gc-enrol__main {
+    height: 100%;
+    padding: 1.5rem 1.25rem;
+    background: var(--color-cream);
+    -webkit-mask:
+      radial-gradient(circle var(--gc-n) at 0 0, #0000 98%, #000) left / 51% 100% no-repeat,
+      radial-gradient(circle var(--gc-n) at 100% 0, #0000 98%, #000) right / 51% 100% no-repeat;
+    mask:
+      radial-gradient(circle var(--gc-n) at 0 0, #0000 98%, #000) left / 51% 100% no-repeat,
+      radial-gradient(circle var(--gc-n) at 100% 0, #0000 98%, #000) right / 51% 100% no-repeat;
+  }
+
+  @media (min-width: 48rem) {
+    .gc-enrol {
+      grid-template-columns: 15rem 1fr;
+    }
+
+    .gc-enrol__stub {
+      padding: 1.75rem 1.5rem;
+      border-bottom: 0;
+      border-right: 2px dashed rgb(255 255 255 / 0.4);
+      -webkit-mask:
+        radial-gradient(circle var(--gc-n) at 100% 0, #0000 98%, #000) top / 100% 51% no-repeat,
+        radial-gradient(circle var(--gc-n) at 100% 100%, #0000 98%, #000) bottom / 100% 51% no-repeat;
+      mask:
+        radial-gradient(circle var(--gc-n) at 100% 0, #0000 98%, #000) top / 100% 51% no-repeat,
+        radial-gradient(circle var(--gc-n) at 100% 100%, #0000 98%, #000) bottom / 100% 51% no-repeat;
+    }
+
+    .gc-enrol__main {
+      padding: 2rem;
+      -webkit-mask:
+        radial-gradient(circle var(--gc-n) at 0 0, #0000 98%, #000) top / 100% 51% no-repeat,
+        radial-gradient(circle var(--gc-n) at 0 100%, #0000 98%, #000) bottom / 100% 51% no-repeat;
+      mask:
+        radial-gradient(circle var(--gc-n) at 0 0, #0000 98%, #000) top / 100% 51% no-repeat,
+        radial-gradient(circle var(--gc-n) at 0 100%, #0000 98%, #000) bottom / 100% 51% no-repeat;
+    }
+  }
+
+  /*
+   * Vé xác nhận học thử. Giấy đào có vân, mực nâu, mực xanh cho dữ liệu phụ huynh điền;
+   * cuống nâu đất bên phải (dưới 40rem: dải nằm dưới). Co giãn theo bề rộng của khối chứa
+   * (`.gc-pass-wrap`) chứ không theo màn hình. Đường cắt V ở đường xé và các khuyết tròn hai
+   * mép là hình học, không phải họa tiết ngẫu nhiên. `--band` là chiều cao dải cuống ở bố
+   * cục dọc và cũng là vị trí đường xé trong `clip-path`, nên hai nơi phải dùng chung.
+   */
+  .gc-pass-wrap {
+    container-type: inline-size;
+    max-width: 60rem;
+    margin-inline: auto;
+  }
+
+  .gc-pass {
+    --gc-ink: var(--color-brand-900);
+    --gc-blue: var(--color-brand-700);
+    --gc-stub: var(--color-brand-600);
+    --gc-line: rgb(24 66 104 / 0.35);
+    --gc-band: 10rem;
+    --gc-r: 0.6rem;
+    color: var(--gc-ink);
+    filter: drop-shadow(0 18px 20px rgb(11 33 54 / 0.55));
+  }
+
+  .gc-pass p,
+  .gc-pass h3 {
+    margin: 0;
+  }
+
+  .gc-pass__paper {
+    display: grid;
+    background-color: var(--color-cream);
+    clip-path: polygon(
+      0 0, 100% 0,
+      100% calc(100% - var(--gc-band) - 0.55rem), calc(100% - 0.95rem) calc(100% - var(--gc-band)),
+      100% calc(100% - var(--gc-band) + 0.55rem), 100% 100%, 0 100%,
+      0 calc(100% - var(--gc-band) + 0.55rem), 0.95rem calc(100% - var(--gc-band)),
+      0 calc(100% - var(--gc-band) - 0.55rem)
+    );
+    -webkit-mask:
+      radial-gradient(circle var(--gc-r) at 0 10%, #0000 98%, #000),
+      radial-gradient(circle var(--gc-r) at 0 38%, #0000 98%, #000),
+      radial-gradient(circle var(--gc-r) at 100% 10%, #0000 98%, #000),
+      radial-gradient(circle var(--gc-r) at 100% 38%, #0000 98%, #000);
+    -webkit-mask-composite: source-in;
+    mask:
+      radial-gradient(circle var(--gc-r) at 0 10%, #0000 98%, #000),
+      radial-gradient(circle var(--gc-r) at 0 38%, #0000 98%, #000),
+      radial-gradient(circle var(--gc-r) at 100% 10%, #0000 98%, #000),
+      radial-gradient(circle var(--gc-r) at 100% 38%, #0000 98%, #000);
+    mask-composite: intersect;
+  }
+
+  .gc-pass__brand {
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+    padding: 1.5rem 1.25rem 1rem;
+    text-align: center;
+  }
+
+  .gc-pass__kick {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font: 700 0.8125rem/1 "Cormorant SC", serif;
+    letter-spacing: 0.24em;
+  }
+
+  .gc-pass__kick svg {
+    width: 2.25rem;
+    height: 0.6rem;
+  }
+
+  .gc-pass__title {
+    font: 700 clamp(2rem, 9cqw, 3.25rem) / 1 "Cormorant SC", serif;
+    letter-spacing: 0.03em;
+  }
+
+  .gc-pass__sub {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font: 700 0.875rem/1 "Cormorant SC", serif;
+    letter-spacing: 0.16em;
+  }
+
+  .gc-pass__sub i {
+    width: 1.75rem;
+    height: 2px;
+    background: var(--gc-ink);
+  }
+
+  /* Con dấu trung tâm thay cho hình minh họa: hơi nghiêng, mực ép lên giấy. */
+  .gc-pass__seal {
+    display: block;
+    width: 8.5rem;
+    height: auto;
+    margin-top: 0.5rem;
+    transform: rotate(-8deg);
+    mix-blend-mode: multiply;
+    color: #a3141c;
+    opacity: 0.92;
+  }
+
+  .gc-pass__info {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border-top: 1px dashed var(--gc-line);
+  }
+
+  .gc-pass__branch {
+    font: 700 1rem/1.1 "Roboto Condensed", sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+
+  .gc-pass__phone {
+    padding: 0.4rem 0.6rem;
+    background: var(--color-brand-50);
+    color: var(--color-brand-800);
+    font: 700 0.8125rem/1.2 "Roboto", sans-serif;
+    letter-spacing: 0.04em;
+    overflow-wrap: anywhere;
+  }
+
+  .gc-pass small {
+    display: block;
+    margin-bottom: 0.25rem;
+    font: 500 0.75rem/1 "Roboto", sans-serif;
+    color: var(--color-slate-600);
+  }
+
+  .gc-pass__who {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem;
+    align-items: end;
+  }
+
+  .gc-pass__initial {
+    display: block;
+    font: 700 2.75rem/0.9 "Roboto Condensed", sans-serif;
+  }
+
+  .gc-pass__name {
+    display: block;
+    font: 700 1.25rem/1.2 "Roboto", sans-serif;
+    letter-spacing: 0.03em;
+    color: var(--gc-blue);
+    overflow-wrap: anywhere;
+  }
+
+  .gc-pass__tbl {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--gc-ink);
+  }
+
+  .gc-pass__tbl > div {
+    min-width: 0;
+    padding: 0.4rem 0.5rem;
+  }
+
+  .gc-pass__tbl > div:nth-child(odd) {
+    border-right: 1px solid var(--gc-ink);
+  }
+
+  .gc-pass__tbl > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--gc-ink);
+  }
+
+  .gc-pass__tbl small {
+    margin-bottom: 0.2rem;
+  }
+
+  .gc-pass__tbl b {
+    display: block;
+    font: 700 0.8125rem/1.15 "Roboto", sans-serif;
+    letter-spacing: 0.03em;
+    color: var(--gc-blue);
+    overflow-wrap: anywhere;
+  }
+
+  .gc-pass__mode {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.75rem;
+    font: 500 0.75rem/1.2 "Roboto", sans-serif;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .gc-pass__mode b {
+    font: 700 0.9375rem/1.2 "Roboto", sans-serif;
+    letter-spacing: 0.03em;
+    text-transform: none;
+    color: var(--gc-blue);
+  }
+
+  .gc-pass__next {
+    font: italic 700 0.75rem/1.3 "Roboto", sans-serif;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* Cuống: tấm màu đặc, nhãn tối ghi tên bé, chữ lớn ở giữa, hai thẻ nhỏ ở đáy. */
+  .gc-pass__ctl {
+    height: var(--gc-band);
+  }
+
+  .gc-pass__panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.5rem;
+    height: 100%;
+    padding: 0.75rem 1rem;
+    overflow: hidden;
+    background: var(--gc-stub);
+    color: #fff;
+  }
+
+  .gc-pass__pill {
+    align-self: flex-start;
+    max-width: 100%;
+    padding: 0.35rem 0.6rem;
+    background: var(--color-brand-950);
+    color: var(--color-brand-100);
+    font: 500 0.75rem/1.3 "Oswald", "Be Vietnam Pro", sans-serif;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+
+  .gc-pass__big {
+    font: 700 2.25rem/1 "Oswald", "Be Vietnam Pro", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+
+  /* Hai thẻ luôn cùng một hàng: thẻ hình thức học co lại (cắt chữ) trước khi xuống dòng. */
+  .gc-pass__tags {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.3rem;
+  }
+
+  .gc-pass__tags span {
+    min-width: 0;
+    padding: 0.25rem 0.4rem;
+    overflow: hidden;
+    background: var(--color-brand-950);
+    color: var(--color-brand-100);
+    font: 500 0.75rem/1.2 "Oswald", "Be Vietnam Pro", sans-serif;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .gc-pass__tags span:last-child {
+    flex: none;
+    background: var(--color-amber-400);
+    color: var(--color-slate-950);
+  }
+
+  @container (min-width: 40rem) {
+    .gc-pass__paper {
+      grid-template-columns: 319fr 177fr 140fr;
+      min-height: 19rem;
+      clip-path: polygon(
+        0 0, calc(78% - 0.55rem) 0, 78% 0.95rem, calc(78% + 0.55rem) 0, 100% 0,
+        100% 100%, calc(78% + 0.55rem) 100%, 78% calc(100% - 0.95rem), calc(78% - 0.55rem) 100%, 0 100%
+      );
+    }
+
+    .gc-pass__brand {
+      align-content: space-between;
+      padding: 1.5rem 1.25rem 1.25rem;
+    }
+
+    .gc-pass__seal {
+      width: 10.5rem;
+    }
+
+    .gc-pass__info {
+      padding: 1.25rem 1rem;
+      border-top: 0;
+      border-left: 1px dashed var(--gc-line);
+    }
+
+    .gc-pass__ctl {
+      height: auto;
+      border-left: 1px dashed var(--gc-line);
+    }
+
+    .gc-pass__panel {
+      gap: 1rem;
+      padding: 1.25rem 0.9rem;
+    }
+
+    .gc-pass__big {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: center;
+      font-size: clamp(2.75rem, 8cqw, 3.75rem);
+      line-height: 0.98;
+    }
+
+    .gc-pass__big span {
+      display: block;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .gc-pass-wrap--in {
+      animation: gc-pass-in 500ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  }
+
+  @keyframes gc-pass-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.75rem);
+    }
+  }
+
   /* A chessboard plane receding into the distance. Decoration only. */
   .gc-hero-board {
     transform: perspective(1100px) rotateX(46deg) rotateZ(-14deg);
