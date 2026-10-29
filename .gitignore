@@ -57,3 +57,6 @@ graphify-out/
 
 # Claude Code (hook graphify dùng đường dẫn tuyệt đối của máy)
 .claude/
+
+# hallmark (báo cáo audit, ảnh chụp, bản ghi trước/sau)
+.hallmark/
