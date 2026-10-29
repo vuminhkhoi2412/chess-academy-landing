@@ -263,7 +263,7 @@ export default function EnrolmentForm() {
             Điền thông tin để nhận vé
           </h4>
           <p className="mt-1 text-sm text-slate-600">
-            Trung tâm sẽ gọi hoặc nhắn Zalo để xếp lớp và khung giờ cho bé. Tất cả các ô đều cần điền.
+            Trung tâm sẽ gọi hoặc nhắn Zalo để xếp lớp và khung giờ cho bé.
           </p>
 
           {errors.length > 0 && (

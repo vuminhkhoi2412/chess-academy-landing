@@ -167,7 +167,7 @@ export const CURRICULUM_PROGRAMS: MajorProgram[] = [
     id: "so-cap",
     title: "Global Chess Sơ Cấp",
     badge: "Học viên mới & Đã biết chơi",
-    totalDuration: "48 buổi (2 giáo trình – 1 lộ trình hoàn chỉnh)",
+    totalDuration: "48 buổi (2 Levels – mỗi Level 24 buổi)",
     targetAudience: "Trẻ từ 7 – 12 tuổi (cả học viên mới và đã biết chơi)",
     sessionLength: "60 – 90 phút / buổi",
     objectives: [
