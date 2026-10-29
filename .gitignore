@@ -51,3 +51,6 @@ pnpm-debug.log*
 # impeccable-ignore-end
 
 .impeccable/
+
+# graphify
+graphify-out/
