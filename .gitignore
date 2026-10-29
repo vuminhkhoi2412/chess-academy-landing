@@ -54,3 +54,6 @@ pnpm-debug.log*
 
 # graphify
 graphify-out/
+
+# Claude Code (hook graphify dùng đường dẫn tuyệt đối của máy)
+.claude/
