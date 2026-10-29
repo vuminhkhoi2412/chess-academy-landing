@@ -30,7 +30,7 @@ const TOGGLE_ID = "gc-mobile-menu-toggle";
 // Nav neo: mục đang xem được đánh dấu bằng data-active để người dùng biết mình
 // đang ở đâu trên trang, thay vì mọi liên kết trông giống hệt nhau.
 const NAV_LINK_CLASS =
-  "transition-colors hover:text-slate-900 active:text-amber-700 data-[active=true]:text-slate-900 data-[active=true]:underline data-[active=true]:decoration-amber-500 data-[active=true]:decoration-2 data-[active=true]:underline-offset-[6px]";
+  "whitespace-nowrap transition-colors hover:text-slate-900 active:text-amber-700 data-[active=true]:text-slate-900 data-[active=true]:underline data-[active=true]:decoration-amber-500 data-[active=true]:decoration-2 data-[active=true]:underline-offset-[6px]";
 
 const hotline = BRAND_INFO.hotlines[0];
 const hotlineHref = `tel:${hotline.replace(/\./g, "")}`;
@@ -61,7 +61,7 @@ const hotlineHref = `tel:${hotline.replace(/\./g, "")}`;
         isHome ? (
           <div>
             <div class="leading-none">{BRAND_INFO.name}</div>
-            <div class="text-[11px] font-semibold text-amber-700 tracking-wider uppercase mt-0.5 font-sans">
+            <div class="text-xs font-semibold text-amber-700 mt-0.5 font-sans">
               {BRAND_INFO.slogan1}
             </div>
           </div>
@@ -75,7 +75,7 @@ const hotlineHref = `tel:${hotline.replace(/\./g, "")}`;
       isHome ? (
         <>
           <nav
-            class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600"
+            class="hidden md:flex items-center gap-5 lg:gap-8 text-sm font-semibold text-slate-600"
             aria-label="Điều hướng chính"
           >
             {NAV_LINKS.map((link) => (

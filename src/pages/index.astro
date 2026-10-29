@@ -24,10 +24,8 @@ import {
   MapPin,
   Phone,
   ArrowRight,
-  ArrowUpRight,
   HelpCircle,
   ChevronDown,
-  CheckCheck,
 } from "lucide-react";
 
 // Ảnh gallery theo thứ tự trong lưới bento (ảnh đầu là ảnh vuông chiếm hai hàng).
@@ -138,7 +136,7 @@ const structuredData = {
   <link
     slot="head"
     rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@700&family=Oswald:wght@500;700&family=Roboto:ital,wght@0,500;0,700;1,700&family=Roboto+Condensed:wght@700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@700&display=swap"
   />
   <script
     slot="head"
@@ -150,7 +148,10 @@ const structuredData = {
     <!-- Top Hotline Bar -->
     <div class="bg-brand-800 text-brand-100 text-xs py-2 px-4">
       <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2">
-        <span class="font-medium text-amber-400">Lớp tối trong tuần &amp; cuối tuần • 5 cơ sở tại TP.HCM</span>
+        <span class="flex flex-wrap gap-x-4 font-medium text-amber-400">
+          <span>Lớp tối trong tuần &amp; cuối tuần</span>
+          <span>5 cơ sở tại TP.HCM</span>
+        </span>
         <div class="flex items-center gap-4">
           <span class="flex items-center gap-1.5">
             <Phone className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
@@ -185,11 +186,6 @@ const structuredData = {
 
       <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-12 gap-10 md:gap-8 lg:gap-12 items-center">
         <div class="md:col-span-6 lg:col-span-7 space-y-5">
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.9375rem] leading-6 font-semibold tracking-[-0.005em]">
-            <span aria-hidden="true" class="h-0.5 w-7 bg-amber-500 rounded-full"></span>
-            <span class="text-slate-700">Đào tạo cờ vua trực tiếp và online</span>
-          </div>
-
           <!--
             Khoá 2 dòng có chủ đích: dòng 1 màu đậm, dòng 2 màu hổ phách, nên màu chữ
             trùng với nhịp xuống dòng ở mọi khổ màn hình thay vì ngắt tuỳ tiện.
@@ -199,9 +195,7 @@ const structuredData = {
             <span class="block text-amber-700">Mở Tư Duy</span>
           </h1>
 
-          <p class="text-slate-600 text-base leading-relaxed max-w-xl">
-            Ba lộ trình chuẩn hóa <strong>Happy Chess (72 buổi)</strong> và <strong>Global Chess Sơ Cấp &amp; Trung Cấp (48 buổi)</strong> giúp trẻ đi từ luật chơi cơ bản đến làm chủ các hệ thống khai cuộc và đòn chiến thuật trung – tàn cuộc.
-          </p>
+          <p class="text-slate-600 text-base leading-relaxed max-w-xl">Trung tâm cờ vua cho trẻ em, học trực tiếp và online.</p>
 
           <div class="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2">
             {/*
@@ -213,36 +207,9 @@ const structuredData = {
               <span class="gc-move__label">Đăng ký tư vấn</span>
               <span class="gc-move__go" aria-hidden="true"><ArrowRight className="w-4 h-4" /></span>
             </a>
-            <a href="#curriculum" class="gc-ref min-h-11">
-              Xem chi tiết lộ trình
-              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-            </a>
+            <a href="#curriculum" class="gc-ref min-h-11">Xem chi tiết lộ trình</a>
           </div>
 
-          <!--
-            Hai cột đầu chia đều, cột thứ ba ăn theo nội dung. "5 Địa Điểm" ở
-            text-2xl rộng hơn 1/3 hàng, nên nếu chia đều ba cột thì nó buộc phải
-            xuống dòng (hoặc tràn ra ngoài khi chặn xuống dòng).
-          -->
-          {/*
-            Ở md (768–1023px) cột chữ của hero chỉ rộng ~352px, chia ba cột thì
-            mỗi ô còn ~98px trong khi "60–90 phút" cần 145px và tràn sang ô bên
-            cạnh. Khoảng đó dùng hai cột; từ lg cột chữ rộng lại nên trả về ba.
-          */}
-          <dl class="grid grid-cols-[repeat(2,minmax(0,1fr))_auto] gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-[repeat(2,minmax(0,1fr))_auto] pt-5 border-t border-slate-300/70 max-w-lg">
-            <div>
-              <dt class="text-xs text-slate-600">Lộ trình Global</dt>
-              <dd class="text-xl md:text-2xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">48 Buổi</dd>
-            </div>
-            <div>
-              <dt class="text-xs text-slate-600">Mỗi buổi học</dt>
-              <dd class="text-xl md:text-2xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">60–90 phút</dd>
-            </div>
-            <div>
-              <dt class="text-xs text-slate-600">Cơ sở tại TP.HCM</dt>
-              <dd class="text-xl md:text-2xl font-extrabold text-slate-900 tabular-nums whitespace-nowrap">5 Địa Điểm</dd>
-            </div>
-          </dl>
         </div>
 
         <!-- Interactive Chessboard Island, lifted off the page with a soft ground shadow -->
@@ -266,8 +233,7 @@ const structuredData = {
     <section id="branches" class="py-16 bg-white border-t border-slate-200">
       <div class="max-w-6xl mx-auto px-4">
         <div class="text-center max-w-2xl mx-auto mb-12">
-          <span class="gc-eyebrow">Hệ thống phòng học tiêu chuẩn</span>
-          <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">Hệ thống các cơ sở</h2>
+          <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold">Hệ thống các cơ sở</h2>
           <p class="text-base text-slate-600 mt-3 max-w-prose mx-auto">
             Các ca học trong tuần và cuối tuần được tổ chức linh hoạt theo trình độ của học viên tại từng cơ sở.
           </p>
@@ -275,8 +241,7 @@ const structuredData = {
             Tình trạng tuyển sinh nói một lần ở đây. Trước đây mỗi thẻ cơ sở đều gắn
             nhãn "Đang tuyển sinh" giống hệt nhau, lặp 5 lần mà không thêm thông tin.
           */}
-          <p class="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
-            <span aria-hidden="true" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <p class="mt-4 text-xs font-semibold text-emerald-700">
             Cả 5 cơ sở đang tuyển sinh
           </p>
         </div>
@@ -340,7 +305,7 @@ const structuredData = {
                       class="inline-flex min-h-11 items-center gap-1.5 rounded-control border border-slate-300 bg-white px-3.5 text-sm font-bold text-brand-800 transition hover:border-brand-800 hover:bg-brand-50"
                       aria-label={`Chỉ đường đến ${branch.name} (mở tab mới)`}
                     >
-                      Chỉ đường <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                      Chỉ đường
                     </a>
                     {/* Nhãn đọc được phải chứa đúng chữ hiển thị "Chọn cơ sở này"; tên cơ sở nối thêm để phân biệt các thẻ. */}
                     <a
@@ -389,8 +354,7 @@ const structuredData = {
       <div class="max-w-6xl mx-auto px-4">
         <div class="grid lg:grid-cols-12 gap-4 lg:gap-8 lg:items-end">
           <div class="lg:col-span-7">
-            <span class="gc-eyebrow">Thư viện hình ảnh</span>
-            <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">Hình ảnh trung tâm</h2>
+            <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold">Hình ảnh trung tâm</h2>
           </div>
           <p class="lg:col-span-5 text-base text-slate-600 leading-relaxed lg:pb-1">
             Những khoảnh khắc trong lớp Happy Chess và Global Chess.
@@ -466,8 +430,7 @@ const structuredData = {
       <div class="max-w-6xl mx-auto px-4">
         <div class="grid gap-4 lg:grid-cols-12 lg:items-end mb-10">
           <div class="lg:col-span-8">
-            <span class="gc-eyebrow">Nhận xét phụ huynh</span>
-            <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">Phụ huynh nói gì về Global Chess</h2>
+            <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold">Phụ huynh nói gì về Global Chess</h2>
           </div>
           <p class="lg:col-span-4 text-sm text-slate-600 leading-relaxed lg:pb-1 lg:text-right">
             Trích nguyên văn chia sẻ của phụ huynh, ghi theo cơ sở bé đang học.
@@ -488,9 +451,6 @@ const structuredData = {
                 <blockquote class="max-w-[92%] rounded-[1.125rem_1.125rem_1.125rem_0.25rem] bg-white px-4 py-3 text-base leading-relaxed text-slate-900 shadow-sm">
                   {item.quote}
                 </blockquote>
-                <p class="mt-2 flex items-center justify-end gap-1 text-xs text-slate-600">
-                  <CheckCheck className="h-3.5 w-3.5 text-brand-500" aria-hidden="true" /> Đã nhận
-                </p>
               </div>
             </figure>
           ))}
@@ -505,8 +465,7 @@ const structuredData = {
     <section id="faq" class="py-16 bg-white border-t border-slate-200">
       <div class="max-w-6xl mx-auto px-4">
         <div class="max-w-2xl">
-          <span class="gc-eyebrow">Giải đáp trước khi đăng ký</span>
-          <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">Câu hỏi thường gặp</h2>
+          <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold">Câu hỏi thường gặp</h2>
         </div>
 
         <div class="grid md:grid-cols-2 gap-x-10 items-start mt-10">

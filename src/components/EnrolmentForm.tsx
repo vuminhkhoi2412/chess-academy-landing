@@ -238,11 +238,11 @@ export default function EnrolmentForm() {
       {/* Bản xem trước: chỉ lặp lại những gì đã nằm trong các ô nhập nên ẩn khỏi trình đọc màn hình. */}
       <div className="gc-enrol__stub">
         <div aria-hidden="true">
-        <div className="text-xs font-bold uppercase tracking-[0.14em] text-brand-200">Đăng ký học thử</div>
+        <div className="text-xs font-bold text-brand-200">Đăng ký học thử</div>
         <p className="mt-1 font-display text-2xl font-extrabold leading-[1.1] tracking-[-0.015em] text-white">
           Global Chess
         </p>
-        <p className="mt-2 inline-block bg-amber-400 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-slate-950">
+        <p className="mt-2 inline-block bg-amber-400 px-2.5 py-0.5 text-xs font-bold text-slate-950">
           Miễn phí
         </p>
         {filledCount === 0 && (
@@ -269,8 +269,8 @@ export default function EnrolmentForm() {
           <li>
             <a href={BRAND_INFO.facebookPage} target="_blank" rel="noreferrer" aria-label="Facebook Global Chess">
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="12" r="12" fill="#1877f2" />
-                <path fill="#fff" d="M16.671 15.469 17.218 12h-3.328V9.75c0-.949.465-1.875 1.956-1.875h1.513V4.922s-1.373-.234-2.686-.234c-2.741 0-4.533 1.66-4.533 4.668V12H7.078v3.469h3.059v8.385a12.1 12.1 0 0 0 3.753 0v-8.385h2.781Z" />
+                <circle cx="12" cy="12" r="12" style={{ fill: "var(--color-facebook)" }} />
+                <path style={{ fill: "var(--color-paper)" }} d="M16.671 15.469 17.218 12h-3.328V9.75c0-.949.465-1.875 1.956-1.875h1.513V4.922s-1.373-.234-2.686-.234c-2.741 0-4.533 1.66-4.533 4.668V12H7.078v3.469h3.059v8.385a12.1 12.1 0 0 0 3.753 0v-8.385h2.781Z" />
               </svg>
             </a>
           </li>

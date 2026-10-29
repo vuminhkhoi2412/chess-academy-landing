@@ -24,10 +24,7 @@ export default function PricingAndCheckout() {
 
       <div className="relative max-w-6xl mx-auto px-4">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="gc-eyebrow gc-eyebrow-invert">
-            Học phí
-          </span>
-          <h2 className="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold mt-3">
+          <h2 className="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold">
             Tham khảo chi phí
           </h2>
         </div>
@@ -51,7 +48,7 @@ export default function PricingAndCheckout() {
                     <h3 className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 font-display text-[1.375rem] font-extrabold leading-tight tracking-[-0.015em] text-white">
                       {program.name}
                       {program.popular && (
-                        <span className="rounded-md bg-amber-500 px-2.5 py-0.5 font-sans text-[11px] font-bold uppercase tracking-wide text-slate-950">
+                        <span className="rounded-md bg-amber-500 px-2.5 py-0.5 font-sans text-xs font-bold text-slate-950">
                           Lộ trình tối ưu nhất
                         </span>
                       )}
@@ -69,7 +66,7 @@ export default function PricingAndCheckout() {
                 </div>
 
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wider text-brand-200">
+                  <div className="text-xs font-semibold text-brand-200">
                     24 buổi (2 buổi/tuần)
                   </div>
                   <span className="block font-display text-[2rem] font-extrabold leading-[1.1] tracking-[-0.02em] text-amber-400 tabular-nums">
@@ -103,8 +100,7 @@ export default function PricingAndCheckout() {
         {/* Form đăng ký học thử đặt thẳng trên trang, ngay dưới bảng giá. Neo #dang-ky là chính form. */}
         <div className="mt-20">
           <div className="mb-8 max-w-2xl">
-            <span className="gc-eyebrow gc-eyebrow-invert">Đăng ký trực tuyến</span>
-            <h3 className="gc-section-title mt-3 text-2xl font-extrabold md:text-3xl lg:text-4xl">
+            <h3 className="gc-section-title text-2xl font-extrabold md:text-3xl lg:text-4xl">
               Đăng ký học thử miễn phí
             </h3>
           </div>

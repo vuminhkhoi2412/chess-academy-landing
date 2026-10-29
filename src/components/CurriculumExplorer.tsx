@@ -16,8 +16,8 @@ type ProgramStyle = {
 const PROGRAM_STYLES: Record<string, ProgramStyle> = {
   "happy-chess": {
     bar: "bg-brand-800",
-    color: "#184268",
-    tint: "#eef5fb",
+    color: "var(--color-brand-800)",
+    tint: "var(--color-brand-50)",
     band: "bg-brand-50/70 border-brand-200/70",
     bandTitle: "text-brand-900",
     bandMeta: "text-brand-700",
@@ -25,8 +25,8 @@ const PROGRAM_STYLES: Record<string, ProgramStyle> = {
   },
   "so-cap": {
     bar: "bg-amber-700",
-    color: "#b45309",
-    tint: "#fdf6ea",
+    color: "var(--color-amber-700)",
+    tint: "var(--color-tint-amber)",
     band: "bg-amber-50/70 border-amber-200/70",
     bandTitle: "text-amber-900",
     bandMeta: "text-amber-800",
@@ -34,8 +34,8 @@ const PROGRAM_STYLES: Record<string, ProgramStyle> = {
   },
   "trung-cap": {
     bar: "bg-emerald-700",
-    color: "#047857",
-    tint: "#eefaf4",
+    color: "var(--color-emerald-700)",
+    tint: "var(--color-tint-emerald)",
     band: "bg-emerald-50/70 border-emerald-200/70",
     bandTitle: "text-emerald-900",
     bandMeta: "text-emerald-800",
@@ -65,13 +65,13 @@ const LEVELS = CURRICULUM_PROGRAMS.flatMap((program) =>
   })),
 );
 
-/** "72 buổi (3 Level – …)" + "Trẻ từ 4 – 12 tuổi (…)" → "72 buổi · từ 4 tuổi". */
+/** "72 buổi (3 Level – …)" + "Trẻ từ 4 – 12 tuổi (…)" → "72 buổi, từ 4 tuổi". */
 function bandMeta(program: MajorProgram): string {
   const sessions = program.totalDuration.match(/^(\d+)\s*buổi/);
   const age = program.targetAudience.match(/từ\s*(\d+)\s*(?:–|-)\s*\d+\s*tuổi/);
   return [sessions ? `${sessions[1]} buổi` : "", age ? `từ ${age[1]} tuổi` : ""]
     .filter(Boolean)
-    .join(" · ");
+    .join(", ");
 }
 
 // Ba bước xếp lớp: phụ huynh không tự chọn cấp độ, giáo viên chốt sau ván thử.
@@ -117,8 +117,7 @@ export default function CurriculumExplorer() {
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <span className="gc-eyebrow">Hệ thống giáo trình bài bản</span>
-          <h2 className="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 mt-3">
+          <h2 className="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900">
             Lộ trình đào tạo
           </h2>
           <p className="text-slate-600 text-sm md:text-base mt-3 max-w-prose mx-auto">
