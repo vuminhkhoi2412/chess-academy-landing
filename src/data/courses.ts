@@ -6,6 +6,8 @@ export const BRAND_INFO = {
   slogan2: "Học cờ rèn tư duy vững tương lai!",
   hotlines: ["0789059440", "0963848430"],
   zaloPhone: "0789059440",
+  facebookPage: "https://www.facebook.com/global.chesss",
+  messengerUrl: "https://m.me/global.chesss",
 };
 
 /*

@@ -5,7 +5,7 @@
 // Phần thuần (kiểm tra, dựng payload, gửi) nằm ở src/lib/enrolment.ts.
 import { useEffect, useRef, useState, type SyntheticEvent } from "react";
 import { PUBLIC_GOOGLE_SHEETS_ENDPOINT } from "astro:env/client";
-import { AlertCircle, ArrowRight } from "lucide-react";
+import { AlertCircle, ArrowRight, Phone } from "lucide-react";
 import { BRANCHES, BRAND_INFO, LEARNING_MODES } from "../data/courses";
 import {
   buildEnrolmentPayload,
@@ -14,6 +14,7 @@ import {
   validateEnrolmentFields,
   type EnrolmentError,
 } from "../lib/enrolment";
+import zaloIcon from "../assets/zalo-icon.svg";
 import EnrolmentTicket from "./EnrolmentTicket";
 
 type SubmitState = "form" | "sending" | "sent" | "error";
@@ -201,19 +202,22 @@ export default function EnrolmentForm() {
             href={`https://zalo.me/${BRAND_INFO.zaloPhone}`}
             target="_blank"
             rel="noreferrer"
-            className="gc-move gc-move--zalo gc-move--block mt-5"
+            className="gc-zalo mt-5"
           >
-            <span className="gc-move__label">Nhắn Zalo trung tâm ngay</span>
-            <span className="gc-move__go" aria-hidden="true">
-              <ArrowRight className="h-4 w-4" />
-            </span>
+            <img src={zaloIcon.src} alt="" width="34" height="34" />
+            Nhắn Zalo trung tâm
           </a>
-          <button type="button" onClick={resetForm} className="gc-move gc-move--quiet gc-move--block mt-3 cursor-pointer">
-            <span className="gc-move__label">Đăng ký thêm cho bé khác</span>
-            <span className="gc-move__go" aria-hidden="true">
-              <ArrowRight className="h-4 w-4" />
-            </span>
-          </button>
+          <p className="mt-3 text-sm text-brand-100">
+            Hoặc nhắn qua{" "}
+            <a
+              href={BRAND_INFO.messengerUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center font-semibold text-white underline underline-offset-4 hover:text-amber-400"
+            >
+              Facebook Messenger
+            </a>
+          </p>
         </div>
       </div>
     );
@@ -232,8 +236,9 @@ export default function EnrolmentForm() {
   return (
     <form id={FORM_ID} onSubmit={handleSubmit} noValidate className="gc-enrol scroll-mt-24" aria-label="Đăng ký học thử">
       {/* Bản xem trước: chỉ lặp lại những gì đã nằm trong các ô nhập nên ẩn khỏi trình đọc màn hình. */}
-      <div className="gc-enrol__stub" aria-hidden="true">
-        <div className="text-xs font-bold uppercase tracking-[0.14em] text-brand-200">Vé học thử</div>
+      <div className="gc-enrol__stub">
+        <div aria-hidden="true">
+        <div className="text-xs font-bold uppercase tracking-[0.14em] text-brand-200">Đăng ký học thử</div>
         <p className="mt-1 font-display text-2xl font-extrabold leading-[1.1] tracking-[-0.015em] text-white">
           Global Chess
         </p>
@@ -253,6 +258,28 @@ export default function EnrolmentForm() {
               </div>
             ))}
         </dl>
+        </div>
+
+        <ul className="gc-enrol__contact" aria-label="Liên hệ trung tâm">
+          <li>
+            <a className="bg-[#0068ff]" href={`https://zalo.me/${BRAND_INFO.zaloPhone}`} target="_blank" rel="noreferrer" aria-label="Nhắn Zalo trung tâm">
+              <img src={zaloIcon.src} alt="" width="44" height="44" />
+            </a>
+          </li>
+          <li>
+            <a href={BRAND_INFO.facebookPage} target="_blank" rel="noreferrer" aria-label="Facebook Global Chess">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="12" fill="#1877f2" />
+                <path fill="#fff" d="M16.671 15.469 17.218 12h-3.328V9.75c0-.949.465-1.875 1.956-1.875h1.513V4.922s-1.373-.234-2.686-.234c-2.741 0-4.533 1.66-4.533 4.668V12H7.078v3.469h3.059v8.385a12.1 12.1 0 0 0 3.753 0v-8.385h2.781Z" />
+              </svg>
+            </a>
+          </li>
+          <li>
+            <a href={`tel:${BRAND_INFO.hotlines[0]}`} className="bg-white" aria-label={`Gọi hotline ${BRAND_INFO.hotlines[0]}`}>
+              <Phone className="h-5 w-5 text-brand-800" aria-hidden="true" />
+            </a>
+          </li>
+        </ul>
       </div>
 
       <div className="gc-enrol__main">
@@ -260,7 +287,7 @@ export default function EnrolmentForm() {
         <fieldset disabled={sending} className="min-w-0">
           <legend className="sr-only">Thông tin đăng ký học thử</legend>
           <h4 className="font-display text-xl font-extrabold leading-tight tracking-[-0.01em]">
-            Điền thông tin để nhận vé
+            Để lại thông tin tư vấn
           </h4>
           <p className="mt-1 text-sm text-slate-600">
             Trung tâm sẽ gọi hoặc nhắn Zalo để xếp lớp và khung giờ cho bé.

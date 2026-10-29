@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nút Zalo sau khi gửi · phương án</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,700..800&display=swap" rel="stylesheet">
+<style>
+:root{--b50:#eef5fb;--b100:#d9e8f5;--b300:#8fb7dc;--b600:#1f5285;--b800:#184268;--b900:#123350;--b950:#0b2136;--cream:#faf8f5;--amber:#fbbf24;--zalo:#0068ff}
+*{box-sizing:border-box;margin:0}
+body{font-family:'Be Vietnam Pro',system-ui,sans-serif;background:var(--b800);color:#fff;line-height:1.6;padding:24px 16px 64px;-webkit-font-smoothing:antialiased}
+h1{font-family:'Bricolage Grotesque',sans-serif;font-size:1.25rem;max-width:960px;margin:0 auto 4px}
+.note{max-width:960px;margin:0 auto 28px;color:var(--b100);font-size:.875rem}
+.grid{max-width:960px;margin:0 auto;display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.opt{background:var(--b900);border:1px solid rgb(255 255 255/.12);border-radius:12px;padding:20px}
+.opt h2{font-size:.8125rem;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin-bottom:2px}
+.opt p.d{font-size:.8125rem;color:var(--b100);margin-bottom:18px}
+.thanks{text-align:center;max-width:28rem;margin:0 auto}
+.thanks .t{font-family:'Bricolage Grotesque',sans-serif;font-size:1.25rem;font-weight:800;line-height:1.35}
+.thanks .s{margin-top:8px;font-size:.875rem;color:var(--b100)}
+.thanks .s b{color:#fff;font-variant-numeric:tabular-nums}
+.slot{margin-top:20px;display:flex;justify-content:center}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+svg{flex:none}
+
+/* A. Nút Zalo xanh thương hiệu, bo tròn, có logo chữ Z */
+.a{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 22px 0 8px;border-radius:999px;background:var(--zalo);font-weight:700;font-size:.9375rem;transition:background .15s,transform .15s}
+.a:hover{background:#0057d9}.a:active{transform:scale(.99)}
+.a i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#fff;color:var(--zalo);font:800 .9375rem/1 'Be Vietnam Pro';font-style:normal}
+
+/* B. Viền cream trên nền navy, hành động phụ, hợp tông với vé */
+.b{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 20px;border-radius:10px;border:1.5px solid var(--cream);color:var(--cream);font-weight:700;font-size:.9375rem;transition:background .15s,color .15s}
+.b:hover{background:var(--cream);color:var(--b800)}
+
+/* C. Một dòng nhẹ: chữ + số điện thoại, không khung */
+.c{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-weight:600;font-size:.9375rem;color:var(--b100);border-bottom:1px solid rgb(255 255 255/.3);padding-block:2px;transition:color .15s,border-color .15s}
+.c:hover{color:#fff;border-color:var(--amber)}
+.c b{color:#fff}
+
+/* D. Thẻ liên hệ: avatar trung tâm + câu hỏi + nút Mở Zalo, như một cuộc trò chuyện sẵn */
+.d{display:flex;align-items:center;gap:14px;width:100%;max-width:26rem;padding:12px 12px 12px 14px;border-radius:14px;background:var(--cream);color:var(--b900);text-align:left;box-shadow:0 8px 24px rgb(0 0 0/.25);transition:transform .15s}
+.d:hover{transform:translateY(-1px)}
+.d .av{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--b800);color:var(--amber);font:800 .8125rem/1 'Be Vietnam Pro'}
+.d .tx{flex:1;min-width:0;line-height:1.35}
+.d .tx b{display:block;font-size:.9375rem}
+.d .tx span{font-size:.8125rem;color:#52627a}
+.d .go{flex:none;display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:10px;background:var(--zalo);color:#fff;font-weight:700;font-size:.875rem}
+</style>
+</head>
+<body>
+<h1>Nút Zalo sau khi gửi đăng ký</h1>
+<p class="note">Nền navy giống phần dưới vé xác nhận. Nút "Đăng ký thêm cho bé khác" đã bỏ. Hiện tại là nút xanh lá rộng hết khung (xem trang thật).</p>
+
+<div class="grid">
+
+<section class="opt"><h2>A · Xanh Zalo, bo tròn</h2><p class="d">Nhận ra ngay là Zalo nhờ màu và chữ Z. Nổi nhất, nhưng thêm một màu thứ ba vào trang.</p>
+<div class="thanks"><div class="t">Cảm ơn ba mẹ đã để lại thông tin.</div><div class="s">Trung tâm sẽ liên hệ qua số <b>0901 234 567</b> để trao đổi khung giờ và xếp lớp cho bé.</div></div>
+<div class="slot"><a class="a" href="#"><i>Z</i>Nhắn Zalo trung tâm</a></div></section>
+
+<section class="opt"><h2>B · Viền kem</h2><p class="d">Hành động phụ, cùng tông kem của vé. Yên tĩnh, không tranh sự chú ý với vé.</p>
+<div class="thanks"><div class="t">Cảm ơn ba mẹ đã để lại thông tin.</div><div class="s">Trung tâm sẽ liên hệ qua số <b>0901 234 567</b> để trao đổi khung giờ và xếp lớp cho bé.</div></div>
+<div class="slot"><a class="b" href="#">Nhắn Zalo trung tâm
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div></section>
+
+<section class="opt"><h2>C · Liên kết một dòng</h2><p class="d">Chỉ là dòng chữ có gạch chân. Nhẹ nhất, hợp nếu ba mẹ không cần nhắn gấp.</p>
+<div class="thanks"><div class="t">Cảm ơn ba mẹ đã để lại thông tin.</div><div class="s">Trung tâm sẽ liên hệ qua số <b>0901 234 567</b> để trao đổi khung giờ và xếp lớp cho bé.</div></div>
+<div class="slot"><a class="c" href="#">Cần gấp hơn? <b>Nhắn Zalo trung tâm</b>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a></div></section>
+
+<section class="opt"><h2>D · Thẻ liên hệ</h2><p class="d">Một thẻ kem nhỏ như khung chat sẵn: có tên trung tâm, câu mời và nút xanh Zalo. Rõ nhất về việc "nhắn ai".</p>
+<div class="thanks"><div class="t">Cảm ơn ba mẹ đã để lại thông tin.</div><div class="s">Trung tâm sẽ liên hệ qua số <b>0901 234 567</b> để trao đổi khung giờ và xếp lớp cho bé.</div></div>
+<div class="slot"><a class="d" href="#"><span class="av">GC</span><span class="tx"><b>Global Chess</b><span>Hỏi nhanh khung giờ, thường trả lời trong ngày</span></span><span class="go">Mở Zalo</span></a></div></section>
+
+</div>
+</body>
+</html>

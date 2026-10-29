@@ -403,19 +403,34 @@
     color: var(--color-slate-600);
   }
 
-  /* Xác nhận đã gửi đăng ký: màu trạng thái, chỉ dùng ở bước cuối. */
-  .gc-move--zalo {
-    background-color: var(--color-emerald-600);
+  /* Nút Zalo ở bước xác nhận: màu và biểu tượng chính thức của Zalo (#0068FF), nên đứng ngoài thang gc-move. */
+  .gc-zalo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 3rem;
+    padding: 0.5rem 1.375rem 0.5rem 0.875rem;
+    border-radius: 999px;
+    background-color: #0068ff;
     color: #fff;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color 150ms ease, transform 150ms ease;
   }
 
-  .gc-move--zalo:hover {
-    background-color: var(--color-emerald-500);
+  .gc-zalo img {
+    border-radius: 0.5rem;
+    outline: 2px solid #fff;
   }
 
-  .gc-move--zalo .gc-move__go {
-    background-color: var(--color-emerald-800);
-    color: #fff;
+  .gc-zalo:hover {
+    background-color: #0057d9;
+  }
+
+  .gc-zalo:active {
+    transform: scale(0.99);
   }
 
   .gc-move[aria-disabled="true"] {
@@ -1017,6 +1032,10 @@
   }
 
   .gc-enrol__stub {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.5rem;
     height: 100%;
     padding: 1.25rem 1.25rem 1.5rem;
     background: var(--color-brand-600);
@@ -1028,6 +1047,35 @@
     mask:
       radial-gradient(circle var(--gc-n) at 0 100%, #0000 98%, #000) left / 51% 100% no-repeat,
       radial-gradient(circle var(--gc-n) at 100% 100%, #0000 98%, #000) right / 51% 100% no-repeat;
+  }
+
+  /* Ba lối liên hệ nhanh ở cuối cuống vé; mỗi nút tròn 44px (cỡ chạm tối thiểu) trên nền trắng. */
+  .gc-enrol__contact {
+    display: flex;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .gc-enrol__contact a {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    overflow: hidden;
+    border-radius: 50%;
+    transition: transform 150ms ease;
+  }
+
+  .gc-enrol__contact a:hover {
+    transform: translateY(-2px);
+  }
+
+  .gc-enrol__contact img,
+  .gc-enrol__contact svg:not(.lucide) {
+    width: 100%;
+    height: 100%;
   }
 
   .gc-enrol__main {
