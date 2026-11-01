@@ -5,6 +5,7 @@ import { Chessboard, type PieceDropHandlerArgs } from "react-chessboard";
 import confetti from "canvas-confetti";
 import { RotateCcw, CheckCircle2 } from "lucide-react";
 import { INTERACTIVE_PUZZLE } from "../data/courses";
+import { playClack } from "../lib/clack";
 
 // Thế cờ và nước giải nằm trong src/data/courses.ts để test được logic cờ.
 const INITIAL_FEN = INTERACTIVE_PUZZLE.fen;
@@ -40,6 +41,7 @@ export default function InteractivePuzzle() {
 
       setGame(next);
       setStatus("solved");
+      playClack();
       // Confetti is decoration; skip it when the visitor asked for reduced motion.
       if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
@@ -76,41 +78,67 @@ export default function InteractivePuzzle() {
         Gợi ý: Kéo quân <strong>Mã trắng (ở ô g5)</strong> để tung đòn "Chĩa đôi".
       </p>
 
+      {/* Lề tọa độ nằm ngoài bàn cờ để không che quân và ô. */}
       <div
-        role="group"
-        aria-label="Bàn cờ tương tác: kéo quân Mã trắng từ ô g5 sang ô f7 để giải đố"
-        className="w-full max-w-[340px] aspect-square mx-auto rounded-control overflow-hidden border-2 border-brand-900 shadow-inner"
+        className="mx-auto grid w-full max-w-[360px] grid-cols-[1.125rem_minmax(0,1fr)] grid-rows-[auto_1.125rem] text-[0.6875rem] font-semibold leading-none text-slate-600"
       >
-        <Chessboard
-          options={{
-            position: game.fen(),
-            onPieceDrop: onDrop,
-            // Bàn cờ dùng đúng màu navy thương hiệu thay vì xám slate.
-            darkSquareStyle: { backgroundColor: "var(--color-brand-600)" },
-            lightSquareStyle: { backgroundColor: "var(--color-board-light)" },
-          }}
-        />
+        <div aria-hidden="true" className="flex flex-col items-center justify-around">
+          {[8, 7, 6, 5, 4, 3, 2, 1].map((n) => (
+            <span key={n}>{n}</span>
+          ))}
+        </div>
+        <div
+          role="group"
+          aria-label="Bàn cờ tương tác: kéo quân Mã trắng từ ô g5 sang ô f7 để giải đố"
+          className="aspect-square rounded-control overflow-hidden border-2 border-brand-900 shadow-inner"
+        >
+          <Chessboard
+            options={{
+              position: game.fen(),
+              onPieceDrop: onDrop,
+              showNotation: false,
+              // Bàn cờ dùng đúng màu navy thương hiệu thay vì xám slate.
+              darkSquareStyle: { backgroundColor: "var(--color-brand-600)" },
+              lightSquareStyle: { backgroundColor: "var(--color-board-light)" },
+              // Ô quân cần đi luôn sáng viền hổ phách.
+              squareStyles:
+                status === "solved"
+                  ? {}
+                  : {
+                      [SOLUTION.from]: {
+                        boxShadow: "inset 0 0 0 3px var(--color-amber-400)",
+                        backgroundImage: "linear-gradient(rgb(251 191 36 / 0.35), rgb(251 191 36 / 0.35))",
+                      },
+                    },
+            }}
+          />
+        </div>
+        <div aria-hidden="true" className="col-start-2 flex items-center justify-around">
+          {["a", "b", "c", "d", "e", "f", "g", "h"].map((c) => (
+            <span key={c}>{c}</span>
+          ))}
+        </div>
       </div>
 
-      <div className="mt-3 min-h-[44px] flex items-center justify-center" role="status" aria-live="polite">
-        {status === "playing" && (
-          <p className="text-sm text-slate-500 italic">
-            Hãy kéo và thả quân cờ trên bàn cờ để giải đố...
-          </p>
-        )}
-        {status === "wrong" && (
-          <p className="text-sm font-semibold text-red-600 animate-pulse motion-reduce:animate-none">
-            Chưa chính xác rồi. Hãy thử tìm ô nào tấn công cùng lúc 2 mục tiêu nhé.
-          </p>
-        )}
-        {status === "solved" && (
-          <div className="flex items-center gap-2 text-emerald-700 bg-emerald-50 px-3 py-2 rounded-control w-full text-sm font-medium border border-emerald-200">
-            <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" aria-hidden="true" />
-            <span>
-              <strong>Tuyệt vời!</strong> Đó chính là đòn <em>Chĩa Đôi (Fork)</em> trong Cấp độ Chiến thuật!
-            </span>
-          </div>
-        )}
+      <div className="mt-3 flex min-h-11 items-center gap-3">
+        <div className="flex flex-1 items-center justify-center" role="status" aria-live="polite">
+          {status === "playing" && (
+            <p className="text-center text-sm text-slate-600 italic">Kéo và thả quân cờ để giải đố</p>
+          )}
+          {status === "wrong" && (
+            <p className="text-sm font-semibold text-red-600 animate-pulse motion-reduce:animate-none">
+              Chưa chính xác rồi. Hãy thử tìm ô nào tấn công cùng lúc 2 mục tiêu nhé.
+            </p>
+          )}
+          {status === "solved" && (
+            <div className="flex items-center gap-2 text-emerald-700 bg-emerald-50 px-3 py-2 rounded-control w-full text-sm font-medium border border-emerald-200">
+              <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" aria-hidden="true" />
+              <span>
+                <strong>Tuyệt vời!</strong> Đó chính là đòn <em>Chĩa Đôi (Fork)</em> trong Cấp độ Chiến thuật!
+              </span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

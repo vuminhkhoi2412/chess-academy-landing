@@ -9,8 +9,11 @@ import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import MobileContactBar from "../components/MobileContactBar.astro";
 import Layout from "../layouts/Layout.astro";
-import { BRAND_INFO, BRANCHES, TUITION_PROGRAMS, TUITION_LEVELS, TESTIMONIALS, FAQS } from "../data/courses";
+import { BRAND_INFO, BRANCHES, CURRICULUM_PROGRAMS, TUITION_PROGRAMS, TUITION_LEVELS, TESTIMONIALS, FAQS } from "../data/courses";
 import galleryCoachStudent from "../assets/images/gallery-coach-student.jpg";
+import faceBe1 from "../assets/images/anh_chan_dung/chan_dung_be_1.jpg";
+import faceBe2 from "../assets/images/anh_chan_dung/chan_dung_be_2.jpg";
+import faceBe3 from "../assets/images/anh_chan_dung/chan_dung_be_3.jpg";
 import galleryClassCoach from "../assets/images/gallery-class-coach.jpg";
 import galleryTournamentPlay from "../assets/images/gallery-tournament-play.jpg";
 import galleryClassPractice from "../assets/images/gallery-class-practice.jpg";
@@ -26,7 +29,26 @@ import {
   ArrowRight,
   HelpCircle,
   ChevronDown,
+  Trophy,
+  Clock,
 } from "lucide-react";
+
+// Số liệu hero lấy từ dữ liệu thật; totalDuration bắt đầu bằng số buổi ("72 buổi (...)").
+const heroStats = [
+  { Icon: MapPin, value: BRANCHES.length, label: "cơ sở tại TP.HCM" },
+  { Icon: Trophy, value: CURRICULUM_PROGRAMS.reduce((n, p) => n + p.subLevels.length, 0), label: "cấp độ nối tiếp" },
+  { Icon: Clock, value: CURRICULUM_PROGRAMS.reduce((n, p) => n + parseInt(p.totalDuration), 0), label: "buổi học toàn lộ trình" },
+];
+
+// Ba ảnh chân dung tròn cạnh nhận xét. Ảnh gốc là chân dung dọc nên phóng to quanh khuôn mặt:
+// `pos` là object-position, `origin` là tâm khuôn mặt, `zoom` là mức phóng. Đổi ảnh thì chỉnh lại ba số này.
+// Ảnh phải có đồng ý của phụ huynh; nhận xét bên cạnh nên là của chính các bé này.
+const heroFaces = [
+  { src: faceBe1, pos: "50% 0%", origin: "50% 49%", zoom: 2.0 },
+  { src: faceBe2, pos: "50% 0%", origin: "44% 44%", zoom: 1.7 },
+  { src: faceBe3, pos: "50% 0%", origin: "52% 37%", zoom: 1.3 },
+];
+const heroQuote = TESTIMONIALS[0];
 
 // Ảnh gallery theo thứ tự trong lưới bento (ảnh đầu là ảnh vuông chiếm hai hàng).
 // `full` là bản tối đa 1600px (không phóng quá kích thước gốc) tối ưu sẵn khi build, dùng cho hộp phóng to; không có JS thì link mở thẳng ảnh này.
@@ -166,7 +188,7 @@ const structuredData = {
 
     <main id="main" tabindex="-1">
     <!-- Hero Section -->
-    <section class="relative isolate overflow-hidden py-14 md:py-20">
+    <section class="relative isolate overflow-hidden py-10 md:py-14">
       <!--
         Depth is built entirely from geometry: a warm/cool mesh, a chessboard plane
         receding in perspective, move notation as texture, and a light grain.
@@ -178,19 +200,24 @@ const structuredData = {
       <div aria-hidden="true" class="gc-hero-fade pointer-events-none absolute inset-0 -z-10">
         <div class="gc-hero-mesh absolute inset-0"></div>
         <div
-          class="gc-board-field gc-hero-board absolute -right-28 -top-44 h-[46rem] w-[46rem] opacity-[0.075] [--gc-cell:4.5rem]"
+          class="gc-board-field gc-hero-board absolute -right-28 -top-44 h-[46rem] w-[46rem] opacity-[0.10] [--gc-cell:4.5rem]"
+        >
+        </div>
+        <div class="absolute right-[4%] top-[12%] h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(closest-side,rgb(245_158_11/0.16),transparent)] blur-[40px]"></div>
+        <div
+          class="gc-board-field gc-fade-radial absolute -bottom-36 -left-24 h-[30rem] w-[30rem] -rotate-[8deg] opacity-[0.05] [--gc-cell:3.5rem] [--mask-on:#000]"
         >
         </div>
         <div class="gc-grain absolute inset-0 opacity-[0.045]"></div>
       </div>
 
       <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-12 gap-10 md:gap-8 lg:gap-12 items-center">
-        <div class="md:col-span-6 lg:col-span-7 space-y-5">
+        <div class="md:col-span-6 lg:col-span-7 space-y-5 justify-items-start">
           <!--
             Khoá 2 dòng có chủ đích: dòng 1 màu đậm, dòng 2 màu hổ phách, nên màu chữ
             trùng với nhịp xuống dòng ở mọi khổ màn hình thay vì ngắt tuỳ tiện.
           -->
-          <h1 class="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight leading-[1.08]">
+          <h1 class="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08]">
             <span class="block text-slate-900">Một Nước Đi,</span>
             <span class="block text-amber-700">Mở Tư Duy</span>
           </h1>
@@ -210,17 +237,46 @@ const structuredData = {
             <a href="#curriculum" class="gc-ref min-h-11">Xem chi tiết lộ trình</a>
           </div>
 
+          <div class="flex max-w-[34rem] flex-wrap items-center gap-3.5">
+            <div class="flex" aria-hidden="true">
+              {heroFaces.map((f) => (
+                <span class="-ml-3 first:ml-0 block h-[3.25rem] w-[3.25rem] shrink-0 overflow-hidden rounded-full border-2 border-cream bg-brand-600">
+                  <Image
+                    src={f.src}
+                    alt=""
+                    width={240}
+                    class="h-full w-full object-cover"
+                    style={`object-position:${f.pos};transform:scale(${f.zoom});transform-origin:${f.origin}`}
+                  />
+                </span>
+              ))}
+            </div>
+            <figure class="min-w-56 flex-1 border-l-[3px] border-amber-500 pl-3">
+              <blockquote class="text-[15px] font-medium leading-snug text-slate-700">“{heroQuote.quote}”</blockquote>
+              <figcaption class="mt-1 text-xs text-slate-600">{heroQuote.author} · {heroQuote.branch}</figcaption>
+            </figure>
+          </div>
+
+          <dl class="grid w-full max-w-lg grid-cols-3 overflow-hidden rounded-card border border-slate-200/90 bg-white/60 shadow-soft backdrop-blur">
+            {heroStats.map((s) => (
+              <div class="flex flex-col-reverse gap-0.5 border-l border-slate-200/90 px-4 py-3.5 first:border-l-0">
+                <dt class="text-xs text-slate-600">{s.label}</dt>
+                <dd class="text-[1.75rem] font-extrabold tabular-nums leading-tight">{s.value}</dd>
+                <s.Icon className="mb-1.5 h-5 w-5 text-amber-700" aria-hidden="true" />
+              </div>
+            ))}
+          </dl>
         </div>
 
-        <!-- Interactive Chessboard Island, lifted off the page with a soft ground shadow -->
-        <div class="md:col-span-6 lg:col-span-5 relative lg:mt-2">
+        <!-- Interactive Chessboard Island, chỉ từ md (768px) trở lên, lifted off the page with a soft ground shadow -->
+        <div class="hidden md:block md:col-span-6 lg:col-span-5 relative lg:mt-2">
           <div
             aria-hidden="true"
             class="absolute inset-x-8 -bottom-4 top-10 rounded-card bg-brand-900/15 blur-2xl"
           >
           </div>
           <div class="relative">
-            <InteractivePuzzle client:load />
+            <InteractivePuzzle client:media="(min-width: 768px)" />
           </div>
         </div>
       </div>
