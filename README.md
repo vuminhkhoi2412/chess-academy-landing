@@ -32,6 +32,7 @@ assets/
   nguon/bang-hoc-phi-global-chess.pdf   bảng học phí gốc của trung tâm
   nguon/trichdan.txt      trích dẫn gốc của phụ huynh
   nguon/hinh-anh/         file gốc 5 ảnh + NGUON.md ghi Drive ID và consent
+  nguon/Tham khảo hero.png  ảnh tham khảo bố cục hero
 DESIGN.md                 quy ước thiết kế: màu, chữ, chuyển động, chống mẫu AI
 google-apps-script/
   Code.gs                 bản nguồn Apps Script để dán vào sheet (không được build)
@@ -51,12 +52,14 @@ public/
   og-image.png            ảnh share 1200x630
 src/
   assets/images/        5 ảnh gallery đã crop, Astro tối ưu WebP khi build
+  assets/images/anh_chan_dung/  3 ảnh chân dung tròn ở hero (đã có consent phụ huynh)
   layouts/Layout.astro  khung HTML dùng chung: <head>, favicon, font, SEO
   data/courses.ts       toàn bộ nội dung: thương hiệu, cơ sở, giáo trình,
                         học phí, thế cờ đố, FAQ, nhận xét phụ huynh
   lib/enrolment.ts      kiểm tra, dựng và gửi payload đăng ký (test được bằng node --test)
+  lib/clack.ts          tiếng "cạch" quân cờ, tổng hợp bằng Web Audio (không có file âm thanh)
   components/
-    InteractivePuzzle.tsx    bàn cờ đố ở hero
+    InteractivePuzzle.tsx    bàn cờ đố ở hero (tọa độ, tiếng cạch khi giải đúng)
     CurriculumExplorer.tsx   tab 3 lộ trình: Happy Chess / Sơ cấp / Trung cấp
     PricingAndCheckout.tsx   bảng học phí + form đăng ký gửi Google Sheets
     SiteHeader.astro         thanh nav dùng chung (kèm menu di động ở trang chủ)
@@ -139,6 +142,8 @@ Gallery `#hinh-anh` dùng 5 ảnh thật của trung tâm, không dùng stock/AI
 `assets/nguon/hinh-anh/`; bản crop trong `src/assets/images/` đã bỏ banner/logo in sẵn
 trên ảnh. Astro sinh WebP và srcset khi build.
 
+- Ba ảnh chân dung ở hero (`src/assets/images/anh_chan_dung/`) được cắt tròn quanh khuôn mặt
+  bằng `heroFaces` trong `index.astro` (`pos`, `origin`, `zoom`); đổi ảnh thì chỉnh lại ba số này.
 - Ảnh đã có sự đồng ý của phụ huynh cho việc dùng trên website. Không thay bằng ảnh
   khác nếu chưa xác nhận lại consent.
 - Không gắn tên cơ sở vào alt text vì nguồn ảnh không ghi rõ ảnh chụp ở cơ sở nào.
