@@ -60,3 +60,4 @@ graphify-out/
 
 # hallmark (báo cáo audit, ảnh chụp, bản ghi trước/sau)
 .hallmark/
+.vercel
