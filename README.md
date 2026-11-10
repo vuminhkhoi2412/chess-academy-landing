@@ -156,8 +156,7 @@ trên ảnh. Astro sinh WebP và srcset khi build.
 
 Phần ảnh gallery đã xong; còn cấu hình domain, biến môi trường và deploy. Checklist, làm đủ 4 bước:
 
-1. **Đổi domain.** Sửa `site` trong `astro.config.mjs` từ `https://globalchess.vn` sang
-   domain thật. Đây là nguồn duy nhất cho `canonical`, `og:url`, `robots.txt` và
+1. **Domain** (đã xong): `site` trong `astro.config.mjs` là `https://globalchess.edu.vn`. Đây là nguồn duy nhất cho `canonical`, `og:url`, `robots.txt` và
    `sitemap-index.xml`; không có chỗ nào khác hardcode domain.
 2. **Deploy Apps Script và khai biến môi trường trên Vercel:** làm theo
    `docs/google-sheets-setup.md` để lấy URL `/exec`, rồi khai `PUBLIC_GOOGLE_SHEETS_ENDPOINT`
@@ -168,10 +167,9 @@ Phần ảnh gallery đã xong; còn cấu hình domain, biến môi trường v
 4. **Deploy.** Import repo vào Vercel, Vercel tự nhận diện Astro, không cần file cấu
    hình. Sau khi deploy, mở `/robots.txt` và `/sitemap-index.xml` để chắc domain đã đúng.
 
-## Placeholder cần đổi
+## Domain
 
-Placeholder URL chỉ có **một** chỗ: `site` trong `astro.config.mjs` (đang là
-`https://globalchess.vn`, có comment `TODO` ngay trên dòng đó). Mọi URL khác trong trang
+Domain chỉ khai ở **một** chỗ: `site` trong `astro.config.mjs` (`https://globalchess.edu.vn`). Mọi URL khác trong trang
 đều suy ra từ `Astro.site`.
 
 Ảnh thật đã nằm trong `src/assets/images/` và gallery `#hinh-anh`; không còn placeholder ảnh.

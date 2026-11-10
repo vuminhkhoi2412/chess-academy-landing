@@ -78,8 +78,7 @@ tuition grid.
   visible to anyone; a honeypot field (`_hp`) deflects naive bots, and the sheet owner deletes
   junk rows. The Apps Script source is `google-apps-script/Code.gs`; setup is in
   `docs/google-sheets-setup.md`.
-- The production domain is still unconfirmed (`site` in `astro.config.mjs` is
-  `https://globalchess.vn`, marked TODO);
+- The production domain is `https://globalchess.edu.vn` (`site` in `astro.config.mjs`);
   canonical URLs, `robots.txt`, `og:url` and the sitemap all derive from it.
 - Vietnamese only, with correct diacritics everywhere. Fonts must ship a Vietnamese subset.
 
