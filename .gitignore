@@ -63,4 +63,4 @@ graphify-out/
 .vercel
 
 # dữ liệu SQLite của trang quản trị (tài khoản, nhật ký, bài đăng)
-data/
+/data/
