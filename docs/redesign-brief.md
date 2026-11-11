@@ -54,7 +54,7 @@ Chụp ảnh từng phần và ghi chú. Gạch bỏ dòng không liên quan.
 
 Ảnh tham khảo nằm ở `docs/redesign-refs/`: `covuasaigon-header-banner.png`, `covuasaigon-six-pieces.png`, `royalchess-header-banner.png`, `royalchess-posts.png`.
 
-Mật độ thông tin muốn có (chọn một): dày đặc như hai site trên / cấu trúc tương tự nhưng thoáng hơn / khác: ...
+Mật độ thông tin muốn có: cấu trúc gần tương tự hai site trên nhưng thoáng, gọn và tương phản tốt hơn.
 
 ## 4. Nhân viên tự sửa được phần nào
 
@@ -67,7 +67,7 @@ Cái nào sửa được trong trang quản trị thì thêm một phần việc
 | Banner trang chủ | Vài tuần | Cho phép sửa|
 | Khoá học và học phí | Theo năm| Cho phép sửa|
 | Thông tin cơ sở | Hầu như không đổi | Cần xác thực nếu muốn sửa |
-| Giáo viên | Thường xuyên | Cho phép thay đổi|
+| Giáo viên | Thường xuyên | Cho phép thay đổi. Sẽ cần ảnh cho từng người, hiện chưa có |
 | Tuyển dụng | Không thường xuyên | Tạm không đăng tuyển dụng |
 | Menu | Ít | Chỉ đổi bằng code|
 
@@ -75,5 +75,5 @@ Cái nào sửa được trong trang quản trị thì thêm một phần việc
 
 - Việc chuyển hosting (bước 5 và 6) làm xong với site hiện tại trước. Bản thiết kế lại làm trên nhánh riêng, không merge vào `main` cho đến khi sẵn sàng.
 - Giữ nguyên: tiếng Việt cho nội dung, URL tiếng Anh, 301 khi đổi URL cũ.
-- Hạn mong muốn (nếu có):
-- Điều khác cần biết:
+- Hạn mong muốn: không có.
+- Điều khác cần biết: không có.
