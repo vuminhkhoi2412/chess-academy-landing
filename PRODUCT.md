@@ -16,11 +16,14 @@ send it to parents over Zalo.
 
 ## Product Purpose
 
-A single Vietnamese landing page for Global Chess, a chess centre with five TP.HCM campuses.
-It exists to turn a browsing parent into an enrolled student: it explains the curriculum,
-shows real classes, lists tuition per level, and collects an enrolment form for the chosen
-class. Success means an enrolment submitted to the centre's Google Sheet so staff can call the
-parent back — the page itself takes no payment.
+A Vietnamese information portal for Global Chess, a chess centre with five TP.HCM campuses.
+The home page introduces the centre briefly and the courses in depth, then carries news and
+knowledge posts, the five campuses and the tuition grid. It exists to turn a browsing parent
+into an enrolled student: it explains the curriculum, shows real classes, lists tuition per
+level, and collects an enrolment form for the chosen class. Success means an enrolment
+submitted to the centre's Google Sheet so staff can call the parent back — the site itself
+takes no payment. The redesign (branch `redesign/portal`) is being built in stages; see
+`docs/redesign-brief.md` section 6 for the decisions it follows.
 
 ## Positioning
 
@@ -48,7 +51,7 @@ tuition grid.
   811 Hậu Giang, P. Bình Phú (Q.6) · 55 Tên Lửa, P. An Lạc (Bình Tân) ·
   52 đường T6, P. Tây Thạnh (Tân Phú) · 152 Nguyễn Sơn, P. Phú Thọ Hoà (Tân Phú) ·
   26 Manhattan, Vinhomes Grand Park, P. Long Bình (TP. Thủ Đức).
-- The page is also the destination for the centre's Facebook/Zalo links, so it must read
+- The site is also the destination for the centre's Facebook/Zalo links, so it must read
   correctly on a phone with no app installed.
 - Global Chess also teaches robotics at the same campuses, but no robotics curriculum,
   pricing or schedule has been supplied. Only chess may be designed for until the centre
@@ -56,10 +59,14 @@ tuition grid.
 
 ## Capabilities and Constraints
 
-- Scope today: one landing page plus a 404, a privacy policy and a terms page. No blog, no
-  per-course or per-campus pages. Multi-page expansion is not planned yet.
-- Static Astro 7 build with three hydrated React islands (puzzle board, curriculum explorer,
-  pricing + checkout); Tailwind CSS 4 via Vite; intended for Vercel. No server, no database.
+- Scope: the home page, news posts (`/news`, with "Kiến thức" as a post category once the
+  admin supports it), a 404, a privacy policy and a terms page. Course, campus, trial and
+  about pages are planned in the redesign. Recruitment, shop and YouTube are out of scope.
+- Astro 7 on the Node adapter with three hydrated React islands (puzzle board, curriculum
+  explorer, pricing + checkout); Tailwind CSS 4 via Vite. The home page and posts render on
+  the server and read a small SQLite database (feature switches, posts, staff accounts) behind
+  the staff admin at `/admin`. Hosting is moving from Vercel to a Droplet (see the brief,
+  section 5).
 - Content is data-driven: `src/data/courses.ts` holds brand strings, branches (address, phone,
   Maps link), the three curriculum programmes, the seven tuition levels, the interactive puzzle, parent
   quotes and FAQs.
@@ -71,7 +78,10 @@ tuition grid.
   Books (50.000đ / 90.000đ), uniform (150.000đ), tournament set (250.000đ) and clock
   (400.000đ) are sold separately — tuition does not include them. Global Chess 9–10
   (Chuyên nghiệp) is priced by title and is deliberately absent from the form.
-- Changing tuition means editing `TUITION_LEVELS` and `tests/tuition.test.mjs` together;
+- Changing tuition today means editing `TUITION_LEVELS` and `tests/tuition.test.mjs` together.
+  Planned: prices editable by Quản trị only in the admin (extras too), with the database as
+  the current price and the PDF only the seed. Until that ships, the code is the source.
+- Campus details stay in code (`BRANCHES`);
   changing the puzzle in `INTERACTIVE_PUZZLE` means re-running `npm test`.
 - The build fails when `PUBLIC_GOOGLE_SHEETS_ENDPOINT` is unset, so a dead form is never
   deployed. `PUBLIC_*` values are inlined into the browser bundle, so the endpoint URL is
@@ -91,10 +101,9 @@ tuition grid.
   superlatives, no "elevate/seamless/world-class", no invented awards or alumni outcomes.
 - The logo is the real centre mark (shield); source file is `assets/logo.jpg`, never published
   as-is. This is the only brand mark; no new logo concepts.
-- Real photography only: the five classroom photos with parent consent (gallery) and one real
-  photo per campus (branch cards), never stock or AI images of children or classrooms.
-  Consent is recorded only for the five gallery photos; the branch photos have no consent
-  note yet.
+- Real photography only: the five classroom photos (gallery), the six campus photos (branch
+  cards) and the three child portraits (testimonials), never stock or AI images of children or
+  classrooms. The site owner confirmed on 2026-11-11 that parents consented to all 14.
 
 ## Evidence on Hand
 
@@ -103,12 +112,14 @@ tuition grid.
 - `assets/nguon/trichdan.txt` — three real parent quotes, used verbatim with the child's first
   name and branch label; do not edit, extend or reword them.
 - `assets/nguon/hinh-anh/` — five original photos plus `NGUON.md` recording Drive IDs and the
-  consent confirmation dated 2026-10-22; cropped copies live in `src/assets/images/`.
-- `src/assets/images/branch_images/` — one photo per campus, shown on the branch cards.
-  Their source and consent are not documented.
+  consent confirmations (2026-10-22 for the gallery, 2026-11-11 for all 14 photos); cropped
+  copies live in `src/assets/images/`.
+- `src/assets/images/branch_images/` (six photos, five campuses) and
+  `src/assets/images/anh_chan_dung/` (three child portraits) — consent confirmed 2026-11-11.
 - `assets/logo.jpg` — source logo (920×813, white background, no alpha).
-- Absent, and therefore not to be fabricated: student counts, ratings or review scores,
-  awards or tournament results, teacher/coach bios or credentials, campus exterior photos,
+- Absent, and therefore not to be fabricated: introduction copy (the brand manager will send it;
+  use a labelled placeholder), teacher bios and photos, tournament history, student counts, ratings or review scores,
+  awards, campus exterior photos,
   usable horizontal video, online reviews, and any robotics material.
 
 ## Product Principles
@@ -120,8 +131,9 @@ tuition grid.
    schedule, address and enrolment steps. Superlatives are treated as defects.
 3. **The curriculum is the proof.** Depth of syllabus and outcome per level carries the
    argument; imagery and motion support it, never replace it.
-4. **One page, one decision.** The page stays a single linear path from "is this for my child"
-   to a filled enrolment form; extra pages are added only when asked.
+4. **One decision per page.** Each page leads a parent towards one next step (choose a campus,
+   read the syllabus, fill the enrolment form); the home page links onward and never buries
+   the enrolment path.
 5. **The parent's phone is the real viewport.** Every change must survive a mid-range Android
    on mobile data, in Vietnamese, with tap targets a parent can hit.
 
