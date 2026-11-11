@@ -7,6 +7,7 @@
 import { audit, type Actor } from "./auth.ts";
 import type { Db } from "./db.ts";
 import { POSTS_POLICY } from "./policy.ts";
+import { htmlToText, sanitizeBody } from "./rich-text.ts";
 
 export class PostError extends Error {
   code: string;
@@ -21,7 +22,9 @@ export interface Post {
   slug: string;
   title: string;
   summary: string;
+  /** HTML đã lọc nếu bodyFormat là "html"; văn bản thuần nếu là "text" (bài cũ). Hiển thị bằng `bodyHtml`. */
   body: string;
+  bodyFormat: "text" | "html";
   status: "draft" | "published";
   publishedAt: number | null;
   createdAt: number;
@@ -53,6 +56,7 @@ function toPost(r: Row): Post {
     title: r.title as string,
     summary: r.summary as string,
     body: r.body as string,
+    bodyFormat: (r.body_format as "text" | "html") ?? "text",
     status: r.status as Post["status"],
     publishedAt: (r.published_at as number | null) ?? null,
     createdAt: r.created_at as number,
@@ -87,14 +91,17 @@ function uniqueSlug(db: Db, title: string): string {
 function clean(input: PostInput): PostInput {
   const title = input.title.replace(/\s+/g, " ").trim();
   const summary = input.summary.replace(/\s+/g, " ").trim();
-  const body = input.body.replace(/\r\n?/g, "\n").trim();
+  // Nội dung luôn là HTML từ trình soạn thảo, đã lọc: chỉ giữ thẻ/thuộc tính cho phép.
+  const body = sanitizeBody(input.body.replace(/\r\n?/g, "\n"));
   if (title === "") throw new PostError("title", "Hãy nhập tiêu đề bài viết.");
   if (title.length > POSTS_POLICY.titleMax)
     throw new PostError("title", `Tiêu đề tối đa ${POSTS_POLICY.titleMax} ký tự (hiện ${title.length}).`);
   if (summary.length > POSTS_POLICY.summaryMax)
     throw new PostError("summary", `Tóm tắt tối đa ${POSTS_POLICY.summaryMax} ký tự (hiện ${summary.length}).`);
-  if (body.length > POSTS_POLICY.bodyMax)
-    throw new PostError("body", `Nội dung tối đa ${POSTS_POLICY.bodyMax} ký tự (hiện ${body.length}).`);
+  const textLength = htmlToText(body).length;
+  if (textLength > POSTS_POLICY.bodyMax)
+    throw new PostError("body", `Nội dung tối đa ${POSTS_POLICY.bodyMax} ký tự (hiện ${textLength}).`);
+  if (body.length > POSTS_POLICY.bodyHtmlMax) throw new PostError("body", "Nội dung quá dài.");
   return { title, summary, body };
 }
 
@@ -103,8 +110,8 @@ export function createPost(db: Db, input: PostInput, actor: Actor, now: number =
   const slug = uniqueSlug(db, v.title);
   const info = db
     .prepare(
-      `INSERT INTO posts (slug, title, summary, body, status, created_at, created_by, updated_at, updated_by)
-       VALUES (?, ?, ?, ?, 'draft', ?, ?, ?, ?)`,
+      `INSERT INTO posts (slug, title, summary, body, body_format, status, created_at, created_by, updated_at, updated_by)
+       VALUES (?, ?, ?, ?, 'html', 'draft', ?, ?, ?, ?)`,
     )
     .run(slug, v.title, v.summary, v.body, now, actor.username, now, actor.username);
   const id = Number(info.lastInsertRowid);
@@ -116,7 +123,7 @@ export function createPost(db: Db, input: PostInput, actor: Actor, now: number =
 export function updatePost(db: Db, id: number, input: PostInput, actor: Actor, now: number = Date.now()): Post {
   const v = clean(input);
   if (!getPostById(db, id)) throw new PostError("not_found", "Bài viết không tồn tại.");
-  db.prepare("UPDATE posts SET title=?, summary=?, body=?, updated_at=?, updated_by=? WHERE id=?").run(
+  db.prepare("UPDATE posts SET title=?, summary=?, body=?, body_format='html', updated_at=?, updated_by=? WHERE id=?").run(
     v.title,
     v.summary,
     v.body,
@@ -142,7 +149,7 @@ export function setPublished(
 ): void {
   const post = getPostById(db, id);
   if (!post) throw new PostError("not_found", "Bài viết không tồn tại.");
-  if (published && post.body === "") throw new PostError("empty", "Bài viết chưa có nội dung nên chưa thể đăng.");
+  if (published && bodyText(post) === "") throw new PostError("empty", "Bài viết chưa có nội dung nên chưa thể đăng.");
   const hasImages = listImages(db, id).length > 0;
   if (published && hasImages && !photoConsent)
     throw new PostError("consent", "Hãy tích xác nhận đã được phụ huynh đồng ý cho đăng ảnh các bé trước khi đăng.");
@@ -249,7 +256,10 @@ export function setCover(db: Db, postId: number, imageId: number, actor: Actor, 
 
 export type Block = { kind: "h2"; text: string } | { kind: "p"; text: string };
 
-/** Tách nội dung thuần thành các khối; trang dựng bằng thẻ <h2>/<p> nên mọi ký tự đều được tự thoát. */
+const escapeHtml = (text: string) =>
+  text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+/** Tách văn bản thuần (bài cũ) thành các khối: dòng trống = đoạn mới, "## " đầu dòng = tiêu đề mục. */
 export function parseBody(body: string): Block[] {
   const blocks: Block[] = [];
   for (const chunk of body.replace(/\r\n?/g, "\n").split(/\n{2,}/)) {
@@ -269,4 +279,20 @@ export function parseBody(body: string): Block[] {
     flush();
   }
   return blocks;
+}
+
+/**
+ * HTML an toàn để hiển thị hoặc nạp vào trình soạn thảo. Bài cũ (văn bản thuần) được đổi sang HTML
+ * với mọi ký tự được thoát; bài HTML được lọc lại một lần nữa phòng khi dữ liệu bị sửa ngoài ứng dụng.
+ */
+export function bodyHtml(post: Pick<Post, "body" | "bodyFormat">): string {
+  if (post.bodyFormat === "html") return sanitizeBody(post.body);
+  return parseBody(post.body)
+    .map((block) => (block.kind === "h2" ? `<h2>${escapeHtml(block.text)}</h2>` : `<p>${escapeHtml(block.text)}</p>`))
+    .join("");
+}
+
+/** Chữ thuần của bài, dùng làm tóm tắt dự phòng và kiểm tra bài rỗng. */
+export function bodyText(post: Pick<Post, "body" | "bodyFormat">): string {
+  return htmlToText(bodyHtml(post));
 }

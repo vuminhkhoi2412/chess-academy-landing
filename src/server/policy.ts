@@ -32,7 +32,10 @@ export const IMAGE_CACHE_POLICY = {
 export const POSTS_POLICY = {
   titleMax: 120,
   summaryMax: 200,
+  /** Số ký tự CHỮ của nội dung (không tính thẻ định dạng). */
   bodyMax: 20000,
+  /** Trần dung lượng HTML sau khi lọc, chặn nội dung phình to bất thường. */
+  bodyHtmlMax: 200000,
   captionMax: 120,
   /** Số ảnh tối đa mỗi bài; ảnh đầu tiên là ảnh bìa. */
   maxImages: 8,

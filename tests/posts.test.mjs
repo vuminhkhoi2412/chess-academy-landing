@@ -8,11 +8,12 @@ import { openDb } from "../src/server/db.ts";
 import { POSTS_POLICY } from "../src/server/policy.ts";
 import { listAudit } from "../src/server/auth.ts";
 import {
-  PostError, addImage, countPublished, createPost, deletePost, getPublishedBySlug, listImages,
+  PostError, addImage, bodyHtml, bodyText, countPublished, getPostById, createPost, deletePost, getPublishedBySlug, listImages,
   listPublished, parseBody, removeImage, setCover, setPublished, slugify, updatePost,
 } from "../src/server/posts.ts";
 import { UploadError, isUploadName, processImage } from "../src/server/uploads.ts";
 import { RateLimiter } from "../src/server/rate-limit.ts";
+import { htmlToText, sanitizeBody } from "../src/server/rich-text.ts";
 
 const actor = { id: 1, username: "nv.lan" };
 const T0 = 1_800_000_000_000;
@@ -145,4 +146,56 @@ test("giới hạn tốc độ: vượt hạn mức thì từ chối, theo từn
   assert.ok(limiter.take("b", 20));
   assert.ok(!limiter.take("a", 999));
   assert.ok(limiter.take("a", 1011));
+});
+
+test("lọc HTML: giữ định dạng cho phép, bỏ script, sự kiện, iframe, ảnh, kiểu dáng lạ và link nguy hiểm", () => {
+  const ok = '<p>A <strong>đậm</strong> <em>nghiêng</em> <u>gạch</u> <span style="color:#a3141c">đỏ</span></p><h2>Mục</h2><ul><li>một</li></ul><ol><li>hai</li></ol>';
+  assert.equal(sanitizeBody(ok), ok);
+  assert.equal(sanitizeBody('<p onclick="x()">a<script>alert(1)</script></p>'), "<p>a</p>");
+  assert.equal(sanitizeBody('<iframe src="https://e.com"></iframe><img src="x" onerror="x()"><p>b</p>'), "<p>b</p>");
+  assert.equal(sanitizeBody('<p><a href="javascript:alert(1)">x</a></p>'), '<p><a rel="noopener noreferrer nofollow">x</a></p>');
+  assert.equal(sanitizeBody('<span style="position:fixed;color:#fff;background:url(x)">t</span>'), '<span style="color:#fff">t</span>');
+  assert.equal(sanitizeBody('<span style="color:expression(alert(1))">t</span>'), "<span>t</span>");
+  assert.equal(sanitizeBody("<h1>Lớn</h1><h3>Nhỏ</h3>"), "<h2>Lớn</h2><h2>Nhỏ</h2>");
+  assert.equal(sanitizeBody("<b>b</b><i>i</i>"), "<strong>b</strong><em>i</em>");
+});
+
+test("lọc HTML: link ngoài mở tab mới có rel an toàn; mailto/tel được giữ; link ngoài danh sách bị bỏ href", () => {
+  assert.equal(sanitizeBody('<a href="https://globalchess.edu.vn">x</a>'), '<a href="https://globalchess.edu.vn" target="_blank" rel="noopener noreferrer nofollow">x</a>');
+  assert.equal(sanitizeBody('<a href="mailto:a@b.vn">x</a>'), '<a href="mailto:a@b.vn" rel="noopener noreferrer nofollow">x</a>');
+  assert.equal(sanitizeBody('<a href="data:text/html,x">x</a>'), '<a rel="noopener noreferrer nofollow">x</a>');
+});
+
+test("htmlToText bỏ thẻ và giải mã ký tự; bài rỗng hoặc chỉ khoảng trắng không đăng được", () => {
+  assert.equal(htmlToText("<p>Tom &amp; <strong>Jerry</strong></p><p> x </p>"), "Tom & Jerry x");
+  const db = openDb(":memory:");
+  const post = createPost(db, input({ body: "<p> </p><p><br></p>" }), actor, T0);
+  assert.throws(() => setPublished(db, post.id, true, actor), (e) => e.code === "empty");
+});
+
+test("lưu bài: HTML được lọc trước khi vào DB; độ dài tính theo chữ chứ không theo thẻ", () => {
+  const db = openDb(":memory:");
+  const post = createPost(db, input({ body: '<p>ok<script>bad()</script></p>' }), actor, T0);
+  assert.equal(getPostById(db, post.id).body, "<p>ok</p>");
+  assert.equal(post.bodyFormat, "html");
+  const tagged = "<p><strong>a</strong></p>".repeat(7000); // HTML ~175 KB, chữ chỉ ~14.000 ký tự
+  assert.ok(createPost(db, input({ body: tagged }), actor, T0));
+  assert.throws(() => createPost(db, input({ body: `<p>${"a".repeat(POSTS_POLICY.bodyMax + 1)}</p>` }), actor), (e) => e.code === "body");
+});
+
+test("bài cũ dạng văn bản thuần vẫn hiển thị đúng, thoát ký tự HTML, và chuyển sang HTML khi sửa", () => {
+  const db = openDb(":memory:");
+  db.prepare("INSERT INTO posts (slug, title, summary, body, body_format, status, created_at, updated_at) VALUES ('cu', 'Cũ', '', ?, 'text', 'draft', 1, 1)")
+    .run("Đoạn một\n\n## Mục\n\nCó <b>thẻ</b> & ký tự");
+  const old = getPostById(db, 1);
+  assert.equal(old.bodyFormat, "text");
+  assert.equal(bodyHtml(old), "<p>Đoạn một</p><h2>Mục</h2><p>Có &lt;b&gt;thẻ&lt;/b&gt; &amp; ký tự</p>");
+  assert.equal(bodyText(old), "Đoạn một Mục Có <b>thẻ</b> & ký tự");
+  const saved = updatePost(db, 1, { title: "Cũ", summary: "", body: bodyHtml(old) }, actor, T0);
+  assert.equal(saved.bodyFormat, "html");
+  assert.equal(bodyHtml(saved), bodyHtml(old));
+});
+
+test("hiển thị lọc lại bài HTML phòng khi DB bị sửa ngoài ứng dụng", () => {
+  assert.equal(bodyHtml({ bodyFormat: "html", body: "<p>x</p><script>y()</script>" }), "<p>x</p>");
 });

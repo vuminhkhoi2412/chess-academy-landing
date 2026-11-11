@@ -5,11 +5,13 @@
 export const prerender = false;
 
 import AdminLayout from "../../../layouts/AdminLayout.astro";
+import RichEditor from "../../../components/admin/RichEditor.astro";
 import { getDb } from "../../../server/db";
 import { POSTS_POLICY } from "../../../server/policy";
 import {
   PostError,
   addImage,
+  bodyHtml,
   createPost,
   deletePost,
   getPostById,
@@ -19,6 +21,7 @@ import {
   setPublished,
   updatePost,
 } from "../../../server/posts";
+import { sanitizeBody } from "../../../server/rich-text";
 import { formatTime } from "../../../server/session";
 import { UploadError, deleteImages, saveImage } from "../../../server/uploads";
 
@@ -42,7 +45,7 @@ const DONE: Record<string, string> = {
 
 let error = "";
 let confirmingDelete = false;
-let draft = { title: post?.title ?? "", summary: post?.summary ?? "", body: post?.body ?? "" };
+let draft = { title: post?.title ?? "", summary: post?.summary ?? "", body: post ? bodyHtml(post) : "" };
 let consentChecked = false;
 
 if (Astro.request.method === "POST") {
@@ -154,12 +157,8 @@ const btn = "min-h-12 px-5 font-bold border-2";
         <span class="text-sm text-slate-600">Tối đa {POSTS_POLICY.summaryMax} ký tự. Có thể để trống.</span>
       </label>
       <div class="flex flex-col gap-1.5">
-        <label for="body" class="font-semibold">Nội dung</label>
-        <div class="flex flex-wrap items-center gap-3">
-          <button type="button" id="add-heading" class="min-h-11 px-4 border-2 border-slate-400 bg-white font-bold hover:bg-slate-50">+ Thêm tiêu đề mục</button>
-          <span class="text-sm text-slate-600">Cách nhau một dòng trống là sang đoạn mới.</span>
-        </div>
-        <textarea id="body" name="body" rows="18" maxlength={POSTS_POLICY.bodyMax} class={field}>{draft.body}</textarea>
+        <span class="font-semibold">Nội dung</span>
+        <RichEditor name="body" html={sanitizeBody(draft.body)} />
       </div>
     </div>
 
@@ -215,18 +214,4 @@ const btn = "min-h-12 px-5 font-bold border-2";
     </div>
   </form>
 
-  <script>
-    const body = document.getElementById("body") as HTMLTextAreaElement | null;
-    document.getElementById("add-heading")?.addEventListener("click", () => {
-      if (!body) return;
-      const at = body.selectionStart ?? body.value.length;
-      const before = body.value.slice(0, at).replace(/\s+$/, "");
-      const after = body.value.slice(at).replace(/^\s+/, "");
-      const lead = before === "" ? "" : "\n\n";
-      body.value = `${before}${lead}## ${after === "" ? "" : "\n\n" + after}`.replace(/## $/, "## ");
-      const caret = before.length + lead.length + 3;
-      body.focus();
-      body.setSelectionRange(caret, caret);
-    });
-  </script>
 </AdminLayout>

@@ -8,15 +8,15 @@ import SiteHeader from "../../components/SiteHeader.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
 import { BRAND_INFO } from "../../data/courses";
 import { getDb } from "../../server/db";
-import { getPublishedBySlug, listImages, parseBody } from "../../server/posts";
+import { bodyHtml, bodyText, getPublishedBySlug, listImages } from "../../server/posts";
 
 const db = getDb();
 const post = getPublishedBySlug(db, Astro.params.slug ?? "");
 // Phản hồi 404 rỗng: Astro tự dựng trang 404.astro của site.
 if (!post) return new Response(null, { status: 404 });
 const images = listImages(db, post.id);
-const blocks = parseBody(post.body);
-const description = post.summary || blocks.find((b) => b.kind === "p")?.text.slice(0, 160) || post.title;
+const html = bodyHtml(post);
+const description = post.summary || bodyText(post).slice(0, 160) || post.title;
 const origin = Astro.site ?? Astro.url;
 const published = post.publishedAt ?? post.createdAt;
 const date = new Intl.DateTimeFormat("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", dateStyle: "long" }).format(published);
@@ -43,13 +43,7 @@ const [cover, ...rest] = images;
 
     {cover && <img src={`/uploads/${cover.file}`} alt={cover.caption || post.title} width="1600" class="mt-8 w-full h-auto bg-slate-100" />}
 
-    <div class="mt-8 space-y-5 text-base md:text-lg text-slate-700 leading-relaxed">
-      {blocks.map((block) =>
-        block.kind === "h2"
-          ? <h2 class="pt-4 text-xl md:text-2xl font-bold text-slate-900">{block.text}</h2>
-          : <p>{block.text}</p>
-      )}
-    </div>
+    <div class="gc-prose mt-8" set:html={html} />
 
     {rest.length > 0 && (
       <div class="mt-10 grid gap-4 sm:grid-cols-2">

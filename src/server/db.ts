@@ -87,6 +87,10 @@ const MIGRATIONS: string[] = [
   );
   CREATE INDEX post_images_post ON post_images (post_id, position);
   `,
+  // Bài viết trước đây là văn bản thuần ('text'); trình soạn thảo mới lưu HTML đã lọc ('html').
+  `
+  ALTER TABLE posts ADD COLUMN body_format TEXT NOT NULL DEFAULT 'text' CHECK (body_format IN ('text', 'html'));
+  `,
 ];
 
 export function migrate(db: Db): void {
