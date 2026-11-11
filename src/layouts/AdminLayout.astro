@@ -1,0 +1,82 @@
+---
+// src/layouts/AdminLayout.astro
+//
+// Khung chung của trang quản trị: thanh điều hướng bên trái (trên điện thoại nằm trên đầu),
+// nội dung tràn hết phần còn lại. Hình chữ nhật, không bo góc. Không được công cụ tìm kiếm lập chỉ mục.
+import Layout from "./Layout.astro";
+import type { SessionUser } from "../server/auth";
+
+interface Props {
+  title: string;
+  active: "tong-quan" | "bat-tat" | "bai-dang" | "tai-khoan" | "nhat-ky";
+  user: SessionUser;
+}
+
+const { title, active, user } = Astro.props;
+
+const NAV = [
+  { id: "tong-quan", href: "/quan-tri", label: "Tổng quan", adminOnly: false, soon: false },
+  { id: "bat-tat", href: "", label: "Bật/tắt tính năng", adminOnly: true, soon: true },
+  { id: "bai-dang", href: "", label: "Bài đăng", adminOnly: false, soon: true },
+  { id: "tai-khoan", href: "/quan-tri/tai-khoan", label: "Tài khoản", adminOnly: true, soon: false },
+  { id: "nhat-ky", href: "/quan-tri/nhat-ky", label: "Nhật ký thay đổi", adminOnly: true, soon: false },
+].filter((item) => !item.adminOnly || user.role === "admin");
+
+const roleLabel = user.role === "admin" ? "Quản trị" : "Biên tập";
+---
+
+<Layout
+  title={`${title} – Quản trị Global Chess`}
+  description="Trang quản trị nội bộ của Global Chess."
+  robots="noindex, nofollow"
+  canonical={false}
+  social={false}
+  bodyClass="min-h-dvh bg-slate-100 text-slate-900"
+>
+  <div class="min-h-dvh lg:grid lg:grid-cols-[17rem_1fr]">
+    <aside class="bg-brand-800 text-brand-100 flex flex-col lg:min-h-dvh">
+      <div class="px-6 py-5 border-b border-brand-600">
+        <p class="font-display text-xl font-extrabold text-white">GLOBAL CHESS</p>
+        <p class="text-sm text-brand-200">Trang quản trị</p>
+      </div>
+
+      <nav aria-label="Quản trị" class="flex flex-row flex-wrap lg:flex-col lg:flex-1">
+        {NAV.map((item) =>
+          item.soon ? (
+            <span class="px-6 py-3 text-brand-300 flex items-center justify-between gap-3 min-h-11 lg:border-b lg:border-brand-700" aria-disabled="true">
+              {item.label}
+              <span class="text-xs uppercase tracking-wide border border-brand-500 px-1.5 py-0.5">Sắp có</span>
+            </span>
+          ) : (
+            <a
+              href={item.href}
+              aria-current={item.id === active ? "page" : undefined}
+              class:list={[
+                "px-6 py-3 min-h-11 flex items-center font-semibold lg:border-b lg:border-brand-700 hover:bg-brand-700",
+                item.id === active ? "bg-brand-950 text-white border-l-4 border-l-amber-400" : "border-l-4 border-l-transparent",
+              ]}
+            >
+              {item.label}
+            </a>
+          ),
+        )}
+      </nav>
+
+      <div class="px-6 py-4 border-t border-brand-600 flex items-center justify-between gap-4 lg:block">
+        <p class="text-sm">
+          <span class="block font-semibold text-white">{user.displayName}</span>
+          <span class="text-brand-200">{roleLabel}</span>
+        </p>
+        <form method="post" action="/quan-tri/dang-xuat" class="lg:mt-3">
+          <button type="submit" class="min-h-11 px-4 font-semibold border-2 border-brand-300 text-white hover:bg-brand-700 w-full lg:w-auto">
+            Đăng xuất
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <main id="main" tabindex="-1" class="p-6 lg:p-10 min-w-0">
+      <slot />
+    </main>
+  </div>
+</Layout>

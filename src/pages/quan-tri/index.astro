@@ -1,0 +1,39 @@
+---
+// src/pages/quan-tri/index.astro
+export const prerender = false;
+
+import AdminLayout from "../../layouts/AdminLayout.astro";
+
+const user = Astro.locals.user!;
+const isAdmin = user.role === "admin";
+
+const TILES = [
+  { title: "Bật/tắt tính năng", text: "Ẩn hoặc hiện từng phần của trang chủ, đóng mở form đăng ký.", href: "", admin: true },
+  { title: "Bài đăng", text: "Soạn và xuất bản tin tức cho phụ huynh.", href: "", admin: false },
+  { title: "Tài khoản", text: "Thêm nhân viên, đặt lại mật khẩu, khoá tài khoản.", href: "/quan-tri/tai-khoan", admin: true },
+  { title: "Nhật ký thay đổi", text: "Ai đã đổi gì và lúc nào.", href: "/quan-tri/nhat-ky", admin: true },
+].filter((tile) => !tile.admin || isAdmin);
+---
+
+<AdminLayout title="Tổng quan" active="tong-quan" user={user}>
+  <h1 class="text-2xl lg:text-3xl font-extrabold">Xin chào, {user.displayName}</h1>
+  <p class="mt-1 text-slate-600">Chọn việc cần làm.</p>
+
+  <ul class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    {TILES.map((tile) => (
+      <li class="bg-white border-2 border-slate-200 p-5 flex flex-col gap-2 min-h-40">
+        <h2 class="text-lg font-bold">{tile.title}</h2>
+        <p class="text-slate-600 flex-1">{tile.text}</p>
+        {tile.href ? (
+          <a href={tile.href} class="min-h-11 inline-flex items-center justify-center bg-brand-800 text-white font-bold hover:bg-brand-700">
+            Mở
+          </a>
+        ) : (
+          <span class="min-h-11 inline-flex items-center justify-center border-2 border-slate-300 text-slate-500 font-semibold">
+            Sắp có
+          </span>
+        )}
+      </li>
+    ))}
+  </ul>
+</AdminLayout>

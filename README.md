@@ -21,6 +21,18 @@ Trang tĩnh, một trang duy nhất, có bàn cờ tương tác, gallery ảnh l
 | `npm run check` | Typecheck Astro + TypeScript |
 | `npm test` | Chạy test logic cờ vua |
 
+## Trang quản trị (`/quan-tri`)
+
+Đang phát triển trên nhánh `feat/admin-flags-posts`, chưa chạy trên Vercel (cần server Node).
+Tài khoản, nhật ký và (sắp tới) bài đăng lưu trong SQLite tại `$DATA_DIR/app.db`, mặc định `./data`.
+
+| Lệnh | Việc |
+| :--- | :--- |
+| `npm run admin:create -- ten.dang.nhap "Tên hiển thị"` | Tạo quản trị đầu tiên (mật khẩu được hỏi, hoặc đặt `ADMIN_PASSWORD`) |
+| `npm run build && node dist/server/entry.mjs` | Chạy bản production, cổng 4321 (đổi bằng `PORT`, `HOST`) |
+
+Thông số đăng nhập (số lần sai tối đa, thời gian khoá, độ dài mật khẩu, hạn phiên) nằm ở `src/server/policy.ts`.
+
 Dev server chạy nền thì dùng `npx astro dev --background`, quản lý bằng
 `npx astro dev status` / `stop` / `logs`.
 

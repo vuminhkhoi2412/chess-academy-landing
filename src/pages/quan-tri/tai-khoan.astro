@@ -1,0 +1,182 @@
+---
+// src/pages/quan-tri/tai-khoan.astro
+// Chỉ quản trị: thêm nhân viên, đặt lại mật khẩu, khoá/mở khoá, đổi quyền.
+export const prerender = false;
+
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import {
+  AuthError,
+  createUser,
+  listUsers,
+  resetPassword,
+  setActive,
+  setRole,
+  type Role,
+} from "../../server/auth";
+import { getDb } from "../../server/db";
+import { AUTH_POLICY } from "../../server/policy";
+import { formatTime } from "../../server/session";
+
+const me = Astro.locals.user!;
+if (me.role !== "admin") return Astro.redirect("/quan-tri");
+
+const db = getDb();
+const actor = { id: me.id, username: me.username };
+
+const DONE: Record<string, string> = {
+  created: "Đã tạo tài khoản.",
+  reset: "Đã đặt lại mật khẩu. Người đó cần đăng nhập lại.",
+  locked: "Đã khoá tài khoản.",
+  unlocked: "Đã mở khoá tài khoản.",
+  role: "Đã đổi quyền.",
+};
+
+let error = "";
+let kept = { username: "", displayName: "", role: "editor" as Role };
+
+if (Astro.request.method === "POST") {
+  const form = await Astro.request.formData();
+  const intent = String(form.get("intent") ?? "");
+  const userId = Number(form.get("user_id") ?? 0);
+  try {
+    if (intent === "create") {
+      kept = {
+        username: String(form.get("username") ?? ""),
+        displayName: String(form.get("display_name") ?? ""),
+        role: form.get("role") === "admin" ? "admin" : "editor",
+      };
+      createUser(db, { ...kept, password: String(form.get("password") ?? "") }, actor);
+      return Astro.redirect("/quan-tri/tai-khoan?ok=created");
+    }
+    if (intent === "reset") {
+      resetPassword(db, userId, String(form.get("password") ?? ""), actor);
+      return Astro.redirect("/quan-tri/tai-khoan?ok=reset");
+    }
+    if (intent === "lock" || intent === "unlock") {
+      if (intent === "lock" && userId === me.id) throw new AuthError("self", "Bạn không thể tự khoá tài khoản của mình.");
+      setActive(db, userId, intent === "unlock", actor);
+      return Astro.redirect(`/quan-tri/tai-khoan?ok=${intent === "lock" ? "locked" : "unlocked"}`);
+    }
+    if (intent === "role") {
+      const role: Role = form.get("role") === "admin" ? "admin" : "editor";
+      if (userId === me.id) throw new AuthError("self", "Bạn không thể tự đổi quyền của mình.");
+      setRole(db, userId, role, actor);
+      return Astro.redirect("/quan-tri/tai-khoan?ok=role");
+    }
+  } catch (caught) {
+    if (!(caught instanceof AuthError)) throw caught;
+    error = caught.message;
+    Astro.response.status = 400;
+  }
+}
+
+const done = DONE[Astro.url.searchParams.get("ok") ?? ""] ?? "";
+const users = listUsers(db);
+
+const ROLES: Array<{ value: Role; title: string; text: string }> = [
+  { value: "editor", title: "Biên tập", text: "Chỉ đăng và sửa bài viết." },
+  { value: "admin", title: "Quản trị", text: "Toàn quyền: bật/tắt, tài khoản, bài đăng." },
+];
+const input = "min-h-12 border-2 border-slate-300 bg-white px-3 text-base focus:border-brand-600 focus:outline-none w-full";
+---
+
+<AdminLayout title="Tài khoản" active="tai-khoan" user={me}>
+  <h1 class="text-2xl lg:text-3xl font-extrabold">Tài khoản</h1>
+
+  {done && <p role="status" class="mt-5 border-l-4 border-green-700 bg-white px-4 py-3 font-semibold text-green-800">{done}</p>}
+  {error && <p role="alert" class="mt-5 border-l-4 border-seal-red bg-white px-4 py-3 font-semibold text-seal-red">{error}</p>}
+
+  <section class="mt-8 bg-white border-2 border-slate-200 p-6">
+    <h2 class="text-lg font-bold">Thêm nhân viên</h2>
+    <form method="post" class="mt-4 grid gap-5 lg:grid-cols-2">
+      <input type="hidden" name="intent" value="create" />
+      <label class="flex flex-col gap-1.5">
+        <span class="font-semibold">Tên hiển thị</span>
+        <input name="display_name" value={kept.displayName} required class={input} />
+      </label>
+      <label class="flex flex-col gap-1.5">
+        <span class="font-semibold">Tên đăng nhập</span>
+        <input name="username" value={kept.username} required autocapitalize="none" spellcheck="false" class={input} />
+        <span class="text-sm text-slate-600">Chữ thường, số, dấu chấm hoặc gạch. Ví dụ: nv.lan</span>
+      </label>
+      <label class="flex flex-col gap-1.5">
+        <span class="font-semibold">Mật khẩu</span>
+        <input name="password" type="password" autocomplete="new-password" required minlength={AUTH_POLICY.minPasswordLength} class={input} />
+        <span class="text-sm text-slate-600">Ít nhất {AUTH_POLICY.minPasswordLength} ký tự.</span>
+      </label>
+      <fieldset class="flex flex-col gap-1.5">
+        <legend class="font-semibold mb-1.5">Quyền</legend>
+        <div class="grid gap-3 sm:grid-cols-2">
+          {ROLES.map((role) => (
+            <label class="cursor-pointer border-2 border-slate-300 p-3 has-[:checked]:border-brand-800 has-[:checked]:bg-brand-50 has-[:focus-visible]:outline has-[:focus-visible]:outline-2">
+              <input type="radio" name="role" value={role.value} checked={kept.role === role.value} class="sr-only" />
+              <span class="block font-bold">{role.title}</span>
+              <span class="block text-sm text-slate-600">{role.text}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <div class="lg:col-span-2">
+        <button type="submit" class="min-h-12 px-6 bg-brand-800 text-white font-bold hover:bg-brand-700">Tạo tài khoản</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="mt-8">
+    <h2 class="text-lg font-bold">Danh sách ({users.length})</h2>
+    <ul class="mt-4 flex flex-col gap-3">
+      {users.map((u) => (
+        <li class:list={["bg-white border-2 p-4 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start", u.active ? "border-slate-200" : "border-slate-300 bg-slate-50"]}>
+          <div>
+            <p class="font-bold text-lg">
+              {u.displayName}
+              {u.id === me.id && <span class="ml-2 text-sm font-semibold text-brand-700">(bạn)</span>}
+            </p>
+            <p class="text-slate-600 text-sm">
+              {u.username} ·{" "}
+              <span class="font-semibold text-slate-800">{u.role === "admin" ? "Quản trị" : "Biên tập"}</span> ·{" "}
+              {u.active ? "Đang hoạt động" : <span class="font-semibold text-seal-red">Đã khoá</span>} · Đăng nhập gần nhất:{" "}
+              {u.lastLoginAt ? formatTime(u.lastLoginAt) : "chưa bao giờ"}
+            </p>
+          </div>
+
+          <div class="flex flex-wrap gap-2 lg:justify-end">
+            {u.id !== me.id && (
+              <form method="post">
+                <input type="hidden" name="user_id" value={u.id} />
+                <input type="hidden" name="intent" value="role" />
+                <input type="hidden" name="role" value={u.role === "admin" ? "editor" : "admin"} />
+                <button type="submit" class="min-h-11 px-4 border-2 border-slate-400 font-semibold hover:bg-slate-100">
+                  {u.role === "admin" ? "Chuyển thành Biên tập" : "Chuyển thành Quản trị"}
+                </button>
+              </form>
+            )}
+            {u.id !== me.id && (
+              <form method="post">
+                <input type="hidden" name="user_id" value={u.id} />
+                <input type="hidden" name="intent" value={u.active ? "lock" : "unlock"} />
+                <button type="submit" class:list={["min-h-11 px-4 border-2 font-semibold", u.active ? "border-seal-red text-seal-red hover:bg-red-50" : "border-green-700 text-green-800 hover:bg-green-50"]}>
+                  {u.active ? "Khoá" : "Mở khoá"}
+                </button>
+              </form>
+            )}
+            <details class="w-full lg:w-auto">
+              <summary class="min-h-11 px-4 border-2 border-slate-400 font-semibold hover:bg-slate-100 inline-flex items-center cursor-pointer list-none">
+                Đặt lại mật khẩu
+              </summary>
+              <form method="post" class="mt-2 flex flex-wrap gap-2 items-end">
+                <input type="hidden" name="user_id" value={u.id} />
+                <input type="hidden" name="intent" value="reset" />
+                <label class="flex flex-col gap-1 grow">
+                  <span class="text-sm font-semibold">Mật khẩu mới (ít nhất {AUTH_POLICY.minPasswordLength} ký tự)</span>
+                  <input name="password" type="password" autocomplete="new-password" required minlength={AUTH_POLICY.minPasswordLength} class={input} />
+                </label>
+                <button type="submit" class="min-h-12 px-4 bg-brand-800 text-white font-bold hover:bg-brand-700">Lưu</button>
+              </form>
+            </details>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </section>
+</AdminLayout>
