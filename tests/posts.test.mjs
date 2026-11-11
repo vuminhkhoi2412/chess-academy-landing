@@ -156,7 +156,7 @@ test("lọc HTML: giữ định dạng cho phép, bỏ script, sự kiện, ifra
   assert.equal(sanitizeBody('<p><a href="javascript:alert(1)">x</a></p>'), '<p><a rel="noopener noreferrer nofollow">x</a></p>');
   assert.equal(sanitizeBody('<span style="position:fixed;color:#fff;background:url(x)">t</span>'), '<span style="color:#fff">t</span>');
   assert.equal(sanitizeBody('<span style="color:expression(alert(1))">t</span>'), "<span>t</span>");
-  assert.equal(sanitizeBody("<h1>Lớn</h1><h3>Nhỏ</h3>"), "<h2>Lớn</h2><h2>Nhỏ</h2>");
+  assert.equal(sanitizeBody("<h5>x</h5><h6>y</h6>"), "xy");
   assert.equal(sanitizeBody("<b>b</b><i>i</i>"), "<strong>b</strong><em>i</em>");
 });
 
@@ -198,4 +198,25 @@ test("bài cũ dạng văn bản thuần vẫn hiển thị đúng, thoát ký t
 
 test("hiển thị lọc lại bài HTML phòng khi DB bị sửa ngoài ứng dụng", () => {
   assert.equal(bodyHtml({ bodyFormat: "html", body: "<p>x</p><script>y()</script>" }), "<p>x</p>");
+});
+
+test("lọc HTML: giữ tiêu đề 1-4, căn lề hợp lệ, bỏ căn lề lạ và kiểu dáng khác trên đoạn", () => {
+  const ok = '<h1>A</h1><h2 style="text-align:center">B</h2><h3>C</h3><h4>D</h4><p style="text-align:justify">E</p>';
+  assert.equal(sanitizeBody(ok), ok);
+  assert.equal(sanitizeBody('<p style="text-align:evil;position:fixed;color:red">x</p>'), "<p>x</p>");
+  assert.equal(sanitizeBody('<p style="text-align: right">x</p>'), '<p style="text-align:right">x</p>');
+});
+
+test("lọc HTML: checklist giữ được, ô tích luôn bị khoá, không thể là loại input khác", () => {
+  const html = '<ul data-type="taskList"><li data-checked="true" data-type="taskItem"><label><input type="checkbox" checked="checked"><span></span></label><div><p>Xong</p></div></li></ul>';
+  const out = sanitizeBody(html);
+  assert.match(out, /<input type="checkbox" disabled="disabled" checked="checked" ?\/?>/);
+  assert.match(out, /<p>Xong<\/p>/);
+  assert.equal(sanitizeBody('<input type="text" value="x" onfocus="y()">'), '<input type="checkbox" disabled="disabled" />');
+  assert.equal(sanitizeBody('<input type="checkbox">'), '<input type="checkbox" disabled="disabled" />');
+});
+
+test("đoạn trống có căn lề cũng bị bỏ; htmlToText ngắt chữ giữa các tiêu đề", () => {
+  assert.equal(sanitizeBody('<p style="text-align:center"></p><p>x</p>'), "<p>x</p>");
+  assert.equal(htmlToText("<h1>Một</h1><h3>Hai</h3>"), "Một Hai");
 });

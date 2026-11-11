@@ -4,11 +4,12 @@ Việc đã chốt là sẽ làm nhưng chưa làm. Thứ tự dưới đây ch�
 
 ## Trình soạn bài (chắc chắn sẽ làm)
 
-Trình soạn hiện có: đậm, nghiêng, gạch chân, tiêu đề mục, danh sách chấm/số, liên kết, màu chữ (6 màu chọn nhanh + màu tự do). Bỏ qua tạm thời:
+Trình soạn hiện có: tiêu đề 1–4, danh sách chấm/số/ô tích, đậm, nghiêng, gạch chân, màu chữ, liên kết, căn lề, tìm/thay. Bỏ qua tạm thời:
 
 - **Chèn ảnh giữa bài.** Hiện ảnh chỉ ở đầu (ảnh bìa) và cuối bài. Cần giữ quy trình xác nhận phụ huynh đồng ý, xoá EXIF và thu nhỏ ảnh như ảnh đính kèm; thêm thẻ `img` vào danh sách lọc ở `src/server/rich-text.ts` chỉ cho đường dẫn `/uploads/...`.
 - **Bảng.** Thêm thẻ `table`, `tr`, `td`, `th` vào bộ lọc; cần kiểu hiển thị cuộn ngang trên điện thoại.
 - **Nhúng video** (YouTube...). Không cho `iframe` tự do; chỉ nhận một số tên miền và dựng iframe ở server từ địa chỉ đã kiểm tra, không lưu HTML iframe do người dùng gửi.
+- **Chưa thêm (mẫu Tiptap có, chưa ai yêu cầu):** gạch ngang chữ, trích dẫn, tô nền chữ, chỉ số trên/dưới, mã. Thêm khi cần.
 
 ## Bài đăng
 

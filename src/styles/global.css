@@ -1440,13 +1440,16 @@
   color: var(--color-slate-700);
 }
 .gc-prose > * + * { margin-top: 1.25rem; }
-.gc-prose h2 {
+.gc-prose h1, .gc-prose h2, .gc-prose h3, .gc-prose h4 {
   padding-top: 0.75rem;
-  font-size: 1.5rem;
   line-height: 1.3;
   font-weight: 700;
   color: var(--color-slate-900);
 }
+.gc-prose h1 { font-size: 1.875rem; }
+.gc-prose h2 { font-size: 1.5rem; }
+.gc-prose h3 { font-size: 1.25rem; }
+.gc-prose h4 { font-size: 1.125rem; }
 .gc-prose strong { font-weight: 700; color: var(--color-slate-900); }
 .gc-prose a { color: var(--color-brand-800); text-decoration: underline; text-underline-offset: 3px; }
 .gc-prose a:hover { color: var(--color-amber-700); }
@@ -1471,3 +1474,20 @@
   opacity: 0; pointer-events: none; transition: opacity 120ms;
 }
 .gc-tip:hover::after, .gc-tip:focus-visible::after { opacity: 1; }
+
+/* Danh sách có ô tích (checklist): ở trang công khai ô tích bị khoá, trong trình soạn bấm được. */
+.gc-prose ul[data-type="taskList"] { list-style: none; padding-left: 0; }
+.gc-prose ul[data-type="taskList"] > li { display: flex; align-items: flex-start; gap: 0.6rem; }
+.gc-prose ul[data-type="taskList"] > li > label { flex: none; margin-top: 0.4rem; }
+.gc-prose ul[data-type="taskList"] > li > label > span { display: none; }
+.gc-prose ul[data-type="taskList"] input[type="checkbox"] { width: 1.1rem; height: 1.1rem; accent-color: var(--color-brand-800); }
+.gc-prose ul[data-type="taskList"] > li > div { flex: 1; }
+.gc-prose ul[data-type="taskList"] > li > div > p { margin: 0; }
+.gc-prose ul[data-type="taskList"] > li[data-checked="true"] > div { color: var(--color-slate-500); text-decoration: line-through; }
+
+/* Kết quả tìm trong trình soạn bài. */
+.gc-search { background: var(--color-amber-200); }
+.gc-search--current { background: var(--color-amber-400); outline: 2px solid var(--color-amber-600); }
+
+/* Vòng tròn chọn màu có ô chú thích: không để chú thích bị cắt. */
+.gc-tip[aria-expanded="true"]::after { display: none; }
