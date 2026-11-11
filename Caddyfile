@@ -1,7 +1,8 @@
 # Caddy đứng trước ứng dụng: lo HTTPS (tự xin và gia hạn chứng chỉ khi SITE_ADDRESS là tên miền thật),
 # nén, giới hạn dung lượng và thêm các header chuẩn. Địa chỉ lấy từ SITE_ADDRESS trong .env:
-#   chạy thử trên máy:  SITE_ADDRESS=http://localhost:8080
+#   chạy thử trên máy:  SITE_ADDRESS=:80   (cổng 80 TRONG container; ngoài máy là HTTP_PORT, mặc định 8080)
 #   chạy thật:          SITE_ADDRESS=globalchess.edu.vn
+# Không đặt cổng khác 80/443 vào đây: Caddy sẽ nghe cổng đó trong container và compose không nối tới được.
 {$SITE_ADDRESS} {
 	encode zstd gzip
 

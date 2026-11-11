@@ -3,7 +3,7 @@
 Không cần VPS. Cần: Docker và Docker Compose. Chạy trong thư mục dự án.
 
 ```bash
-cp .env.example .env        # điền PUBLIC_GOOGLE_SHEETS_ENDPOINT; để SITE_ADDRESS=http://localhost:8080
+cp .env.example .env        # điền PUBLIC_GOOGLE_SHEETS_ENDPOINT; để nguyên SITE_ADDRESS (mặc định :80)
 docker compose up -d --build
 docker compose ps           # app phải "healthy"
 ```
