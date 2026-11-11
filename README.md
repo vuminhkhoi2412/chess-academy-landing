@@ -217,3 +217,7 @@ Trên macOS/Linux thì thay dòng thứ hai bằng `rm -rf node_modules/.vite`.
 Số tài khoản thật vẫn còn trong commit `9e05ddc`. Repo đang private nên chỉ người có
 quyền mới thấy lịch sử đó. Nếu sau này chuyển repo sang public thì phải viết lại lịch
 sử (`git filter-repo`) rồi `push --force`, chứ xoá trong file thôi là không đủ.
+
+## Chạy bằng Docker
+
+Xem [docs/docker-local.md](docs/docker-local.md): `docker compose up -d --build` chạy Astro + Caddy, dữ liệu trong volume.

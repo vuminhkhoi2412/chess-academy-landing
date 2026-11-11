@@ -43,3 +43,14 @@ export const POSTS_POLICY = {
   /** Số bài mỗi trang ở /tin-tuc. */
   perPage: 12,
 };
+
+/**
+ * Giới hạn xử lý ảnh `/_image` để một người không thể bắt server chạy sharp liên tục với kích thước tuỳ ý.
+ * Chỉ đếm lượt phải xử lý thật (không có trong bộ nhớ đệm); ảnh đã nhớ trả về ngay, không bị tính.
+ */
+export const IMAGE_LIMIT_POLICY = {
+  /** Số lượt xử lý ảnh mới tối đa mỗi phút cho mỗi địa chỉ IP. */
+  missesPerMinute: 60,
+  /** Chiều rộng ảnh tối đa được yêu cầu; trang chỉ dùng tới 2560. */
+  maxWidth: 2560,
+};

@@ -6,10 +6,13 @@ import { defineMiddleware } from "astro:middleware";
 import { getSessionUser } from "./server/auth";
 import { getDb } from "./server/db";
 import { ImageCache } from "./server/image-cache";
-import { SESSION_COOKIE } from "./server/session";
+import { IMAGE_LIMIT_POLICY } from "./server/policy";
+import { RateLimiter } from "./server/rate-limit";
+import { SESSION_COOKIE, clientIp } from "./server/session";
 
 const LOGIN_PATH = "/quan-tri/dang-nhap";
 const imageCache = new ImageCache();
+const imageLimiter = new RateLimiter(IMAGE_LIMIT_POLICY.missesPerMinute);
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
@@ -20,6 +23,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const key = context.url.search;
     const hit = imageCache.get(key);
     if (hit) return new Response(hit.body as BodyInit, { status: hit.status, headers: hit.headers });
+    const width = Number(context.url.searchParams.get("w") ?? 0);
+    if (width > IMAGE_LIMIT_POLICY.maxWidth) return new Response("Kích thước ảnh quá lớn", { status: 400 });
+    const ip = clientIp(context.request.headers, context.clientAddress);
+    if (!imageLimiter.take(ip)) {
+      return new Response("Quá nhiều yêu cầu, thử lại sau.", { status: 429, headers: { "Retry-After": "60" } });
+    }
     const response = await next();
     if (response.status === 200) {
       const body = new Uint8Array(await response.clone().arrayBuffer());

@@ -12,6 +12,7 @@ import {
   listPublished, parseBody, removeImage, setCover, setPublished, slugify, updatePost,
 } from "../src/server/posts.ts";
 import { UploadError, isUploadName, processImage } from "../src/server/uploads.ts";
+import { RateLimiter } from "../src/server/rate-limit.ts";
 
 const actor = { id: 1, username: "nv.lan" };
 const T0 = 1_800_000_000_000;
@@ -134,4 +135,14 @@ test("ảnh tải lên: thu nhỏ, đổi webp, xoá EXIF; từ chối file khô
   await assert.rejects(processImage(new Uint8Array(POSTS_POLICY.maxUploadBytes + 1)), UploadError);
   assert.ok(isUploadName("a".repeat(32) + ".webp"));
   assert.ok(!isUploadName("../etc/passwd"));
+});
+
+test("giới hạn tốc độ: vượt hạn mức thì từ chối, theo từng IP, và hết cửa sổ thì được lại", () => {
+  const limiter = new RateLimiter(2, 1000);
+  assert.ok(limiter.take("a", 0));
+  assert.ok(limiter.take("a", 10));
+  assert.ok(!limiter.take("a", 20));
+  assert.ok(limiter.take("b", 20));
+  assert.ok(!limiter.take("a", 999));
+  assert.ok(limiter.take("a", 1011));
 });

@@ -72,6 +72,9 @@ Quyết định đã làm, chờ chủ trung tâm xác nhận:
 - `DATA_DIR`: thư mục chứa `app.db`, mặc định `./data`. Trên VPS đặt ra ổ/volume được sao lưu.
 - `TRUST_PROXY=1`: bật khi chạy sau Caddy để lấy đúng IP khách (lấy phần tử **cuối** của `X-Forwarded-For`).
 - `security.allowedDomains` trong `astro.config.mjs`: phải khai tên miền thật, nếu không Astro từ chối mọi form POST sau proxy (lỗi 403).
+- `IMAGE_LIMIT_POLICY` (`policy.ts`): 60 lượt xử lý ảnh mới mỗi phút mỗi IP, chiều rộng tối đa 2560. Nhiều phụ huynh dùng chung một mạng (wifi trường) cùng mở trang chủ lúc chưa có ảnh trong bộ nhớ đệm có thể chạm mức này; nếu gặp thì tăng.
+- Caddy: giới hạn một request 70 MB (`Caddyfile`), tương ứng 8 ảnh x 8 MB.
+- Chưa bật HSTS; bật sau khi HTTPS ổn định.
 
 ## Chưa quyết định
 

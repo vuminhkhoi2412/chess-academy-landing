@@ -1,0 +1,37 @@
+# Chạy: docker compose up -d --build     (cần file .env, xem .env.example)
+# Dữ liệu (app.db + ảnh bài đăng) nằm trong volume `gc_data`, giữ nguyên khi build lại.
+services:
+  app:
+    build:
+      context: .
+      args:
+        PUBLIC_GOOGLE_SHEETS_ENDPOINT: ${PUBLIC_GOOGLE_SHEETS_ENDPOINT:?điền trong .env}
+    restart: unless-stopped
+    init: true
+    environment:
+      TRUST_PROXY: "1" # an toàn vì cổng của app không mở ra ngoài, chỉ Caddy gọi tới được
+    volumes:
+      - gc_data:/data
+    expose:
+      - "4321"
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-http://localhost:8080}
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+      - "${HTTPS_PORT:-8443}:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  gc_data:
+  caddy_data:
+  caddy_config:

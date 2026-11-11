@@ -1,0 +1,24 @@
+# Caddy đứng trước ứng dụng: lo HTTPS (tự xin và gia hạn chứng chỉ khi SITE_ADDRESS là tên miền thật),
+# nén, giới hạn dung lượng và thêm các header chuẩn. Địa chỉ lấy từ SITE_ADDRESS trong .env:
+#   chạy thử trên máy:  SITE_ADDRESS=http://localhost:8080
+#   chạy thật:          SITE_ADDRESS=globalchess.edu.vn
+{$SITE_ADDRESS} {
+	encode zstd gzip
+
+	# Một bài tối đa 8 ảnh x 8 MB cộng chữ.
+	request_body {
+		max_size 70MB
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options SAMEORIGIN
+		-Server
+	}
+
+	reverse_proxy app:4321 {
+		health_uri /healthz
+		health_interval 10s
+	}
+}
