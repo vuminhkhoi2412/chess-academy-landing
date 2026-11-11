@@ -7,7 +7,12 @@ import { Check, ArrowRight } from "lucide-react";
 import EnrolmentForm, { scrollToEnrolment } from "./EnrolmentForm";
 import PieceIcon from "./PieceIcon";
 
-export default function PricingAndCheckout() {
+interface Props {
+  /** false khi quản trị đã đóng form: ẩn form và mọi nút dẫn tới form, giữ nguyên bảng học phí. */
+  enrolmentOpen?: boolean;
+}
+
+export default function PricingAndCheckout({ enrolmentOpen = true }: Props) {
   return (
     <section id="pricing" className="relative overflow-hidden py-20 bg-brand-800 text-white">
       {/*
@@ -39,7 +44,10 @@ export default function PricingAndCheckout() {
             const multipleTiers = new Set(levels.map((level) => level.group24)).size > 1;
 
             return (
-              <article key={program.id} className={`gc-rate ${program.popular ? "gc-rate--pop" : ""}`}>
+              <article
+                key={program.id}
+                className={`gc-rate ${program.popular ? "gc-rate--pop" : ""} ${enrolmentOpen ? "" : "gc-rate--no-cta"}`}
+              >
                 <div className="flex items-start gap-4">
                   <div className="gc-rate__tile" aria-hidden="true">
                     <PieceIcon programId={program.id} className="size-10 text-amber-400" />
@@ -80,6 +88,7 @@ export default function PricingAndCheckout() {
                   </div>
                 </div>
 
+                {enrolmentOpen && (
                 <button
                   type="button"
                   onClick={scrollToEnrolment}
@@ -92,12 +101,14 @@ export default function PricingAndCheckout() {
                     <ArrowRight className="w-4 h-4" />
                   </span>
                 </button>
+                )}
               </article>
             );
           })}
         </div>
 
         {/* Form đăng ký học thử đặt thẳng trên trang, ngay dưới bảng giá. Neo #dang-ky là chính form. */}
+        {enrolmentOpen && (
         <div className="mt-20">
           <div className="mb-8 max-w-2xl">
             <h3 className="gc-section-title text-2xl font-extrabold md:text-3xl lg:text-4xl">
@@ -106,6 +117,7 @@ export default function PricingAndCheckout() {
           </div>
           <EnrolmentForm />
         </div>
+        )}
       </div>
 
     </section>

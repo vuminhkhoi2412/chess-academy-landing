@@ -1,0 +1,135 @@
+---
+// src/pages/quan-tri/bat-tat.astro
+// Chỉ quản trị: bật/tắt từng phần của trang chủ và soạn dòng thông báo. Có hiệu lực ngay ở lượt tải trang kế tiếp.
+export const prerender = false;
+
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { getDb } from "../../server/db";
+import {
+  CONFIRM_BEFORE_OFF,
+  FlagError,
+  getBannerText,
+  isFlagKey,
+  listFlagStates,
+  setBannerText,
+  setFlag,
+  type FlagKey,
+} from "../../server/flags";
+import { SITE_POLICY } from "../../server/policy";
+import { formatTime } from "../../server/session";
+
+const me = Astro.locals.user!;
+if (me.role !== "admin") return Astro.redirect("/quan-tri");
+
+const db = getDb();
+const actor = { id: me.id, username: me.username };
+
+let error = "";
+let confirming: FlagKey | null = null;
+let draftBanner: string | null = null;
+
+if (Astro.request.method === "POST") {
+  const form = await Astro.request.formData();
+  const intent = String(form.get("intent") ?? "");
+  try {
+    if (intent === "flag") {
+      const key = String(form.get("key") ?? "");
+      const enabled = form.get("enabled") === "1";
+      if (!isFlagKey(key)) throw new FlagError("unknown_flag", "Tính năng này không tồn tại.");
+      if (!enabled && CONFIRM_BEFORE_OFF.includes(key) && form.get("confirmed") !== "1") {
+        // Bước xác nhận chạy ở server: không phụ thuộc JavaScript trên trình duyệt.
+        confirming = key;
+      } else {
+        setFlag(db, key, enabled, actor);
+        return Astro.redirect(`/quan-tri/bat-tat?ok=${enabled ? "on" : "off"}`);
+      }
+    } else if (intent === "banner") {
+      draftBanner = String(form.get("text") ?? "");
+      setBannerText(db, draftBanner, actor);
+      return Astro.redirect("/quan-tri/bat-tat?ok=banner");
+    }
+  } catch (caught) {
+    if (!(caught instanceof FlagError)) throw caught;
+    error = caught.message;
+    Astro.response.status = 400;
+  }
+}
+
+const DONE: Record<string, string> = {
+  on: "Đã bật. Trang chủ cập nhật ở lần tải trang kế tiếp.",
+  off: "Đã tắt. Trang chủ cập nhật ở lần tải trang kế tiếp.",
+  banner: "Đã lưu nội dung thông báo.",
+};
+const done = DONE[Astro.url.searchParams.get("ok") ?? ""] ?? "";
+const states = listFlagStates(db);
+const bannerText = draftBanner ?? getBannerText(db);
+const confirmDef = states.find((state) => state.def.key === confirming)?.def;
+const choice = "min-h-12 px-5 font-bold border-2";
+---
+
+<AdminLayout title="Bật/tắt tính năng" active="bat-tat" user={me}>
+  <h1 class="text-2xl lg:text-3xl font-extrabold">Bật/tắt tính năng</h1>
+  <p class="mt-2 text-slate-600">Thay đổi có hiệu lực ngay khi phụ huynh tải lại trang chủ, không cần chờ.</p>
+
+  {done && <p role="status" class="mt-5 border-l-4 border-green-700 bg-white px-4 py-3 font-semibold text-green-800">{done}</p>}
+  {error && <p role="alert" class="mt-5 border-l-4 border-seal-red bg-white px-4 py-3 font-semibold text-seal-red">{error}</p>}
+
+  {confirmDef && (
+    <section role="alertdialog" aria-labelledby="confirm-title" class="mt-6 border-2 border-seal-red bg-white p-6">
+      <h2 id="confirm-title" class="text-lg font-extrabold">Tắt "{confirmDef.label}"?</h2>
+      <p class="mt-2">{confirmDef.whenOff}</p>
+      <p class="mt-2 font-semibold">Trong lúc tắt, phụ huynh không thể đăng ký trên web.</p>
+      <form method="post" class="mt-5 flex flex-wrap gap-3">
+        <input type="hidden" name="intent" value="flag" />
+        <input type="hidden" name="key" value={confirmDef.key} />
+        <input type="hidden" name="enabled" value="0" />
+        <input type="hidden" name="confirmed" value="1" />
+        <button type="submit" class={`${choice} border-seal-red bg-seal-red text-white`}>Có, tắt đăng ký</button>
+        <a href="/quan-tri/bat-tat" class={`${choice} inline-flex items-center border-slate-400 bg-white`}>Không, giữ nguyên</a>
+      </form>
+    </section>
+  )}
+
+  <ul class="mt-8 grid gap-4">
+    {states.map(({ def, enabled, updatedAt, updatedBy }) => (
+      <li class="bg-white border-2 border-slate-200 p-5 lg:p-6">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div class="max-w-2xl">
+            <h2 class="text-lg font-bold">{def.label}</h2>
+            <p class="mt-1 text-slate-700">{def.description}</p>
+            <p class="mt-1 text-sm text-slate-600"><strong>Khi tắt:</strong> {def.whenOff}</p>
+            <p class="mt-2 text-sm text-slate-500">
+              {updatedAt ? `Chỉnh lần cuối: ${updatedBy ?? "?"}, ${formatTime(updatedAt)}` : "Chưa ai chỉnh (đang theo mặc định)."}
+            </p>
+          </div>
+          <form method="post" class="flex flex-col items-start gap-2" aria-label={def.label}>
+            <input type="hidden" name="intent" value="flag" />
+            <input type="hidden" name="key" value={def.key} />
+            <p class={`font-extrabold ${enabled ? "text-green-800" : "text-slate-600"}`}>
+              Đang {enabled ? "BẬT" : "TẮT"}
+            </p>
+            <div class="flex">
+              <button type="submit" name="enabled" value="1" aria-pressed={enabled}
+                class={`${choice} ${enabled ? "border-green-800 bg-green-800 text-white" : "border-slate-300 bg-white hover:bg-slate-50"}`}>Bật</button>
+              <button type="submit" name="enabled" value="0" aria-pressed={!enabled}
+                class={`${choice} border-l-0 ${!enabled ? "border-slate-700 bg-slate-700 text-white" : "border-slate-300 bg-white hover:bg-slate-50"}`}>Tắt</button>
+            </div>
+          </form>
+        </div>
+
+        {def.key === "banner" && (
+          <form method="post" class="mt-5 border-t-2 border-slate-100 pt-5">
+            <input type="hidden" name="intent" value="banner" />
+            <label class="flex flex-col gap-1.5">
+              <span class="font-semibold">Nội dung thông báo</span>
+              <textarea name="text" rows="2" maxlength={SITE_POLICY.bannerMaxLength} id="banner-text"
+                class="border-2 border-slate-300 bg-white p-3 text-base focus:border-brand-600 focus:outline-none w-full">{bannerText}</textarea>
+              <span class="text-sm text-slate-600">Tối đa {SITE_POLICY.bannerMaxLength} ký tự, một dòng. Nội dung chỉ hiện khi mục này đang BẬT.</span>
+            </label>
+            <button type="submit" class="mt-3 min-h-12 px-6 bg-brand-800 text-white font-bold hover:bg-brand-700">Lưu nội dung</button>
+          </form>
+        )}
+      </li>
+    ))}
+  </ul>
+</AdminLayout>

@@ -16,7 +16,7 @@ const { title, active, user } = Astro.props;
 
 const NAV = [
   { id: "tong-quan", href: "/quan-tri", label: "Tổng quan", adminOnly: false, soon: false },
-  { id: "bat-tat", href: "", label: "Bật/tắt tính năng", adminOnly: true, soon: true },
+  { id: "bat-tat", href: "/quan-tri/bat-tat", label: "Bật/tắt tính năng", adminOnly: true, soon: false },
   { id: "bai-dang", href: "", label: "Bài đăng", adminOnly: false, soon: true },
   { id: "tai-khoan", href: "/quan-tri/tai-khoan", label: "Tài khoản", adminOnly: true, soon: false },
   { id: "nhat-ky", href: "/quan-tri/nhat-ky", label: "Nhật ký thay đổi", adminOnly: true, soon: false },

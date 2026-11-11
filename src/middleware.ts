@@ -5,13 +5,29 @@
 import { defineMiddleware } from "astro:middleware";
 import { getSessionUser } from "./server/auth";
 import { getDb } from "./server/db";
+import { ImageCache } from "./server/image-cache";
 import { SESSION_COOKIE } from "./server/session";
 
 const LOGIN_PATH = "/quan-tri/dang-nhap";
+const imageCache = new ImageCache();
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
   const inAdmin = pathname === "/quan-tri" || pathname.startsWith("/quan-tri/");
+
+  // Ảnh đã xử lý: nhớ trong RAM theo URL đầy đủ (có cả kích thước, định dạng) để lượt sau khỏi chạy sharp.
+  if (pathname === "/_image" && context.request.method === "GET") {
+    const key = context.url.search;
+    const hit = imageCache.get(key);
+    if (hit) return new Response(hit.body as BodyInit, { status: hit.status, headers: hit.headers });
+    const response = await next();
+    if (response.status === 200) {
+      const body = new Uint8Array(await response.clone().arrayBuffer());
+      imageCache.set(key, { status: 200, headers: [...response.headers], body });
+    }
+    return response;
+  }
+
   if (!inAdmin) return next();
 
   const token = context.cookies.get(SESSION_COOKIE)?.value ?? "";

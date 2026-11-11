@@ -11,8 +11,14 @@
 // trang điều khoản vẫn tới đúng mục.
 import { BRAND_INFO } from "../data/courses";
 
+interface Props {
+  /** Trang chủ truyền false khi quản trị đã ẩn mục hỏi đáp, để không còn liên kết tới mục không có. */
+  faq?: boolean;
+}
+const { faq = true } = Astro.props;
+
 const FOOTER_LINKS = [
-  { href: "/#faq", label: "Câu hỏi thường gặp" },
+  ...(faq ? [{ href: "/#faq", label: "Câu hỏi thường gặp" }] : []),
   { href: "/chinh-sach-bao-mat", label: "Chính sách bảo mật" },
   { href: "/dieu-khoan-su-dung", label: "Điều khoản sử dụng" },
   { href: "#main", label: "Về đầu trang" },

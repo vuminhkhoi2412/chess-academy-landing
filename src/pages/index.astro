@@ -1,4 +1,5 @@
 ---
+export const prerender = false;
 // src/pages/index.astro
 import { Image, getImage } from "astro:assets";
 import type { ImageMetadata } from "astro";
@@ -9,6 +10,7 @@ import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import MobileContactBar from "../components/MobileContactBar.astro";
 import Layout from "../layouts/Layout.astro";
+import { getSiteConfig } from "../server/site-config";
 import { BRAND_INFO, BRANCHES, CURRICULUM_PROGRAMS, TUITION_PROGRAMS, TUITION_LEVELS, TESTIMONIALS, FAQS } from "../data/courses";
 import galleryCoachStudent from "../assets/images/gallery-coach-student.jpg";
 import faceBe1 from "../assets/images/anh_chan_dung/chan_dung_be_1.jpg";
@@ -59,12 +61,18 @@ const GALLERY_SOURCES = [
   { src: galleryClassroom, alt: "Phòng học cờ vua tại một cơ sở Global Chess, các học viên đang luyện tập." },
   { src: galleryClassCoach, alt: "Giáo viên đứng lớp và theo dõi các học viên luyện tập cờ vua tại Global Chess." },
 ];
-const GALLERY = await Promise.all(
-  GALLERY_SOURCES.map(async (photo) => ({
-    ...photo,
-    full: (await getImage({ src: photo.src, width: Math.min(1600, photo.src.width), quality: 82 })).src,
-  })),
-);
+// Cấu hình bật/tắt đọc ở MỖI request (trang này chạy trên server), nên đổi trong /quan-tri có hiệu lực ngay.
+const { flags, banner } = getSiteConfig();
+
+// Chỉ xử lý ảnh gallery khi mục ảnh đang bật.
+const GALLERY = flags.gallery
+  ? await Promise.all(
+      GALLERY_SOURCES.map(async (photo) => ({
+        ...photo,
+        full: (await getImage({ src: photo.src, width: Math.min(1600, photo.src.width), quality: 82 })).src,
+      })),
+    )
+  : [];
 
 // Ảnh từng cơ sở. Cơ sở nào chưa có ảnh thì thẻ rơi về ô bàn cờ có mã cơ sở.
 const BRANCH_PHOTOS: Record<string, { src: ImageMetadata; alt: string; pos?: string }> = {
@@ -149,7 +157,7 @@ const structuredData = {
   title={pageTitle}
   description={pageDescription}
   robots="index, follow, max-image-preview:large"
-  bodyClass="pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:pb-0"
+  bodyClass={flags.mobile_bar ? "pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:pb-0" : undefined}
 >
   {/*
     Phông riêng của vé xác nhận (chỉ trang chủ có vé). Trình duyệt chỉ tải tệp phông khi chữ dùng nó
@@ -166,6 +174,12 @@ const structuredData = {
     is:inline
     set:html={JSON.stringify(structuredData).replace(/</g, "\\u003c")}
   />
+
+    {banner && (
+      <div role="region" aria-label="Thông báo" class="bg-amber-400 text-slate-950 px-4 py-2.5 text-center text-sm font-bold">
+        {banner}
+      </div>
+    )}
 
     <!-- Top Hotline Bar -->
     <div class="bg-brand-800 text-brand-100 text-xs py-2 px-4">
@@ -184,7 +198,7 @@ const structuredData = {
     </div>
 
     <!-- Navbar -->
-    <SiteHeader />
+    <SiteHeader enrolmentOpen={flags.enrolment} />
 
     <main id="main" tabindex="-1">
     <!-- Hero Section -->
@@ -231,12 +245,13 @@ const structuredData = {
               nhau; nay lối xem lộ trình lùi về thành một liên kết có gạch chân.
             */}
             <a href="#pricing" class="gc-move gc-move--navy gc-move--lg">
-              <span class="gc-move__label">Đăng ký tư vấn</span>
+              <span class="gc-move__label">{flags.enrolment ? "Đăng ký tư vấn" : "Xem học phí"}</span>
               <span class="gc-move__go" aria-hidden="true"><ArrowRight className="w-4 h-4" /></span>
             </a>
             <a href="#curriculum" class="gc-ref min-h-11">Xem chi tiết lộ trình</a>
           </div>
 
+          {flags.testimonials && (
           <div class="flex max-w-[34rem] flex-wrap items-center gap-3.5">
             <div class="flex" aria-hidden="true">
               {heroFaces.map((f) => (
@@ -256,6 +271,7 @@ const structuredData = {
               <figcaption class="mt-1 text-xs text-slate-600">{heroQuote.author} · {heroQuote.branch}</figcaption>
             </figure>
           </div>
+          )}
 
           <dl class="grid w-full max-w-lg grid-cols-3 overflow-hidden rounded-card border border-slate-200/90 bg-white/60 shadow-soft backdrop-blur">
             {heroStats.map((s) => (
@@ -269,6 +285,7 @@ const structuredData = {
         </div>
 
         <!-- Interactive Chessboard Island, chỉ từ md (768px) trở lên, lifted off the page with a soft ground shadow -->
+        {flags.puzzle && (
         <div class="hidden md:block md:col-span-6 lg:col-span-5 relative lg:mt-2">
           <div
             aria-hidden="true"
@@ -279,6 +296,7 @@ const structuredData = {
             <InteractivePuzzle client:media="(min-width: 768px)" />
           </div>
         </div>
+        )}
       </div>
     </section>
 
@@ -364,6 +382,7 @@ const structuredData = {
                       Chỉ đường
                     </a>
                     {/* Nhãn đọc được phải chứa đúng chữ hiển thị "Chọn cơ sở này"; tên cơ sở nối thêm để phân biệt các thẻ. */}
+                    {flags.enrolment && (
                     <a
                       href="#dang-ky"
                       data-branch={branch.id}
@@ -372,6 +391,7 @@ const structuredData = {
                     >
                       Chọn cơ sở này <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
                     </a>
+                    )}
                   </div>
                 </div>
               </article>
@@ -406,6 +426,7 @@ const structuredData = {
       Không dùng ảnh stock và không gắn tên cơ sở: nguồn ảnh không ghi rõ ảnh
       chụp tại cơ sở nào, nên caption/alt chỉ mô tả đúng những gì nhìn thấy.
     -->
+{flags.gallery && (
     <section id="hinh-anh" class="py-16 bg-cream border-t border-slate-200">
       <div class="max-w-6xl mx-auto px-4">
         <div class="grid lg:grid-cols-12 gap-4 lg:gap-8 lg:items-end">
@@ -477,11 +498,13 @@ const structuredData = {
         </dialog>
       </div>
     </section>
+    )}
 
     <!--
       Nhận xét phụ huynh: lời trích nguyên văn trong TESTIMONIALS (src/data/courses.ts),
       dựng thành khung chat. Avatar là chữ viết tắt tên bé, không dùng ảnh trẻ em.
     -->
+{flags.testimonials && (
     <section id="phu-huynh" class="py-16 border-t border-slate-200">
       <div class="max-w-6xl mx-auto px-4">
         <div class="grid gap-4 lg:grid-cols-12 lg:items-end mb-10">
@@ -513,11 +536,13 @@ const structuredData = {
         </div>
       </div>
     </section>
+    )}
 
     <!--
       Câu hỏi thường gặp. Dùng <details> gốc nên bàn phím, trình đọc màn hình và
       Ctrl+F đều hoạt động mà không cần script; mỗi câu mở độc lập.
     -->
+{flags.faq && (
     <section id="faq" class="py-16 bg-white border-t border-slate-200">
       <div class="max-w-6xl mx-auto px-4">
         <div class="max-w-2xl">
@@ -538,14 +563,15 @@ const structuredData = {
         </div>
       </div>
     </section>
+    )}
 
     <!-- Pricing & Enrolment Form -->
-    <PricingAndCheckout client:load />
+    <PricingAndCheckout client:load enrolmentOpen={flags.enrolment} />
     </main>
 
-    <SiteFooter />
+    <SiteFooter faq={flags.faq} />
 
-    <MobileContactBar />
+    {flags.mobile_bar && <MobileContactBar />}
 
     <script is:inline>
       // Progressive enhancement: clicking a branch card selects that branch in the enrolment form

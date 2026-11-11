@@ -231,6 +231,11 @@
       align-items: center;
       padding-left: 1.75rem;
     }
+
+    /* Khi form đăng ký đóng, hàng học phí không còn cột nút. */
+    .gc-rate--no-cta {
+      grid-template-columns: minmax(0, 1fr) 15rem;
+    }
   }
 
   /*

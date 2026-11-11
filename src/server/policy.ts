@@ -15,3 +15,15 @@ export const AUTH_POLICY = {
   /** Độ dài mật khẩu tối thiểu, tính theo ký tự. */
   minPasswordLength: 10,
 } as const;
+
+export const SITE_POLICY = {
+  /** Độ dài tối đa của dòng thông báo đầu trang, tính theo ký tự. */
+  bannerMaxLength: 160,
+} as const;
+
+/** Bộ nhớ đệm ảnh `/_image` trong RAM (xem src/server/image-cache.ts). Chỉnh theo RAM của máy chủ. */
+export const IMAGE_CACHE_POLICY = {
+  maxEntries: 400,
+  maxTotalBytes: 64 * 1024 * 1024,
+  maxEntryBytes: 3 * 1024 * 1024,
+};

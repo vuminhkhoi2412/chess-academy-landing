@@ -49,6 +49,20 @@ const MIGRATIONS: string[] = [
   );
   CREATE INDEX audit_at ON audit_log(at DESC);
   `,
+  `
+  CREATE TABLE feature_flags (
+    key        TEXT PRIMARY KEY,
+    enabled    INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    updated_by TEXT
+  );
+  CREATE TABLE site_settings (
+    key        TEXT PRIMARY KEY,
+    value      TEXT NOT NULL,
+    updated_at INTEGER NOT NULL,
+    updated_by TEXT
+  );
+  `,
 ];
 
 export function migrate(db: Db): void {
