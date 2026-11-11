@@ -1,0 +1,47 @@
+---
+// src/components/home/TestimonialsSection.astro
+// Nhận xét phụ huynh: lời trích nguyên văn trong TESTIMONIALS, dựng thành khung chat.
+import { TESTIMONIALS } from "../../data/courses";
+
+/** "Phụ huynh bé Bảo Khang" → "BK" cho avatar. */
+const initials = (author: string) => {
+  const w = author.replace("Phụ huynh bé ", "").split(" ");
+  return (w[0][0] + w[w.length - 1][0]).toUpperCase();
+};
+---
+
+<!--
+  Nhận xét phụ huynh: lời trích nguyên văn trong TESTIMONIALS (src/data/courses.ts),
+  dựng thành khung chat. Avatar là chữ viết tắt tên bé, không dùng ảnh trẻ em.
+-->
+<section id="phu-huynh" class="py-16 border-t border-slate-200">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="grid gap-4 lg:grid-cols-12 lg:items-end mb-10">
+      <div class="lg:col-span-8">
+        <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold">Phụ huynh nói gì về Global Chess</h2>
+      </div>
+      <p class="lg:col-span-4 text-sm text-slate-600 leading-relaxed lg:pb-1 lg:text-right">
+        Trích nguyên văn chia sẻ của phụ huynh, ghi theo cơ sở bé đang học.
+      </p>
+    </div>
+
+    <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+      {TESTIMONIALS.map((item) => (
+        <figure class="flex flex-col overflow-hidden rounded-card border border-slate-200/90 bg-white shadow-soft">
+          <figcaption class="flex items-center gap-3 bg-brand-800 px-4 py-3.5 text-white">
+            <span aria-hidden="true" class="flex size-10 flex-none items-center justify-center rounded-full bg-brand-600 text-[0.8125rem] font-bold leading-none text-amber-400">{initials(item.author)}</span>
+            <div>
+              <b class="block text-[0.9375rem] leading-snug">{item.author}</b>
+              <span class="block text-[0.8125rem] leading-snug text-brand-200">{item.branch}</span>
+            </div>
+          </figcaption>
+          <div class="flex-1 bg-brand-50 px-4 pb-4 pt-5">
+            <blockquote class="max-w-[92%] rounded-[1.125rem_1.125rem_1.125rem_0.25rem] bg-white px-4 py-3 text-base leading-relaxed text-slate-900 shadow-sm">
+              {item.quote}
+            </blockquote>
+          </div>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>

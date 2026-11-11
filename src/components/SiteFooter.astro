@@ -1,15 +1,10 @@
 ---
 // src/components/SiteFooter.astro
 //
-// Chân trang dùng chung cho cả bốn trang. Trước đây khối này chỉ nằm trong
-// index.astro, nên hai trang nội dung (điều khoản, bảo mật) và trang 404 kết
-// thúc giữa trang với đúng một liên kết quay về. Tách ra đây để mọi trang có
-// cùng lối đi: câu hỏi thường gặp, chính sách bảo mật, điều khoản, về đầu trang.
-//
-// "Về đầu trang" trỏ tới #main, nên mọi trang dùng chân trang này phải có
-// <main id="main">. "Câu hỏi thường gặp" trỏ tuyệt đối về trang chủ để bấm từ
-// trang điều khoản vẫn tới đúng mục.
-import { BRAND_INFO } from "../data/courses";
+// Chân trang dùng chung cho mọi trang: sơ đồ trang, danh sách cơ sở, Facebook và lối vào
+// đăng nhập của nhân viên (nhỏ, ở dòng cuối). Mọi liên kết tuyệt đối để dùng được từ trang con.
+// "Về đầu trang" trỏ tới #main, nên mọi trang dùng chân trang này phải có <main id="main">.
+import { BRAND_INFO, BRANCHES } from "../data/courses";
 
 interface Props {
   /** Trang chủ truyền false khi quản trị đã ẩn mục hỏi đáp, để không còn liên kết tới mục không có. */
@@ -19,32 +14,69 @@ interface Props {
 }
 const { faq = true, news = false } = Astro.props;
 
-const FOOTER_LINKS = [
-  ...(faq ? [{ href: "/#faq", label: "Câu hỏi thường gặp" }] : []),
+// Trang /courses, /branches, /trial chưa có (đợt 5): tạm trỏ tới các mục của trang chủ.
+const SITEMAP = [
+  { href: "/#curriculum", label: "Lộ trình học" },
+  { href: "/#pricing", label: "Học phí & đăng ký" },
+  { href: "/#branches", label: "Hệ thống cơ sở" },
   ...(news ? [{ href: "/news", label: "Tin tức" }] : []),
+  ...(faq ? [{ href: "/#faq", label: "Câu hỏi thường gặp" }] : []),
+];
+const LEGAL = [
   { href: "/privacy-policy", label: "Chính sách bảo mật" },
   { href: "/terms", label: "Điều khoản sử dụng" },
   { href: "#main", label: "Về đầu trang" },
 ];
+const LINK = "inline-flex min-h-11 items-center hover:text-white hover:underline transition-colors md:min-h-8";
+const HEADING = "mb-2 text-sm font-bold text-white";
 ---
 
-<footer class="py-10 bg-brand-950 text-brand-200 text-xs border-t border-brand-800">
-  <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
-    <div class="text-center md:text-left">
-      <div class="font-bold text-white text-sm">{BRAND_INFO.name} – "{BRAND_INFO.slogan1}"</div>
+<footer class="border-t border-brand-800 bg-brand-950 py-10 text-xs text-brand-200">
+  <div class="mx-auto grid max-w-6xl gap-8 px-4 md:grid-cols-12">
+    <div class="md:col-span-4">
+      <div class="text-sm font-bold text-white">{BRAND_INFO.name} – "{BRAND_INFO.slogan1}"</div>
       <div class="mt-1">{BRAND_INFO.slogan2}</div>
-    </div>
-    <nav class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1" aria-label="Liên kết chân trang">
-      {FOOTER_LINKS.map((link) => (
-        <a href={link.href} class="inline-flex min-h-11 items-center hover:text-white hover:underline transition-colors md:min-h-0">{link.label}</a>
-      ))}
-    </nav>
-    <div class="text-center md:text-right space-y-1">
-      <div>Hotline: <strong class="text-white tabular-nums">{BRAND_INFO.hotlines.join(" – ")}</strong></div>
-      <div>
-        <a href={BRAND_INFO.facebookPage} target="_blank" rel="noreferrer" class="inline-flex min-h-11 items-center font-semibold text-white hover:underline md:min-h-0">Facebook Global Chess</a>
+      <div class="mt-4">
+        Hotline: <strong class="tabular-nums text-white">{BRAND_INFO.hotlines.join(" – ")}</strong>
       </div>
-      <div>© {new Date().getFullYear()} Global Chess. Bảo lưu mọi quyền.</div>
+      <a href={BRAND_INFO.facebookPage} target="_blank" rel="noopener noreferrer" class={`${LINK} font-semibold text-white`}>
+        Facebook Global Chess<span class="sr-only"> (mở tab mới)</span>
+      </a>
+    </div>
+
+    <nav class="md:col-span-3" aria-label="Sơ đồ trang">
+      <h2 class={HEADING}>Sơ đồ trang</h2>
+      <ul class="list-none">
+        {SITEMAP.map((link) => <li><a href={link.href} class={LINK}>{link.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <section class="md:col-span-5" aria-labelledby="footer-branches">
+      <h2 id="footer-branches" class={HEADING}>Cơ sở</h2>
+      <ul class="list-none space-y-2">
+        {
+          BRANCHES.map((branch) => (
+            <li>
+              <span class="font-semibold text-white">{branch.name}</span>
+              <br />
+              {branch.address} ·{" "}
+              <a href={`tel:${branch.phone ?? BRAND_INFO.hotlines[0]}`} class="tabular-nums hover:text-white hover:underline">
+                {branch.phone ?? BRAND_INFO.hotlines[0]}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+
+  <div class="mx-auto mt-8 flex max-w-6xl flex-col items-center justify-between gap-2 border-t border-brand-800 px-4 pt-5 md:flex-row">
+    <nav class="flex flex-wrap items-center justify-center gap-x-5" aria-label="Liên kết pháp lý">
+      {LEGAL.map((link) => <a href={link.href} class={LINK}>{link.label}</a>)}
+    </nav>
+    <div class="flex flex-wrap items-center justify-center gap-x-4">
+      <span>© {new Date().getFullYear()} Global Chess. Bảo lưu mọi quyền.</span>
+      <a href="/admin/login" class="inline-flex min-h-11 items-center text-brand-300 hover:text-white hover:underline md:min-h-8">Dành cho nhân viên</a>
     </div>
   </div>
 </footer>

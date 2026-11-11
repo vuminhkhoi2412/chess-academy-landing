@@ -35,7 +35,7 @@ const [cover, ...rest] = images;
 
 <Layout title={`${post.title} – ${BRAND_INFO.name}`} description={description}>
   <script type="application/ld+json" slot="head" set:html={jsonLd} />
-  <SiteHeader variant="document" />
+  <SiteHeader hasNews />
   <main id="main" tabindex="-1" class="max-w-3xl mx-auto px-4 py-12 md:py-16">
     <a href="/news" class="text-sm font-semibold text-brand-800 underline">← Tin tức</a>
     <p class="mt-6 text-xs font-bold text-slate-600">{date}</p>

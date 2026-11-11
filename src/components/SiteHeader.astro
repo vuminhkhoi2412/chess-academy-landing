@@ -1,180 +1,200 @@
 ---
 // src/components/SiteHeader.astro
 //
-// Thanh điều hướng dùng chung cho cả bốn trang. Trang chủ cần nav neo trong trang
-// và nút đăng ký; ba trang nội dung (điều khoản, bảo mật, lỗi 404) chỉ cần lối về
-// trang chủ. Phần khung sticky và logo được tách ra đây thay vì chép lại ở từng trang.
+// Đầu trang dùng chung cho mọi trang: thanh trên (hotline, Facebook, bản đồ, nút học thử)
+// và thanh menu có mục thả xuống. Mọi liên kết là đường dẫn tuyệt đối ("/#pricing") nên bấm
+// từ trang con vẫn về đúng mục của trang chủ.
 //
-// Trang chủ còn có menu di động: dưới breakpoint md, nav neo trong trang thu vào
-// một nút mở/đóng để phụ huynh dùng điện thoại vẫn tới được mọi mục.
-import { ArrowLeft, ArrowRight, Menu, Phone, X } from "lucide-react";
-import { BRAND_INFO } from "../data/courses";
+// Mục thả xuống: rê chuột là mở; bàn phím và cảm ứng dùng nút mũi tên cạnh mục cha
+// (aria-expanded), Esc đóng. Mục cha vẫn là liên kết thật nên không có JS vẫn đi được.
+// Dưới md menu thu vào nút hamburger, các mục con xếp thẳng dưới mục cha.
+import { ArrowRight, ChevronDown, Menu, Phone, X, MapPin } from "lucide-react";
+import { BRAND_INFO, BRANCHES } from "../data/courses";
 
 interface Props {
-  /** "home": nav neo trong trang + CTA đăng ký. "document": link về trang chủ. */
-  variant?: "home" | "document";
   /** Trang chủ truyền false khi quản trị đã đóng form đăng ký: nhãn đổi sang "Học phí". */
   enrolmentOpen?: boolean;
-  /** Có ít nhất một bài đã đăng thì menu trang chủ có thêm "Tin tức". */
+  /** Có ít nhất một bài đã đăng thì menu có thêm "Tin tức". */
   hasNews?: boolean;
 }
 
-const { variant = "home", enrolmentOpen = true, hasNews = false } = Astro.props;
-const isHome = variant === "home";
+const { enrolmentOpen = true, hasNews = false } = Astro.props;
 
-const NAV_LINKS = [
-  { href: "#curriculum", label: "Lộ trình" },
-  { href: "#branches", label: "Hệ thống trung tâm" },
-  { href: "#pricing", label: enrolmentOpen ? "Đăng ký & học phí" : "Học phí" },
-  ...(hasNews ? [{ href: "/news", label: "Tin tức" }] : []),
+// Trang /courses, /branches, /trial chưa có (đợt 5): tạm trỏ tới các mục của trang chủ.
+const NAV: { label: string; href: string; children?: { label: string; href: string }[] }[] = [
+  {
+    label: "Khoá học",
+    href: "/#curriculum",
+    children: [
+      { label: "Lộ trình học", href: "/#curriculum" },
+      { label: enrolmentOpen ? "Học phí & đăng ký" : "Học phí", href: "/#pricing" },
+    ],
+  },
+  {
+    label: "Cơ sở",
+    href: "/#branches",
+    children: BRANCHES.map((branch) => ({ label: branch.name, href: "/#branches" })),
+  },
+  ...(hasNews ? [{ label: "Tin tức", href: "/news" }] : []),
 ];
 
 const MENU_ID = "gc-mobile-menu";
 const TOGGLE_ID = "gc-mobile-menu-toggle";
 
-// Nav neo: mục đang xem được đánh dấu bằng data-active để người dùng biết mình
-// đang ở đâu trên trang, thay vì mọi liên kết trông giống hệt nhau.
-const NAV_LINK_CLASS =
-  "whitespace-nowrap transition-colors hover:text-slate-900 active:text-amber-700 data-[active=true]:text-slate-900 data-[active=true]:underline data-[active=true]:decoration-amber-500 data-[active=true]:decoration-2 data-[active=true]:underline-offset-[6px]";
-
-const hotline = BRAND_INFO.hotlines[0];
-const hotlineHref = `tel:${hotline.replace(/\./g, "")}`;
+const hotlineHref = (phone: string) => `tel:${phone.replace(/\./g, "")}`;
+const ctaLabel = enrolmentOpen ? "Đăng ký học thử" : "Xem học phí";
+const LINK = "transition-colors hover:text-slate-900 active:text-amber-700";
 ---
 
-<header class="sticky top-0 z-40 bg-cream/95 backdrop-blur-md border-b border-slate-200/80">
-  <div
-    class:list={[
-      "mx-auto px-4 h-16 flex items-center justify-between",
-      // Trang chủ chỉ cần gap nhỏ: justify-between đã tách logo, nav và CTA,
-      // nhưng vẫn phải giữ khoảng thở khi logo và nút menu gặp nhau ở màn hẹp.
-      isHome ? "max-w-6xl gap-3" : "max-w-3xl gap-4",
-    ]}
-  >
-    <a
-      href={isHome ? "#main" : "/"}
-      class:list={["font-extrabold flex items-center gap-2.5", isHome && "text-lg tracking-tight"]}
-    >
-      <img
-        src="/brand/mark-128.png"
-        alt=""
-        width="40"
-        height="40"
-        decoding="async"
-        class="w-10 h-10 shrink-0"
-      />
+<div class="hidden bg-brand-800 text-xs text-brand-100 md:block">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4">
+    <p class="flex items-center gap-1.5">
+      <Phone className="h-3.5 w-3.5 text-amber-400" aria-hidden="true" />
+      <span>Hotline:</span>
       {
-        isHome ? (
-          <div>
-            <div class="leading-none">{BRAND_INFO.name}</div>
-            <div class="text-xs font-semibold text-amber-700 mt-0.5 font-sans">
-              {BRAND_INFO.slogan1}
-            </div>
-          </div>
-        ) : (
-          <span>{BRAND_INFO.name}</span>
-        )
+        BRAND_INFO.hotlines.map((phone, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">–</span>}
+            <a href={hotlineHref(phone)} class="inline-flex min-h-9 items-center font-bold tabular-nums text-white hover:underline">
+              {phone}
+            </a>
+          </>
+        ))
       }
+    </p>
+    <div class="flex items-center gap-4">
+      <a
+        href={BRAND_INFO.facebookPage}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex min-h-9 items-center gap-1.5 hover:text-white hover:underline"
+      > Facebook
+        <span class="sr-only">(mở tab mới)</span>
+      </a>
+      <a href="/#branches" class="inline-flex min-h-9 items-center gap-1.5 hover:text-white hover:underline">
+        <MapPin className="h-3.5 w-3.5" aria-hidden="true" /> Bản đồ cơ sở
+      </a>
+      <a
+        href="/#pricing"
+        class="inline-flex min-h-9 items-center rounded-control bg-amber-400 px-3 font-bold text-slate-950 transition hover:bg-amber-300 active:scale-[0.98]"
+      >
+        {ctaLabel}
+      </a>
+    </div>
+  </div>
+</div>
+
+<header class="sticky top-0 z-40 border-b border-slate-200/80 bg-cream/95 backdrop-blur-md">
+  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4">
+    <a href="/" class="flex items-center gap-2.5 text-lg font-extrabold tracking-tight">
+      <img src="/brand/mark-128.png" alt="" width="40" height="40" decoding="async" class="h-10 w-10 shrink-0" />
+      <div>
+        <div class="leading-none">{BRAND_INFO.name}</div>
+        <div class="mt-0.5 font-sans text-xs font-semibold text-amber-700">{BRAND_INFO.slogan1}</div>
+      </div>
     </a>
 
-    {
-      isHome ? (
-        <>
-          <nav
-            class="hidden md:flex items-center gap-5 lg:gap-8 text-sm font-semibold text-slate-600"
-            aria-label="Điều hướng chính"
-          >
-            {NAV_LINKS.map((link) => (
-              <a href={link.href} data-nav-link class={NAV_LINK_CLASS}>
-                {link.label}
+    <nav class="hidden items-center gap-6 text-sm font-semibold text-slate-600 md:flex lg:gap-8" aria-label="Điều hướng chính">
+      {
+        NAV.map((item) => (
+          <div class="relative" data-dropdown={item.children ? "" : undefined}>
+            <div class="flex items-center">
+              <a href={item.href} class={`inline-flex min-h-11 items-center whitespace-nowrap ${LINK}`}>
+                {item.label}
               </a>
-            ))}
-          </nav>
-
-          <div class="flex items-center gap-2">
-            {/*
-              Dưới sm, CTA nhường chỗ cho nút menu để logo không bị bóp lại. Lối
-              đăng ký khi đó vẫn còn: nằm ngay trong menu và ở thanh liên hệ dưới đáy.
-            */}
-            <a
-              href="#pricing"
-              class="gc-move gc-move--amber hidden min-h-11 text-xs sm:inline-flex md:text-sm"
-            >
-              <span class="gc-move__label whitespace-nowrap">{enrolmentOpen ? "Đăng ký tư vấn" : "Xem học phí"}</span>
-              {/*
-                Ô đích chỉ hiện từ lg: trong khoảng 768–1023px thanh header đã có
-                logo, ba mục nav và nút này, thêm 44px nữa là logo và nav bị ép
-                xuống dòng.
-              */}
-              <span class="gc-move__go hidden lg:inline-flex" aria-hidden="true">
-                <ArrowRight className="w-3.5 h-3.5" />
-              </span>
-            </a>
-
-            <button
-              type="button"
-              id={TOGGLE_ID}
-              aria-expanded="false"
-              aria-controls={MENU_ID}
-              aria-label="Mở menu điều hướng"
-              class="md:hidden inline-flex h-11 w-11 items-center justify-center rounded-control border border-slate-300/90 bg-white/70 text-slate-700 hover:bg-white hover:text-slate-900 active:scale-95 transition"
-            >
-              <Menu data-menu-icon="open" className="w-5 h-5" aria-hidden="true" />
-              <X data-menu-icon="close" className="hidden w-5 h-5" aria-hidden="true" />
-            </button>
+              {item.children && (
+                <button
+                  type="button"
+                  data-dropdown-toggle
+                  aria-expanded="false"
+                  aria-label={`Mở các mục của ${item.label}`}
+                  class="inline-flex h-11 w-8 items-center justify-center text-slate-500 hover:text-slate-900"
+                >
+                  <ChevronDown className="h-4 w-4 transition-transform" aria-hidden="true" />
+                </button>
+              )}
+            </div>
+            {item.children && (
+              <div hidden data-dropdown-panel class="absolute left-0 top-full z-50 w-72 pt-1">
+                <ul class="list-none rounded-card border border-slate-200 bg-white p-1.5 shadow-soft">
+                  {item.children.map((child) => (
+                    <li>
+                      <a
+                        href={child.href}
+                        class="flex min-h-11 items-center rounded-control px-3 text-sm font-semibold text-slate-700 hover:bg-brand-50 hover:text-slate-900"
+                      >
+                        {child.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
-        </>
-      ) : (
-        <a
-          href="/"
-          class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-slate-900 active:scale-[0.98] transition rounded-control px-2 py-1.5"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" /> Về trang chủ
-        </a>
-      )
-    }
+        ))
+      }
+    </nav>
+
+    <div class="flex items-center gap-2">
+      {/* Nút học thử đã có ở thanh trên (từ md); dưới md nó nằm trong menu và thanh liên hệ dưới đáy. */}
+      <button
+        type="button"
+        id={TOGGLE_ID}
+        aria-expanded="false"
+        aria-controls={MENU_ID}
+        aria-label="Mở menu điều hướng"
+        class="inline-flex h-11 w-11 items-center justify-center rounded-control border border-slate-300/90 bg-white/70 text-slate-700 transition hover:bg-white hover:text-slate-900 active:scale-95 md:hidden"
+      >
+        <Menu data-menu-icon="open" className="h-5 w-5" aria-hidden="true" />
+        <X data-menu-icon="close" className="hidden h-5 w-5" aria-hidden="true" />
+      </button>
+    </div>
   </div>
 
-  {isHome && (
-    <div
-      id={MENU_ID}
-      hidden
-      class="md:hidden border-t border-slate-200/80 bg-cream/98 backdrop-blur-md"
-    >
-      <nav class="mx-auto max-w-6xl px-4 py-3" aria-label="Điều hướng di động">
-        <ul class="list-none flex flex-col">
-          {NAV_LINKS.map((link) => (
-            <li>
+  <div id={MENU_ID} hidden class="border-t border-slate-200/80 bg-cream md:hidden">
+    <nav class="mx-auto max-w-6xl px-4 py-3" aria-label="Điều hướng di động">
+      <ul class="flex list-none flex-col">
+        {
+          NAV.map((item) => (
+            <li class="border-b border-slate-200/70">
               <a
-                href={link.href}
-                data-nav-link
-                class="flex min-h-[3rem] items-center justify-between gap-3 border-b border-slate-200/70 text-base font-semibold text-slate-700 transition-colors hover:text-slate-900 active:text-amber-700 data-[active=true]:text-amber-700"
+                href={item.href}
+                class={`flex min-h-12 items-center justify-between gap-3 text-base font-semibold text-slate-800 ${LINK}`}
               >
-                <span>{link.label}</span>
-                <ArrowRight className="w-4 h-4 text-slate-400 shrink-0" aria-hidden="true" />
+                <span>{item.label}</span>
+                <ArrowRight className="h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" />
               </a>
+              {item.children && (
+                <ul class="mb-2 list-none border-l-2 border-amber-500/60 pl-3">
+                  {item.children.map((child) => (
+                    <li>
+                      <a href={child.href} class={`flex min-h-11 items-center text-sm font-medium text-slate-600 ${LINK}`}>
+                        {child.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
-          ))}
-        </ul>
+          ))
+        }
+      </ul>
 
-        <a
-          href="#pricing"
-          class="gc-move gc-move--amber gc-move--block mt-3"
-        >
-          <span class="gc-move__label">{enrolmentOpen ? "Đăng ký tư vấn" : "Xem học phí"}</span>
-          <span class="gc-move__go" aria-hidden="true">
-            <ArrowRight className="w-4 h-4" />
-          </span>
-        </a>
+      <a href="/#pricing" class="gc-move gc-move--amber gc-move--block mt-3">
+        <span class="gc-move__label">{ctaLabel}</span>
+        <span class="gc-move__go" aria-hidden="true"><ArrowRight className="h-4 w-4" /></span>
+      </a>
 
-        <a
-          href={hotlineHref}
-          class="mt-2 mb-1 flex min-h-[2.75rem] items-center justify-center gap-2 rounded-control text-sm font-semibold text-slate-600 transition hover:text-slate-900 tabular-nums"
-        >
-          <Phone className="w-4 h-4 text-slate-500" aria-hidden="true" /> Hotline {hotline}
+      <div class="mt-2 flex flex-wrap items-center justify-center gap-x-5 text-sm font-semibold text-slate-600">
+        <a href={hotlineHref(BRAND_INFO.hotlines[0])} class={`inline-flex min-h-11 items-center gap-2 tabular-nums ${LINK}`}>
+          <Phone className="h-4 w-4 text-slate-500" aria-hidden="true" /> Hotline {BRAND_INFO.hotlines[0]}
         </a>
-      </nav>
-    </div>
-  )}
+        <a href={BRAND_INFO.facebookPage} target="_blank" rel="noopener noreferrer" class={`inline-flex min-h-11 items-center gap-2 ${LINK}`}> Facebook
+          <span class="sr-only">(mở tab mới)</span>
+        </a>
+      </div>
+    </nav>
+  </div>
 </header>
 
 <script>
@@ -188,9 +208,7 @@ const hotlineHref = `tel:${hotline.replace(/\./g, "")}`;
     const openIcon = toggle.querySelector('[data-menu-icon="open"]');
     const closeIcon = toggle.querySelector('[data-menu-icon="close"]');
 
-    function isOpen() {
-      return toggle!.getAttribute("aria-expanded") === "true";
-    }
+    const isOpen = () => toggle.getAttribute("aria-expanded") === "true";
 
     function setOpen(open: boolean) {
       toggle!.setAttribute("aria-expanded", String(open));
@@ -215,8 +233,7 @@ const hotlineHref = `tel:${hotline.replace(/\./g, "")}`;
 
     document.addEventListener("click", (event) => {
       if (!isOpen() || !header) return;
-      const target = event.target;
-      if (target instanceof Node && !header.contains(target)) setOpen(false);
+      if (event.target instanceof Node && !header.contains(event.target)) setOpen(false);
     });
 
     // Panel tự ẩn ở breakpoint md, nhưng trạng thái aria phải khớp lại.
@@ -225,53 +242,58 @@ const hotlineHref = `tel:${hotline.replace(/\./g, "")}`;
     });
   }
 
-  // Đánh dấu mục đang xem trong nav neo, để người dùng biết mình đang ở đâu.
-  function initActiveSection() {
-    const links = Array.from(document.querySelectorAll<HTMLAnchorElement>("a[data-nav-link]"));
-    if (links.length === 0 || !("IntersectionObserver" in window)) return;
+  // Mục thả xuống trên desktop: rê chuột mở/đóng; nút mũi tên cho bàn phím và cảm ứng.
+  function initDropdowns() {
+    const items = Array.from(document.querySelectorAll<HTMLElement>("[data-dropdown]"));
+    const canHover = window.matchMedia("(hover: hover)").matches;
 
-    const pairs = links
-      .map((link) => {
-        const id = link.getAttribute("href")?.replace("#", "");
-        const section = id ? document.getElementById(id) : null;
-        return section ? { link, section } : null;
-      })
-      .filter((pair): pair is { link: HTMLAnchorElement; section: HTMLElement } => pair !== null);
-    if (pairs.length === 0) return;
+    function setOpen(item: HTMLElement, open: boolean) {
+      const toggle = item.querySelector<HTMLButtonElement>("[data-dropdown-toggle]");
+      const panel = item.querySelector<HTMLElement>("[data-dropdown-panel]");
+      if (!toggle || !panel) return;
+      toggle.setAttribute("aria-expanded", String(open));
+      panel.hidden = !open;
+      toggle.querySelector("svg")?.classList.toggle("rotate-180", open);
+    }
+    const isOpen = (item: HTMLElement) =>
+      item.querySelector("[data-dropdown-toggle]")?.getAttribute("aria-expanded") === "true";
+    const closeAll = (except?: HTMLElement) => {
+      for (const item of items) if (item !== except) setOpen(item, false);
+    };
 
-    const visible = new Set<HTMLElement>();
+    for (const item of items) {
+      item.querySelector("[data-dropdown-toggle]")?.addEventListener("click", () => {
+        const open = !isOpen(item);
+        closeAll(item);
+        setOpen(item, open);
+      });
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const section = entry.target as HTMLElement;
-          if (entry.isIntersecting) visible.add(section);
-          else visible.delete(section);
-        }
+      if (canHover) {
+        item.addEventListener("mouseenter", () => {
+          closeAll(item);
+          setOpen(item, true);
+        });
+        item.addEventListener("mouseleave", () => setOpen(item, false));
+      }
 
-        // Nhiều mục có thể cùng nằm trong dải quan sát: chọn mục cao nhất.
-        const active = Array.from(visible).sort(
-          (a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top
-        )[0];
+      // Tab ra khỏi mục thì đóng.
+      item.addEventListener("focusout", (event) => {
+        if (!(event.relatedTarget instanceof Node) || !item.contains(event.relatedTarget)) setOpen(item, false);
+      });
 
-        for (const pair of pairs) {
-          const on = pair.section === active;
-          if (on) {
-            pair.link.dataset.active = "true";
-            pair.link.setAttribute("aria-current", "true");
-          } else {
-            delete pair.link.dataset.active;
-            pair.link.removeAttribute("aria-current");
-          }
-        }
-      },
-      // Dải quan sát nằm dưới thanh header 4rem một chút.
-      { rootMargin: "-88px 0px -55% 0px" }
-    );
+      item.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape" || !isOpen(item)) return;
+        setOpen(item, false);
+        item.querySelector<HTMLElement>("[data-dropdown-toggle]")?.focus();
+      });
+    }
 
-    for (const pair of pairs) observer.observe(pair.section);
+    document.addEventListener("click", (event) => {
+      if (!(event.target instanceof Node)) return;
+      for (const item of items) if (!item.contains(event.target)) setOpen(item, false);
+    });
   }
 
   initMobileMenu();
-  initActiveSection();
+  initDropdowns();
 </script>

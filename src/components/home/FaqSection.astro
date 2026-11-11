@@ -1,0 +1,31 @@
+---
+// src/components/home/FaqSection.astro
+// Câu hỏi thường gặp.
+import { HelpCircle, ChevronDown } from "lucide-react";
+import { FAQS } from "../../data/courses";
+---
+
+<!--
+  Câu hỏi thường gặp. Dùng <details> gốc nên bàn phím, trình đọc màn hình và
+  Ctrl+F đều hoạt động mà không cần script; mỗi câu mở độc lập.
+-->
+<section id="faq" class="py-16 bg-white border-t border-slate-200">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="max-w-2xl">
+      <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold">Câu hỏi thường gặp</h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-x-10 items-start mt-10">
+      {FAQS.map((item) => (
+        <details class="gc-faq group border-t border-slate-200">
+          <summary class="flex min-h-11 cursor-pointer list-none items-start gap-2 py-4 font-bold text-slate-900 text-base [&::-webkit-details-marker]:hidden">
+            <HelpCircle className="w-4 h-4 text-slate-500 shrink-0 mt-1" aria-hidden="true" />
+            <span class="flex-1">{item.q}</span>
+            <ChevronDown className="w-4 h-4 text-slate-500 shrink-0 mt-1 group-open:rotate-180" aria-hidden="true" />
+          </summary>
+          <p class="text-base text-slate-600 pb-5 leading-relaxed pl-6">{item.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>

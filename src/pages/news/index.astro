@@ -26,7 +26,7 @@ const date = (ms: number) =>
   description={`Tin tức, hoạt động lớp học và giải đấu mới nhất của ${BRAND_INFO.name}.`}
   robots={total === 0 ? "noindex, follow" : "index, follow"}
 >
-  <SiteHeader variant="document" />
+  <SiteHeader hasNews={total > 0} />
   <main id="main" tabindex="-1" class="max-w-3xl mx-auto px-4 py-12 md:py-16">
     <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900">Tin tức</h1>
 
