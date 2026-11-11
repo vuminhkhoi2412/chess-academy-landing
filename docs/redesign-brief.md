@@ -77,3 +77,20 @@ Cái nào sửa được trong trang quản trị thì thêm một phần việc
 - Giữ nguyên: tiếng Việt cho nội dung, URL tiếng Anh, 301 khi đổi URL cũ.
 - Hạn mong muốn: không có.
 - Điều khác cần biết: không có.
+
+## 6. Quyết định đã chốt (2026-11-11)
+
+Các quyết định này trả lời các câu hỏi mở của bản kế hoạch đầu tiên. Chỗ nào mâu thuẫn với phần trên thì ưu tiên phần này.
+
+1. **Cửa hàng và YouTube:** bỏ khỏi site mới.
+2. **Ảnh:** chủ site xác nhận toàn bộ ảnh trong repo (5 ảnh gallery, 6 ảnh cơ sở, 3 ảnh chân dung bé) đã được phụ huynh đồng ý cho dùng. Cập nhật `PRODUCT.md` và `NGUON.md` cho khớp.
+3. **Form học thử:** site mới mặc định bật. Nhân viên vẫn tắt được bằng công tắc trong trang quản trị; khi tắt thì thay bằng các nút gọi, Zalo, Messenger.
+4. **Tin tức:** làm khối tin và phân mục ngay đợt đầu, khối tự ẩn đến khi có bài đầu tiên. "Kiến thức" là một mục của bài đăng, dùng chung trình soạn.
+5. **Nhánh:** không merge `feat/admin-flags-posts` vào `main` ở bước 5 (bước 5 chỉ deploy lên Droplet với subdomain). Chỉ merge khi cắt DNS ở bước 6 (Vercel giữ khoảng một tuần rồi bỏ). Nhánh redesign tách từ `feat/admin-flags-posts` và chỉ merge sau khi bước 6 xong.
+6. **6 ô quân cờ:** làm lối tắt tới Khoá học, Học phí, Cơ sở, Tin tức, Kiến thức, Học thử. Ô phải tương phản tốt.
+7. **Nút tài khoản:** bỏ khỏi thanh trên. Lối vào đăng nhập của nhân viên đặt nhỏ ở chân trang.
+8. **Ảnh banner:** chưa có banner thiết kế. Tạm dùng placeholder là ảnh lớp học thật kèm chữ.
+9. **Màu:** giữ palette hiện tại của Global Chess.
+10. **Nội dung giới thiệu:** quản lý brand sẽ gửi sau. Tạm dùng placeholder.
+11. **Thông tin cơ sở:** để trong code.
+12. **Học phí:** sửa được trong trang quản trị ngay từ đợt đầu, chỉ sửa giá. Tên khoá, độ tuổi, giáo trình giữ trong code.
