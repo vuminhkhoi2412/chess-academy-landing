@@ -59,7 +59,7 @@ Các quyết định cần chủ trung tâm xác nhận:
 
 Quyết định đã làm, chờ chủ trung tâm xác nhận:
 
-- Nội dung bài soạn bằng trình soạn dạng Word (`src/components/admin/RichEditor.astro`): đậm, nghiêng, gạch chân, tiêu đề mục (một cấp), danh sách chấm/số, liên kết, màu chữ. Chèn ảnh giữa bài, bảng, nhúng video chưa có (xem `docs/backlog.md`). Ảnh nằm ở đầu (bìa) và cuối bài.
+- Nội dung bài soạn bằng trình soạn dạng Word, thanh nút biểu tượng (`src/components/admin/RichEditor.tsx`, React + Tiptap): đậm, nghiêng, gạch chân, tiêu đề mục (một cấp), danh sách chấm/số, liên kết, màu chữ. Chèn ảnh giữa bài, bảng, nhúng video chưa có (xem `docs/backlog.md`). Ảnh nằm ở đầu (bìa) và cuối bài.
 - Màu chữ: 6 màu chọn nhanh ở `src/data/editor-palette.ts` (đen, xanh đậm, xanh dương, vàng hổ phách, đỏ, xám) và có màu tự do. Muốn bỏ màu tự do thì bỏ ô "Màu khác" trong trình soạn.
 - Bài lưu dưới dạng HTML và **luôn được lọc ở server** (`src/server/rich-text.ts`): chỉ giữ các thẻ `p, h2, br, strong, em, u, a, span (chỉ color), ul, ol, li`; link chỉ nhận http, https, mailto, tel và link ngoài tự mở tab mới. Đoạn trống bị bỏ. `h1`, `h3`, `h4` dán từ nơi khác được quy về `h2`.
 - Giới hạn nội dung tính theo **chữ** (`bodyMax` 20.000 ký tự, không tính thẻ), kèm trần dung lượng HTML `bodyHtmlMax` 200.000 ký tự. Bài cũ dạng văn bản thuần vẫn hiển thị đúng và chuyển sang HTML khi sửa lần đầu.

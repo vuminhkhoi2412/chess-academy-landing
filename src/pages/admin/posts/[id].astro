@@ -5,7 +5,7 @@
 export const prerender = false;
 
 import AdminLayout from "../../../layouts/AdminLayout.astro";
-import RichEditor from "../../../components/admin/RichEditor.astro";
+import RichEditor from "../../../components/admin/RichEditor";
 import { getDb } from "../../../server/db";
 import { POSTS_POLICY } from "../../../server/policy";
 import {
@@ -158,7 +158,7 @@ const btn = "min-h-12 px-5 font-bold border-2";
       </label>
       <div class="flex flex-col gap-1.5">
         <span class="font-semibold">Nội dung</span>
-        <RichEditor name="body" html={sanitizeBody(draft.body)} />
+        <RichEditor client:only="react" name="body" html={sanitizeBody(draft.body)} />
       </div>
     </div>
 
