@@ -12,7 +12,8 @@
     "check": "astro check",
     "test": "node --disable-warning=ExperimentalWarning --test",
     "astro": "astro",
-    "admin:create": "node --disable-warning=ExperimentalWarning scripts/create-admin.mjs"
+    "admin:create": "node --disable-warning=ExperimentalWarning scripts/create-admin.mjs",
+    "admin:reset": "node --disable-warning=ExperimentalWarning scripts/reset-password.mjs"
   },
   "dependencies": {
     "@astrojs/node": "^11.1.12",

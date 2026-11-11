@@ -14,6 +14,12 @@ Tạo tài khoản quản trị đầu tiên (hỏi mật khẩu, không hiện 
 docker compose exec app npm run admin:create -- ten.dang.nhap "Tên hiển thị"
 ```
 
+Quên mật khẩu của quản trị duy nhất thì đặt lại (hỏi mật khẩu mới, tối thiểu 10 ký tự):
+
+```bash
+docker compose exec app npm run admin:reset -- ten.dang.nhap
+```
+
 Mở http://localhost:8080 (trang chủ) và http://localhost:8080/quan-tri (quản trị).
 
 ## Việc cần thử trước khi mua VPS
