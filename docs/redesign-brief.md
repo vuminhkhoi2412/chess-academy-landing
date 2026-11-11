@@ -94,3 +94,7 @@ Các quyết định này trả lời các câu hỏi mở của bản kế ho�
 10. **Nội dung giới thiệu:** quản lý brand sẽ gửi sau. Tạm dùng placeholder.
 11. **Thông tin cơ sở:** để trong code.
 12. **Học phí:** sửa được trong trang quản trị ngay từ đợt đầu, chỉ sửa giá. Tên khoá, độ tuổi, giáo trình giữ trong code.
+13. **Phụ phí:** giá sách, đồng phục, bộ cờ thi đấu, đồng hồ cũng sửa được trong trang quản trị, cùng trang với học phí.
+14. **Quyền sửa học phí:** chỉ Quản trị sửa. Biên tập chỉ xem, không sửa được.
+15. **Nguồn giá:** giá trong cơ sở dữ liệu là giá hiện hành. `assets/nguon/bang-hoc-phi-global-chess.pdf` chỉ là giá khởi tạo.
+16. **Chữ trên banner tạm:** dùng hai câu khẩu hiệu cố định của thương hiệu ("Một nước đi, mở tư duy" và "Học cờ rèn tư duy vững tương lai!"), không viết câu quảng cáo mới.
