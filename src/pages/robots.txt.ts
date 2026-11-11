@@ -4,11 +4,14 @@ import type { APIRoute } from "astro";
 
 export const GET: APIRoute = ({ site }) => {
   const sitemapUrl = site ? new URL("sitemap-index.xml", site).href : null;
+  const postsSitemapUrl = site ? new URL("sitemap-posts.xml", site).href : null;
 
   const body = [
     "User-agent: *",
     "Allow: /",
-    sitemapUrl ? `\nSitemap: ${sitemapUrl}\n` : "",
+    "Disallow: /quan-tri",
+    sitemapUrl ? `\nSitemap: ${sitemapUrl}` : "",
+    postsSitemapUrl ? `Sitemap: ${postsSitemapUrl}\n` : "",
   ].join("\n");
 
   return new Response(body, {

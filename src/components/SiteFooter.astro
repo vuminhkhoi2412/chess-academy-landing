@@ -14,11 +14,14 @@ import { BRAND_INFO } from "../data/courses";
 interface Props {
   /** Trang chủ truyền false khi quản trị đã ẩn mục hỏi đáp, để không còn liên kết tới mục không có. */
   faq?: boolean;
+  /** Có bài đã đăng thì chân trang có liên kết tới Tin tức. */
+  news?: boolean;
 }
-const { faq = true } = Astro.props;
+const { faq = true, news = false } = Astro.props;
 
 const FOOTER_LINKS = [
   ...(faq ? [{ href: "/#faq", label: "Câu hỏi thường gặp" }] : []),
+  ...(news ? [{ href: "/tin-tuc", label: "Tin tức" }] : []),
   { href: "/chinh-sach-bao-mat", label: "Chính sách bảo mật" },
   { href: "/dieu-khoan-su-dung", label: "Điều khoản sử dụng" },
   { href: "#main", label: "Về đầu trang" },

@@ -1,0 +1,66 @@
+---
+// src/pages/tin-tuc/[slug].astro
+// Một bài đã đăng. Nháp hoặc bài không tồn tại đều trả 404, không lộ bài chưa xong.
+export const prerender = false;
+
+import Layout from "../../layouts/Layout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+import { BRAND_INFO } from "../../data/courses";
+import { getDb } from "../../server/db";
+import { getPublishedBySlug, listImages, parseBody } from "../../server/posts";
+
+const db = getDb();
+const post = getPublishedBySlug(db, Astro.params.slug ?? "");
+// Phản hồi 404 rỗng: Astro tự dựng trang 404.astro của site.
+if (!post) return new Response(null, { status: 404 });
+const images = listImages(db, post.id);
+const blocks = parseBody(post.body);
+const description = post.summary || blocks.find((b) => b.kind === "p")?.text.slice(0, 160) || post.title;
+const origin = Astro.site ?? Astro.url;
+const published = post.publishedAt ?? post.createdAt;
+const date = new Intl.DateTimeFormat("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", dateStyle: "long" }).format(published);
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: post.title,
+  description,
+  datePublished: new Date(published).toISOString(),
+  dateModified: new Date(post.updatedAt).toISOString(),
+  ...(images[0] ? { image: new URL(`/uploads/${images[0].file}`, origin).href } : {}),
+  publisher: { "@type": "Organization", name: BRAND_INFO.name },
+}).replace(/</g, "\\u003c");
+const [cover, ...rest] = images;
+---
+
+<Layout title={`${post.title} – ${BRAND_INFO.name}`} description={description}>
+  <script type="application/ld+json" slot="head" set:html={jsonLd} />
+  <SiteHeader variant="document" />
+  <main id="main" tabindex="-1" class="max-w-3xl mx-auto px-4 py-12 md:py-16">
+    <a href="/tin-tuc" class="text-sm font-semibold text-brand-800 underline">← Tin tức</a>
+    <p class="mt-6 text-xs font-bold text-slate-600">{date}</p>
+    <h1 class="mt-2 text-3xl md:text-4xl font-extrabold text-slate-900">{post.title}</h1>
+
+    {cover && <img src={`/uploads/${cover.file}`} alt={cover.caption || post.title} width="1600" class="mt-8 w-full h-auto bg-slate-100" />}
+
+    <div class="mt-8 space-y-5 text-base md:text-lg text-slate-700 leading-relaxed">
+      {blocks.map((block) =>
+        block.kind === "h2"
+          ? <h2 class="pt-4 text-xl md:text-2xl font-bold text-slate-900">{block.text}</h2>
+          : <p>{block.text}</p>
+      )}
+    </div>
+
+    {rest.length > 0 && (
+      <div class="mt-10 grid gap-4 sm:grid-cols-2">
+        {rest.map((image) => (
+          <figure>
+            <img src={`/uploads/${image.file}`} alt={image.caption} loading="lazy" class="aspect-[4/3] w-full object-cover bg-slate-100" />
+            {image.caption && <figcaption class="mt-1 text-sm text-slate-600">{image.caption}</figcaption>}
+          </figure>
+        ))}
+      </div>
+    )}
+  </main>
+  <SiteFooter news />
+</Layout>

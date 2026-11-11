@@ -10,7 +10,7 @@ import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import MobileContactBar from "../components/MobileContactBar.astro";
 import Layout from "../layouts/Layout.astro";
-import { getSiteConfig } from "../server/site-config";
+import { getSiteConfig, hasPublishedPosts } from "../server/site-config";
 import { BRAND_INFO, BRANCHES, CURRICULUM_PROGRAMS, TUITION_PROGRAMS, TUITION_LEVELS, TESTIMONIALS, FAQS } from "../data/courses";
 import galleryCoachStudent from "../assets/images/gallery-coach-student.jpg";
 import faceBe1 from "../assets/images/anh_chan_dung/chan_dung_be_1.jpg";
@@ -63,6 +63,7 @@ const GALLERY_SOURCES = [
 ];
 // Cấu hình bật/tắt đọc ở MỖI request (trang này chạy trên server), nên đổi trong /quan-tri có hiệu lực ngay.
 const { flags, banner } = getSiteConfig();
+const hasNews = hasPublishedPosts();
 
 // Chỉ xử lý ảnh gallery khi mục ảnh đang bật.
 const GALLERY = flags.gallery
@@ -198,7 +199,7 @@ const structuredData = {
     </div>
 
     <!-- Navbar -->
-    <SiteHeader enrolmentOpen={flags.enrolment} />
+    <SiteHeader enrolmentOpen={flags.enrolment} hasNews={hasNews} />
 
     <main id="main" tabindex="-1">
     <!-- Hero Section -->
@@ -569,7 +570,7 @@ const structuredData = {
     <PricingAndCheckout client:load enrolmentOpen={flags.enrolment} />
     </main>
 
-    <SiteFooter faq={flags.faq} />
+    <SiteFooter faq={flags.faq} news={hasNews} />
 
     {flags.mobile_bar && <MobileContactBar />}
 

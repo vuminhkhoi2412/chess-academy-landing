@@ -1,0 +1,65 @@
+---
+// src/pages/tin-tuc/index.astro
+// Danh sách bài đã đăng, mới nhất trước. Chạy trên server nên bài vừa đăng hiện ngay, không cần build lại.
+export const prerender = false;
+
+import Layout from "../../layouts/Layout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+import { BRAND_INFO } from "../../data/courses";
+import { getDb } from "../../server/db";
+import { POSTS_POLICY } from "../../server/policy";
+import { countPublished, listImages, listPublished } from "../../server/posts";
+
+const db = getDb();
+const total = countPublished(db);
+const pages = Math.max(1, Math.ceil(total / POSTS_POLICY.perPage));
+const requested = Number(Astro.url.searchParams.get("trang") ?? 1);
+const page = Number.isInteger(requested) ? Math.min(Math.max(requested, 1), pages) : 1;
+const posts = listPublished(db, page).map((post) => ({ post, cover: listImages(db, post.id)[0] ?? null }));
+const date = (ms: number) =>
+  new Intl.DateTimeFormat("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", dateStyle: "long" }).format(ms);
+---
+
+<Layout
+  title={`Tin tức – ${BRAND_INFO.name}`}
+  description={`Tin tức, hoạt động lớp học và giải đấu mới nhất của ${BRAND_INFO.name}.`}
+  robots={total === 0 ? "noindex, follow" : "index, follow"}
+>
+  <SiteHeader variant="document" />
+  <main id="main" tabindex="-1" class="max-w-3xl mx-auto px-4 py-12 md:py-16">
+    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900">Tin tức</h1>
+
+    {total === 0 ? (
+      <p class="mt-8 text-slate-600">Chưa có bài viết nào. Mời bạn quay lại sau.</p>
+    ) : (
+      <ul class="mt-8 grid gap-8">
+        {posts.map(({ post, cover }) => (
+          <li>
+            <a href={`/tin-tuc/${post.slug}`} class="group grid gap-4 sm:grid-cols-[14rem_1fr]">
+              {cover ? (
+                <img src={`/uploads/${cover.file}`} alt="" width="448" height="336" loading="lazy" class="aspect-[4/3] w-full object-cover bg-slate-100" />
+              ) : (
+                <div class="hidden sm:block aspect-[4/3] bg-brand-50" aria-hidden="true"></div>
+              )}
+              <div>
+                <p class="text-xs font-bold text-slate-600">{date(post.publishedAt ?? post.createdAt)}</p>
+                <h2 class="mt-1 text-xl font-extrabold text-slate-900 group-hover:underline">{post.title}</h2>
+                {post.summary && <p class="mt-2 text-slate-700 leading-relaxed">{post.summary}</p>}
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    {pages > 1 && (
+      <nav class="mt-12 flex items-center justify-between" aria-label="Phân trang">
+        {page > 1 ? <a href={page === 2 ? "/tin-tuc" : `/tin-tuc?trang=${page - 1}`} class="inline-flex min-h-12 items-center px-5 border-2 border-brand-800 font-bold text-brand-800">← Mới hơn</a> : <span></span>}
+        <span class="text-sm text-slate-600">Trang {page}/{pages}</span>
+        {page < pages ? <a href={`/tin-tuc?trang=${page + 1}`} class="inline-flex min-h-12 items-center px-5 border-2 border-brand-800 font-bold text-brand-800">Cũ hơn →</a> : <span></span>}
+      </nav>
+    )}
+  </main>
+  <SiteFooter news={total > 0} />
+</Layout>

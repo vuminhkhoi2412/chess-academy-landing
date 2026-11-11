@@ -47,6 +47,26 @@ Các quyết định cần chủ trung tâm xác nhận:
 - Lỗi đọc cơ sở dữ liệu: trang chủ dùng giá trị mặc định ở bảng trên và ghi lỗi ra log, không báo lỗi cho phụ huynh.
 - Các trang tĩnh (404, trang chính sách) không biết trạng thái nút bật/tắt: thanh Gọi/Zalo trên trang 404 luôn hiện.
 
+## Bài đăng (`src/server/policy.ts`, `POSTS_POLICY`)
+
+| Thông số | Hiện tại | Ý nghĩa |
+|---|---|---|
+| `titleMax` / `summaryMax` / `bodyMax` | 120 / 200 / 20.000 | Số ký tự tối đa của tiêu đề, tóm tắt, nội dung |
+| `maxImages` | 8 | Số ảnh tối đa mỗi bài; ảnh đầu là ảnh bìa |
+| `maxUploadBytes` | 8 MB | Dung lượng tối đa mỗi ảnh tải lên |
+| `imageMaxWidth` / `imageQuality` | 1600 px / 80 | Ảnh tải lên được thu nhỏ và đổi sang webp theo mức này |
+| `perPage` | 12 | Số bài mỗi trang ở `/tin-tuc` |
+
+Quyết định đã làm, chờ chủ trung tâm xác nhận:
+
+- Nội dung bài là **văn bản thuần** (dòng trống = đoạn mới, nút "+ Thêm tiêu đề mục"), không in đậm/chèn link/chèn ảnh giữa bài. Ảnh nằm ở đầu (bìa) và cuối bài. Muốn trình soạn thảo đầy đủ thì làm thêm ở bước sau.
+- Bài có ảnh chỉ đăng được khi người đăng tích "đã được phụ huynh đồng ý cho đăng ảnh các bé"; nhật ký ghi lại xác nhận này. Cần rà lại `chinh-sach-bao-mat.astro` cho khớp việc đăng ảnh các bé.
+- Mọi nhân viên (Biên tập và Quản trị) soạn, đăng, gỡ bài được; **chỉ Quản trị xoá bài**.
+- Đường dẫn bài (slug) tạo từ tiêu đề lúc lưu lần đầu và **không đổi** khi sửa tiêu đề.
+- Ảnh được xoá thông tin EXIF (gồm vị trí GPS) và đặt tên ngẫu nhiên; lưu ở `DATA_DIR/uploads`, nên **thư mục này phải nằm trong sao lưu cùng `app.db`**.
+- Mục "Tin tức" ở menu/chân trang chỉ hiện khi có ít nhất một bài đã đăng, và chỉ ở trang chủ và trang tin; các trang tĩnh khác (điều khoản, 404) không có liên kết này.
+- Chưa có: hẹn giờ đăng, danh mục theo mục, tìm kiếm, bình luận.
+
 ## Triển khai (bước 4–5)
 
 - `DATA_DIR`: thư mục chứa `app.db`, mặc định `./data`. Trên VPS đặt ra ổ/volume được sao lưu.

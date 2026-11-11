@@ -27,3 +27,19 @@ export const IMAGE_CACHE_POLICY = {
   maxTotalBytes: 64 * 1024 * 1024,
   maxEntryBytes: 3 * 1024 * 1024,
 };
+
+/** Bài đăng (src/server/posts.ts, uploads.ts). */
+export const POSTS_POLICY = {
+  titleMax: 120,
+  summaryMax: 200,
+  bodyMax: 20000,
+  captionMax: 120,
+  /** Số ảnh tối đa mỗi bài; ảnh đầu tiên là ảnh bìa. */
+  maxImages: 8,
+  maxUploadBytes: 8 * 1024 * 1024,
+  /** Ảnh tải lên được thu nhỏ về chiều rộng này và đổi sang webp. */
+  imageMaxWidth: 1600,
+  imageQuality: 80,
+  /** Số bài mỗi trang ở /tin-tuc. */
+  perPage: 12,
+};

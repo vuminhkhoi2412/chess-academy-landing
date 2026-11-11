@@ -15,15 +15,18 @@ interface Props {
   variant?: "home" | "document";
   /** Trang chủ truyền false khi quản trị đã đóng form đăng ký: nhãn đổi sang "Học phí". */
   enrolmentOpen?: boolean;
+  /** Có ít nhất một bài đã đăng thì menu trang chủ có thêm "Tin tức". */
+  hasNews?: boolean;
 }
 
-const { variant = "home", enrolmentOpen = true } = Astro.props;
+const { variant = "home", enrolmentOpen = true, hasNews = false } = Astro.props;
 const isHome = variant === "home";
 
 const NAV_LINKS = [
   { href: "#curriculum", label: "Lộ trình" },
   { href: "#branches", label: "Hệ thống trung tâm" },
   { href: "#pricing", label: enrolmentOpen ? "Đăng ký & học phí" : "Học phí" },
+  ...(hasNews ? [{ href: "/tin-tuc", label: "Tin tức" }] : []),
 ];
 
 const MENU_ID = "gc-mobile-menu";

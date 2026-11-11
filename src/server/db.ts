@@ -63,6 +63,30 @@ const MIGRATIONS: string[] = [
     updated_by TEXT
   );
   `,
+  `
+  CREATE TABLE posts (
+    id           INTEGER PRIMARY KEY,
+    slug         TEXT NOT NULL UNIQUE,
+    title        TEXT NOT NULL,
+    summary      TEXT NOT NULL,
+    body         TEXT NOT NULL,
+    status       TEXT NOT NULL CHECK (status IN ('draft', 'published')),
+    published_at INTEGER,
+    created_at   INTEGER NOT NULL,
+    created_by   TEXT,
+    updated_at   INTEGER NOT NULL,
+    updated_by   TEXT
+  );
+  CREATE INDEX posts_published ON posts (status, published_at DESC);
+  CREATE TABLE post_images (
+    id       INTEGER PRIMARY KEY,
+    post_id  INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+    file     TEXT NOT NULL,
+    caption  TEXT NOT NULL DEFAULT '',
+    position INTEGER NOT NULL
+  );
+  CREATE INDEX post_images_post ON post_images (post_id, position);
+  `,
 ];
 
 export function migrate(db: Db): void {
