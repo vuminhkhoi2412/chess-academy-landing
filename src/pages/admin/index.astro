@@ -1,5 +1,5 @@
 ---
-// src/pages/quan-tri/index.astro
+// src/pages/admin/index.astro
 export const prerender = false;
 
 import AdminLayout from "../../layouts/AdminLayout.astro";
@@ -10,12 +10,12 @@ const isAdmin = user.role === "admin";
 const TILES = [
   { title: "Bật/tắt tính năng", text: "Ẩn hoặc hiện từng phần của trang chủ, đóng mở form đăng ký.", href: "", admin: true },
   { title: "Bài đăng", text: "Soạn và xuất bản tin tức cho phụ huynh.", href: "", admin: false },
-  { title: "Tài khoản", text: "Thêm nhân viên, đặt lại mật khẩu, khoá tài khoản.", href: "/quan-tri/tai-khoan", admin: true },
-  { title: "Nhật ký thay đổi", text: "Ai đã đổi gì và lúc nào.", href: "/quan-tri/nhat-ky", admin: true },
+  { title: "Tài khoản", text: "Thêm nhân viên, đặt lại mật khẩu, khoá tài khoản.", href: "/admin/accounts", admin: true },
+  { title: "Nhật ký thay đổi", text: "Ai đã đổi gì và lúc nào.", href: "/admin/activity", admin: true },
 ].filter((tile) => !tile.admin || isAdmin);
 ---
 
-<AdminLayout title="Tổng quan" active="tong-quan" user={user}>
+<AdminLayout title="Tổng quan" active="overview" user={user}>
   <h1 class="text-2xl lg:text-3xl font-extrabold">Xin chào, {user.displayName}</h1>
   <p class="mt-1 text-slate-600">Chọn việc cần làm.</p>
 

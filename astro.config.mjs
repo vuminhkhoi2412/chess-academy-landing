@@ -15,6 +15,12 @@ export default defineConfig({
   // (trang quản trị) chạy trên server Node, dữ liệu nằm trong SQLite ở thư mục DATA_DIR.
   adapter: node({ mode: 'standalone' }),
 
+  // Địa chỉ cũ (tiếng Việt) của hai trang pháp lý: giữ link đã chia sẻ và chỉ mục tìm kiếm không chết.
+  redirects: {
+    '/chinh-sach-bao-mat': { status: 301, destination: '/privacy-policy' },
+    '/dieu-khoan-su-dung': { status: 301, destination: '/terms' },
+  },
+
   // Sau Caddy, Astro cần biết những tên miền nào được tin ở X-Forwarded-Host, nếu không kiểm tra
   // nguồn gốc (Origin) coi mọi form POST là giả mạo và trả 403. Đổi tên miền ở đây rồi build lại.
   // `localhost` (http) chỉ để chạy thử bằng docker compose trên máy; `**.` gồm cả subdomain thử nghiệm.

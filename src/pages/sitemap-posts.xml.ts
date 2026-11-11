@@ -13,10 +13,10 @@ export const GET: APIRoute = ({ site, url }) => {
   const db = getDb();
   const posts = listPublished(db, 1, Math.max(1, countPublished(db)));
   const entries = [
-    ...(posts.length ? [`<url><loc>${esc(new URL("/tin-tuc", origin).href)}</loc></url>`] : []),
+    ...(posts.length ? [`<url><loc>${esc(new URL("/news", origin).href)}</loc></url>`] : []),
     ...posts.map(
       (post) =>
-        `<url><loc>${esc(new URL(`/tin-tuc/${post.slug}`, origin).href)}</loc><lastmod>${new Date(post.updatedAt).toISOString()}</lastmod></url>`,
+        `<url><loc>${esc(new URL(`/news/${post.slug}`, origin).href)}</loc><lastmod>${new Date(post.updatedAt).toISOString()}</lastmod></url>`,
     ),
   ];
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join("\n")}\n</urlset>\n`;

@@ -21,7 +21,7 @@ Trang tĩnh, một trang duy nhất, có bàn cờ tương tác, gallery ảnh l
 | `npm run check` | Typecheck Astro + TypeScript |
 | `npm test` | Chạy test logic cờ vua |
 
-## Trang quản trị (`/quan-tri`)
+## Trang quản trị (`/admin`)
 
 Đang phát triển trên nhánh `feat/admin-flags-posts`, chưa chạy trên Vercel (cần server Node).
 Tài khoản, nhật ký và (sắp tới) bài đăng lưu trong SQLite tại `$DATA_DIR/app.db`, mặc định `./data`.
@@ -80,8 +80,8 @@ src/
   pages/
     index.astro         cả trang, kèm toàn bộ thẻ SEO
     404.astro           trang 404
-    chinh-sach-bao-mat.astro   chính sách bảo mật
-    dieu-khoan-su-dung.astro   điều khoản sử dụng
+    privacy-policy.astro   chính sách bảo mật
+    terms.astro   điều khoản sử dụng
     robots.txt.ts       sinh robots.txt từ `site` trong astro.config.mjs
   styles/global.css     Tailwind + `@theme` token (font, màu brand, radius, shadow)
                         và các class dùng chung: nhãn mục (.gc-eyebrow), tiêu đề mục

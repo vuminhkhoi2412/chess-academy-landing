@@ -1,5 +1,5 @@
 ---
-// src/pages/quan-tri/nhat-ky.astro
+// src/pages/admin/activity.astro
 // Chỉ quản trị: 200 thay đổi gần nhất, ai làm gì lúc nào.
 export const prerender = false;
 
@@ -9,7 +9,7 @@ import { getDb } from "../../server/db";
 import { formatTime } from "../../server/session";
 
 const me = Astro.locals.user!;
-if (me.role !== "admin") return Astro.redirect("/quan-tri");
+if (me.role !== "admin") return Astro.redirect("/admin");
 
 const LABELS: Record<string, string> = {
   login: "Đăng nhập",
@@ -45,7 +45,7 @@ function describe(action: string, detail: Record<string, unknown> | null): strin
 const rows = listAudit(getDb(), 200);
 ---
 
-<AdminLayout title="Nhật ký thay đổi" active="nhat-ky" user={me}>
+<AdminLayout title="Nhật ký thay đổi" active="activity" user={me}>
   <h1 class="text-2xl lg:text-3xl font-extrabold">Nhật ký thay đổi</h1>
   <p class="mt-1 text-slate-600">200 sự kiện gần nhất, mới nhất ở trên.</p>
 

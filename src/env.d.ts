@@ -2,7 +2,7 @@
 
 declare namespace App {
   interface Locals {
-    /** Người đang đăng nhập vào trang quản trị, hoặc null. Chỉ được gán cho đường dẫn /quan-tri. */
+    /** Người đang đăng nhập vào trang quản trị, hoặc null. Chỉ được gán cho đường dẫn /admin. */
     user: import("./server/auth").SessionUser | null;
   }
 }

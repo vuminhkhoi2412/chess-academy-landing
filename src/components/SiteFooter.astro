@@ -21,9 +21,9 @@ const { faq = true, news = false } = Astro.props;
 
 const FOOTER_LINKS = [
   ...(faq ? [{ href: "/#faq", label: "Câu hỏi thường gặp" }] : []),
-  ...(news ? [{ href: "/tin-tuc", label: "Tin tức" }] : []),
-  { href: "/chinh-sach-bao-mat", label: "Chính sách bảo mật" },
-  { href: "/dieu-khoan-su-dung", label: "Điều khoản sử dụng" },
+  ...(news ? [{ href: "/news", label: "Tin tức" }] : []),
+  { href: "/privacy-policy", label: "Chính sách bảo mật" },
+  { href: "/terms", label: "Điều khoản sử dụng" },
   { href: "#main", label: "Về đầu trang" },
 ];
 ---

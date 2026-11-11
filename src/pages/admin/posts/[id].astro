@@ -1,6 +1,6 @@
 ---
-// src/pages/quan-tri/bai-dang/[id].astro
-// Soạn và sửa một bài (id = "moi" để viết bài mới). Một form duy nhất: mọi nút bấm đều lưu chữ trước,
+// src/pages/admin/posts/[id].astro
+// Soạn và sửa một bài (id = "new" để viết bài mới). Một form duy nhất: mọi nút bấm đều lưu chữ trước,
 // nên thêm ảnh hay đăng bài không làm mất phần vừa gõ.
 export const prerender = false;
 
@@ -26,10 +26,10 @@ const me = Astro.locals.user!;
 const db = getDb();
 const actor = { id: me.id, username: me.username };
 
-const isNew = Astro.params.id === "moi";
+const isNew = Astro.params.id === "new";
 const id = isNew ? 0 : Number(Astro.params.id);
 let post = isNew ? null : Number.isInteger(id) ? getPostById(db, id) : null;
-if (!isNew && !post) return Astro.redirect("/quan-tri/bai-dang");
+if (!isNew && !post) return Astro.redirect("/admin/posts");
 
 const DONE: Record<string, string> = {
   saved: "Đã lưu nháp.",
@@ -54,7 +54,7 @@ if (Astro.request.method === "POST") {
     body: String(form.get("body") ?? ""),
   };
   consentChecked = form.get("photo_consent") === "1";
-  const go = (ok: string) => Astro.redirect(`/quan-tri/bai-dang/${post!.id}?ok=${ok}`);
+  const go = (ok: string) => Astro.redirect(`/admin/posts/${post!.id}?ok=${ok}`);
   try {
     if (intent === "delete" || intent === "delete_confirmed") {
       if (!post) throw new PostError("not_found", "Bài viết chưa được lưu.");
@@ -63,7 +63,7 @@ if (Astro.request.method === "POST") {
         confirmingDelete = true;
       } else {
         await deleteImages(deletePost(db, post.id, actor));
-        return Astro.redirect("/quan-tri/bai-dang?ok=deleted");
+        return Astro.redirect("/admin/posts?ok=deleted");
       }
     } else {
       // Mọi nút khác đều lưu chữ trước.
@@ -118,8 +118,8 @@ const field = "border-2 border-slate-300 bg-white p-3 text-base focus:border-bra
 const btn = "min-h-12 px-5 font-bold border-2";
 ---
 
-<AdminLayout title={isNew ? "Viết bài mới" : "Sửa bài"} active="bai-dang" user={me}>
-  <a href="/quan-tri/bai-dang" class="font-semibold text-brand-800 underline">← Tất cả bài đăng</a>
+<AdminLayout title={isNew ? "Viết bài mới" : "Sửa bài"} active="posts" user={me}>
+  <a href="/admin/posts" class="font-semibold text-brand-800 underline">← Tất cả bài đăng</a>
   <div class="mt-2 flex flex-wrap items-center gap-3">
     <h1 class="text-2xl lg:text-3xl font-extrabold">{isNew ? "Viết bài mới" : "Sửa bài"}</h1>
     {post && (published
@@ -137,7 +137,7 @@ const btn = "min-h-12 px-5 font-bold border-2";
       <p class="mt-2">Bài và toàn bộ ảnh của bài sẽ mất, không khôi phục được. Muốn chỉ ẩn bài thì chọn "Gỡ về nháp".</p>
       <form method="post" class="mt-5 flex flex-wrap gap-3">
         <button type="submit" name="intent" value="delete_confirmed" class={`${btn} border-seal-red bg-seal-red text-white`}>Có, xoá hẳn</button>
-        <a href={`/quan-tri/bai-dang/${post.id}`} class={`${btn} inline-flex items-center border-slate-400 bg-white`}>Không, giữ lại</a>
+        <a href={`/admin/posts/${post.id}`} class={`${btn} inline-flex items-center border-slate-400 bg-white`}>Không, giữ lại</a>
       </form>
     </section>
   )}
@@ -201,7 +201,7 @@ const btn = "min-h-12 px-5 font-bold border-2";
           {published
             ? <button type="submit" name="intent" value="unpublish" class={`${btn} border-slate-700 bg-slate-700 text-white`}>Gỡ về nháp</button>
             : <button type="submit" name="intent" value="publish" class={`${btn} border-green-800 bg-green-800 text-white hover:bg-green-700`}>Đăng bài</button>}
-          {published && post && <a href={`/tin-tuc/${post.slug}`} target="_blank" rel="noopener" class={`${btn} inline-flex items-center justify-center border-slate-400 bg-white`}>Xem bài trên trang</a>}
+          {published && post && <a href={`/news/${post.slug}`} target="_blank" rel="noopener" class={`${btn} inline-flex items-center justify-center border-slate-400 bg-white`}>Xem bài trên trang</a>}
           {published && <p class="text-sm text-slate-600">Bấm "Lưu nháp" để lưu chỉnh sửa; bài đã đăng cập nhật ngay.</p>}
         </div>
       </section>

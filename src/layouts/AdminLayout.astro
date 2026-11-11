@@ -8,18 +8,18 @@ import type { SessionUser } from "../server/auth";
 
 interface Props {
   title: string;
-  active: "tong-quan" | "bat-tat" | "bai-dang" | "tai-khoan" | "nhat-ky";
+  active: "overview" | "features" | "posts" | "accounts" | "activity";
   user: SessionUser;
 }
 
 const { title, active, user } = Astro.props;
 
 const NAV = [
-  { id: "tong-quan", href: "/quan-tri", label: "Tổng quan", adminOnly: false, soon: false },
-  { id: "bat-tat", href: "/quan-tri/bat-tat", label: "Bật/tắt tính năng", adminOnly: true, soon: false },
-  { id: "bai-dang", href: "/quan-tri/bai-dang", label: "Bài đăng", adminOnly: false, soon: false },
-  { id: "tai-khoan", href: "/quan-tri/tai-khoan", label: "Tài khoản", adminOnly: true, soon: false },
-  { id: "nhat-ky", href: "/quan-tri/nhat-ky", label: "Nhật ký thay đổi", adminOnly: true, soon: false },
+  { id: "overview", href: "/admin", label: "Tổng quan", adminOnly: false, soon: false },
+  { id: "features", href: "/admin/features", label: "Bật/tắt tính năng", adminOnly: true, soon: false },
+  { id: "posts", href: "/admin/posts", label: "Bài đăng", adminOnly: false, soon: false },
+  { id: "accounts", href: "/admin/accounts", label: "Tài khoản", adminOnly: true, soon: false },
+  { id: "activity", href: "/admin/activity", label: "Nhật ký thay đổi", adminOnly: true, soon: false },
 ].filter((item) => !item.adminOnly || user.role === "admin");
 
 const roleLabel = user.role === "admin" ? "Quản trị" : "Biên tập";
@@ -67,7 +67,7 @@ const roleLabel = user.role === "admin" ? "Quản trị" : "Biên tập";
           <span class="block font-semibold text-white">{user.displayName}</span>
           <span class="text-brand-200">{roleLabel}</span>
         </p>
-        <form method="post" action="/quan-tri/dang-xuat" class="lg:mt-3">
+        <form method="post" action="/admin/logout" class="lg:mt-3">
           <button type="submit" class="min-h-11 px-4 font-semibold border-2 border-brand-300 text-white hover:bg-brand-700 w-full lg:w-auto">
             Đăng xuất
           </button>

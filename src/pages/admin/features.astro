@@ -1,5 +1,5 @@
 ---
-// src/pages/quan-tri/bat-tat.astro
+// src/pages/admin/features.astro
 // Chỉ quản trị: bật/tắt từng phần của trang chủ và soạn dòng thông báo. Có hiệu lực ngay ở lượt tải trang kế tiếp.
 export const prerender = false;
 
@@ -19,7 +19,7 @@ import { SITE_POLICY } from "../../server/policy";
 import { formatTime } from "../../server/session";
 
 const me = Astro.locals.user!;
-if (me.role !== "admin") return Astro.redirect("/quan-tri");
+if (me.role !== "admin") return Astro.redirect("/admin");
 
 const db = getDb();
 const actor = { id: me.id, username: me.username };
@@ -41,12 +41,12 @@ if (Astro.request.method === "POST") {
         confirming = key;
       } else {
         setFlag(db, key, enabled, actor);
-        return Astro.redirect(`/quan-tri/bat-tat?ok=${enabled ? "on" : "off"}`);
+        return Astro.redirect(`/admin/features?ok=${enabled ? "on" : "off"}`);
       }
     } else if (intent === "banner") {
       draftBanner = String(form.get("text") ?? "");
       setBannerText(db, draftBanner, actor);
-      return Astro.redirect("/quan-tri/bat-tat?ok=banner");
+      return Astro.redirect("/admin/features?ok=banner");
     }
   } catch (caught) {
     if (!(caught instanceof FlagError)) throw caught;
@@ -67,7 +67,7 @@ const confirmDef = states.find((state) => state.def.key === confirming)?.def;
 const choice = "min-h-12 px-5 font-bold border-2";
 ---
 
-<AdminLayout title="Bật/tắt tính năng" active="bat-tat" user={me}>
+<AdminLayout title="Bật/tắt tính năng" active="features" user={me}>
   <h1 class="text-2xl lg:text-3xl font-extrabold">Bật/tắt tính năng</h1>
   <p class="mt-2 text-slate-600">Thay đổi có hiệu lực ngay khi phụ huynh tải lại trang chủ, không cần chờ.</p>
 
@@ -85,7 +85,7 @@ const choice = "min-h-12 px-5 font-bold border-2";
         <input type="hidden" name="enabled" value="0" />
         <input type="hidden" name="confirmed" value="1" />
         <button type="submit" class={`${choice} border-seal-red bg-seal-red text-white`}>Có, tắt đăng ký</button>
-        <a href="/quan-tri/bat-tat" class={`${choice} inline-flex items-center border-slate-400 bg-white`}>Không, giữ nguyên</a>
+        <a href="/admin/features" class={`${choice} inline-flex items-center border-slate-400 bg-white`}>Không, giữ nguyên</a>
       </form>
     </section>
   )}

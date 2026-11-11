@@ -9,7 +9,7 @@ export const GET: APIRoute = ({ site }) => {
   const body = [
     "User-agent: *",
     "Allow: /",
-    "Disallow: /quan-tri",
+    "Disallow: /admin",
     sitemapUrl ? `\nSitemap: ${sitemapUrl}` : "",
     postsSitemapUrl ? `Sitemap: ${postsSitemapUrl}\n` : "",
   ].join("\n");

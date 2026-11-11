@@ -1,5 +1,5 @@
 ---
-// src/pages/quan-tri/bai-dang/index.astro
+// src/pages/admin/posts/index.astro
 // Danh sách bài đăng cho mọi nhân viên: nháp và đã đăng, bấm vào để sửa.
 export const prerender = false;
 
@@ -15,10 +15,10 @@ const DONE: Record<string, string> = { deleted: "Đã xoá bài viết." };
 const done = DONE[Astro.url.searchParams.get("ok") ?? ""] ?? "";
 ---
 
-<AdminLayout title="Bài đăng" active="bai-dang" user={me}>
+<AdminLayout title="Bài đăng" active="posts" user={me}>
   <div class="flex flex-wrap items-center justify-between gap-4">
     <h1 class="text-2xl lg:text-3xl font-extrabold">Bài đăng</h1>
-    <a href="/quan-tri/bai-dang/moi" class="inline-flex min-h-12 items-center px-6 bg-brand-800 text-white font-bold hover:bg-brand-700">Viết bài mới</a>
+    <a href="/admin/posts/new" class="inline-flex min-h-12 items-center px-6 bg-brand-800 text-white font-bold hover:bg-brand-700">Viết bài mới</a>
   </div>
 
   {done && <p role="status" class="mt-5 border-l-4 border-green-700 bg-white px-4 py-3 font-semibold text-green-800">{done}</p>}
@@ -47,7 +47,7 @@ const done = DONE[Astro.url.searchParams.get("ok") ?? ""] ?? "";
               {listImages(db, post.id).length > 0 && <span class="ml-2 text-sm text-slate-500">có ảnh</span>}
             </td>
             <td class="px-4 py-3 whitespace-nowrap tabular-nums text-slate-600">{formatTime(post.updatedAt)} · {post.updatedBy ?? "?"}</td>
-            <td class="px-4 py-3"><a href={`/quan-tri/bai-dang/${post.id}`} class="inline-flex min-h-11 items-center px-4 border-2 border-brand-800 font-bold text-brand-800 hover:bg-brand-50">Mở</a></td>
+            <td class="px-4 py-3"><a href={`/admin/posts/${post.id}`} class="inline-flex min-h-11 items-center px-4 border-2 border-brand-800 font-bold text-brand-800 hover:bg-brand-50">Mở</a></td>
           </tr>
         ))}
       </tbody>

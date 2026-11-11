@@ -1,4 +1,4 @@
-// src/pages/quan-tri/dang-xuat.ts
+// src/pages/admin/logout.ts
 // Chỉ nhận POST (nút "Đăng xuất" là một form), để một đường link lạ không đăng xuất được ai.
 import type { APIRoute } from "astro";
 import { logout } from "../../server/auth";
@@ -13,6 +13,6 @@ export const POST: APIRoute = ({ cookies, locals, redirect }) => {
     const user = locals.user;
     logout(getDb(), token, user ? { id: user.id, username: user.username } : null);
   }
-  cookies.delete(SESSION_COOKIE, { path: "/quan-tri" });
-  return redirect("/quan-tri/dang-nhap");
+  cookies.delete(SESSION_COOKIE, { path: "/admin" });
+  return redirect("/admin/login");
 };

@@ -1,5 +1,5 @@
 ---
-// src/pages/quan-tri/tai-khoan.astro
+// src/pages/admin/accounts.astro
 // Chỉ quản trị: thêm nhân viên, đặt lại mật khẩu, khoá/mở khoá, đổi quyền.
 export const prerender = false;
 
@@ -18,7 +18,7 @@ import { AUTH_POLICY } from "../../server/policy";
 import { formatTime } from "../../server/session";
 
 const me = Astro.locals.user!;
-if (me.role !== "admin") return Astro.redirect("/quan-tri");
+if (me.role !== "admin") return Astro.redirect("/admin");
 
 const db = getDb();
 const actor = { id: me.id, username: me.username };
@@ -46,22 +46,22 @@ if (Astro.request.method === "POST") {
         role: form.get("role") === "admin" ? "admin" : "editor",
       };
       createUser(db, { ...kept, password: String(form.get("password") ?? "") }, actor);
-      return Astro.redirect("/quan-tri/tai-khoan?ok=created");
+      return Astro.redirect("/admin/accounts?ok=created");
     }
     if (intent === "reset") {
       resetPassword(db, userId, String(form.get("password") ?? ""), actor);
-      return Astro.redirect("/quan-tri/tai-khoan?ok=reset");
+      return Astro.redirect("/admin/accounts?ok=reset");
     }
     if (intent === "lock" || intent === "unlock") {
       if (intent === "lock" && userId === me.id) throw new AuthError("self", "Bạn không thể tự khoá tài khoản của mình.");
       setActive(db, userId, intent === "unlock", actor);
-      return Astro.redirect(`/quan-tri/tai-khoan?ok=${intent === "lock" ? "locked" : "unlocked"}`);
+      return Astro.redirect(`/admin/accounts?ok=${intent === "lock" ? "locked" : "unlocked"}`);
     }
     if (intent === "role") {
       const role: Role = form.get("role") === "admin" ? "admin" : "editor";
       if (userId === me.id) throw new AuthError("self", "Bạn không thể tự đổi quyền của mình.");
       setRole(db, userId, role, actor);
-      return Astro.redirect("/quan-tri/tai-khoan?ok=role");
+      return Astro.redirect("/admin/accounts?ok=role");
     }
   } catch (caught) {
     if (!(caught instanceof AuthError)) throw caught;
@@ -80,7 +80,7 @@ const ROLES: Array<{ value: Role; title: string; text: string }> = [
 const input = "min-h-12 border-2 border-slate-300 bg-white px-3 text-base focus:border-brand-600 focus:outline-none w-full";
 ---
 
-<AdminLayout title="Tài khoản" active="tai-khoan" user={me}>
+<AdminLayout title="Tài khoản" active="accounts" user={me}>
   <h1 class="text-2xl lg:text-3xl font-extrabold">Tài khoản</h1>
 
   {done && <p role="status" class="mt-5 border-l-4 border-green-700 bg-white px-4 py-3 font-semibold text-green-800">{done}</p>}

@@ -1,5 +1,5 @@
 ---
-// src/pages/tin-tuc/[slug].astro
+// src/pages/news/[slug].astro
 // Một bài đã đăng. Nháp hoặc bài không tồn tại đều trả 404, không lộ bài chưa xong.
 export const prerender = false;
 
@@ -37,7 +37,7 @@ const [cover, ...rest] = images;
   <script type="application/ld+json" slot="head" set:html={jsonLd} />
   <SiteHeader variant="document" />
   <main id="main" tabindex="-1" class="max-w-3xl mx-auto px-4 py-12 md:py-16">
-    <a href="/tin-tuc" class="text-sm font-semibold text-brand-800 underline">← Tin tức</a>
+    <a href="/news" class="text-sm font-semibold text-brand-800 underline">← Tin tức</a>
     <p class="mt-6 text-xs font-bold text-slate-600">{date}</p>
     <h1 class="mt-2 text-3xl md:text-4xl font-extrabold text-slate-900">{post.title}</h1>
 

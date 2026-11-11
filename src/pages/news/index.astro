@@ -1,5 +1,5 @@
 ---
-// src/pages/tin-tuc/index.astro
+// src/pages/news/index.astro
 // Danh sách bài đã đăng, mới nhất trước. Chạy trên server nên bài vừa đăng hiện ngay, không cần build lại.
 export const prerender = false;
 
@@ -14,7 +14,7 @@ import { countPublished, listImages, listPublished } from "../../server/posts";
 const db = getDb();
 const total = countPublished(db);
 const pages = Math.max(1, Math.ceil(total / POSTS_POLICY.perPage));
-const requested = Number(Astro.url.searchParams.get("trang") ?? 1);
+const requested = Number(Astro.url.searchParams.get("page") ?? 1);
 const page = Number.isInteger(requested) ? Math.min(Math.max(requested, 1), pages) : 1;
 const posts = listPublished(db, page).map((post) => ({ post, cover: listImages(db, post.id)[0] ?? null }));
 const date = (ms: number) =>
@@ -36,7 +36,7 @@ const date = (ms: number) =>
       <ul class="mt-8 grid gap-8">
         {posts.map(({ post, cover }) => (
           <li>
-            <a href={`/tin-tuc/${post.slug}`} class="group grid gap-4 sm:grid-cols-[14rem_1fr]">
+            <a href={`/news/${post.slug}`} class="group grid gap-4 sm:grid-cols-[14rem_1fr]">
               {cover ? (
                 <img src={`/uploads/${cover.file}`} alt="" width="448" height="336" loading="lazy" class="aspect-[4/3] w-full object-cover bg-slate-100" />
               ) : (
@@ -55,9 +55,9 @@ const date = (ms: number) =>
 
     {pages > 1 && (
       <nav class="mt-12 flex items-center justify-between" aria-label="Phân trang">
-        {page > 1 ? <a href={page === 2 ? "/tin-tuc" : `/tin-tuc?trang=${page - 1}`} class="inline-flex min-h-12 items-center px-5 border-2 border-brand-800 font-bold text-brand-800">← Mới hơn</a> : <span></span>}
+        {page > 1 ? <a href={page === 2 ? "/news" : `/news?page=${page - 1}`} class="inline-flex min-h-12 items-center px-5 border-2 border-brand-800 font-bold text-brand-800">← Mới hơn</a> : <span></span>}
         <span class="text-sm text-slate-600">Trang {page}/{pages}</span>
-        {page < pages ? <a href={`/tin-tuc?trang=${page + 1}`} class="inline-flex min-h-12 items-center px-5 border-2 border-brand-800 font-bold text-brand-800">Cũ hơn →</a> : <span></span>}
+        {page < pages ? <a href={`/news?page=${page + 1}`} class="inline-flex min-h-12 items-center px-5 border-2 border-brand-800 font-bold text-brand-800">Cũ hơn →</a> : <span></span>}
       </nav>
     )}
   </main>

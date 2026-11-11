@@ -20,13 +20,13 @@ Quên mật khẩu của quản trị duy nhất thì đặt lại (hỏi mật 
 docker compose exec app npm run admin:reset -- ten.dang.nhap
 ```
 
-Mở http://localhost:8080 (trang chủ) và http://localhost:8080/quan-tri (quản trị).
+Mở http://localhost:8080 (trang chủ) và http://localhost:8080/admin (quản trị).
 
 ## Việc cần thử trước khi mua VPS
 
-1. Đăng nhập được ở `/quan-tri` (không bị lỗi 403 "Cross-site POST").
+1. Đăng nhập được ở `/admin` (không bị lỗi 403 "Cross-site POST").
 2. Bật/tắt một tính năng, tải lại trang chủ thấy đổi ngay.
-3. Viết một bài có ảnh, đăng, xem ở `/tin-tuc`.
+3. Viết một bài có ảnh, đăng, xem ở `/news`.
 4. `docker compose restart app` rồi `docker compose down && docker compose up -d`: tài khoản, bài và ảnh vẫn còn.
 5. `docker compose logs app` không có lỗi lặp lại.
 6. Mở trang chủ lần đầu (ảnh chưa có trong bộ nhớ đệm) và lần hai; lần hai phải nhanh rõ rệt.

@@ -40,7 +40,7 @@ export const POSTS_POLICY = {
   /** Ảnh tải lên được thu nhỏ về chiều rộng này và đổi sang webp. */
   imageMaxWidth: 1600,
   imageQuality: 80,
-  /** Số bài mỗi trang ở /tin-tuc. */
+  /** Số bài mỗi trang ở /news. */
   perPage: 12,
 };
 

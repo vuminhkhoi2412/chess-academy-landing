@@ -1,5 +1,5 @@
 ---
-// src/pages/quan-tri/dang-nhap.astro
+// src/pages/admin/login.astro
 export const prerender = false;
 
 import Layout from "../../layouts/Layout.astro";
@@ -9,7 +9,7 @@ import { AUTH_POLICY } from "../../server/policy";
 import { SESSION_COOKIE, clientIp } from "../../server/session";
 
 // Middleware đã gán người dùng: ai đã đăng nhập thì vào thẳng tổng quan.
-if (Astro.locals.user) return Astro.redirect("/quan-tri");
+if (Astro.locals.user) return Astro.redirect("/admin");
 
 let error = "";
 let username = "";
@@ -32,10 +32,10 @@ if (Astro.request.method === "POST") {
       httpOnly: true,
       sameSite: "lax",
       secure: import.meta.env.PROD,
-      path: "/quan-tri",
+      path: "/admin",
       expires: new Date(result.expiresAt),
     });
-    return Astro.redirect("/quan-tri");
+    return Astro.redirect("/admin");
   }
   error =
     result.reason === "locked"
