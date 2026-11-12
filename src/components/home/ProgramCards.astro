@@ -1,0 +1,34 @@
+---
+// src/components/home/ProgramCards.astro
+// Ba thẻ chương trình, mỗi thẻ dẫn tới lộ trình chi tiết ở #curriculum.
+import { ArrowRight } from "lucide-react";
+import PieceIcon from "../PieceIcon";
+import { CURRICULUM_PROGRAMS } from "../../data/courses";
+---
+
+<section id="chuong-trinh" class="border-t border-slate-200 bg-cream py-14">
+  <div class="mx-auto max-w-6xl px-4">
+    <h2 class="gc-section-title text-3xl font-extrabold md:text-4xl">Ba chương trình học</h2>
+    <p class="mt-3 max-w-prose text-base text-slate-600">Mỗi cấp độ gồm 24 buổi, có giáo trình in riêng và mục tiêu đầu ra rõ ràng.</p>
+
+    <div class="mt-8 grid gap-4 md:grid-cols-3">
+      {
+        CURRICULUM_PROGRAMS.map((program) => (
+          <article class="flex flex-col rounded-lg border border-slate-200 bg-white p-5">
+            <PieceIcon programId={program.id} className="h-9 w-9 text-brand-800" />
+            <h3 class="mt-3 text-xl font-extrabold text-slate-900">{program.title}</h3>
+            <p class="text-sm font-semibold text-amber-700">{program.badge}</p>
+            <dl class="mt-3 space-y-1 text-sm text-slate-600">
+              <div><dt class="sr-only">Độ tuổi</dt><dd>{program.targetAudience}</dd></div>
+              <div><dt class="sr-only">Thời lượng</dt><dd>{program.totalDuration}</dd></div>
+              <div><dt class="sr-only">Mỗi buổi</dt><dd>{program.sessionLength}</dd></div>
+            </dl>
+            <a href="/#curriculum" class="mt-auto inline-flex min-h-11 items-center gap-1.5 pt-3 text-sm font-bold text-brand-800 hover:underline">
+              Xem lộ trình <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

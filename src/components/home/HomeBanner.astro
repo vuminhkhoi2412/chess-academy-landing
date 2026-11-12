@@ -1,0 +1,119 @@
+---
+// src/components/home/HomeBanner.astro
+// Đầu trang chủ: banner trượt (CSS scroll-snap, không thư viện) và cột lối tắt bên cạnh.
+// Slide tạm là ảnh lớp học thật kèm hai câu khẩu hiệu cố định; khi có banner thiết kế thì
+// thêm slide vào SLIDES (đợt 3 chuyển danh sách này sang trang quản trị).
+import { Image } from "astro:assets";
+import { ArrowRight, BookOpen, Banknote, MapPin, Newspaper, Lightbulb, GraduationCap, Phone } from "lucide-react";
+import { BRAND_INFO, BRANCHES } from "../../data/courses";
+import classroom from "../../assets/images/gallery-classroom.jpg";
+
+interface Props {
+  /** Form đăng ký đang mở: ô "Học thử" dẫn tới form; tắt thì thành ô gọi điện. */
+  enrolment: boolean;
+  /** Có bài đã đăng thì có ô Tin tức. */
+  news: boolean;
+  /** Có bài thuộc mục Kiến thức thì có ô Kiến thức (chưa có phân mục: đợt 3). */
+  knowledge?: boolean;
+}
+const { enrolment, news, knowledge = false } = Astro.props;
+
+const SLIDES = [
+  {
+    src: classroom,
+    alt: "Phòng học cờ vua tại một cơ sở Global Chess, các học viên đang luyện tập.",
+    title: BRAND_INFO.slogan1,
+    text: BRAND_INFO.slogan2,
+  },
+];
+
+const hotline = BRAND_INFO.hotlines[0];
+// Ô lối tắt: ô tin và kiến thức tự ẩn khi chưa có bài để không dẫn tới trang trống.
+const TILES = [
+  { href: "/#curriculum", label: "Khoá học", hint: "Lộ trình từng cấp độ", Icon: BookOpen, show: true },
+  { href: "/#pricing", label: "Học phí", hint: "Bảng giá theo cấp độ", Icon: Banknote, show: true },
+  { href: "/#branches", label: "Cơ sở", hint: `${BRANCHES.length} cơ sở tại TP.HCM`, Icon: MapPin, show: true },
+  { href: "/news", label: "Tin tức", hint: "Hoạt động mới nhất", Icon: Newspaper, show: news },
+  { href: "/news", label: "Kiến thức", hint: "Bài viết về cờ vua", Icon: Lightbulb, show: knowledge },
+  enrolment
+    ? { href: "/#pricing", label: "Học thử", hint: "Để lại thông tin", Icon: GraduationCap, show: true }
+    : { href: `tel:${hotline}`, label: "Gọi tư vấn", hint: hotline, Icon: Phone, show: true },
+].filter((tile) => tile.show);
+---
+
+<section class="bg-cream py-5 md:py-8" aria-label="Giới thiệu nhanh">
+  <div class="mx-auto grid max-w-6xl gap-4 px-4 lg:grid-cols-12">
+    <div class="relative lg:col-span-8">
+      <div
+        class="flex snap-x snap-mandatory overflow-x-auto scroll-smooth rounded-lg [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        tabindex="0"
+        role="region"
+        aria-roledescription="băng chuyền"
+        aria-label="Banner"
+      >
+        {
+          SLIDES.map((slide, i) => (
+            <div id={`slide-${i + 1}`} class="relative min-h-[22rem] w-full shrink-0 snap-start overflow-hidden bg-brand-900 md:min-h-[26rem] lg:min-h-[28rem]">
+              <Image
+                src={slide.src}
+                alt={slide.alt}
+                widths={[640, 960, 1280]}
+                sizes="(min-width: 1024px) 66vw, 100vw"
+                quality={80}
+                loading={i === 0 ? "eager" : "lazy"}
+                class="absolute inset-0 h-full w-full object-cover"
+              />
+              {/* Lớp phủ navy giữ chữ trắng đủ tương phản trên mọi ảnh. */}
+              <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/55 to-brand-950/10 md:bg-gradient-to-r md:from-brand-950/90 md:via-brand-950/60 md:to-transparent"></div>
+              <div class="relative flex h-full min-h-[inherit] flex-col justify-end gap-4 p-6 md:max-w-[34rem] md:justify-center md:p-10">
+                {i === 0 ? (
+                  <h1 class="text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl">{slide.title}</h1>
+                ) : (
+                  <h2 class="text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl">{slide.title}</h2>
+                )}
+                <p class="text-base font-medium text-brand-100 sm:text-lg">{slide.text}</p>
+                <div>
+                  <a href="/#pricing" class="gc-move gc-move--amber gc-move--lg">
+                    <span class="gc-move__label">{enrolment ? "Đăng ký học thử" : "Xem học phí"}</span>
+                    <span class="gc-move__go" aria-hidden="true"><ArrowRight className="h-4 w-4" /></span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+
+      {
+        SLIDES.length > 1 && (
+          <nav class="absolute inset-x-0 bottom-3 flex justify-center gap-1" aria-label="Chọn banner">
+            {SLIDES.map((_, i) => (
+              <a href={`#slide-${i + 1}`} class="grid size-6 place-items-center" aria-label={`Banner ${i + 1}`}>
+                <span class="block size-2 rounded-full bg-white/80"></span>
+              </a>
+            ))}
+          </nav>
+        )
+      }
+    </div>
+
+    <ul class="grid list-none grid-cols-2 gap-3 sm:grid-cols-3 lg:col-span-4 lg:grid-cols-2 lg:auto-rows-fr">
+      {
+        TILES.map(({ href, label, hint, Icon }) => (
+          <li class="contents">
+            <a
+              href={href}
+              class="group flex min-h-24 flex-col justify-between gap-3 rounded-lg bg-brand-800 p-4 text-white transition hover:bg-brand-700 active:scale-[0.98]"
+            >
+              <Icon className="h-6 w-6 text-amber-400" aria-hidden="true" />
+              <span>
+                <span class="block text-base font-bold leading-tight">{label}</span>
+                <span class="mt-0.5 block text-xs text-brand-100">{hint}</span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
