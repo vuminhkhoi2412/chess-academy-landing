@@ -144,7 +144,7 @@ const TILES = [
   ["cap","Học thử","Để lại thông tin"]
 ];
 
-const top = `<div class="top"><div class="in"><span>Hotline: <b>0789059440</b> – <b>0963848430</b></span><span style="display:flex;gap:1rem;align-items:center"><span>f</span><span>⌖</span><span class="cta">Đăng ký học thử</span></span></div></div>
+const topBar = `<div class="top"><div class="in"><span>Hotline: <b>0789059440</b> – <b>0963848430</b></span><span style="display:flex;gap:1rem;align-items:center"><span>f</span><span>⌖</span><span class="cta">Đăng ký học thử</span></span></div></div>
 <header class="nav"><div class="in"><div class="logo">GLOBAL CHESS<small>Một nước đi, mở tư duy</small></div><nav><span>Giới thiệu</span><span>Khoá học ▾</span><span>Cơ sở ▾</span><span>Học thử</span></nav></div></header>`;
 
 const strip = (cls="") => `<div class="strip ${cls}">${TILES.map(([i,l,h])=>`<a href="#" onclick="return false"><span class="ic">${ICON[i]}</span><span><b>${l}</b><small>${h}</small></span><span class="go" aria-hidden="true">›</span></a>`).join("")}</div>`;
@@ -175,13 +175,13 @@ const sec = (t) => `<div class="sec"><h2>${t}</h2><div class="ghost">nội dung 
 const OPT = {
   a: {
     title:"A · Bàn cờ thế chỗ cột lối tắt",
-    html: () => `${top}<div class="stage"><div class="two">${banner()}${puzzle(300)}</div><div style="height:.75rem"></div>${strip()}</div><div class="stage">${sec("Lộ trình đào tạo")}${sec("Hệ thống các cơ sở")}</div>`,
+    html: () => `${topBar}<div class="stage"><div class="two">${banner()}${puzzle(300)}</div><div style="height:.75rem"></div>${strip()}</div><div class="stage">${sec("Lộ trình đào tạo")}${sec("Hệ thống các cơ sở")}</div>`,
     y:"Bàn cờ lên ngay đầu trang, là thứ đầu tiên trẻ nhìn thấy và muốn bấm. Banner vẫn lớn. Cột phải không còn khối rỗng.",
     n:"Đầu trang đông hơn: ba thứ cạnh tranh sự chú ý (banner, bàn cờ, dải lối tắt). Trên điện thoại bàn cờ bị đẩy xuống dưới banner."
   },
   b: {
     title:"B · Dải lối tắt nổi lên mép banner, bàn cờ thành băng navy",
-    html: () => `${top}<div class="stage">${banner()}${strip("over")}</div><div class="stage" style="padding-top:.5rem">${sec("Lộ trình đào tạo")}</div>
+    html: () => `${topBar}<div class="stage">${banner()}${strip("over")}</div><div class="stage" style="padding-top:.5rem">${sec("Lộ trình đào tạo")}</div>
       <div class="band"><div class="stage"><div><h2>Thử một thế cờ</h2><p>Một thế cờ nhỏ để bạn và bé cùng thử. Bấm quân để đi; làm đúng sẽ thấy đòn "Chĩa đôi" mà bé học ở cấp độ chiến thuật.</p><span class="btn">Xem lộ trình chiến thuật →</span></div>${puzzle(320,{heading:"Thử thách ngày hôm nay"})}</div></div>
       <div class="stage">${sec("Hệ thống các cơ sở")}</div>`,
     y:"Banner được trọn chiều ngang, dải lối tắt gắn vào mép banner trông liền khối. Bàn cờ có hẳn một băng navy riêng, có chỗ cho lời dẫn và nút đi tiếp nên đỡ cảm giác bị bỏ lại giữa trang.",
@@ -189,13 +189,13 @@ const OPT = {
   },
   c: {
     title:"C · Bàn cờ là slide thứ hai của banner",
-    html: () => `${top}<div class="stage"><div class="banner" id="cban" style="min-height:26rem"></div>${strip()}</div><div class="stage">${sec("Lộ trình đào tạo")}${sec("Hệ thống các cơ sở")}</div>`,
+    html: () => `${topBar}<div class="stage"><div class="banner" id="cban" style="min-height:26rem"></div>${strip()}</div><div class="stage">${sec("Lộ trình đào tạo")}${sec("Hệ thống các cơ sở")}</div>`,
     y:"Không thêm khối nào, tận dụng đúng cơ chế banner trượt đã có và chỗ cũ của cột lối tắt. Banner đỡ đơn điệu khi có hai slide. Dải lối tắt vẫn ngay dưới.",
     n:"Người xem không bấm sang slide hai sẽ không thấy bàn cờ (dùng chấm chuyển slide, không tự trượt). Bàn cờ nhỏ hơn hai phương án trên."
   },
   d: {
     title:"D · Băng gọn giữa trang (ngay sau Lộ trình)",
-    html: () => `${top}<div class="stage">${banner()}<div style="height:.75rem"></div>${strip()}</div><div class="stage" style="padding-top:0">${sec("Lộ trình đào tạo")}
+    html: () => `${topBar}<div class="stage">${banner()}<div style="height:.75rem"></div>${strip()}</div><div class="stage" style="padding-top:0">${sec("Lộ trình đào tạo")}
       <div class="mini"><div style="max-width:15rem">${puzzle(208,{title:false,heading:"Thử thách hôm nay"})}</div><div><h3>Con bạn tìm ra nước đi này không?</h3><p>Trắng đi trước: làm sao để bắt Xe của Đen? Bấm quân Mã ở g5 rồi chọn ô đích.</p></div><span class="btn" style="background:var(--navy-800);color:#fff">Xem lộ trình →</span></div>${sec("Hệ thống các cơ sở")}</div>`,
     y:"Thay đổi nhỏ nhất: banner và dải lối tắt giữ nguyên, bàn cờ thu thành một băng ngang gọn đứng cạnh Lộ trình, đúng chỗ nó liên quan (đòn chiến thuật). Ít tốn diện tích nhất.",
     n:"Bàn cờ nhỏ (208px) nên quân hơi bé; phù hợp xem như một món thêm hơn là điểm nhấn của trang."
