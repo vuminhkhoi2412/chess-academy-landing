@@ -1,14 +1,17 @@
 ---
 // src/components/home/NewsSection.astro
 // Khối tin: một bài lớn bên trái, ba bài nhỏ bên phải, cùng rìa với banner (max-w-6xl, px-4).
-// Trang chủ chỉ dựng khối này khi có bài đã đăng. Chia mục (Tin tức/Kiến thức) thêm ở đợt 3.
+// Trang chủ chỉ dựng khối này khi có bài đã đăng. Mỗi bài ghi rõ mục (Tin tức/Kiến thức).
 import { ArrowRight } from "lucide-react";
-import type { Post, PostImage } from "../../server/posts";
+import { POST_CATEGORIES, type Post, type PostImage } from "../../server/posts";
 
 interface Props {
   items: { post: Post; cover: PostImage | null }[];
+  /** Mục nào đã có bài: tab lọc chỉ hiện khi cả hai mục đều có. */
+  news: boolean;
+  knowledge: boolean;
 }
-const { items } = Astro.props;
+const { items, news, knowledge } = Astro.props;
 const [lead, ...rest] = items;
 
 const date = (ms: number) =>
@@ -19,9 +22,17 @@ const date = (ms: number) =>
   <div class="mx-auto max-w-6xl px-4">
     <div class="flex items-end justify-between gap-4">
       <h2 class="gc-section-title text-3xl font-extrabold md:text-4xl">Tin tức</h2>
-      <a href="/news" class="inline-flex min-h-11 items-center gap-1.5 text-sm font-bold text-brand-800 hover:underline">
-        Xem tất cả <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-      </a>
+      <nav class="flex flex-wrap items-center gap-x-5" aria-label="Xem theo mục">
+        {news && knowledge && (
+          <>
+            <a href="/news?category=news" class="inline-flex min-h-11 items-center text-sm font-bold text-brand-800 hover:underline">{POST_CATEGORIES.news}</a>
+            <a href="/news?category=knowledge" class="inline-flex min-h-11 items-center text-sm font-bold text-brand-800 hover:underline">{POST_CATEGORIES.knowledge}</a>
+          </>
+        )}
+        <a href="/news" class="inline-flex min-h-11 items-center gap-1.5 text-sm font-bold text-brand-800 hover:underline">
+          Xem tất cả <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+        </a>
+      </nav>
     </div>
 
     <div class="mt-6 grid gap-6 lg:grid-cols-12">
@@ -33,7 +44,7 @@ const date = (ms: number) =>
             <div class="aspect-video w-full rounded-lg bg-brand-50" aria-hidden="true"></div>
           )
         }
-        <p class="mt-3 text-xs font-bold text-slate-600">{date(lead.post.publishedAt ?? lead.post.createdAt)}</p>
+        <p class="mt-3 text-xs font-bold text-slate-600">{POST_CATEGORIES[lead.post.category]} · {date(lead.post.publishedAt ?? lead.post.createdAt)}</p>
         <h3 class="mt-1 text-2xl font-extrabold leading-tight text-slate-900 group-hover:underline">{lead.post.title}</h3>
         {lead.post.summary && <p class="mt-2 leading-relaxed text-slate-700">{lead.post.summary}</p>}
       </a>
@@ -50,7 +61,7 @@ const date = (ms: number) =>
                     <div class="aspect-[4/3] w-full rounded-lg bg-brand-50" aria-hidden="true"></div>
                   )}
                   <div>
-                    <p class="text-xs font-bold text-slate-600">{date(post.publishedAt ?? post.createdAt)}</p>
+                    <p class="text-xs font-bold text-slate-600">{POST_CATEGORIES[post.category]} · {date(post.publishedAt ?? post.createdAt)}</p>
                     <h3 class="mt-0.5 text-base font-bold leading-snug text-slate-900 group-hover:underline">{post.title}</h3>
                   </div>
                 </a>

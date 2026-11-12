@@ -14,11 +14,13 @@ import { BRAND_INFO, BRANCHES, CURRICULUM_PROGRAMS } from "../data/courses";
 interface Props {
   /** Trang chủ truyền false khi quản trị đã đóng form đăng ký: nhãn đổi sang "Học phí". */
   enrolmentOpen?: boolean;
-  /** Có ít nhất một bài đã đăng thì menu có thêm "Tin tức". */
-  hasNews?: boolean;
+  /** Mục Tin tức đã có bài đăng. */
+  news?: boolean;
+  /** Mục Kiến thức đã có bài đăng. */
+  knowledge?: boolean;
 }
 
-const { enrolmentOpen = true, hasNews = false } = Astro.props;
+const { enrolmentOpen = true, news = false, knowledge = false } = Astro.props;
 
 // Trang /courses, /branches, /trial chưa có (đợt 5): tạm trỏ tới các mục của trang chủ.
 const NAV: { label: string; href: string; children?: { label: string; href: string }[] }[] = [
@@ -36,8 +38,24 @@ const NAV: { label: string; href: string; children?: { label: string; href: stri
     href: "/#branches",
     children: BRANCHES.map((branch) => ({ label: branch.name, href: "/#branches" })),
   },
-  // Mục con "Kiến thức" thêm ở đợt 3, khi bài đăng có phân mục.
-  ...(hasNews ? [{ label: "Tin tức", href: "/news" }] : []),
+  // Mục nào chưa có bài thì không hiện, để không dẫn tới trang trống.
+  ...(news && knowledge
+    ? [
+        {
+          label: "Tin tức",
+          href: "/news",
+          children: [
+            { label: "Tất cả bài viết", href: "/news" },
+            { label: "Tin tức", href: "/news?category=news" },
+            { label: "Kiến thức", href: "/news?category=knowledge" },
+          ],
+        },
+      ]
+    : news
+      ? [{ label: "Tin tức", href: "/news" }]
+      : knowledge
+        ? [{ label: "Kiến thức", href: "/news?category=knowledge" }]
+        : []),
   ...(enrolmentOpen ? [{ label: "Học thử", href: "/#pricing" }] : []),
 ];
 

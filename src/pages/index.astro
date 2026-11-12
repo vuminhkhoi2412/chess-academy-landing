@@ -13,13 +13,14 @@ import FaqSection from "../components/home/FaqSection.astro";
 import CurriculumExplorer from "../components/CurriculumExplorer";
 import PricingAndCheckout from "../components/PricingAndCheckout";
 import Layout from "../layouts/Layout.astro";
-import { getSiteConfig, getLatestPosts } from "../server/site-config";
+import { getSiteConfig, getHomeSlides, getLatestPosts, getNewsAvailability } from "../server/site-config";
 import { BRAND_INFO, BRANCHES, TUITION_PROGRAMS, TUITION_LEVELS, TESTIMONIALS } from "../data/courses";
 
 // Cấu hình bật/tắt đọc ở MỖI request (trang này chạy trên server), nên đổi trong /admin có hiệu lực ngay.
 const { flags, banner } = getSiteConfig();
 const latestPosts = getLatestPosts(4);
-const hasNews = latestPosts.length > 0;
+const { news, knowledge } = getNewsAvailability();
+const slides = getHomeSlides();
 
 // Hết nhận xét thật thì không được đăng trang (thay cho ô TODO cũ).
 if (TESTIMONIALS.length === 0) throw new Error("TESTIMONIALS đang rỗng: cần ít nhất một nhận xét thật của phụ huynh.");
@@ -111,12 +112,12 @@ const structuredData = {
     )}
 
 
-    <SiteHeader enrolmentOpen={flags.enrolment} hasNews={hasNews} />
+    <SiteHeader enrolmentOpen={flags.enrolment} news={news} knowledge={knowledge} />
 
     <main id="main" tabindex="-1">
-    <HomeBanner enrolment={flags.enrolment} news={hasNews} puzzle={flags.puzzle} />
+    <HomeBanner enrolment={flags.enrolment} news={news} knowledge={knowledge} puzzle={flags.puzzle} slides={slides} />
 
-    {hasNews && <NewsSection items={latestPosts} />}
+    {latestPosts.length > 0 && <NewsSection items={latestPosts} news={news} knowledge={knowledge} />}
 
     <!-- Interactive Curriculum Explorer (Sơ cấp 1-2 & Trung cấp Q1-Q2) -->
     <CurriculumExplorer client:load />
@@ -133,7 +134,7 @@ const structuredData = {
     <PricingAndCheckout client:load enrolmentOpen={flags.enrolment} />
     </main>
 
-    <SiteFooter faq={flags.faq} news={hasNews} />
+    <SiteFooter faq={flags.faq} news={latestPosts.length > 0} />
 
     {flags.mobile_bar && <MobileContactBar />}
 </Layout>

@@ -57,6 +57,8 @@ Các quyết định cần chủ trung tâm xác nhận:
 | `imageMaxWidth` / `imageQuality` | 1600 px / 80 | Ảnh tải lên được thu nhỏ và đổi sang webp theo mức này |
 | `perPage` | 12 | Số bài mỗi trang ở `/news` |
 
+Mục của bài (`category`): `news` (Tin tức) hoặc `knowledge` (Kiến thức), chọn ở trang soạn bài; bài cũ mặc định là Tin tức. Menu, ô lối tắt và tab lọc ở `/news` chỉ hiện một mục khi mục đó đã có bài đã đăng.
+
 Quyết định đã làm, chờ chủ trung tâm xác nhận:
 
 - Nội dung bài soạn bằng trình soạn dạng Word, thanh nút biểu tượng (`src/components/admin/RichEditor.tsx`, React + Tiptap): hoàn tác/làm lại, tiêu đề 1–4 (menu thả xuống), danh sách chấm/đánh số/có ô tích, đậm, nghiêng, gạch chân, màu chữ, liên kết, căn trái/giữa/phải/đều, tìm và thay thế (không phân biệt hoa thường và dấu). Chèn ảnh giữa bài, bảng, nhúng video chưa có (xem `docs/backlog.md`). Ảnh nằm ở đầu (bìa) và cuối bài.
@@ -86,3 +88,16 @@ Quyết định đã làm, chờ chủ trung tâm xác nhận:
 - Bài đăng chia danh mục theo mục trang sau; hiện dùng một danh sách chung.
 - Đăng nhập bằng Google (tuỳ chọn, làm sau nếu cần).
 - Năm giá trị `AUTH_POLICY` ở trên.
+
+## Banner trang chủ (`src/server/policy.ts`, `SLIDES_POLICY`; trang `/admin/slides`)
+
+| Thông số | Hiện tại | Ý nghĩa |
+|---|---|---|
+| `maxSlides` | 6 | Số slide tối đa |
+| `titleMax` / `textMax` / `altMax` / `linkMax` | 60 / 120 / 160 / 200 | Số ký tự tối đa của tiêu đề, dòng phụ, mô tả ảnh, liên kết |
+| `minWidth` × `minHeight` | 1600 × 900 px | Ảnh nhỏ hơn bị từ chối để banner không bị mờ |
+
+- Cả Quản trị và Biên tập thêm, sửa, bật/tắt, đổi thứ tự và xoá slide. Mọi thay đổi vào nhật ký.
+- Không có slide nào đang bật (hoặc DB lỗi) thì trang chủ dùng slide tạm trong `HomeBanner.astro`: ảnh lớp học và hai khẩu hiệu cố định của thương hiệu.
+- Liên kết chỉ nhận `/đường-dẫn` trong site hoặc `https://`; chặn `//`, `http:`, `javascript:`. Slide không có tiêu đề (chữ đã in trên ảnh) bắt buộc có mô tả ảnh.
+- Ảnh slide cũng nằm ở `DATA_DIR/uploads`, cùng sao lưu với `app.db`. **Triển khai bản có đợt 3 lên Droplet: sao lưu `app.db` trước, migration chạy tự động khi server khởi động.**

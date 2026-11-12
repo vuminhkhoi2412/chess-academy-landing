@@ -17,11 +17,18 @@ export class PostError extends Error {
   }
 }
 
+/** Mục của bài đăng: nhãn tiếng Việt hiển thị trên trang và trong quản trị. */
+export const POST_CATEGORIES = { news: "Tin tức", knowledge: "Kiến thức" } as const;
+export type PostCategory = keyof typeof POST_CATEGORIES;
+export const isCategory = (value: unknown): value is PostCategory =>
+  typeof value === "string" && Object.hasOwn(POST_CATEGORIES, value);
+
 export interface Post {
   id: number;
   slug: string;
   title: string;
   summary: string;
+  category: PostCategory;
   /** HTML đã lọc nếu bodyFormat là "html"; văn bản thuần nếu là "text" (bài cũ). Hiển thị bằng `bodyHtml`. */
   body: string;
   bodyFormat: "text" | "html";
@@ -45,6 +52,8 @@ export interface PostInput {
   title: string;
   summary: string;
   body: string;
+  /** Không truyền thì là "news". */
+  category?: PostCategory;
 }
 
 type Row = Record<string, unknown>;
@@ -55,6 +64,7 @@ function toPost(r: Row): Post {
     slug: r.slug as string,
     title: r.title as string,
     summary: r.summary as string,
+    category: isCategory(r.category) ? r.category : "news",
     body: r.body as string,
     bodyFormat: (r.body_format as "text" | "html") ?? "text",
     status: r.status as Post["status"],
@@ -88,7 +98,9 @@ function uniqueSlug(db: Db, title: string): string {
   return slug;
 }
 
-function clean(input: PostInput): PostInput {
+function clean(input: PostInput): Required<PostInput> {
+  const category = input.category ?? "news";
+  if (!isCategory(category)) throw new PostError("category", "Hãy chọn mục cho bài viết.");
   const title = input.title.replace(/\s+/g, " ").trim();
   const summary = input.summary.replace(/\s+/g, " ").trim();
   // Nội dung luôn là HTML từ trình soạn thảo, đã lọc: chỉ giữ thẻ/thuộc tính cho phép.
@@ -102,7 +114,7 @@ function clean(input: PostInput): PostInput {
   if (textLength > POSTS_POLICY.bodyMax)
     throw new PostError("body", `Nội dung tối đa ${POSTS_POLICY.bodyMax} ký tự (hiện ${textLength}).`);
   if (body.length > POSTS_POLICY.bodyHtmlMax) throw new PostError("body", "Nội dung quá dài.");
-  return { title, summary, body };
+  return { title, summary, body, category };
 }
 
 export function createPost(db: Db, input: PostInput, actor: Actor, now: number = Date.now()): Post {
@@ -110,10 +122,10 @@ export function createPost(db: Db, input: PostInput, actor: Actor, now: number =
   const slug = uniqueSlug(db, v.title);
   const info = db
     .prepare(
-      `INSERT INTO posts (slug, title, summary, body, body_format, status, created_at, created_by, updated_at, updated_by)
-       VALUES (?, ?, ?, ?, 'html', 'draft', ?, ?, ?, ?)`,
+      `INSERT INTO posts (slug, title, summary, category, body, body_format, status, created_at, created_by, updated_at, updated_by)
+       VALUES (?, ?, ?, ?, ?, 'html', 'draft', ?, ?, ?, ?)`,
     )
-    .run(slug, v.title, v.summary, v.body, now, actor.username, now, actor.username);
+    .run(slug, v.title, v.summary, v.category, v.body, now, actor.username, now, actor.username);
   const id = Number(info.lastInsertRowid);
   audit(db, actor, "post_created", String(id), { title: v.title }, now);
   return getPostById(db, id)!;
@@ -123,9 +135,10 @@ export function createPost(db: Db, input: PostInput, actor: Actor, now: number =
 export function updatePost(db: Db, id: number, input: PostInput, actor: Actor, now: number = Date.now()): Post {
   const v = clean(input);
   if (!getPostById(db, id)) throw new PostError("not_found", "Bài viết không tồn tại.");
-  db.prepare("UPDATE posts SET title=?, summary=?, body=?, body_format='html', updated_at=?, updated_by=? WHERE id=?").run(
+  db.prepare("UPDATE posts SET title=?, summary=?, category=?, body=?, body_format='html', updated_at=?, updated_by=? WHERE id=?").run(
     v.title,
     v.summary,
+    v.category,
     v.body,
     now,
     actor.username,
@@ -187,17 +200,23 @@ export function listPosts(db: Db): Post[] {
   return (db.prepare("SELECT * FROM posts ORDER BY updated_at DESC, id DESC").all() as Row[]).map(toPost);
 }
 
-export function listPublished(db: Db, page = 1, perPage = POSTS_POLICY.perPage): Post[] {
+/** Bài đã đăng, mới nhất trước; truyền `category` để chỉ lấy một mục. */
+export function listPublished(db: Db, page = 1, perPage = POSTS_POLICY.perPage, category?: PostCategory): Post[] {
   const offset = (Math.max(1, page) - 1) * perPage;
+  const where = category ? "status='published' AND category=?" : "status='published'";
+  const args = category ? [category, perPage, offset] : [perPage, offset];
   return (
-    db
-      .prepare("SELECT * FROM posts WHERE status='published' ORDER BY published_at DESC, id DESC LIMIT ? OFFSET ?")
-      .all(perPage, offset) as Row[]
+    db.prepare(`SELECT * FROM posts WHERE ${where} ORDER BY published_at DESC, id DESC LIMIT ? OFFSET ?`).all(...args) as Row[]
   ).map(toPost);
 }
 
-export function countPublished(db: Db): number {
-  return (db.prepare("SELECT COUNT(*) AS n FROM posts WHERE status='published'").get() as { n: number }).n;
+export function countPublished(db: Db, category?: PostCategory): number {
+  const row = (
+    category
+      ? db.prepare("SELECT COUNT(*) AS n FROM posts WHERE status='published' AND category=?").get(category)
+      : db.prepare("SELECT COUNT(*) AS n FROM posts WHERE status='published'").get()
+  ) as { n: number };
+  return row.n;
 }
 
 // ---------- Ảnh ----------

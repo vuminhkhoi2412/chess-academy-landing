@@ -7,7 +7,7 @@ import { randomBytes } from "node:crypto";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import sharp from "sharp";
-import { POSTS_POLICY } from "./policy.ts";
+import { POSTS_POLICY, SLIDES_POLICY } from "./policy.ts";
 
 export class UploadError extends Error {}
 
@@ -41,8 +41,29 @@ export async function processImage(input: Uint8Array): Promise<Buffer> {
   }
 }
 
-export async function saveImage(input: Uint8Array): Promise<string> {
-  const data = await processImage(input);
+/**
+ * Ảnh banner: như ảnh bài đăng nhưng phải đủ lớn (SLIDES_POLICY) để không bị mờ khi phóng ra.
+ * Kích thước tính theo chiều nhìn thấy, sau khi xoay theo EXIF.
+ */
+export async function processSlideImage(input: Uint8Array): Promise<Buffer> {
+  try {
+    const meta = await sharp(input).metadata();
+    const swapped = (meta.orientation ?? 1) >= 5;
+    const width = (swapped ? meta.height : meta.width) ?? 0;
+    const height = (swapped ? meta.width : meta.height) ?? 0;
+    if (width > 0 && (width < SLIDES_POLICY.minWidth || height < SLIDES_POLICY.minHeight))
+      throw new UploadError(
+        `Ảnh banner cần tối thiểu ${SLIDES_POLICY.minWidth}×${SLIDES_POLICY.minHeight} px (ảnh này ${width}×${height} px).`,
+      );
+  } catch (error) {
+    if (error instanceof UploadError) throw error;
+    // Không đọc được siêu dữ liệu: để processImage báo lỗi "không phải ảnh".
+  }
+  return processImage(input);
+}
+
+export async function saveImage(input: Uint8Array, process: (input: Uint8Array) => Promise<Buffer> = processImage): Promise<string> {
+  const data = await process(input);
   const name = `${randomBytes(16).toString("hex")}.webp`;
   await mkdir(uploadsDir(), { recursive: true });
   await writeFile(join(uploadsDir(), name), data);

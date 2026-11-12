@@ -9,29 +9,67 @@ import SiteFooter from "../../components/SiteFooter.astro";
 import { BRAND_INFO } from "../../data/courses";
 import { getDb } from "../../server/db";
 import { POSTS_POLICY } from "../../server/policy";
-import { countPublished, listImages, listPublished } from "../../server/posts";
+import { POST_CATEGORIES, countPublished, isCategory, listImages, listPublished } from "../../server/posts";
 
 const db = getDb();
-const total = countPublished(db);
+const requestedCategory = Astro.url.searchParams.get("category");
+const category = isCategory(requestedCategory) ? requestedCategory : undefined;
+const counts = { news: countPublished(db, "news"), knowledge: countPublished(db, "knowledge") };
+const allTotal = counts.news + counts.knowledge;
+const total = category ? counts[category] : allTotal;
 const pages = Math.max(1, Math.ceil(total / POSTS_POLICY.perPage));
 const requested = Number(Astro.url.searchParams.get("page") ?? 1);
 const page = Number.isInteger(requested) ? Math.min(Math.max(requested, 1), pages) : 1;
-const posts = listPublished(db, page).map((post) => ({ post, cover: listImages(db, post.id)[0] ?? null }));
+const posts = listPublished(db, page, POSTS_POLICY.perPage, category).map((post) => ({ post, cover: listImages(db, post.id)[0] ?? null }));
 const date = (ms: number) =>
   new Intl.DateTimeFormat("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", dateStyle: "long" }).format(ms);
+
+// Liên kết lọc mục / phân trang giữ nguyên mục đang xem.
+const listHref = (cat: string | undefined, n = 1) => {
+  const query = new URLSearchParams();
+  if (cat) query.set("category", cat);
+  if (n > 1) query.set("page", String(n));
+  const text = query.toString();
+  return text ? `/news?${text}` : "/news";
+};
+// Chỉ hiện tab lọc khi cả hai mục đều có bài; một mục thôi thì không có gì để chọn.
+const showTabs = counts.news > 0 && counts.knowledge > 0;
+const TABS = [
+  { label: "Tất cả", cat: undefined, n: allTotal },
+  { label: POST_CATEGORIES.news, cat: "news", n: counts.news },
+  { label: POST_CATEGORIES.knowledge, cat: "knowledge", n: counts.knowledge },
+];
+const heading = category ? POST_CATEGORIES[category] : "Tin tức";
 ---
 
 <Layout
-  title={`Tin tức – ${BRAND_INFO.name}`}
+  title={`${heading} – ${BRAND_INFO.name}`}
   description={`Tin tức, hoạt động lớp học và giải đấu mới nhất của ${BRAND_INFO.name}.`}
   robots={total === 0 ? "noindex, follow" : "index, follow"}
 >
-  <SiteHeader hasNews={total > 0} />
+  <SiteHeader news={counts.news > 0} knowledge={counts.knowledge > 0} />
   <main id="main" tabindex="-1" class="max-w-3xl mx-auto px-4 py-12 md:py-16">
-    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900">Tin tức</h1>
+    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900">{heading}</h1>
+
+    {showTabs && (
+      <nav class="mt-6 flex flex-wrap gap-2" aria-label="Lọc theo mục">
+        {TABS.map((tab) => (
+          <a
+            href={listHref(tab.cat)}
+            aria-current={tab.cat === category ? "page" : undefined}
+            class:list={[
+              "inline-flex min-h-11 items-center px-4 text-sm font-bold border-2",
+              tab.cat === category ? "border-brand-800 bg-brand-800 text-white" : "border-slate-300 bg-white text-slate-700 hover:border-brand-800",
+            ]}
+          >
+            {tab.label} <span class="ml-1.5 font-medium opacity-80">({tab.n})</span>
+          </a>
+        ))}
+      </nav>
+    )}
 
     {total === 0 ? (
-      <p class="mt-8 text-slate-600">Chưa có bài viết nào. Mời bạn quay lại sau.</p>
+      <p class="mt-8 text-slate-600">{category ? "Chưa có bài nào trong mục này." : "Chưa có bài viết nào."} Mời bạn quay lại sau.</p>
     ) : (
       <ul class="mt-8 grid gap-8">
         {posts.map(({ post, cover }) => (
@@ -43,7 +81,7 @@ const date = (ms: number) =>
                 <div class="hidden sm:block aspect-[4/3] bg-brand-50" aria-hidden="true"></div>
               )}
               <div>
-                <p class="text-xs font-bold text-slate-600">{date(post.publishedAt ?? post.createdAt)}</p>
+                <p class="text-xs font-bold text-slate-600">{POST_CATEGORIES[post.category]} · {date(post.publishedAt ?? post.createdAt)}</p>
                 <h2 class="mt-1 text-xl font-extrabold text-slate-900 group-hover:underline">{post.title}</h2>
                 {post.summary && <p class="mt-2 text-slate-700 leading-relaxed">{post.summary}</p>}
               </div>
@@ -55,11 +93,11 @@ const date = (ms: number) =>
 
     {pages > 1 && (
       <nav class="mt-12 flex items-center justify-between" aria-label="Phân trang">
-        {page > 1 ? <a href={page === 2 ? "/news" : `/news?page=${page - 1}`} class="inline-flex min-h-12 items-center px-5 border-2 border-brand-800 font-bold text-brand-800">← Mới hơn</a> : <span></span>}
+        {page > 1 ? <a href={listHref(category, page - 1)} class="inline-flex min-h-12 items-center px-5 border-2 border-brand-800 font-bold text-brand-800">← Mới hơn</a> : <span></span>}
         <span class="text-sm text-slate-600">Trang {page}/{pages}</span>
-        {page < pages ? <a href={`/news?page=${page + 1}`} class="inline-flex min-h-12 items-center px-5 border-2 border-brand-800 font-bold text-brand-800">Cũ hơn →</a> : <span></span>}
+        {page < pages ? <a href={listHref(category, page + 1)} class="inline-flex min-h-12 items-center px-5 border-2 border-brand-800 font-bold text-brand-800">Cũ hơn →</a> : <span></span>}
       </nav>
     )}
   </main>
-  <SiteFooter news={total > 0} />
+  <SiteFooter news={allTotal > 0} />
 </Layout>

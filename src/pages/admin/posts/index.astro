@@ -5,7 +5,7 @@ export const prerender = false;
 
 import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { getDb } from "../../../server/db";
-import { listImages, listPosts } from "../../../server/posts";
+import { POST_CATEGORIES, listImages, listPosts } from "../../../server/posts";
 import { formatTime } from "../../../server/session";
 
 const me = Astro.locals.user!;
@@ -28,6 +28,7 @@ const done = DONE[Astro.url.searchParams.get("ok") ?? ""] ?? "";
       <thead class="bg-slate-100">
         <tr>
           <th class="px-4 py-3">Tiêu đề</th>
+          <th class="px-4 py-3">Mục</th>
           <th class="px-4 py-3">Trạng thái</th>
           <th class="px-4 py-3">Sửa lần cuối</th>
           <th class="px-4 py-3"><span class="sr-only">Mở</span></th>
@@ -35,11 +36,12 @@ const done = DONE[Astro.url.searchParams.get("ok") ?? ""] ?? "";
       </thead>
       <tbody>
         {posts.length === 0 && (
-          <tr><td colspan="4" class="px-4 py-6 text-slate-600">Chưa có bài nào. Bấm "Viết bài mới" để bắt đầu.</td></tr>
+          <tr><td colspan="5" class="px-4 py-6 text-slate-600">Chưa có bài nào. Bấm "Viết bài mới" để bắt đầu.</td></tr>
         )}
         {posts.map((post) => (
           <tr class="border-t border-slate-200">
             <td class="px-4 py-3 font-semibold">{post.title}</td>
+            <td class="px-4 py-3 whitespace-nowrap">{POST_CATEGORIES[post.category]}</td>
             <td class="px-4 py-3">
               {post.status === "published"
                 ? <span class="font-bold text-green-800">Đã đăng</span>

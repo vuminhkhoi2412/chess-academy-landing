@@ -1,34 +1,57 @@
 ---
 // src/components/home/HomeBanner.astro
 // Đầu trang chủ: banner trượt (CSS scroll-snap, không thư viện) cạnh bàn cờ đố, và dải lối tắt bên dưới.
-// Slide tạm là ảnh lớp học thật kèm hai câu khẩu hiệu cố định; khi có banner thiết kế thì
-// thêm slide vào SLIDES (đợt 3 chuyển danh sách này sang trang quản trị).
+// Slide lấy từ trang quản trị (/admin/slides). Chưa có slide nào đang bật thì dùng slide tạm:
+// ảnh lớp học thật kèm hai câu khẩu hiệu cố định của thương hiệu.
 import { Image } from "astro:assets";
 import { ArrowRight, BookOpen, Banknote, MapPin, Newspaper, Lightbulb, GraduationCap, Phone } from "lucide-react";
 import InteractivePuzzle from "../InteractivePuzzle";
 import { BRAND_INFO, BRANCHES } from "../../data/courses";
 import classroom from "../../assets/images/gallery-classroom.jpg";
+import type { ImageMetadata } from "astro";
+import type { Slide } from "../../server/slides";
 
 interface Props {
   /** Form đăng ký đang mở: ô "Học thử" dẫn tới form; tắt thì thành ô gọi điện. */
   enrolment: boolean;
   /** Có bài đã đăng thì có ô Tin tức. */
   news: boolean;
-  /** Có bài thuộc mục Kiến thức thì có ô Kiến thức (chưa có phân mục: đợt 3). */
+  /** Có bài thuộc mục Kiến thức thì có ô Kiến thức. */
   knowledge?: boolean;
+  /** Slide đang bật từ trang quản trị, đã sắp thứ tự. Rỗng thì dùng slide tạm. */
+  slides?: Slide[];
   /** Công tắc bàn cờ đố: bật thì bàn cờ chiếm cột phải của banner (chỉ từ md trở lên). */
   puzzle: boolean;
 }
-const { enrolment, news, knowledge = false, puzzle } = Astro.props;
+const { enrolment, news, knowledge = false, puzzle, slides = [] } = Astro.props;
 
-const SLIDES = [
-  {
-    src: classroom,
-    alt: "Phòng học cờ vua tại một cơ sở Global Chess, các học viên đang luyện tập.",
-    title: BRAND_INFO.slogan1,
-    text: BRAND_INFO.slogan2,
-  },
-];
+interface SlideView {
+  /** Ảnh dựng sẵn trong build (slide tạm) hoặc đường dẫn ảnh tải lên. */
+  image: ImageMetadata | string;
+  alt: string;
+  title: string;
+  text: string;
+  cta: { label: string; href: string } | null;
+}
+
+const FALLBACK: SlideView = {
+  image: classroom,
+  alt: "Phòng học cờ vua tại một cơ sở Global Chess, các học viên đang luyện tập.",
+  title: BRAND_INFO.slogan1,
+  text: BRAND_INFO.slogan2,
+  cta: { label: enrolment ? "Đăng ký học thử" : "Xem học phí", href: "/#pricing" },
+};
+
+const SLIDES: SlideView[] =
+  slides.length > 0
+    ? slides.map((slide) => ({
+        image: `/uploads/${slide.file}`,
+        alt: slide.alt,
+        title: slide.title,
+        text: slide.text,
+        cta: slide.link ? { label: "Xem thêm", href: slide.link } : null,
+      }))
+    : [FALLBACK];
 
 const hotline = BRAND_INFO.hotlines[0];
 // Ô lối tắt: ô tin và kiến thức tự ẩn khi chưa có bài để không dẫn tới trang trống.
@@ -36,8 +59,8 @@ const TILES = [
   { href: "/#curriculum", label: "Khoá học", hint: "Lộ trình từng cấp độ", Icon: BookOpen, show: true },
   { href: "/#pricing", label: "Học phí", hint: "Bảng giá theo cấp độ", Icon: Banknote, show: true },
   { href: "/#branches", label: "Cơ sở", hint: `${BRANCHES.length} cơ sở tại TP.HCM`, Icon: MapPin, show: true },
-  { href: "/news", label: "Tin tức", hint: "Hoạt động mới nhất", Icon: Newspaper, show: news },
-  { href: "/news", label: "Kiến thức", hint: "Bài viết về cờ vua", Icon: Lightbulb, show: knowledge },
+  { href: news && knowledge ? "/news?category=news" : "/news", label: "Tin tức", hint: "Hoạt động mới nhất", Icon: Newspaper, show: news },
+  { href: "/news?category=knowledge", label: "Kiến thức", hint: "Bài viết về cờ vua", Icon: Lightbulb, show: knowledge },
   enrolment
     ? { href: "/#pricing", label: "Học thử", hint: "Để lại thông tin", Icon: GraduationCap, show: true }
     : { href: `tel:${hotline}`, label: "Gọi tư vấn", hint: hotline, Icon: Phone, show: true },
@@ -56,35 +79,61 @@ const TILES = [
         aria-label="Banner"
       >
         {
-          SLIDES.map((slide, i) => (
-            <div id={`slide-${i + 1}`} class="relative min-h-[22rem] w-full shrink-0 snap-start overflow-hidden bg-brand-900 md:min-h-[24rem] lg:min-h-[22rem]">
-              <Image
-                src={slide.src}
-                alt={slide.alt}
-                widths={[640, 960, 1280]}
-                sizes="(min-width: 1024px) 66vw, 100vw"
-                quality={80}
-                loading={i === 0 ? "eager" : "lazy"}
-                class="absolute inset-0 h-full w-full object-cover"
-              />
-              {/* Lớp phủ navy giữ chữ trắng đủ tương phản trên mọi ảnh. */}
-              <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/55 to-brand-950/10 md:bg-gradient-to-r md:from-brand-950/90 md:via-brand-950/60 md:to-transparent"></div>
-              <div class="relative flex h-full min-h-[inherit] flex-col justify-end gap-4 p-6 md:max-w-[34rem] md:justify-center md:p-10">
-                {i === 0 ? (
-                  <h1 class="text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl">{slide.title}</h1>
+          SLIDES.map((slide, i) => {
+            const hasText = slide.title !== "" || slide.text !== "";
+            // Trang cần đúng một <h1>: slide đầu không có tiêu đề thì dùng h1 ẩn mang tên thương hiệu.
+            const Heading = i === 0 ? "h1" : "h2";
+            return (
+              <div id={`slide-${i + 1}`} class="relative min-h-[22rem] w-full shrink-0 snap-start overflow-hidden bg-brand-900 md:min-h-[24rem] lg:min-h-[22rem]">
+                {typeof slide.image === "string" ? (
+                  <img
+                    src={slide.image}
+                    alt={slide.title ? "" : slide.alt}
+                    width="1600"
+                    height="900"
+                    loading={i === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    class="absolute inset-0 h-full w-full object-cover"
+                  />
                 ) : (
-                  <h2 class="text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl">{slide.title}</h2>
+                  <Image
+                    src={slide.image}
+                    alt={slide.alt}
+                    widths={[640, 960, 1280]}
+                    sizes="(min-width: 1024px) 66vw, 100vw"
+                    quality={80}
+                    loading={i === 0 ? "eager" : "lazy"}
+                    class="absolute inset-0 h-full w-full object-cover"
+                  />
                 )}
-                <p class="text-base font-medium text-brand-100 sm:text-lg">{slide.text}</p>
-                <div>
-                  <a href="/#pricing" class="gc-move gc-move--amber gc-move--lg">
-                    <span class="gc-move__label">{enrolment ? "Đăng ký học thử" : "Xem học phí"}</span>
-                    <span class="gc-move__go" aria-hidden="true"><ArrowRight className="h-4 w-4" /></span>
-                  </a>
-                </div>
+                {i === 0 && slide.title === "" && <h1 class="sr-only">{BRAND_INFO.name} – {BRAND_INFO.slogan1}</h1>}
+                {/* Slide chỉ có ảnh (chữ đã in sẵn trên ảnh): cả slide là liên kết nếu có. */}
+                {!hasText && slide.cta && (
+                  <a href={slide.cta.href} class="absolute inset-0" aria-label={slide.alt || slide.cta.label}></a>
+                )}
+                {hasText && (
+                  <>
+                    {/* Lớp phủ navy giữ chữ trắng đủ tương phản trên mọi ảnh. */}
+                    <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/55 to-brand-950/10 md:bg-gradient-to-r md:from-brand-950/90 md:via-brand-950/60 md:to-transparent"></div>
+                    <div class="relative flex h-full min-h-[inherit] flex-col justify-end gap-4 p-6 md:max-w-[34rem] md:justify-center md:p-10">
+                      {slide.title !== "" && (
+                        <Heading class="text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl">{slide.title}</Heading>
+                      )}
+                      {slide.text !== "" && <p class="text-base font-medium text-brand-100 sm:text-lg">{slide.text}</p>}
+                      {slide.cta && (
+                        <div>
+                          <a href={slide.cta.href} class="gc-move gc-move--amber gc-move--lg">
+                            <span class="gc-move__label">{slide.cta.label}</span>
+                            <span class="gc-move__go" aria-hidden="true"><ArrowRight className="h-4 w-4" /></span>
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
-            </div>
-          ))
+            );
+          })
         }
       </div>
 
@@ -111,7 +160,7 @@ const TILES = [
    </div>
 
     {/* Dải lối tắt: thẻ phẳng, icon + tên + một dòng mô tả. */}
-    <ul class="grid list-none grid-cols-2 gap-3 sm:grid-cols-3 lg:auto-cols-fr lg:grid-flow-col">
+    <ul class:list={["grid list-none grid-cols-2 gap-3 sm:grid-cols-3", TILES.length === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"]}>
       {
         TILES.map(({ href, label, hint, Icon }) => (
           <li class="contents">

@@ -9,12 +9,14 @@ import RichEditor from "../../../components/admin/RichEditor";
 import { getDb } from "../../../server/db";
 import { POSTS_POLICY } from "../../../server/policy";
 import {
+  POST_CATEGORIES,
   PostError,
   addImage,
   bodyHtml,
   createPost,
   deletePost,
   getPostById,
+  isCategory,
   listImages,
   removeImage,
   setCover,
@@ -45,7 +47,7 @@ const DONE: Record<string, string> = {
 
 let error = "";
 let confirmingDelete = false;
-let draft = { title: post?.title ?? "", summary: post?.summary ?? "", body: post ? bodyHtml(post) : "" };
+let draft = { title: post?.title ?? "", summary: post?.summary ?? "", category: post?.category ?? "news", body: post ? bodyHtml(post) : "" };
 let consentChecked = false;
 
 if (Astro.request.method === "POST") {
@@ -54,6 +56,7 @@ if (Astro.request.method === "POST") {
   draft = {
     title: String(form.get("title") ?? ""),
     summary: String(form.get("summary") ?? ""),
+    category: isCategory(form.get("category")) ? (form.get("category") as "news" | "knowledge") : "news",
     body: String(form.get("body") ?? ""),
   };
   consentChecked = form.get("photo_consent") === "1";
@@ -150,6 +153,15 @@ const btn = "min-h-12 px-5 font-bold border-2";
       <label class="flex flex-col gap-1.5">
         <span class="font-semibold">Tiêu đề</span>
         <input name="title" value={draft.title} required maxlength={POSTS_POLICY.titleMax} class={field} />
+      </label>
+      <label class="flex flex-col gap-1.5">
+        <span class="font-semibold">Mục</span>
+        <select name="category" class={field}>
+          {Object.entries(POST_CATEGORIES).map(([value, label]) => (
+            <option value={value} selected={draft.category === value}>{label}</option>
+          ))}
+        </select>
+        <span class="text-sm text-slate-600">Tin tức: hoạt động, sự kiện, giải đấu. Kiến thức: bài hướng dẫn, chiến thuật cờ vua.</span>
       </label>
       <label class="flex flex-col gap-1.5">
         <span class="font-semibold">Tóm tắt ngắn (hiện ở danh sách tin)</span>

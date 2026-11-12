@@ -91,6 +91,24 @@ const MIGRATIONS: string[] = [
   `
   ALTER TABLE posts ADD COLUMN body_format TEXT NOT NULL DEFAULT 'text' CHECK (body_format IN ('text', 'html'));
   `,
+  // Phân mục bài đăng (bài cũ là 'news') và các slide của banner trang chủ.
+  `
+  ALTER TABLE posts ADD COLUMN category TEXT NOT NULL DEFAULT 'news' CHECK (category IN ('news', 'knowledge'));
+  CREATE INDEX posts_category ON posts (category, status, published_at DESC);
+  CREATE TABLE slides (
+    id         INTEGER PRIMARY KEY,
+    file       TEXT NOT NULL,
+    title      TEXT NOT NULL DEFAULT '',
+    text       TEXT NOT NULL DEFAULT '',
+    link       TEXT NOT NULL DEFAULT '',
+    alt        TEXT NOT NULL DEFAULT '',
+    position   INTEGER NOT NULL,
+    enabled    INTEGER NOT NULL DEFAULT 1,
+    updated_at INTEGER NOT NULL,
+    updated_by TEXT
+  );
+  CREATE INDEX slides_order ON slides (position, id);
+  `,
 ];
 
 export function migrate(db: Db): void {

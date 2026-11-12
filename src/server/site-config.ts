@@ -3,18 +3,10 @@
 import { getDb } from "./db";
 import { loadSiteConfig, type SiteConfig } from "./flags";
 import { countPublished, listImages, listPublished } from "./posts";
+import { listEnabledSlides, type Slide } from "./slides";
 
 export function getSiteConfig(): SiteConfig {
   return loadSiteConfig(getDb);
-}
-
-/** Trang chủ chỉ hiện mục "Tin tức" khi có bài đã đăng; lỗi DB thì coi như chưa có. */
-export function hasPublishedPosts(): boolean {
-  try {
-    return countPublished(getDb()) > 0;
-  } catch {
-    return false;
-  }
 }
 
 /** Bài mới nhất cho khối tin trên trang chủ, kèm ảnh bìa; lỗi DB thì coi như chưa có bài. */
@@ -22,6 +14,25 @@ export function getLatestPosts(count: number) {
   try {
     const db = getDb();
     return listPublished(db, 1, count).map((post) => ({ post, cover: listImages(db, post.id)[0] ?? null }));
+  } catch {
+    return [];
+  }
+}
+
+/** Mục nào đã có bài đăng: quyết định menu, ô lối tắt và khối tin hiện gì. Lỗi DB thì coi như chưa có. */
+export function getNewsAvailability(): { news: boolean; knowledge: boolean } {
+  try {
+    const db = getDb();
+    return { news: countPublished(db, "news") > 0, knowledge: countPublished(db, "knowledge") > 0 };
+  } catch {
+    return { news: false, knowledge: false };
+  }
+}
+
+/** Slide banner đang bật; rỗng (hoặc lỗi DB) thì trang chủ dùng slide tạm trong HomeBanner. */
+export function getHomeSlides(): Slide[] {
+  try {
+    return listEnabledSlides(getDb());
   } catch {
     return [];
   }

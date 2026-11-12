@@ -47,6 +47,19 @@ export const POSTS_POLICY = {
   perPage: 12,
 };
 
+/** Slide banner trang chủ (src/server/slides.ts, uploads.ts). */
+export const SLIDES_POLICY = {
+  /** Số slide tối đa; nhiều hơn thì banner quá dài để lướt qua. */
+  maxSlides: 6,
+  titleMax: 60,
+  textMax: 120,
+  altMax: 160,
+  linkMax: 200,
+  /** Ảnh nhỏ hơn mức này bị từ chối để banner không bị mờ khi phóng ra. */
+  minWidth: 1600,
+  minHeight: 900,
+};
+
 /**
  * Giới hạn xử lý ảnh `/_image` để một người không thể bắt server chạy sharp liên tục với kích thước tuỳ ý.
  * Chỉ đếm lượt phải xử lý thật (không có trong bộ nhớ đệm); ảnh đã nhớ trả về ngay, không bị tính.

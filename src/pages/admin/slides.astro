@@ -1,0 +1,202 @@
+---
+// src/pages/admin/slides.astro
+// Quản lý slide banner trang chủ: thêm, sửa chữ/liên kết, bật/tắt, đổi thứ tự, xoá. Quản trị và biên tập đều dùng được.
+// Mỗi slide là một form riêng; sau khi lưu chuyển hướng về trang này (tránh gửi lại form khi tải lại).
+export const prerender = false;
+
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { getDb } from "../../server/db";
+import { SLIDES_POLICY } from "../../server/policy";
+import { formatTime } from "../../server/session";
+import {
+  SlideError,
+  createSlide,
+  deleteSlide,
+  getSlide,
+  listSlides,
+  moveSlide,
+  setSlideEnabled,
+  updateSlide,
+} from "../../server/slides";
+import { UploadError, deleteImages, processSlideImage, saveImage } from "../../server/uploads";
+
+const me = Astro.locals.user!;
+const db = getDb();
+const actor = { id: me.id, username: me.username };
+
+const DONE: Record<string, string> = {
+  added: "Đã thêm slide. Banner trang chủ đã cập nhật.",
+  saved: "Đã lưu slide.",
+  enabled: "Đã bật slide.",
+  disabled: "Đã tắt slide. Slide không còn hiện ở trang chủ.",
+  moved: "Đã đổi thứ tự.",
+  deleted: "Đã xoá slide.",
+};
+
+let error = "";
+let confirmingDelete = 0;
+
+if (Astro.request.method === "POST") {
+  const form = await Astro.request.formData();
+  const intent = String(form.get("intent") ?? "");
+  const id = Number(form.get("id") ?? 0);
+  const fields = () => ({
+    title: String(form.get("title") ?? ""),
+    text: String(form.get("text") ?? ""),
+    link: String(form.get("link") ?? ""),
+    alt: String(form.get("alt") ?? ""),
+  });
+  const go = (ok: string) => Astro.redirect(`/admin/slides?ok=${ok}`);
+  try {
+    if (intent === "add") {
+      const file = form.get("photo");
+      if (!(file instanceof File) || file.size === 0) throw new SlideError("no_file", "Hãy chọn một ảnh cho slide.");
+      // Lưu ảnh trước; nếu phần chữ không hợp lệ thì xoá ngay ảnh vừa lưu, không để lại file mồ côi.
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const name = await saveImage(bytes, processSlideImage);
+      try {
+        createSlide(db, name, fields(), actor);
+      } catch (caught) {
+        await deleteImages([name]);
+        throw caught;
+      }
+      return go("added");
+    }
+    if (!getSlide(db, id)) throw new SlideError("not_found", "Slide không tồn tại.");
+    if (intent === "save") {
+      updateSlide(db, id, fields(), actor);
+      return go("saved");
+    }
+    if (intent === "enable" || intent === "disable") {
+      setSlideEnabled(db, id, intent === "enable", actor);
+      return go(intent === "enable" ? "enabled" : "disabled");
+    }
+    if (intent === "up" || intent === "down") {
+      moveSlide(db, id, intent === "up" ? -1 : 1, actor);
+      return go("moved");
+    }
+    if (intent === "delete") confirmingDelete = id;
+    if (intent === "delete_confirmed") {
+      await deleteImages([deleteSlide(db, id, actor)]);
+      return go("deleted");
+    }
+  } catch (caught) {
+    if (caught instanceof SlideError || caught instanceof UploadError) {
+      error = caught.message;
+      Astro.response.status = 400;
+    } else throw caught;
+  }
+}
+
+const done = DONE[Astro.url.searchParams.get("ok") ?? ""] ?? "";
+const slides = listSlides(db);
+const field = "border-2 border-slate-300 bg-white p-3 text-base focus:border-brand-600 focus:outline-none w-full";
+const btn = "min-h-11 px-4 font-bold border-2";
+---
+
+<AdminLayout title="Banner trang chủ" active="slides" user={me}>
+  <h1 class="text-2xl lg:text-3xl font-extrabold">Banner trang chủ</h1>
+  <p class="mt-1 max-w-prose text-slate-600">
+    Các slide hiện theo thứ tự dưới đây ở đầu trang chủ. Chưa có slide nào đang bật thì trang chủ dùng slide mặc định (ảnh lớp học và hai khẩu hiệu của trung tâm).
+  </p>
+
+  {done && <p role="status" class="mt-5 border-l-4 border-green-700 bg-white px-4 py-3 font-semibold text-green-800">{done}</p>}
+  {error && <p role="alert" class="mt-5 border-l-4 border-seal-red bg-white px-4 py-3 font-semibold text-seal-red">{error}</p>}
+
+  <ul class="mt-8 grid gap-6">
+    {slides.length === 0 && (
+      <li class="bg-white border-2 border-slate-200 p-5 text-slate-600">Chưa có slide nào. Trang chủ đang dùng slide mặc định.</li>
+    )}
+    {slides.map((slide, index) => (
+      <li class="bg-white border-2 border-slate-200 p-5">
+        <div class="grid gap-5 lg:grid-cols-[16rem_1fr]">
+          <div>
+            <img src={`/uploads/${slide.file}`} alt={slide.alt || slide.title} class="aspect-video w-full object-cover bg-slate-100" loading="lazy" />
+            <p class="mt-2 text-sm font-bold">
+              Slide {index + 1} ·{" "}
+              {slide.enabled ? <span class="text-green-800">Đang bật</span> : <span class="text-slate-600">Đang tắt</span>}
+            </p>
+            <p class="text-xs text-slate-600">Sửa lần cuối: {slide.updatedBy ?? "?"}, {formatTime(slide.updatedAt)}</p>
+          </div>
+
+          <form method="post" class="grid gap-4">
+            <input type="hidden" name="id" value={slide.id} />
+            <label class="flex flex-col gap-1.5">
+              <span class="font-semibold">Tiêu đề lớn (có thể để trống)</span>
+              <input name="title" value={slide.title} maxlength={SLIDES_POLICY.titleMax} class={field} />
+            </label>
+            <label class="flex flex-col gap-1.5">
+              <span class="font-semibold">Dòng chữ phụ (có thể để trống)</span>
+              <input name="text" value={slide.text} maxlength={SLIDES_POLICY.textMax} class={field} />
+            </label>
+            <label class="flex flex-col gap-1.5">
+              <span class="font-semibold">Liên kết khi bấm nút "Xem thêm" (có thể để trống)</span>
+              <input name="link" value={slide.link} maxlength={SLIDES_POLICY.linkMax} placeholder="/news hoặc https://…" class={field} />
+            </label>
+            <label class="flex flex-col gap-1.5">
+              <span class="font-semibold">Mô tả ảnh (bắt buộc nếu không có tiêu đề)</span>
+              <input name="alt" value={slide.alt} maxlength={SLIDES_POLICY.altMax} class={field} />
+            </label>
+
+            <div class="flex flex-wrap gap-3">
+              <button type="submit" name="intent" value="save" class={`${btn} border-brand-800 bg-brand-800 text-white hover:bg-brand-700`}>Lưu chữ</button>
+              <button type="submit" name="intent" value={slide.enabled ? "disable" : "enable"} class={`${btn} border-slate-400 bg-white`}>
+                {slide.enabled ? "Tắt slide" : "Bật slide"}
+              </button>
+              <button type="submit" name="intent" value="up" disabled={index === 0} class={`${btn} border-slate-400 bg-white disabled:opacity-40`} aria-label={`Đưa slide ${index + 1} lên trước`}>↑ Lên</button>
+              <button type="submit" name="intent" value="down" disabled={index === slides.length - 1} class={`${btn} border-slate-400 bg-white disabled:opacity-40`} aria-label={`Đưa slide ${index + 1} xuống sau`}>↓ Xuống</button>
+              <button type="submit" name="intent" value="delete" class={`${btn} border-seal-red bg-white text-seal-red hover:bg-red-50`}>Xoá…</button>
+            </div>
+          </form>
+        </div>
+
+        {confirmingDelete === slide.id && (
+          <section role="alertdialog" aria-labelledby={`del-${slide.id}`} class="mt-5 border-2 border-seal-red p-5">
+            <h2 id={`del-${slide.id}`} class="text-lg font-extrabold">Xoá hẳn slide {index + 1}?</h2>
+            <p class="mt-2">Slide và ảnh của nó sẽ mất, không khôi phục được. Muốn chỉ ẩn thì chọn "Tắt slide".</p>
+            <form method="post" class="mt-4 flex flex-wrap gap-3">
+              <input type="hidden" name="id" value={slide.id} />
+              <button type="submit" name="intent" value="delete_confirmed" class={`${btn} border-seal-red bg-seal-red text-white`}>Có, xoá hẳn</button>
+              <a href="/admin/slides" class={`${btn} inline-flex items-center border-slate-400 bg-white`}>Không, giữ lại</a>
+            </form>
+          </section>
+        )}
+      </li>
+    ))}
+  </ul>
+
+  <section class="mt-10 bg-white border-2 border-slate-200 p-5">
+    <h2 class="text-lg font-bold">Thêm slide</h2>
+    {slides.length >= SLIDES_POLICY.maxSlides ? (
+      <p class="mt-2 text-slate-600">Đã đủ {SLIDES_POLICY.maxSlides} slide. Hãy xoá bớt một slide cũ để thêm mới.</p>
+    ) : (
+      <form method="post" enctype="multipart/form-data" class="mt-3 grid max-w-2xl gap-4">
+        <input type="hidden" name="intent" value="add" />
+        <label class="flex flex-col gap-1.5">
+          <span class="font-semibold">Ảnh</span>
+          <input type="file" name="photo" accept="image/*" required class="block w-full text-base file:mr-4 file:min-h-11 file:border-2 file:border-slate-400 file:bg-white file:px-4 file:font-bold" />
+          <span class="text-sm text-slate-600">
+            Tối thiểu {SLIDES_POLICY.minWidth}×{SLIDES_POLICY.minHeight} px, tỉ lệ gần 16:9 (ngang). Ảnh đã có sẵn chữ thì để trống phần chữ bên dưới. Chỉ dùng ảnh đã được phép đăng.
+          </span>
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="font-semibold">Tiêu đề lớn (có thể để trống)</span>
+          <input name="title" maxlength={SLIDES_POLICY.titleMax} class={field} />
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="font-semibold">Dòng chữ phụ (có thể để trống)</span>
+          <input name="text" maxlength={SLIDES_POLICY.textMax} class={field} />
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="font-semibold">Liên kết khi bấm nút "Xem thêm" (có thể để trống)</span>
+          <input name="link" maxlength={SLIDES_POLICY.linkMax} placeholder="/news hoặc https://…" class={field} />
+        </label>
+        <label class="flex flex-col gap-1.5">
+          <span class="font-semibold">Mô tả ảnh (bắt buộc nếu không có tiêu đề)</span>
+          <input name="alt" maxlength={SLIDES_POLICY.altMax} class={field} />
+        </label>
+        <button type="submit" class={`${btn} justify-self-start border-brand-800 bg-brand-800 px-6 text-white hover:bg-brand-700`}>Thêm slide</button>
+      </form>
+    )}
+  </section>
+</AdminLayout>
