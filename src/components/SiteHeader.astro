@@ -9,7 +9,7 @@
 // (aria-expanded), Esc đóng. Mục cha vẫn là liên kết thật nên không có JS vẫn đi được.
 // Dưới md menu thu vào nút hamburger, các mục con xếp thẳng dưới mục cha.
 import { ArrowRight, ChevronDown, Menu, Phone, X, MapPin } from "lucide-react";
-import { BRAND_INFO, BRANCHES } from "../data/courses";
+import { BRAND_INFO, BRANCHES, CURRICULUM_PROGRAMS } from "../data/courses";
 
 interface Props {
   /** Trang chủ truyền false khi quản trị đã đóng form đăng ký: nhãn đổi sang "Học phí". */
@@ -22,12 +22,14 @@ const { enrolmentOpen = true, hasNews = false } = Astro.props;
 
 // Trang /courses, /branches, /trial chưa có (đợt 5): tạm trỏ tới các mục của trang chủ.
 const NAV: { label: string; href: string; children?: { label: string; href: string }[] }[] = [
+  // "#gioi-thieu" có từ đợt 2; tới lúc đó liên kết rơi về đầu trang chủ.
+  { label: "Giới thiệu", href: "/#gioi-thieu" },
   {
     label: "Khoá học",
     href: "/#curriculum",
     children: [
-      { label: "Lộ trình học", href: "/#curriculum" },
-      { label: enrolmentOpen ? "Học phí & đăng ký" : "Học phí", href: "/#pricing" },
+      ...CURRICULUM_PROGRAMS.map((program) => ({ label: program.title, href: "/#curriculum" })),
+      { label: "Học phí", href: "/#pricing" },
     ],
   },
   {
@@ -35,7 +37,9 @@ const NAV: { label: string; href: string; children?: { label: string; href: stri
     href: "/#branches",
     children: BRANCHES.map((branch) => ({ label: branch.name, href: "/#branches" })),
   },
+  // Mục con "Kiến thức" thêm ở đợt 3, khi bài đăng có phân mục.
   ...(hasNews ? [{ label: "Tin tức", href: "/news" }] : []),
+  ...(enrolmentOpen ? [{ label: "Học thử", href: "/#pricing" }] : []),
 ];
 
 const MENU_ID = "gc-mobile-menu";
