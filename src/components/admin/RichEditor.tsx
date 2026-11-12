@@ -162,6 +162,14 @@ export default function RichEditor({ name, html }: Props) {
     };
   }, []);
 
+  // Trang soạn bài khôi phục bản nháp tự lưu bằng sự kiện này (xem script trong admin/posts/[id].astro).
+  useEffect(() => {
+    if (!editor) return;
+    const onSet = (event: Event) => editor.commands.setContent((event as CustomEvent<string>).detail, { emitUpdate: true });
+    window.addEventListener("gc-editor-set", onSet);
+    return () => window.removeEventListener("gc-editor-set", onSet);
+  }, [editor]);
+
   // Ô chọn màu tự do của trình duyệt báo "change" khi người dùng chốt màu (khác "input" bắn liên tục khi kéo).
   const applyFree = useRef<(hex: string) => void>(() => {});
   useEffect(() => {
@@ -359,6 +367,18 @@ export default function RichEditor({ name, html }: Props) {
           <span className="ml-auto" />
           <Tool cmd="search" label="Tìm và thay thế" shortcut="" expanded={searching} onClick={() => (searching ? closeSearch() : openSearch())}><Search {...icon} /></Tool>
         </div>
+
+        {/* Con trỏ đang nằm trong chữ có liên kết: hiện rõ địa chỉ để sửa hoặc gỡ ngay. */}
+        {editor.isActive("link") && menu !== "link" && (
+          <div data-link-strip role="status" className="flex flex-wrap items-center gap-x-3 gap-y-1 border-2 border-t-0 border-slate-300 bg-brand-50 px-3 py-1.5 text-sm">
+            <Link2 size={16} aria-hidden="true" className="shrink-0 text-brand-800" />
+            <span className="min-w-0 flex-1 truncate font-semibold text-brand-900" title={editor.getAttributes("link").href as string}>
+              {editor.getAttributes("link").href as string}
+            </span>
+            <button type="button" data-link-strip-edit onClick={() => toggleMenu("link")} className="min-h-8 px-2 font-bold text-brand-800 underline">Sửa</button>
+            <button type="button" data-link-strip-remove onClick={() => chain().extendMarkRange("link").unsetLink().run()} className="min-h-8 px-2 font-bold text-seal-red underline">Gỡ</button>
+          </div>
+        )}
 
         {searching && (
           <div role="search" className="flex flex-wrap items-center gap-2 border-2 border-t-0 border-slate-300 bg-slate-50 p-2">

@@ -148,7 +148,16 @@ const btn = "min-h-12 px-5 font-bold border-2";
     </section>
   )}
 
-  <form method="post" enctype="multipart/form-data" class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+  {/* Bản nháp tự lưu trong trình duyệt (xem script bên dưới): hiện khi tìm thấy bản chưa lưu khác bản trên máy chủ. */}
+  <section id="draft-banner" hidden role="alert" class="mt-5 border-l-4 border-amber-600 bg-white px-4 py-3">
+    <p class="font-semibold">Tìm thấy bản soạn chưa lưu từ <span id="draft-time"></span>. Bạn có muốn khôi phục?</p>
+    <div class="mt-3 flex flex-wrap gap-3">
+      <button type="button" id="draft-restore" class={`${btn} min-h-11 border-brand-800 bg-brand-800 text-white hover:bg-brand-700`}>Khôi phục</button>
+      <button type="button" id="draft-discard" class={`${btn} min-h-11 border-slate-400 bg-white`}>Bỏ bản đó</button>
+    </div>
+  </section>
+
+  <form method="post" enctype="multipart/form-data" data-draft-key={post ? String(post.id) : "new"} class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
     <div class="grid content-start gap-6">
       <label class="flex flex-col gap-1.5">
         <span class="font-semibold">Tiêu đề</span>
@@ -227,3 +236,93 @@ const btn = "min-h-12 px-5 font-bold border-2";
   </form>
 
 </AdminLayout>
+
+<script>
+  // Chống mất bài: tự lưu bản đang soạn vào trình duyệt (localStorage, theo từng bài), cảnh báo khi rời trang
+  // lúc còn thay đổi chưa lưu, và đề nghị khôi phục khi mở lại. Máy chủ vẫn là nơi lưu chính: bấm
+  // "Lưu nháp"/"Đăng bài" mới thật sự lưu. Bản tự lưu chỉ nằm trong trình duyệt này.
+  const form = document.querySelector<HTMLFormElement>("form[data-draft-key]");
+  if (form) {
+    const key = `gc-draft:${form.dataset.draftKey}`;
+    const names = ["title", "category", "summary", "body"] as const;
+    type Snap = Record<(typeof names)[number], string>;
+    const snap = (): Snap =>
+      Object.fromEntries(names.map((n) => [n, (form.elements.namedItem(n) as HTMLInputElement | null)?.value ?? ""])) as Snap;
+    const same = (a: Snap, b: Snap) => names.every((n) => a[n] === b[n]);
+    const store = {
+      read: (): (Snap & { at: number }) | null => {
+        try {
+          return JSON.parse(localStorage.getItem(key) ?? "null");
+        } catch {
+          return null;
+        }
+      },
+      write: (value: Snap) => {
+        try {
+          localStorage.setItem(key, JSON.stringify({ ...value, at: Date.now() }));
+        } catch {} // trình duyệt chặn lưu trữ: bỏ qua, vẫn còn cảnh báo khi rời trang
+      },
+      clear: () => {
+        try {
+          localStorage.removeItem(key);
+        } catch {}
+      },
+    };
+
+    const banner = document.getElementById("draft-banner")!;
+    let baseline: Snap | null = null; // bản trên máy chủ, lấy sau khi trình soạn dựng xong
+    let last: Snap | null = null;
+    let pending = false; // đang chờ người dùng chọn khôi phục hay bỏ: không ghi đè bản đã lưu
+    let submitting = false;
+
+    // Ô nội dung do trình soạn (React) dựng sau; chờ nó xuất hiện và ổn định rồi mới lấy mốc.
+    const wait = setInterval(() => {
+      if (!form.elements.namedItem("body")) return;
+      clearInterval(wait);
+      setTimeout(() => {
+        baseline = last = snap();
+        const saved = store.read();
+        if (saved && !same(saved, baseline)) {
+          pending = true;
+          document.getElementById("draft-time")!.textContent = new Date(saved.at).toLocaleString("vi-VN");
+          banner.hidden = false;
+        } else store.clear();
+      }, 800);
+    }, 200);
+
+    document.getElementById("draft-restore")!.addEventListener("click", () => {
+      const saved = store.read();
+      if (!saved) return;
+      for (const n of ["title", "category", "summary"] as const) (form.elements.namedItem(n) as HTMLInputElement).value = saved[n];
+      window.dispatchEvent(new CustomEvent("gc-editor-set", { detail: saved.body }));
+      pending = false;
+      banner.hidden = true;
+    });
+    document.getElementById("draft-discard")!.addEventListener("click", () => {
+      store.clear();
+      pending = false;
+      banner.hidden = true;
+    });
+
+    setInterval(() => {
+      if (!baseline || !last || pending || submitting) return;
+      const now = snap();
+      if (same(now, last)) return;
+      last = now;
+      if (same(now, baseline)) store.clear();
+      else store.write(now);
+    }, 1500);
+
+    // Bấm Lưu/Đăng/Thêm ảnh: máy chủ dựng lại trang từ dữ liệu vừa gửi nên bản tự lưu không còn cần.
+    form.addEventListener("submit", () => {
+      submitting = true;
+      store.clear();
+    });
+
+    window.addEventListener("beforeunload", (event) => {
+      if (submitting || pending || !baseline || same(snap(), baseline)) return;
+      store.write(snap()); // chốt bản mới nhất trước khi trình duyệt hỏi
+      event.preventDefault();
+    });
+  }
+</script>

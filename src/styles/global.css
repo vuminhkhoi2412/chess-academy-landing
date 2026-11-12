@@ -1451,6 +1451,8 @@
 .gc-prose h3 { font-size: 1.25rem; }
 .gc-prose h4 { font-size: 1.125rem; }
 .gc-prose strong { font-weight: 700; color: var(--color-slate-900); }
+/* Chữ đậm được tô màu nằm trong <span style="color">: không để màu đậm mặc định đè lên màu đã chọn. */
+.gc-prose span[style] > strong { color: inherit; }
 .gc-prose a { color: var(--color-brand-800); text-decoration: underline; text-underline-offset: 3px; }
 .gc-prose a:hover { color: var(--color-amber-700); }
 .gc-prose ul { list-style: square; padding-left: 1.5rem; }
@@ -1484,6 +1486,16 @@
 .gc-prose ul[data-type="taskList"] > li > div { flex: 1; }
 .gc-prose ul[data-type="taskList"] > li > div > p { margin: 0; }
 .gc-prose ul[data-type="taskList"] > li[data-checked="true"] > div { color: var(--color-slate-500); text-decoration: line-through; }
+
+/* Chữ có liên kết trong trình soạn: rê chuột vào thì hiện địa chỉ liên kết (không mở trang). */
+.gc-editor__surface a { position: relative; }
+.gc-editor__surface a:hover::after {
+  content: attr(href);
+  position: absolute; left: 0; top: 100%; margin-top: 2px; z-index: 20;
+  max-width: 22rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  padding: 0.25rem 0.5rem; background: var(--color-slate-900); color: white;
+  font-size: 0.75rem; font-weight: 600; line-height: 1.2; text-decoration: none; pointer-events: none;
+}
 
 /* Kết quả tìm trong trình soạn bài. */
 .gc-search { background: var(--color-amber-200); }
