@@ -6,7 +6,6 @@ import SiteFooter from "../components/SiteFooter.astro";
 import MobileContactBar from "../components/MobileContactBar.astro";
 import HomeBanner from "../components/home/HomeBanner.astro";
 import NewsSection from "../components/home/NewsSection.astro";
-import PuzzleSection from "../components/home/PuzzleSection.astro";
 import BranchesSection from "../components/home/BranchesSection.astro";
 import GallerySection from "../components/home/GallerySection.astro";
 import TestimonialsSection from "../components/home/TestimonialsSection.astro";
@@ -115,7 +114,7 @@ const structuredData = {
     <SiteHeader enrolmentOpen={flags.enrolment} hasNews={hasNews} />
 
     <main id="main" tabindex="-1">
-    <HomeBanner enrolment={flags.enrolment} news={hasNews} />
+    <HomeBanner enrolment={flags.enrolment} news={hasNews} puzzle={flags.puzzle} />
 
     {hasNews && <NewsSection items={latestPosts} />}
 
@@ -123,8 +122,6 @@ const structuredData = {
     <CurriculumExplorer client:load />
 
     <BranchesSection enrolment={flags.enrolment} />
-
-    {flags.puzzle && <PuzzleSection />}
 
     {flags.gallery && <GallerySection />}
 

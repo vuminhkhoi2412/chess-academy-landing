@@ -1,10 +1,11 @@
 ---
 // src/components/home/HomeBanner.astro
-// Đầu trang chủ: banner trượt (CSS scroll-snap, không thư viện) và cột lối tắt bên cạnh.
+// Đầu trang chủ: banner trượt (CSS scroll-snap, không thư viện) cạnh bàn cờ đố, và dải lối tắt bên dưới.
 // Slide tạm là ảnh lớp học thật kèm hai câu khẩu hiệu cố định; khi có banner thiết kế thì
 // thêm slide vào SLIDES (đợt 3 chuyển danh sách này sang trang quản trị).
 import { Image } from "astro:assets";
 import { ArrowRight, BookOpen, Banknote, MapPin, Newspaper, Lightbulb, GraduationCap, Phone } from "lucide-react";
+import InteractivePuzzle from "../InteractivePuzzle";
 import { BRAND_INFO, BRANCHES } from "../../data/courses";
 import classroom from "../../assets/images/gallery-classroom.jpg";
 
@@ -15,8 +16,10 @@ interface Props {
   news: boolean;
   /** Có bài thuộc mục Kiến thức thì có ô Kiến thức (chưa có phân mục: đợt 3). */
   knowledge?: boolean;
+  /** Công tắc bàn cờ đố: bật thì bàn cờ chiếm cột phải của banner (chỉ từ md trở lên). */
+  puzzle: boolean;
 }
-const { enrolment, news, knowledge = false } = Astro.props;
+const { enrolment, news, knowledge = false, puzzle } = Astro.props;
 
 const SLIDES = [
   {
@@ -42,10 +45,11 @@ const TILES = [
 ---
 
 <section class="bg-cream py-5 md:py-8" aria-label="Giới thiệu nhanh">
-  <div class="mx-auto grid max-w-6xl gap-4 px-4 lg:grid-cols-12">
-    <div class="relative lg:col-span-8">
+  <div class="mx-auto max-w-6xl space-y-4 px-4">
+   <div class="grid gap-4 lg:grid-cols-12">
+    <div class:list={["relative", puzzle ? "lg:col-span-8" : "lg:col-span-12"]}>
       <div
-        class="flex snap-x snap-mandatory overflow-x-auto scroll-smooth rounded-lg [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        class="flex h-full snap-x snap-mandatory overflow-x-auto scroll-smooth rounded-lg [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         tabindex="0"
         role="region"
         aria-roledescription="băng chuyền"
@@ -97,19 +101,32 @@ const TILES = [
       }
     </div>
 
-    <ul class="grid list-none grid-cols-2 gap-3 sm:grid-cols-3 lg:col-span-4 lg:grid-cols-2 lg:auto-rows-fr">
+    {
+      puzzle && (
+        <div class="hidden md:block lg:col-span-4">
+          <InteractivePuzzle client:media="(min-width: 768px)" />
+        </div>
+      )
+    }
+   </div>
+
+    {/* Dải lối tắt: thẻ phẳng, icon + tên + một dòng mô tả. */}
+    <ul class="grid list-none grid-cols-2 gap-3 sm:grid-cols-3 lg:auto-cols-fr lg:grid-flow-col">
       {
         TILES.map(({ href, label, hint, Icon }) => (
           <li class="contents">
             <a
               href={href}
-              class="group flex min-h-24 flex-col justify-between gap-3 rounded-lg bg-brand-800 p-4 text-white transition hover:bg-brand-700 active:scale-[0.98]"
+              class="group flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 transition hover:border-brand-800 hover:shadow-sm active:scale-[0.99]"
             >
-              <Icon className="h-6 w-6 text-amber-400" aria-hidden="true" />
-              <span>
-                <span class="block text-base font-bold leading-tight">{label}</span>
-                <span class="mt-0.5 block text-xs text-brand-100">{hint}</span>
+              <span class="grid size-10 shrink-0 place-items-center rounded-md bg-brand-50 text-brand-800">
+                <Icon className="h-5 w-5" aria-hidden="true" />
               </span>
+              <span class="min-w-0 flex-1">
+                <span class="block text-[0.9375rem] font-bold leading-tight text-slate-900">{label}</span>
+                <span class="block text-xs text-slate-600">{hint}</span>
+              </span>
+              <ArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-brand-800" aria-hidden="true" />
             </a>
           </li>
         ))

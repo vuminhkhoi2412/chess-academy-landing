@@ -59,7 +59,7 @@ export default function InteractivePuzzle() {
   }
 
   return (
-    <div className="bg-white p-5 rounded-card shadow-lifted border border-slate-200 max-w-md mx-auto">
+    <div className="bg-white p-5 rounded-lg shadow-soft border border-slate-200 max-w-md mx-auto">
       <div className="flex items-center justify-between gap-3 mb-3">
         <span className="text-[0.9375rem] leading-6 font-semibold tracking-[-0.005em] text-slate-700">Thử thách ngày hôm nay</span>
         <button
