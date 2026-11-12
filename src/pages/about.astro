@@ -1,0 +1,31 @@
+---
+// src/pages/about.astro
+// Trang giới thiệu trung tâm. Chạy trên server để header/footer phản ánh đúng công tắc và bài đã đăng.
+export const prerender = false;
+
+import Layout from "../layouts/Layout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import MobileContactBar from "../components/MobileContactBar.astro";
+import AboutIntro from "../components/AboutIntro.astro";
+import { BRAND_INFO } from "../data/courses";
+import { getSiteConfig, getLatestPosts } from "../server/site-config";
+
+const { flags } = getSiteConfig();
+const hasNews = getLatestPosts(1).length > 0;
+---
+
+<Layout
+  title={`Giới thiệu – ${BRAND_INFO.name}`}
+  description={`Giới thiệu trung tâm cờ vua ${BRAND_INFO.name} tại TP.HCM: lộ trình chuẩn hoá, năm cơ sở, học trực tiếp và online.`}
+  bodyClass={flags.mobile_bar ? "pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:pb-0" : undefined}
+>
+  <SiteHeader enrolmentOpen={flags.enrolment} hasNews={hasNews} />
+  <main id="main" tabindex="-1">
+    <div class="mx-auto max-w-6xl px-4">
+      <AboutIntro testimonials={flags.testimonials} />
+    </div>
+  </main>
+  <SiteFooter faq={flags.faq} news={hasNews} />
+  {flags.mobile_bar && <MobileContactBar />}
+</Layout>

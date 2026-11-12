@@ -5,8 +5,6 @@ import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import MobileContactBar from "../components/MobileContactBar.astro";
 import HomeBanner from "../components/home/HomeBanner.astro";
-import IntroSection from "../components/home/IntroSection.astro";
-import ProgramCards from "../components/home/ProgramCards.astro";
 import NewsSection from "../components/home/NewsSection.astro";
 import PuzzleSection from "../components/home/PuzzleSection.astro";
 import BranchesSection from "../components/home/BranchesSection.astro";
@@ -118,10 +116,6 @@ const structuredData = {
 
     <main id="main" tabindex="-1">
     <HomeBanner enrolment={flags.enrolment} news={hasNews} />
-
-    <IntroSection testimonials={flags.testimonials} />
-
-    <ProgramCards />
 
     {hasNews && <NewsSection items={latestPosts} />}
 

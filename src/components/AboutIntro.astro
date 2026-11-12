@@ -1,13 +1,13 @@
 ---
-// src/components/home/IntroSection.astro
-// Giới thiệu ngắn về trung tâm. Nội dung giới thiệu do quản lý brand gửi sau nên đang là khối
+// src/components/AboutIntro.astro
+// Nội dung trang /about: giới thiệu về trung tâm. Nội dung giới thiệu do quản lý brand gửi sau nên đang là khối
 // TODO có nhãn (PRODUCT.md: không bịa nội dung). Số liệu lấy từ dữ liệu thật.
 import { Image } from "astro:assets";
 import { MapPin, Trophy, Clock } from "lucide-react";
-import { BRANCHES, CURRICULUM_PROGRAMS, TESTIMONIALS } from "../../data/courses";
-import faceBe1 from "../../assets/images/anh_chan_dung/chan_dung_be_1.jpg";
-import faceBe2 from "../../assets/images/anh_chan_dung/chan_dung_be_2.jpg";
-import faceBe3 from "../../assets/images/anh_chan_dung/chan_dung_be_3.jpg";
+import { BRANCHES, CURRICULUM_PROGRAMS, TESTIMONIALS } from "../data/courses";
+import faceBe1 from "../assets/images/anh_chan_dung/chan_dung_be_1.jpg";
+import faceBe2 from "../assets/images/anh_chan_dung/chan_dung_be_2.jpg";
+import faceBe3 from "../assets/images/anh_chan_dung/chan_dung_be_3.jpg";
 
 interface Props {
   testimonials: boolean;
@@ -31,10 +31,10 @@ const faces = [
 const quote = TESTIMONIALS[0];
 ---
 
-<section id="gioi-thieu" class="border-t border-slate-200 bg-white py-14">
+<section class="py-12 md:py-16">
   <div class="mx-auto grid max-w-6xl gap-10 px-4 lg:grid-cols-12 lg:gap-12">
     <div class="lg:col-span-7">
-      <h2 class="gc-section-title text-3xl font-extrabold md:text-4xl">Giới thiệu Global Chess</h2>
+      <h1 class="gc-section-title text-3xl font-extrabold md:text-5xl">Giới thiệu Global Chess</h1>
       <p class="mt-4 max-w-prose text-base leading-relaxed text-slate-600">
         Trung tâm cờ vua cho trẻ em, học trực tiếp và online, với lộ trình chuẩn hoá giống nhau ở cả năm cơ sở.
       </p>
