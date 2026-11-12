@@ -45,18 +45,7 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [tailwindcss()],
-    // Trình soạn bài chỉ dựng ở trình duyệt (client:only), nên Vite dev chỉ thấy thư viện Tiptap khi mở trang soạn,
-    // rồi đóng gói lại giữa chừng và đánh rơi ô soạn (504 Outdated Optimize Dep). Khai trước để đóng gói ngay từ đầu.
-    optimizeDeps: {
-      include: [
-        '@tiptap/react',
-        '@tiptap/starter-kit',
-        '@tiptap/extension-list',
-        '@tiptap/extension-text-align',
-        '@tiptap/extension-text-style',
-      ],
-    },
+    plugins: [tailwindcss()]
   },
 
   integrations: [react(), sitemap()]
