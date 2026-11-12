@@ -430,24 +430,33 @@ export const TUITION_PROGRAMS: TuitionProgram[] = [
 ];
 
 /**
- * Thế cờ đố tương tác ở đầu trang chủ (InteractivePuzzle).
+ * Thế cờ đố tương tác ở đầu trang chủ (InteractivePuzzle): Trắng chiếu hết trong 2 nước.
  *
- * Đây là đòn "Chĩa đôi" (Fork) thật: Mã Trắng đi từ g5 sang f7, chiếu Vua Đen ở h8
- * và đồng thời tấn công Xe Đen ở d8.
- * Vua h8 không kề ô f7, và Đen không còn quân nào bắt được Mã f7, nên Đen buộc phải
- * đi Vua h8 -> g8. Sau đó Trắng ăn Xe d8.
+ * 1. Xe d2-d8+ (hy sinh Xe, chiếu theo hàng 8). Đen chỉ có đúng một nước hợp lệ: Xe c8 ăn d8.
+ * 2. Hậu d1 ăn Xe d8, chiếu hết (Vua g8 bị chốt f7 g7 h7 chặn đường).
  *
- * Không sửa FEN mà không chạy lại `npm test`: test sẽ báo lỗi nếu thế cờ không còn
- * là đòn chĩa đôi hợp lệ.
+ * `solution` là ba nước theo thứ tự: Trắng, Đen (bắt buộc, máy tự đi), Trắng.
+ * Không sửa FEN mà không chạy lại `npm test`: test khoá rằng đây đúng là chiếu hết trong 2 nước,
+ * nước đáp của Đen là duy nhất, và nước đầu của Trắng là cách giải duy nhất.
  */
+export interface PuzzleMove {
+  from: string;
+  to: string;
+}
+
 export interface InteractivePuzzleConfig {
   fen: string;
-  solution: { from: string; to: string };
+  /** [nước Trắng, nước đáp bắt buộc của Đen, nước chiếu hết của Trắng]. */
+  solution: [PuzzleMove, PuzzleMove, PuzzleMove];
 }
 
 export const INTERACTIVE_PUZZLE: InteractivePuzzleConfig = {
-  fen: "3r3k/ppp2ppp/8/4p1N1/8/8/PPPP1PPP/R1BQK2R w KQ - 0 1",
-  solution: { from: "g5", to: "f7" },
+  fen: "2r3k1/pp3ppp/8/8/8/8/PP1R1PPP/3Q2K1 w - - 0 1",
+  solution: [
+    { from: "d2", to: "d8" },
+    { from: "c8", to: "d8" },
+    { from: "d1", to: "d8" },
+  ],
 };
 
 /**

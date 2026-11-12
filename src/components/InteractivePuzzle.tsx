@@ -8,44 +8,63 @@ import { INTERACTIVE_PUZZLE } from "../data/courses";
 import { playClack } from "../lib/clack";
 
 // Thế cờ và nước giải nằm trong src/data/courses.ts để test được logic cờ.
+// SOLUTION: [nước Trắng, nước đáp bắt buộc của Đen (máy tự đi), nước chiếu hết của Trắng].
 const INITIAL_FEN = INTERACTIVE_PUZZLE.fen;
 const SOLUTION = INTERACTIVE_PUZZLE.solution;
+const REPLY_DELAY_MS = 450;
 
 export default function InteractivePuzzle() {
   const [game, setGame] = useState(() => new Chess(INITIAL_FEN));
-  const [status, setStatus] = useState<"playing" | "solved" | "wrong">("playing");
-  const wrongTimer = useRef<number | undefined>(undefined);
+  // step: nước thứ mấy trong SOLUTION đang chờ người chơi (0 hoặc 2); 1 là lúc máy đáp.
+  const [step, setStep] = useState(0);
+  const [status, setStatus] = useState<"playing" | "wrong" | "replying" | "solved">("playing");
+  const timers = useRef<number[]>([]);
 
-  // The "wrong move" hint resets itself. Clear the timer if the island unmounts first.
-  useEffect(() => () => window.clearTimeout(wrongTimer.current), []);
+  const later = (fn: () => void, ms: number) => {
+    timers.current.push(window.setTimeout(fn, ms));
+  };
+  // Hẹn giờ tự dọn khi island bị gỡ.
+  useEffect(() => () => timers.current.forEach(window.clearTimeout), []);
 
   function onDrop({ sourceSquare, targetSquare }: PieceDropHandlerArgs) {
-    // Đã giải xong, hoặc thả ra ngoài bàn cờ
-    if (status === "solved" || !targetSquare) return false;
+    if (status === "solved" || status === "replying" || !targetSquare) return false;
 
+    const expected = SOLUTION[step];
     // Sai nước: trả quân về chỗ cũ, không đổi thế cờ
-    if (sourceSquare !== SOLUTION.from || targetSquare !== SOLUTION.to) {
+    if (sourceSquare !== expected.from || targetSquare !== expected.to) {
       setStatus("wrong");
-      wrongTimer.current = window.setTimeout(
-        () => setStatus((prev) => (prev === "wrong" ? "playing" : prev)),
-        1400
-      );
+      later(() => setStatus((prev) => (prev === "wrong" ? "playing" : prev)), 1400);
       return false;
     }
 
     // Đúng nước: áp dụng lên bản sao để không sửa state cũ
     try {
       const next = new Chess(game.fen());
-      const move = next.move({ from: sourceSquare, to: targetSquare, promotion: "q" });
-      if (!move) return false;
-
+      if (!next.move({ from: sourceSquare, to: targetSquare, promotion: "q" })) return false;
       setGame(next);
-      setStatus("solved");
       playClack();
-      // Confetti is decoration; skip it when the visitor asked for reduced motion.
-      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
+
+      if (step === SOLUTION.length - 1) {
+        setStatus("solved");
+        // Confetti is decoration; skip it when the visitor asked for reduced motion.
+        if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
+        }
+        return true;
       }
+
+      // Đen chỉ có đúng một nước đáp hợp lệ (test khoá điều này): máy tự đi.
+      setStep(step + 1);
+      setStatus("replying");
+      const reply = SOLUTION[step + 1];
+      later(() => {
+        const after = new Chess(next.fen());
+        after.move({ from: reply.from, to: reply.to, promotion: "q" });
+        setGame(after);
+        playClack();
+        setStep(step + 2);
+        setStatus("playing");
+      }, REPLY_DELAY_MS);
       return true;
     } catch {
       return false;
@@ -53,15 +72,17 @@ export default function InteractivePuzzle() {
   }
 
   function resetPuzzle() {
-    window.clearTimeout(wrongTimer.current);
+    timers.current.forEach(window.clearTimeout);
+    timers.current = [];
     setGame(new Chess(INITIAL_FEN));
+    setStep(0);
     setStatus("playing");
   }
 
   return (
-    <div className="bg-white p-5 rounded-lg shadow-soft border border-slate-200 max-w-md mx-auto">
-      <div className="flex items-center justify-between gap-3 mb-3">
-        <span className="text-[0.9375rem] leading-6 font-semibold tracking-[-0.005em] text-slate-700">Thử thách ngày hôm nay</span>
+    <div className="bg-white p-4 rounded-lg shadow-soft border border-slate-200 max-w-md mx-auto">
+      <div className="flex items-center justify-between gap-3 mb-2">
+        <h2 className="text-[0.9375rem] leading-6 font-semibold text-slate-800">Chiếu hết trong 2 nước</h2>
         <button
           type="button"
           onClick={resetPuzzle}
@@ -71,16 +92,9 @@ export default function InteractivePuzzle() {
         </button>
       </div>
 
-      <h2 className="text-base font-bold text-slate-900 mb-1">
-        Trắng đi trước: Làm sao để bắt Xe của Đen?
-      </h2>
-      <p className="text-sm text-slate-600 mb-3">
-        Gợi ý: Kéo quân <strong>Mã trắng (ở ô g5)</strong> để tung đòn "Chĩa đôi".
-      </p>
-
       {/* Lề tọa độ nằm ngoài bàn cờ để không che quân và ô. */}
       <div
-        className="mx-auto grid w-full max-w-[360px] grid-cols-[1.125rem_minmax(0,1fr)] grid-rows-[auto_1.125rem] text-[0.6875rem] font-semibold leading-none text-slate-600"
+        className="mx-auto grid w-full max-w-[320px] grid-cols-[1.125rem_minmax(0,1fr)] grid-rows-[auto_1.125rem] text-[0.6875rem] font-semibold leading-none text-slate-600"
       >
         <div aria-hidden="true" className="flex flex-col items-center justify-around">
           {[8, 7, 6, 5, 4, 3, 2, 1].map((n) => (
@@ -89,7 +103,7 @@ export default function InteractivePuzzle() {
         </div>
         <div
           role="group"
-          aria-label="Bàn cờ tương tác: kéo quân Mã trắng từ ô g5 sang ô f7 để giải đố"
+          aria-label="Bàn cờ tương tác: Trắng đi trước, chiếu hết Đen trong 2 nước"
           className="aspect-square rounded-control overflow-hidden border-2 border-brand-900 shadow-inner"
         >
           <Chessboard
@@ -100,16 +114,6 @@ export default function InteractivePuzzle() {
               // Bàn cờ dùng đúng màu navy thương hiệu thay vì xám slate.
               darkSquareStyle: { backgroundColor: "var(--color-brand-600)" },
               lightSquareStyle: { backgroundColor: "var(--color-board-light)" },
-              // Ô quân cần đi luôn sáng viền hổ phách.
-              squareStyles:
-                status === "solved"
-                  ? {}
-                  : {
-                      [SOLUTION.from]: {
-                        boxShadow: "inset 0 0 0 3px var(--color-amber-400)",
-                        backgroundImage: "linear-gradient(rgb(251 191 36 / 0.35), rgb(251 191 36 / 0.35))",
-                      },
-                    },
             }}
           />
         </div>
@@ -120,25 +124,16 @@ export default function InteractivePuzzle() {
         </div>
       </div>
 
-      <div className="mt-3 flex min-h-11 items-center gap-3">
-        <div className="flex flex-1 items-center justify-center" role="status" aria-live="polite">
-          {status === "playing" && (
-            <p className="text-center text-sm text-slate-600 italic">Kéo và thả quân cờ để giải đố</p>
-          )}
-          {status === "wrong" && (
-            <p className="text-sm font-semibold text-red-600 animate-pulse motion-reduce:animate-none">
-              Chưa chính xác rồi. Hãy thử tìm ô nào tấn công cùng lúc 2 mục tiêu nhé.
-            </p>
-          )}
-          {status === "solved" && (
-            <div className="flex items-center gap-2 text-emerald-700 bg-emerald-50 px-3 py-2 rounded-control w-full text-sm font-medium border border-emerald-200">
-              <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" aria-hidden="true" />
-              <span>
-                <strong>Tuyệt vời!</strong> Đó chính là đòn <em>Chĩa Đôi (Fork)</em> trong Cấp độ Chiến thuật!
-              </span>
-            </div>
-          )}
-        </div>
+      <div className="mt-2 flex min-h-9 items-center justify-center" role="status" aria-live="polite">
+        {status === "wrong" && (
+          <p className="text-sm font-semibold text-red-600 animate-pulse motion-reduce:animate-none">Chưa đúng, thử lại nhé.</p>
+        )}
+        {status === "solved" && (
+          <div className="flex items-center gap-2 text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-control w-full text-sm font-semibold border border-emerald-200">
+            <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" aria-hidden="true" />
+            Chiếu hết! Bạn giải đúng rồi.
+          </div>
+        )}
       </div>
     </div>
   );
