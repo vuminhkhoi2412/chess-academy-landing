@@ -40,7 +40,7 @@ const DONE: Record<string, string> = {
   saved: "Đã lưu nháp.",
   published: "Đã đăng. Bài đã hiện ở trang Tin tức.",
   unpublished: "Đã gỡ về nháp. Bài không còn hiện công khai.",
-  image: "Đã thêm ảnh.",
+  image: "Đã lưu bài và thêm ảnh.",
   removed: "Đã gỡ ảnh.",
   cover: "Đã đổi ảnh bìa.",
 };
@@ -75,17 +75,11 @@ if (Astro.request.method === "POST") {
       // Mọi nút khác đều lưu chữ trước.
       post = post ? updatePost(db, post.id, draft, actor) : createPost(db, draft, actor);
 
-      if (intent === "publish") {
-        setPublished(db, post.id, true, actor, Date.now(), consentChecked);
-        return go("published");
-      }
-      if (intent === "unpublish") {
-        setPublished(db, post.id, false, actor);
-        return go("unpublished");
-      }
-      if (intent === "upload") {
-        const files = form.getAll("photos").filter((f): f is File => f instanceof File && f.size > 0);
-        if (files.length === 0) throw new PostError("no_file", "Hãy chọn ít nhất một ảnh.");
+      // Ảnh đã chọn trong ô tệp được lưu cùng lúc với mọi nút lưu/đăng, không chỉ nút "Thêm ảnh đã chọn":
+      // trước đây chọn ảnh rồi bấm "Đăng bài" thì ảnh bị bỏ qua mà không báo gì.
+      const files = form.getAll("photos").filter((f): f is File => f instanceof File && f.size > 0);
+      if (intent === "upload" && files.length === 0) throw new PostError("no_file", "Hãy chọn ít nhất một ảnh.");
+      if (files.length > 0 && (intent === "upload" || intent === "save" || intent === "publish")) {
         const room = POSTS_POLICY.maxImages - listImages(db, post.id).length;
         if (files.length > room) throw new PostError("too_many_images", `Chỉ thêm được ${room} ảnh nữa (tối đa ${POSTS_POLICY.maxImages} ảnh mỗi bài).`);
         const saved: string[] = [];
@@ -96,7 +90,16 @@ if (Astro.request.method === "POST") {
           await deleteImages(saved);
           throw caught;
         }
-        return go("image");
+        if (intent === "upload" || intent === "save") return go("image");
+      }
+      if (intent === "publish") {
+        // Vừa thêm ảnh mà chưa tích xác nhận của phụ huynh thì báo lỗi; chữ và ảnh đã lưu, ô tích hiện ra ở lần sau.
+        setPublished(db, post.id, true, actor, Date.now(), consentChecked);
+        return go("published");
+      }
+      if (intent === "unpublish") {
+        setPublished(db, post.id, false, actor);
+        return go("unpublished");
       }
       if (intent.startsWith("remove:")) {
         const file = removeImage(db, post.id, Number(intent.slice(7)), actor);
@@ -157,7 +160,7 @@ const btn = "min-h-12 px-5 font-bold border-2";
     </div>
   </section>
 
-  <form method="post" enctype="multipart/form-data" data-draft-key={post ? String(post.id) : "new"} class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+  <form method="post" action={post ? `/admin/posts/${post.id}` : undefined} enctype="multipart/form-data" data-draft-key={post ? String(post.id) : "new"} class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
     <div class="grid content-start gap-6">
       <label class="flex flex-col gap-1.5">
         <span class="font-semibold">Tiêu đề</span>
