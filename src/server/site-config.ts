@@ -4,6 +4,8 @@ import { getDb } from "./db";
 import { loadSiteConfig, type SiteConfig } from "./flags";
 import { countPublished, listImages, listPublished } from "./posts";
 import { listEnabledSlides, type Slide } from "./slides";
+import { loadTuition, type Tuition } from "./tuition";
+import { EXTRA_FEES, TUITION_LEVELS } from "../data/courses";
 
 export function getSiteConfig(): SiteConfig {
   return loadSiteConfig(getDb);
@@ -35,5 +37,14 @@ export function getHomeSlides(): Slide[] {
     return listEnabledSlides(getDb());
   } catch {
     return [];
+  }
+}
+
+/** Học phí và phụ phí hiện hành; lỗi DB thì dùng giá khởi tạo trong code, trang chủ vẫn hiện giá. */
+export function getTuition(): Tuition {
+  try {
+    return loadTuition(getDb());
+  } catch {
+    return { levels: TUITION_LEVELS, extras: EXTRA_FEES };
   }
 }

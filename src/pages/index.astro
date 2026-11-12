@@ -13,14 +13,15 @@ import FaqSection from "../components/home/FaqSection.astro";
 import CurriculumExplorer from "../components/CurriculumExplorer";
 import PricingAndCheckout from "../components/PricingAndCheckout";
 import Layout from "../layouts/Layout.astro";
-import { getSiteConfig, getHomeSlides, getLatestPosts, getNewsAvailability } from "../server/site-config";
-import { BRAND_INFO, BRANCHES, TUITION_PROGRAMS, TUITION_LEVELS, TESTIMONIALS } from "../data/courses";
+import { getSiteConfig, getHomeSlides, getLatestPosts, getNewsAvailability, getTuition } from "../server/site-config";
+import { BRAND_INFO, BRANCHES, TUITION_PROGRAMS, TESTIMONIALS } from "../data/courses";
 
 // Cấu hình bật/tắt đọc ở MỖI request (trang này chạy trên server), nên đổi trong /admin có hiệu lực ngay.
 const { flags, banner } = getSiteConfig();
 const latestPosts = getLatestPosts(4);
 const { news, knowledge } = getNewsAvailability();
 const slides = getHomeSlides();
+const tuition = getTuition();
 
 // Hết nhận xét thật thì không được đăng trang (thay cho ô TODO cũ).
 if (TESTIMONIALS.length === 0) throw new Error("TESTIMONIALS đang rỗng: cần ít nhất một nhận xét thật của phụ huynh.");
@@ -67,7 +68,7 @@ const structuredData = {
     "@type": "OfferCatalog",
     name: "Khóa học cờ vua",
     itemListElement: TUITION_PROGRAMS.map((program) => {
-      const levels = TUITION_LEVELS.filter((level) => level.programId === program.id);
+      const levels = tuition.levels.filter((level) => level.programId === program.id);
       return {
         "@type": "AggregateOffer",
         name: program.name,
@@ -128,10 +129,10 @@ const structuredData = {
 
     {flags.testimonials && <TestimonialsSection />}
 
-    {flags.faq && <FaqSection />}
+    {flags.faq && <FaqSection fees={tuition.extras} />}
 
     <!-- Pricing & Enrolment Form -->
-    <PricingAndCheckout client:load enrolmentOpen={flags.enrolment} />
+    <PricingAndCheckout client:load enrolmentOpen={flags.enrolment} levels={tuition.levels} />
     </main>
 
     <SiteFooter faq={flags.faq} news={latestPosts.length > 0} />

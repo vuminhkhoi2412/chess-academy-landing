@@ -70,3 +70,9 @@ export const IMAGE_LIMIT_POLICY = {
   /** Chiều rộng ảnh tối đa được yêu cầu; trang chỉ dùng tới 2560. */
   maxWidth: 2560,
 };
+
+/** Học phí và phụ phí (src/server/tuition.ts). */
+export const TUITION_POLICY = {
+  /** Trần mỗi mức giá (đồng): chặn gõ thừa số 0. */
+  maxPrice: 50_000_000,
+} as const;

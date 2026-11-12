@@ -109,6 +109,15 @@ const MIGRATIONS: string[] = [
   );
   CREATE INDEX slides_order ON slides (position, id);
   `,
+  // Giá đã được quản trị sửa. Chưa có dòng thì dùng giá khởi tạo trong src/data/courses.ts.
+  `
+  CREATE TABLE tuition_prices (
+    key        TEXT PRIMARY KEY,
+    amount     INTEGER NOT NULL CHECK (amount > 0),
+    updated_at INTEGER NOT NULL,
+    updated_by TEXT
+  );
+  `,
 ];
 
 export function migrate(db: Db): void {

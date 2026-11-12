@@ -2,7 +2,7 @@
 //
 // Bảng học phí và form đăng ký học thử, cùng nằm trong dải navy `#pricing`. Các nút "Đăng ký ngay"
 // ở bảng giá chỉ cuộn xuống form; form (EnrolmentForm) tự lo phần nhập, gửi và vé xác nhận.
-import { TUITION_PROGRAMS, TUITION_LEVELS } from "../data/courses";
+import { TUITION_PROGRAMS, type TuitionLevel } from "../data/courses";
 import { Check, ArrowRight } from "lucide-react";
 import EnrolmentForm, { scrollToEnrolment } from "./EnrolmentForm";
 import PieceIcon from "./PieceIcon";
@@ -10,9 +10,11 @@ import PieceIcon from "./PieceIcon";
 interface Props {
   /** false khi quản trị đã đóng form: ẩn form và mọi nút dẫn tới form, giữ nguyên bảng học phí. */
   enrolmentOpen?: boolean;
+  /** Giá hiện hành (đã gồm giá quản trị sửa), do trang chủ đọc từ DB. */
+  levels: TuitionLevel[];
 }
 
-export default function PricingAndCheckout({ enrolmentOpen = true }: Props) {
+export default function PricingAndCheckout({ enrolmentOpen = true, levels: allLevels }: Props) {
   return (
     <section id="pricing" className="relative overflow-hidden py-20 bg-brand-800 text-white">
       {/*
@@ -37,7 +39,7 @@ export default function PricingAndCheckout({ enrolmentOpen = true }: Props) {
         {/* Bảng giá: mỗi khóa một hàng, quân cờ làm biểu tượng của khóa. */}
         <div className="border-b border-brand-600">
           {TUITION_PROGRAMS.map((program) => {
-            const levels = TUITION_LEVELS.filter((level) => level.programId === program.id);
+            const levels = allLevels.filter((level) => level.programId === program.id);
             const min12 = Math.min(...levels.map((level) => level.group12));
             const min24 = Math.min(...levels.map((level) => level.group24));
             const minOneOnOne = Math.min(...levels.map((level) => level.oneOnOne));

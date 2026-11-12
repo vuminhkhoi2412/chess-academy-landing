@@ -36,6 +36,7 @@ const LABELS: Record<string, string> = {
   slide_disabled: "Tắt slide banner",
   slide_moved: "Đổi thứ tự slide banner",
   slide_deleted: "Xoá slide banner",
+  price_changed: "Đổi học phí / phụ phí",
 };
 const ROLE_NAME: Record<string, string> = { admin: "Quản trị", editor: "Biên tập" };
 
@@ -44,6 +45,7 @@ function describe(action: string, detail: Record<string, unknown> | null): strin
   if (!detail) return "";
   if (action === "role_changed") return `${ROLE_NAME[String(detail.from)] ?? "?"} → ${ROLE_NAME[String(detail.to)] ?? "?"}`;
   if (action === "user_created") return `Quyền: ${ROLE_NAME[String(detail.role)] ?? "?"}`;
+  if (action === "price_changed") return `${Number(detail.from).toLocaleString("vi-VN")}đ → ${Number(detail.to).toLocaleString("vi-VN")}đ`;
   if (action === "login" || action === "login_failed") return `IP ${String(detail.ip ?? "?")}`;
   return "";
 }

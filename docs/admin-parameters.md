@@ -101,3 +101,16 @@ Quyết định đã làm, chờ chủ trung tâm xác nhận:
 - Không có slide nào đang bật (hoặc DB lỗi) thì trang chủ dùng slide tạm trong `HomeBanner.astro`: ảnh lớp học và hai khẩu hiệu cố định của thương hiệu.
 - Liên kết chỉ nhận `/đường-dẫn` trong site hoặc `https://`; chặn `//`, `http:`, `javascript:`. Slide không có tiêu đề (chữ đã in trên ảnh) bắt buộc có mô tả ảnh.
 - Ảnh slide cũng nằm ở `DATA_DIR/uploads`, cùng sao lưu với `app.db`. **Triển khai bản có đợt 3 lên Droplet: sao lưu `app.db` trước, migration chạy tự động khi server khởi động.**
+
+## Học phí và phụ phí (`src/server/tuition.ts`, `TUITION_POLICY`; trang `/admin/tuition`)
+
+| Thông số | Hiện tại | Ý nghĩa |
+|---|---|---|
+| `maxPrice` | 50.000.000đ | Trần mỗi mức giá, chặn gõ thừa số 0 |
+
+- Gồm 28 giá lớp học (7 cấp độ × 4 mức) và 5 phụ phí (sách, sách bài tập, áo, bộ cờ, đồng hồ). Chỉ Quản trị sửa; Biên tập chỉ xem (máy chủ cũng chặn).
+- Giá khởi tạo nằm trong `src/data/courses.ts` (theo `assets/nguon/bang-hoc-phi-global-chess.pdf`). Bảng `tuition_prices` chỉ giữ những giá đã sửa; giá hiện hành = giá trong DB nếu có, không thì giá khởi tạo. Đổi giá khởi tạo trong code **không** ảnh hưởng giá đã sửa trong DB.
+- Sửa xong có màn xác nhận liệt kê giá cũ → mới. Mỗi giá đổi ghi một dòng nhật ký (giá cũ, giá mới).
+- Chặn nhầm: giá 24 buổi phải cao hơn 12 buổi, giá 1 kèm 1 phải cao hơn 1 kèm 2.
+- Giá hiện ở bảng học phí, dữ liệu có cấu trúc (JSON-LD) và câu hỏi thường gặp của trang chủ. Form đăng ký không gửi giá.
+- Migration 6 chạy tự động khi khởi động: sao lưu `app.db` trước khi triển khai.

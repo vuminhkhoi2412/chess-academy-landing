@@ -2,7 +2,13 @@
 // src/components/home/FaqSection.astro
 // Câu hỏi thường gặp.
 import { HelpCircle, ChevronDown } from "lucide-react";
-import { FAQS } from "../../data/courses";
+import { buildFaqs, type ExtraFee } from "../../data/courses";
+
+interface Props {
+  /** Giá phụ phí hiện hành, dùng trong câu trả lời về sách và đồng phục. */
+  fees: ExtraFee[];
+}
+const faqs = buildFaqs(Astro.props.fees);
 ---
 
 <!--
@@ -16,7 +22,7 @@ import { FAQS } from "../../data/courses";
     </div>
 
     <div class="grid md:grid-cols-2 gap-x-10 items-start mt-10">
-      {FAQS.map((item) => (
+      {faqs.map((item) => (
         <details class="gc-faq group border-t border-slate-200">
           <summary class="flex min-h-11 cursor-pointer list-none items-start gap-2 py-4 font-bold text-slate-900 text-base [&::-webkit-details-marker]:hidden">
             <HelpCircle className="w-4 h-4 text-slate-500 shrink-0 mt-1" aria-hidden="true" />
