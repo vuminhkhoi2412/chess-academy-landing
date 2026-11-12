@@ -104,7 +104,7 @@ export default function InteractivePuzzle() {
         <div
           role="group"
           aria-label="Bàn cờ tương tác: Trắng đi trước, chiếu hết Đen trong 2 nước"
-          className="aspect-square rounded-control overflow-hidden border-2 border-brand-900 shadow-inner"
+          className="aspect-square rounded-sm overflow-hidden border-2 border-brand-900 shadow-inner"
         >
           <Chessboard
             options={{
@@ -125,6 +125,9 @@ export default function InteractivePuzzle() {
       </div>
 
       <div className="mt-2 flex min-h-9 items-center justify-center" role="status" aria-live="polite">
+        {(status === "playing" || status === "replying") && (
+          <p className="text-sm font-medium text-slate-600">{status === "replying" ? "Đen đang đi…" : step === 0 ? "Trắng đi trước" : "Trắng đi tiếp"}</p>
+        )}
         {status === "wrong" && (
           <p className="text-sm font-semibold text-red-600 animate-pulse motion-reduce:animate-none">Chưa đúng, thử lại nhé.</p>
         )}
