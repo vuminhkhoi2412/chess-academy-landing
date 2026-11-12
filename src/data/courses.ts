@@ -430,14 +430,15 @@ export const TUITION_PROGRAMS: TuitionProgram[] = [
 ];
 
 /**
- * Thế cờ đố tương tác ở đầu trang chủ (InteractivePuzzle): Trắng chiếu hết trong 2 nước.
+ * Thế cờ đố tương tác ở đầu trang chủ (InteractivePuzzle): Trắng chiếu hết trong 3 nước.
  *
- * 1. Xe d2-d8+ (hy sinh Xe, chiếu theo hàng 8). Đen chỉ có đúng một nước hợp lệ: Xe c8 ăn d8.
- * 2. Hậu d1 ăn Xe d8, chiếu hết (Vua g8 bị chốt f7 g7 h7 chặn đường).
+ * 1. Hậu e3-e8+ (chiếu theo hàng 8). Đen chỉ có đúng một nước: Hậu a3-f8.
+ * 2. Tượng h5 ăn f7+, chiếu (Hậu e8 bảo vệ Tượng). Đen chỉ có đúng một nước: Vua g8-h8.
+ * 3. Hậu e8 ăn f8, chiếu hết.
  *
- * `solution` là ba nước theo thứ tự: Trắng, Đen (bắt buộc, máy tự đi), Trắng.
- * Không sửa FEN mà không chạy lại `npm test`: test khoá rằng đây đúng là chiếu hết trong 2 nước,
- * nước đáp của Đen là duy nhất, và nước đầu của Trắng là cách giải duy nhất.
+ * `solution` là các nước theo thứ tự Trắng, Đen (bắt buộc, máy tự đi), Trắng, ..., kết thúc
+ * bằng nước chiếu hết. Không sửa FEN mà không chạy lại `npm test`: test khoá rằng đây đúng là
+ * chiếu hết trong 3 nước, mọi nước đáp của Đen là duy nhất, và mỗi nước của Trắng là cách giải duy nhất.
  */
 export interface PuzzleMove {
   from: string;
@@ -446,16 +447,18 @@ export interface PuzzleMove {
 
 export interface InteractivePuzzleConfig {
   fen: string;
-  /** [nước Trắng, nước đáp bắt buộc của Đen, nước chiếu hết của Trắng]. */
-  solution: [PuzzleMove, PuzzleMove, PuzzleMove];
+  /** Trắng, Đen (bắt buộc), Trắng, ..., nước chiếu hết của Trắng. Độ dài lẻ. */
+  solution: PuzzleMove[];
 }
 
 export const INTERACTIVE_PUZZLE: InteractivePuzzleConfig = {
-  fen: "2r3k1/pp3ppp/8/8/8/8/PP1R1PPP/3Q2K1 w - - 0 1",
+  fen: "6k1/pp3ppp/8/7B/8/q3Q3/PP3PPP/6K1 w - - 0 1",
   solution: [
-    { from: "d2", to: "d8" },
-    { from: "c8", to: "d8" },
-    { from: "d1", to: "d8" },
+    { from: "e3", to: "e8" },
+    { from: "a3", to: "f8" },
+    { from: "h5", to: "f7" },
+    { from: "g8", to: "h8" },
+    { from: "e8", to: "f8" },
   ],
 };
 

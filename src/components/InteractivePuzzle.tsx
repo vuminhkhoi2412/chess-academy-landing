@@ -8,14 +8,15 @@ import { INTERACTIVE_PUZZLE } from "../data/courses";
 import { playClack } from "../lib/clack";
 
 // Thế cờ và nước giải nằm trong src/data/courses.ts để test được logic cờ.
-// SOLUTION: [nước Trắng, nước đáp bắt buộc của Đen (máy tự đi), nước chiếu hết của Trắng].
+// SOLUTION: Trắng, Đen (bắt buộc, máy tự đi), Trắng, ... kết thúc bằng nước chiếu hết của Trắng.
 const INITIAL_FEN = INTERACTIVE_PUZZLE.fen;
 const SOLUTION = INTERACTIVE_PUZZLE.solution;
 const REPLY_DELAY_MS = 450;
+const MOVES_TO_MATE = (SOLUTION.length + 1) / 2;
 
 export default function InteractivePuzzle() {
   const [game, setGame] = useState(() => new Chess(INITIAL_FEN));
-  // step: nước thứ mấy trong SOLUTION đang chờ người chơi (0 hoặc 2); 1 là lúc máy đáp.
+  // step: nước thứ mấy trong SOLUTION đang chờ người chơi (số chẵn); số lẻ là lúc máy đáp.
   const [step, setStep] = useState(0);
   const [status, setStatus] = useState<"playing" | "wrong" | "replying" | "solved">("playing");
   const timers = useRef<number[]>([]);
@@ -82,7 +83,7 @@ export default function InteractivePuzzle() {
   return (
     <div className="bg-white p-4 rounded-lg shadow-soft border border-slate-200 max-w-md mx-auto">
       <div className="flex items-center justify-between gap-3 mb-2">
-        <h2 className="text-[0.9375rem] leading-6 font-semibold text-slate-800">Chiếu hết trong 2 nước</h2>
+        <h2 className="text-[0.9375rem] leading-6 font-semibold text-slate-800">Chiếu hết trong {MOVES_TO_MATE} nước</h2>
         <button
           type="button"
           onClick={resetPuzzle}
@@ -103,7 +104,7 @@ export default function InteractivePuzzle() {
         </div>
         <div
           role="group"
-          aria-label="Bàn cờ tương tác: Trắng đi trước, chiếu hết Đen trong 2 nước"
+          aria-label={`Bàn cờ tương tác: Trắng đi trước, chiếu hết Đen trong ${MOVES_TO_MATE} nước`}
           className="aspect-square rounded-sm overflow-hidden border-2 border-brand-900 shadow-inner"
         >
           <Chessboard
