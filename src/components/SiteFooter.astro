@@ -14,12 +14,12 @@ interface Props {
 }
 const { faq = true, news = false } = Astro.props;
 
-// Trang /courses, /branches, /trial chưa có (đợt 5): tạm trỏ tới các mục của trang chủ.
 const SITEMAP = [
   { href: "/about", label: "Giới thiệu" },
-  { href: "/#curriculum", label: "Lộ trình học" },
-  { href: "/#pricing", label: "Học phí & đăng ký" },
-  { href: "/#branches", label: "Hệ thống cơ sở" },
+  { href: "/courses", label: "Khoá học" },
+  { href: "/courses#pricing", label: "Học phí" },
+  { href: "/branches", label: "Hệ thống cơ sở" },
+  { href: "/trial", label: "Đăng ký học thử" },
   ...(news ? [{ href: "/news", label: "Tin tức" }] : []),
   ...(faq ? [{ href: "/#faq", label: "Câu hỏi thường gặp" }] : []),
 ];

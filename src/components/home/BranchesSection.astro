@@ -14,8 +14,12 @@ import branchVinhomes from "../../assets/images/branch_images/Vinhome.jpg";
 interface Props {
   /** Form đăng ký đang mở thì thẻ có nút "Chọn cơ sở này". */
   enrolment: boolean;
+  /** Trang /branches không có form: nút "Chọn cơ sở này" dẫn sang /trial?branch=<mã> thay vì cuộn tới form. */
+  trial?: boolean;
+  /** Trang /branches dùng h1 cho tiêu đề này; trang chủ dùng h2. */
+  as?: "h1" | "h2";
 }
-const { enrolment } = Astro.props;
+const { enrolment, trial = false, as: Heading = "h2" } = Astro.props;
 
 // Ảnh từng cơ sở. Cơ sở nào chưa có ảnh thì thẻ rơi về ô bàn cờ có mã cơ sở.
 const BRANCH_PHOTOS: Record<string, { src: ImageMetadata; alt: string; pos?: string }> = {
@@ -34,7 +38,7 @@ const fmtPhone = (p: string) => p.replace(/(\d{4})(\d{3})(\d{3})/, "$1 $2 $3");
 <section id="branches" class="py-16 bg-white border-t border-slate-200">
   <div class="max-w-6xl mx-auto px-4">
     <div class="text-center max-w-2xl mx-auto mb-12">
-      <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold">Hệ thống các cơ sở</h2>
+      <Heading class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold">Hệ thống các cơ sở</Heading>
       <p class="text-base text-slate-600 mt-3 max-w-prose mx-auto">
         Các ca học trong tuần và cuối tuần được tổ chức linh hoạt theo trình độ của học viên tại từng cơ sở.
       </p>
@@ -57,7 +61,7 @@ const fmtPhone = (p: string) => p.replace(/(\d{4})(\d{3})(\d{3})/, "$1 $2 $3");
         const photo = BRANCH_PHOTOS[branch.id];
         const phone = branch.phone ?? BRAND_INFO.hotlines[0];
         return (
-          <article class="flex flex-col overflow-hidden rounded-card border border-slate-200/90 bg-white transition hover:border-slate-300 hover:shadow-soft">
+          <article id={`branch-${branch.id}`} class="flex flex-col overflow-hidden rounded-card border border-slate-200/90 bg-white transition hover:border-slate-300 hover:shadow-soft">
             <div class="relative aspect-video overflow-hidden bg-brand-800">
               {photo ? (
                 <Image
@@ -111,9 +115,9 @@ const fmtPhone = (p: string) => p.replace(/(\d{4})(\d{3})(\d{3})/, "$1 $2 $3");
                 {/* Nhãn đọc được phải chứa đúng chữ hiển thị "Chọn cơ sở này"; tên cơ sở nối thêm để phân biệt các thẻ. */}
                 {enrolment && (
                 <a
-                  href="#dang-ky"
+                  href={trial ? `/trial?branch=${branch.id}` : "#dang-ky"}
                   data-branch={branch.id}
-                  class="js-choose-branch inline-flex min-h-11 items-center gap-1.5 rounded-control bg-brand-800 px-3.5 text-sm font-bold text-white transition hover:bg-brand-900"
+                  class:list={[trial ? "" : "js-choose-branch", "inline-flex min-h-11 items-center gap-1.5 rounded-control bg-brand-800 px-3.5 text-sm font-bold text-white transition hover:bg-brand-900"]}
                   aria-label={`Chọn cơ sở này – ${branch.name}`}
                 >
                   Chọn cơ sở này <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />

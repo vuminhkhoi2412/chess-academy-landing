@@ -39,7 +39,7 @@ const FALLBACK: SlideView = {
   alt: "Phòng học cờ vua tại một cơ sở Global Chess, các học viên đang luyện tập.",
   title: BRAND_INFO.slogan1,
   text: BRAND_INFO.slogan2,
-  cta: { label: enrolment ? "Đăng ký học thử" : "Xem học phí", href: "/#pricing" },
+  cta: { label: enrolment ? "Đăng ký học thử" : "Xem học phí", href: enrolment ? "/trial" : "/courses#pricing" },
 };
 
 const SLIDES: SlideView[] =
@@ -56,13 +56,13 @@ const SLIDES: SlideView[] =
 const hotline = BRAND_INFO.hotlines[0];
 // Ô lối tắt: ô tin và kiến thức tự ẩn khi chưa có bài để không dẫn tới trang trống.
 const TILES = [
-  { href: "/#curriculum", label: "Khoá học", hint: "Lộ trình từng cấp độ", Icon: BookOpen, show: true },
-  { href: "/#pricing", label: "Học phí", hint: "Bảng giá theo cấp độ", Icon: Banknote, show: true },
-  { href: "/#branches", label: "Cơ sở", hint: `${BRANCHES.length} cơ sở tại TP.HCM`, Icon: MapPin, show: true },
+  { href: "/courses", label: "Khoá học", hint: "Lộ trình từng cấp độ", Icon: BookOpen, show: true },
+  { href: "/courses#pricing", label: "Học phí", hint: "Bảng giá theo cấp độ", Icon: Banknote, show: true },
+  { href: "/branches", label: "Cơ sở", hint: `${BRANCHES.length} cơ sở tại TP.HCM`, Icon: MapPin, show: true },
   { href: news && knowledge ? "/news?category=news" : "/news", label: "Tin tức", hint: "Hoạt động mới nhất", Icon: Newspaper, show: news },
   { href: "/news?category=knowledge", label: "Kiến thức", hint: "Bài viết về cờ vua", Icon: Lightbulb, show: knowledge },
   enrolment
-    ? { href: "/#pricing", label: "Học thử", hint: "Để lại thông tin", Icon: GraduationCap, show: true }
+    ? { href: "/trial", label: "Học thử", hint: "Để lại thông tin", Icon: GraduationCap, show: true }
     : { href: `tel:${hotline}`, label: "Gọi tư vấn", hint: hotline, Icon: Phone, show: true },
 ].filter((tile) => tile.show);
 ---

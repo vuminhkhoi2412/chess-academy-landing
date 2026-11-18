@@ -1,0 +1,29 @@
+---
+// src/pages/branches.astro
+// Trang các cơ sở. Không có form: nút "Chọn cơ sở này" dẫn sang /trial?branch=<mã cơ sở>.
+export const prerender = false;
+
+import Layout from "../layouts/Layout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import MobileContactBar from "../components/MobileContactBar.astro";
+import BranchesSection from "../components/home/BranchesSection.astro";
+import { BRAND_INFO } from "../data/courses";
+import { getSiteConfig, getNewsAvailability } from "../server/site-config";
+
+const { flags } = getSiteConfig();
+const { news, knowledge } = getNewsAvailability();
+---
+
+<Layout
+  title={`Hệ thống cơ sở – ${BRAND_INFO.name}`}
+  description="Năm cơ sở cờ vua Global Chess tại TP.HCM: địa chỉ, số điện thoại và chỉ đường."
+  bodyClass={flags.mobile_bar ? "pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:pb-0" : undefined}
+>
+  <SiteHeader enrolmentOpen={flags.enrolment} news={news} knowledge={knowledge} />
+  <main id="main" tabindex="-1">
+    <BranchesSection enrolment={flags.enrolment} trial as="h1" />
+  </main>
+  <SiteFooter faq={flags.faq} news={news || knowledge} />
+  {flags.mobile_bar && <MobileContactBar />}
+</Layout>

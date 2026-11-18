@@ -2,8 +2,8 @@
 // src/components/SiteHeader.astro
 //
 // Đầu trang dùng chung cho mọi trang: thanh trên (hotline, Facebook, bản đồ, nút học thử)
-// và thanh menu có mục thả xuống. Mọi liên kết là đường dẫn tuyệt đối ("/#pricing") nên bấm
-// từ trang con vẫn về đúng mục của trang chủ.
+// và thanh menu có mục thả xuống. Mọi liên kết là đường dẫn tuyệt đối ("/courses#pricing") nên bấm
+// từ trang con vẫn về đúng trang.
 //
 // Mục thả xuống: rê chuột là mở; bàn phím và cảm ứng dùng nút mũi tên cạnh mục cha
 // (aria-expanded), Esc đóng. Mục cha vẫn là liên kết thật nên không có JS vẫn đi được.
@@ -23,22 +23,21 @@ interface Props {
 
 const { enrolmentOpen = true, news = false, knowledge = false } = Astro.props;
 
-// Trang /courses, /branches, /trial chưa có (đợt 5): tạm trỏ tới các mục của trang chủ.
 const NAV: { label: string; href: string; children?: { label: string; href: string }[] }[] = [
   { label: "Trang chủ", href: "/" },
   { label: "Giới thiệu", href: "/about" },
   {
     label: "Khoá học",
-    href: "/#curriculum",
+    href: "/courses",
     children: [
-      ...CURRICULUM_PROGRAMS.map((program) => ({ label: program.title, href: `/#curriculum:${program.id}` })),
-      { label: "Học phí", href: "/#pricing" },
+      ...CURRICULUM_PROGRAMS.map((program) => ({ label: program.title, href: `/courses#curriculum:${program.id}` })),
+      { label: "Học phí", href: "/courses#pricing" },
     ],
   },
   {
     label: "Cơ sở",
-    href: "/#branches",
-    children: BRANCHES.map((branch) => ({ label: branch.name, href: "/#branches" })),
+    href: "/branches",
+    children: BRANCHES.map((branch) => ({ label: branch.name, href: `/branches#branch-${branch.id}` })),
   },
   // Mục nào chưa có bài thì không hiện, để không dẫn tới trang trống.
   ...(news && knowledge
@@ -58,7 +57,7 @@ const NAV: { label: string; href: string; children?: { label: string; href: stri
       : knowledge
         ? [{ label: "Kiến thức", href: "/news?category=knowledge" }]
         : []),
-  ...(enrolmentOpen ? [{ label: "Học thử", href: "/#pricing" }] : []),
+  ...(enrolmentOpen ? [{ label: "Học thử", href: "/trial" }] : []),
 ];
 
 const MENU_ID = "gc-mobile-menu";
@@ -66,6 +65,7 @@ const TOGGLE_ID = "gc-mobile-menu-toggle";
 
 const hotlineHref = (phone: string) => `tel:${phone.replace(/\./g, "")}`;
 const ctaLabel = enrolmentOpen ? "Đăng ký học thử" : "Xem học phí";
+const ctaHref = enrolmentOpen ? "/trial" : "/courses#pricing";
 const LINK = "hover:text-slate-900 active:text-amber-700";
 ---
 
@@ -107,11 +107,11 @@ const LINK = "hover:text-slate-900 active:text-amber-700";
           <path style="fill: var(--color-paper)" d="M16.671 15.469 17.218 12h-3.328V9.75c0-.949.465-1.875 1.956-1.875h1.513V4.922s-1.373-.234-2.686-.234c-2.741 0-4.533 1.66-4.533 4.668V12H7.078v3.469h3.059v8.385a12.1 12.1 0 0 0 3.753 0v-8.385h2.781Z" />
         </svg>
       </a>
-      <a href="/#branches" aria-label="Bản đồ cơ sở" class="inline-flex h-9 w-9 items-center justify-center hover:text-white">
+      <a href="/branches" aria-label="Bản đồ cơ sở" class="inline-flex h-9 w-9 items-center justify-center hover:text-white">
         <MapPin className="h-5 w-5" aria-hidden="true" />
       </a>
       <a
-        href="/#pricing"
+        href={ctaHref}
         class="inline-flex min-h-7 items-center rounded-md bg-amber-400 px-3.5 font-bold text-slate-950 transition hover:bg-amber-300 active:scale-[0.98]"
       >
         {ctaLabel}
@@ -217,7 +217,7 @@ const LINK = "hover:text-slate-900 active:text-amber-700";
         }
       </ul>
 
-      <a href="/#pricing" class="gc-move gc-move--amber gc-move--block mt-3">
+      <a href={ctaHref} class="gc-move gc-move--amber gc-move--block mt-3">
         <span class="gc-move__label">{ctaLabel}</span>
         <span class="gc-move__go" aria-hidden="true"><ArrowRight className="h-4 w-4" /></span>
       </a>

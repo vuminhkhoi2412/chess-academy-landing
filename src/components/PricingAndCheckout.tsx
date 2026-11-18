@@ -12,9 +12,11 @@ interface Props {
   enrolmentOpen?: boolean;
   /** Giá hiện hành (đã gồm giá quản trị sửa), do trang chủ đọc từ DB. */
   levels: TuitionLevel[];
+  /** false ở trang /courses: không dựng form, nút "Đăng ký ngay" dẫn sang /trial. Trang chủ giữ form. */
+  form?: boolean;
 }
 
-export default function PricingAndCheckout({ enrolmentOpen = true, levels: allLevels }: Props) {
+export default function PricingAndCheckout({ enrolmentOpen = true, levels: allLevels, form = true }: Props) {
   return (
     <section id="pricing" className="relative overflow-hidden py-20 bg-brand-800 text-white">
       {/*
@@ -90,27 +92,29 @@ export default function PricingAndCheckout({ enrolmentOpen = true, levels: allLe
                   </div>
                 </div>
 
-                {enrolmentOpen && (
-                <button
-                  type="button"
-                  onClick={scrollToEnrolment}
-                  className={`gc-move gc-move--block ${
-                    program.popular ? "gc-move--amber" : "gc-move--quiet"
-                  } cursor-pointer`}
-                >
-                  <span className="gc-move__label">Đăng ký ngay</span>
-                  <span className="gc-move__go" aria-hidden="true">
-                    <ArrowRight className="w-4 h-4" />
-                  </span>
-                </button>
-                )}
+                {enrolmentOpen && (() => {
+                  const cta = `gc-move gc-move--block ${program.popular ? "gc-move--amber" : "gc-move--quiet"} cursor-pointer`;
+                  const inner = (
+                    <>
+                      <span className="gc-move__label">Đăng ký ngay</span>
+                      <span className="gc-move__go" aria-hidden="true">
+                        <ArrowRight className="w-4 h-4" />
+                      </span>
+                    </>
+                  );
+                  return form ? (
+                    <button type="button" onClick={scrollToEnrolment} className={cta}>{inner}</button>
+                  ) : (
+                    <a href="/trial" className={cta}>{inner}</a>
+                  );
+                })()}
               </article>
             );
           })}
         </div>
 
         {/* Form đăng ký học thử đặt thẳng trên trang, ngay dưới bảng giá. Neo #dang-ky là chính form. */}
-        {enrolmentOpen && (
+        {enrolmentOpen && form && (
         <div className="mt-20">
           <div className="mb-8 max-w-2xl">
             <h3 className="gc-section-title text-2xl font-extrabold md:text-3xl lg:text-4xl">
