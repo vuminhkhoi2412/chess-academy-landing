@@ -73,12 +73,19 @@ src/
   components/
     InteractivePuzzle.tsx    bàn cờ đố ở hero (tọa độ, tiếng cạch khi giải đúng)
     CurriculumExplorer.tsx   tab 3 lộ trình: Happy Chess / Sơ cấp / Trung cấp
-    PricingAndCheckout.tsx   bảng học phí + form đăng ký gửi Google Sheets
-    SiteHeader.astro         thanh nav dùng chung (kèm menu di động ở trang chủ)
-    SiteFooter.astro         chân trang dùng chung cho cả bốn trang
+    PricingAndCheckout.tsx   bảng học phí; prop `form` (mặc định bật) dựng form đăng ký, tắt ở /courses
+    EnrolmentForm.tsx        form đăng ký gửi Google Sheets (trang chủ và /trial; đọc ?branch=<mã cơ sở>)
+    SiteHeader.astro         thanh nav dùng chung (kèm menu di động)
+    SiteFooter.astro         chân trang dùng chung cho mọi trang công khai
     MobileContactBar.astro   thanh gọi điện / Zalo cố định ở đáy màn hình điện thoại
   pages/
-    index.astro         cả trang, kèm toàn bộ thẻ SEO
+    index.astro         trang chủ, kèm toàn bộ thẻ SEO
+    about.astro         giới thiệu
+    courses.astro       giáo trình và học phí (nút "Đăng ký ngay" dẫn sang /trial)
+    branches.astro      các cơ sở (nút "Chọn cơ sở này" dẫn sang /trial?branch=<mã>)
+    trial.astro         đăng ký học thử; form đóng thì hiện hotline và Zalo
+    news/               danh sách và bài đăng
+    admin/              trang quản trị
     404.astro           trang 404
     privacy-policy.astro   chính sách bảo mật
     terms.astro   điều khoản sử dụng
@@ -90,6 +97,7 @@ tests/
   puzzle.test.mjs       test thế cờ đố
   curriculum.test.mjs   test dữ liệu 3 lộ trình
   tuition.test.mjs      test bảng học phí chính thức
+  links.test.mjs        mọi liên kết nội bộ ở menu, chân trang, banner, thẻ cơ sở phải có trang thật
 ```
 
 `assets/logo.jpg` là file gốc duy nhất không publish (920x813, JPEG, nền trắng, không alpha).

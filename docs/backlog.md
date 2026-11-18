@@ -23,6 +23,10 @@ Trình soạn hiện có: tiêu đề 1–4, danh sách chấm/số/ô tích, đ
 - Đăng nhập bằng Google (tuỳ chọn).
 - Nhân viên tự đổi mật khẩu của mình (hiện chỉ Quản trị đặt lại giúp, hoặc dùng `npm run admin:reset`).
 
+## Đợt 5 (đã có trang riêng, còn lại)
+
+- Kiểm tay trên trình duyệt thật: cuộn tới `#curriculum:<id>`, `#pricing`, `#branch-<mã>` và giao diện mobile của `/courses`, `/branches`, `/trial`.
+
 ## Hạ tầng
 
 - Sao lưu hằng ngày `gc_data` (bước 6; chọn homelab hay Google Drive).
