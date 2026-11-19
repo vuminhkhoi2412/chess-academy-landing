@@ -2,7 +2,16 @@
 // src/components/home/HomeBanner.astro
 // Đầu trang chủ: hero (hero mặc định, hoặc băng chuyền slide từ /admin/slides với hai kiểu: ảnh học viên / banner có sẵn chữ),
 // dải lối tắt, rồi hàng "Hành trình học" cạnh bàn cờ đố.
-import { ArrowRight, BookOpen, Banknote, MapPin, Layers } from "lucide-react";
+import { Image } from "astro:assets";
+import { ArrowRight, Layers, Users, CirclePlay, ChartNoAxesColumn, Crown } from "lucide-react";
+import khoaHoc from "../../assets/images/icons/khoa-hoc.png";
+import loTrinh from "../../assets/images/icons/lo-trinh.png";
+import hocPhi from "../../assets/images/icons/hoc-phi.png";
+import coSo from "../../assets/images/icons/co-so.png";
+import quanCoNen from "../../assets/images/icons/quan-co-nen.png";
+import bacTot from "../../assets/images/bac-1-tot.png";
+import bacMa from "../../assets/images/bac-2-ma.png";
+import bacXe from "../../assets/images/bac-3-xe.png";
 import InteractivePuzzle from "../InteractivePuzzle";
 import { BRAND_INFO, BRANCHES, CURRICULUM_PROGRAMS } from "../../data/courses";
 import HeroPhoto from "./HeroPhoto.astro";
@@ -30,21 +39,27 @@ const SLIDES = slides.map((slide) => ({
 
 // Dải lối tắt luôn đúng 4 ô trên một hàng (kể cả mobile), nên không có ô ẩn/hiện theo dữ liệu.
 const TILES = [
-  { href: "/courses", label: "Khoá học", hint: "Theo độ tuổi & cấp độ", Icon: BookOpen },
-  { href: "/courses#curriculum", label: "Lộ trình đào tạo", hint: "Từ nhập môn đến nâng cao", Icon: Layers },
-  { href: "/courses#pricing", label: "Học phí", hint: "Ưu đãi & học bổng", Icon: Banknote },
-  { href: "/branches", label: "Cơ sở", hint: `${BRANCHES.length} cơ sở tại TP.HCM`, Icon: MapPin },
+  { href: "/courses", label: "Khoá học", hint: "Theo độ tuổi & cấp độ", icon: khoaHoc },
+  { href: "/courses#curriculum", label: "Lộ trình đào tạo", hint: "Từ nhập môn đến nâng cao", icon: loTrinh },
+  { href: "/courses#pricing", label: "Học phí", hint: "Ưu đãi & học bổng", icon: hocPhi },
+  { href: "/branches", label: "Cơ sở", hint: `${BRANCHES.length} cơ sở tại TP.HCM`, icon: coSo },
 ];
 
 // Hành trình học: lấy thẳng từ giáo trình để không lệch với trang /courses.
-const STEP_TINTS = ["bg-sky-100", "bg-emerald-100", "bg-amber-100"];
+const STEP_STYLES = [
+  { art: bacTot, card: "from-sky-100 via-sky-50 to-white", pill: "bg-sky-600" },
+  { art: bacMa, card: "from-emerald-100 via-emerald-50 to-white", pill: "bg-emerald-600" },
+  { art: bacXe, card: "from-amber-100 via-amber-50 to-white", pill: "bg-amber-500" },
+] as const;
 const STEPS = CURRICULUM_PROGRAMS.map((program, i) => ({
   n: i + 1,
   title: program.title,
   badge: program.badge,
+  // "Trẻ từ 4 – 12 tuổi (…)" -> "4 – 12 tuổi"; "72 buổi (3 Level …)" -> "72 buổi".
+  age: program.targetAudience.match(/\d+\s*–\s*\d+\s*tuổi/)?.[0] ?? program.targetAudience,
   duration: program.totalDuration.split(" (")[0],
   href: `/courses#curriculum:${program.id}`,
-  tint: STEP_TINTS[i % STEP_TINTS.length],
+  ...STEP_STYLES[i % STEP_STYLES.length],
 }));
 ---
 
@@ -101,26 +116,27 @@ const STEPS = CURRICULUM_PROGRAMS.map((program, i) => ({
   }
 </section>
 
-<section class="bg-cream py-5 md:py-8" aria-label="Giới thiệu nhanh">
-  <div class="mx-auto max-w-6xl space-y-4 px-4">
+<section class="relative overflow-hidden bg-cream py-5 md:py-8" aria-label="Giới thiệu nhanh">
+  <Image src={quanCoNen} alt="" width={300} class="pointer-events-none absolute -bottom-4 right-4 hidden w-28 rotate-[14deg] opacity-35 lg:block" />
+  <div class="relative mx-auto max-w-6xl space-y-4 px-4">
 
     {/* Dải lối tắt: luôn 4 ô trên một hàng. Dưới md chỉ còn icon + tên xếp dọc cho vừa chiều ngang. */}
-    <ul class="grid list-none grid-cols-4 gap-2 md:gap-3">
+    <ul class="grid list-none grid-cols-4 gap-2 md:gap-4">
       {
-        TILES.map(({ href, label, hint, Icon }) => (
+        TILES.map(({ href, label, hint, icon }) => (
           <li class="contents">
             <a
               href={href}
-              class="group flex min-w-0 flex-col items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-2 text-center transition hover:border-brand-800 hover:shadow-sm active:scale-[0.99] md:flex-row md:gap-3 md:p-3 md:text-left"
+              class="group flex min-w-0 flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white p-2 text-center shadow-soft transition hover:border-amber-300 hover:bg-amber-50 active:scale-[0.99] md:flex-row md:gap-4 md:p-4 md:text-left"
             >
-              <span class="grid size-9 shrink-0 place-items-center rounded-md bg-brand-50 text-brand-800 md:size-10">
-                <Icon className="h-5 w-5" aria-hidden="true" />
+              <span class="grid size-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-50 to-white transition group-hover:from-amber-100 md:size-14">
+                <Image src={icon} alt="" width={96} height={96} class="size-8 object-contain md:size-11" />
               </span>
               <span class="min-w-0 flex-1">
-                <span class="block text-xs font-bold leading-tight text-slate-900 md:text-[0.9375rem]">{label}</span>
-                <span class="hidden text-xs text-slate-600 md:block">{hint}</span>
+                <span class="block text-xs font-bold leading-tight text-slate-900 md:text-base">{label}</span>
+                <span class="hidden text-sm text-slate-600 md:block">{hint}</span>
               </span>
-              <ArrowRight className="hidden h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-brand-800 md:block" aria-hidden="true" />
+              <ArrowRight className="hidden h-5 w-5 shrink-0 text-brand-400 transition group-hover:text-amber-500 md:block" aria-hidden="true" />
             </a>
           </li>
         ))
@@ -128,33 +144,67 @@ const STEPS = CURRICULUM_PROGRAMS.map((program, i) => ({
     </ul>
 
     {/* Hành trình học (từ giáo trình) cạnh bàn cờ đố; tắt bàn cờ thì hành trình chiếm cả hàng. */}
-    <div class:list={["grid gap-4", puzzle && "md:grid-cols-12"]}>
-      <section class:list={["flex flex-col rounded-lg border border-slate-200 bg-white p-5", puzzle && "md:col-span-7"]} aria-labelledby="journey-title">
-        <h2 id="journey-title" class="text-xl font-extrabold leading-tight tracking-tight text-slate-900">Hành trình học cờ vua tại Global Chess</h2>
-        <p class="mb-4 mt-1 text-sm text-slate-600">Lộ trình bài bản, phù hợp từng độ tuổi và năng lực của học viên.</p>
-        <ol class="grid flex-1 list-none gap-2 sm:grid-cols-3">
+    <div class:list={["grid gap-4 md:gap-6", puzzle && "md:grid-cols-12"]}>
+      <section class:list={["flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-soft md:p-6", puzzle && "md:col-span-7"]} aria-labelledby="journey-title">
+        <div class="flex items-start gap-3">
+          <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-amber-100 to-white shadow-soft">
+            <ChartNoAxesColumn className="h-7 w-7 text-amber-500" strokeWidth={2.75} aria-hidden="true" />
+          </span>
+          <div class="min-w-0 flex-1">
+            <h2 id="journey-title" class="text-xl font-extrabold leading-tight tracking-tight text-slate-900 md:text-2xl">Hành trình học cờ vua tại Global Chess</h2>
+            <p class="mt-1 text-sm text-slate-600">Lộ trình bài bản, phù hợp từng độ tuổi và năng lực của học viên.</p>
+          </div>
+          <Crown className="hidden h-14 w-14 shrink-0 rotate-[14deg] text-amber-400 sm:block" strokeWidth={1.5} aria-hidden="true" />
+        </div>
+
+        <ol class="mt-[4.75rem] grid flex-1 list-none gap-x-4 gap-y-[4.75rem] md:grid-cols-3 md:gap-x-8 md:gap-y-0">
           {
             STEPS.map((step) => (
-              <li class="contents">
-                <a href={step.href} class:list={["flex flex-col gap-1 rounded-lg p-3.5 transition hover:shadow-sm active:scale-[0.99]", step.tint]}>
-                  <span class="text-2xl font-extrabold leading-none text-brand-800/50">{step.n}</span>
-                  <span class="text-[0.9375rem] font-bold leading-tight text-slate-900">{step.title}</span>
-                  <span class="text-xs leading-snug text-slate-700">{step.badge}</span>
-                  <span class="mt-auto pt-2 text-xs font-semibold text-brand-800">{step.duration}</span>
+              <li class="relative">
+                <a href={step.href} class:list={["relative block h-full rounded-3xl bg-gradient-to-b px-3 pb-5 pt-[7rem] text-center shadow-soft transition hover:shadow-md active:scale-[0.99]", step.card]}>
+                  <Image
+                    src={step.art}
+                    alt=""
+                    width={420}
+                    quality={80}
+                    class="pointer-events-none absolute -top-12 left-1/2 h-32 w-auto max-w-none -translate-x-1/2"
+                  />
+                  <span class:list={["absolute left-1/2 top-[4.6rem] -translate-x-1/2 rounded-full px-5 py-1 text-sm font-bold leading-none text-white shadow-sm ring-2 ring-white", step.pill]}>Bậc {step.n}</span>
+                  <span class="block text-lg font-extrabold leading-tight text-slate-900">{step.title}</span>
+                  <span class="mt-1 block text-sm text-slate-700">{step.badge}</span>
+                  <span class="mt-3 flex items-center justify-center gap-2 text-sm font-semibold text-slate-800">
+                    <Users className="h-4 w-4 text-brand-700" aria-hidden="true" />{step.age}
+                  </span>
+                  <span class="mt-1 flex items-center justify-center gap-2 text-sm font-semibold text-slate-800">
+                    <Layers className="h-4 w-4 text-brand-700" aria-hidden="true" />{step.duration}
+                  </span>
                 </a>
+                {step.n < STEPS.length && (
+                  <svg aria-hidden="true" viewBox="0 0 32 14" class="pointer-events-none absolute -right-8 top-[5.1rem] hidden h-3.5 w-8 md:block" focusable="false">
+                    <path d="M0 9 Q8 2 16 7 T32 5" fill="none" stroke="#fcd34d" stroke-width="2.5" stroke-linecap="round" />
+                    <circle cx="16" cy="7" r="4" fill="#fff" stroke="#fcd34d" stroke-width="2.5" />
+                  </svg>
+                )}
               </li>
             ))
           }
         </ol>
-        <a href="/courses" class="mt-4 inline-flex min-h-11 items-center gap-1 self-start text-sm font-bold text-brand-800 hover:underline">
-          Xem giáo trình chi tiết <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </a>
+
+        <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+          <a href="/courses#curriculum" class="gc-move gc-move--navy gc-move--lg">
+            <span class="gc-move__label">Xem giáo trình chi tiết</span>
+            <span class="gc-move__go" aria-hidden="true"><ArrowRight className="h-4 w-4" /></span>
+          </a>
+          <a href="/courses" class="gc-move gc-move--quiet-light gc-move--lg">
+            <span class="gc-move__label"><CirclePlay className="h-5 w-5 shrink-0 text-brand-600" aria-hidden="true" />Lộ trình đào tạo đầy đủ</span>
+          </a>
+        </div>
       </section>
 
       {
         puzzle && (
-          <div class="hidden md:col-span-5 md:flex md:items-center md:justify-center">
-            <InteractivePuzzle client:media="(min-width: 768px)" />
+          <div class="hidden md:col-span-5 md:flex md:items-start">
+            <InteractivePuzzle variant="panel" client:media="(min-width: 768px)" />
           </div>
         )
       }
