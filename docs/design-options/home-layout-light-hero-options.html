@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global Chess – Hero sáng, lối tắt ngang, bàn cờ cạnh hành trình</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-950:#0b2136;--navy-900:#123350;--navy-800:#184268;--navy-700:#1b4a76;--navy-600:#1f5285;--navy-200:#b6d0e8;--navy-100:#d9e8f5;--navy-50:#eef5fb;
+  --cream:#faf8f5;--ink:#0f172a;--ink-2:#334155;--ink-3:#475569;--rule:#e2e8f0;--board-light:#f7f3ed;
+  --amber-400:#fbbf24;--amber-500:#f59e0b;--amber-700:#b45309;
+  --display:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;
+  --sans:"Be Vietnam Pro",system-ui,sans-serif;
+  --r:.5rem; /* bo góc nhỏ như đã chốt: 8px */
+}
+*{box-sizing:border-box;margin:0}
+html,body{overflow-x:clip}
+body{font-family:var(--sans);color:var(--ink);background:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--navy-800);outline-offset:2px}
+.wrap{max-width:72rem;margin:0 auto;padding:0 1rem}
+
+/* ---- thành phần mô phỏng trang thật ---- */
+.top{background:var(--navy-800);color:var(--navy-100);font-size:.75rem;padding:.4rem 1rem}
+.top .in{max-width:72rem;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.top .cta{background:var(--amber-400);color:#0b1220;font-weight:700;padding:.15rem .75rem;border-radius:.375rem}
+header.nav{background:rgb(250 248 245/.95);border-bottom:1px solid var(--rule);height:3.5rem}
+header.nav .in{max-width:72rem;margin:0 auto;padding:0 1rem;height:100%;display:flex;align-items:center;gap:2rem}
+.logo{font-weight:800;font-size:1rem;letter-spacing:-.01em;line-height:1}
+.logo small{display:block;font-size:.6875rem;color:var(--amber-700);font-weight:600;margin-top:2px}
+header.nav nav{display:flex;gap:1.5rem;font-size:.8125rem;font-weight:600;color:var(--ink-3);margin-left:auto}
+.stage{max-width:72rem;margin:0 auto;padding:1.25rem 1rem}
+
+/* thẻ bàn cờ */
+.pz{background:#fff;border:1px solid var(--rule);border-radius:var(--r);padding:1rem;box-shadow:0 8px 24px -14px rgb(15 23 42/.3)}
+.pz .hd{display:flex;justify-content:space-between;align-items:center;font-size:.8125rem;font-weight:600;color:var(--ink-3);margin-bottom:.5rem}
+.pz .hd button{font-size:.75rem;color:var(--ink-3)}
+.pz h4{font-size:.9375rem;line-height:1.3;margin-bottom:.5rem}
+.board{display:grid;grid-template-columns:repeat(8,1fr);aspect-ratio:1;border:2px solid var(--navy-900);border-radius:.375rem;overflow:hidden;user-select:none}
+.board div{display:grid;place-items:center;font-size:calc(var(--bs,320px)/8*.72);line-height:1;cursor:pointer;position:relative}
+.board .l{background:var(--board-light)}.board .d{background:var(--navy-600)}
+.board .hint::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 3px var(--amber-400);background:rgb(251 191 36/.3)}
+.board .sel::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 3px #fff}
+.pc-w{color:#fff;text-shadow:0 0 2px #0b2136,0 0 2px #0b2136,0 0 2px #0b2136}
+.pc-b{color:#0b1220}
+.pz .st{margin-top:.5rem;font-size:.8125rem;color:var(--ink-3);font-style:italic;text-align:center;min-height:1.5rem}
+.pz .st.ok{color:#065f46;font-style:normal;font-weight:600}
+.pz .st.no{color:#b91c1c;font-style:normal;font-weight:600}
+
+
+
+.sec{padding:2.5rem 0;border-top:1px solid var(--rule)}
+.sec h2{font-family:var(--display);font-size:1.75rem;font-weight:800;letter-spacing:-.02em}
+.ghost{margin-top:1rem;height:7rem;border:1px dashed #cbd5e1;border-radius:var(--r);background:repeating-linear-gradient(135deg,#f1f5f9 0 8px,#f8fafc 8px 16px);display:grid;place-items:center;color:var(--ink-3);font-size:.8125rem}
+.note{font-size:.875rem;color:var(--ink-3);max-width:62rem;padding:1.5rem 0 .5rem}.note b{color:var(--ink)}
+.frame{border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;background:var(--cream);margin:1rem 0 2rem}
+.frame>h3{font-size:.8125rem;font-weight:700;padding:.5rem 1rem;background:#fff;border-bottom:1px solid var(--rule);color:var(--ink-2)}
+
+/* ---- phương án: hero sáng, lối tắt ngang, bàn cờ navy cạnh hành trình ---- */
+.hero2{position:relative;border-radius:var(--r);overflow:hidden;background:linear-gradient(100deg,#fff 0%,var(--navy-50) 55%,#dbe9f6 100%);border:1px solid var(--rule);display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);min-height:23rem}
+.hero2 .txt{position:relative;z-index:2;padding:2.5rem 0 2.5rem 2.5rem;display:flex;flex-direction:column;justify-content:center;gap:1rem}
+.hero2 .tag{align-self:flex-start;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--navy-800);background:#fff;border:1px solid var(--rule);border-radius:999px;padding:.25rem .75rem}
+.hero2 h1{font-family:var(--display);font-size:3rem;line-height:1.05;font-weight:800;letter-spacing:-.02em;color:var(--navy-800)}
+.hero2 h1 em{font-style:normal;color:var(--amber-700)}
+.hero2 p{color:var(--ink-2);max-width:26rem}
+.hero2 .acts{display:flex;gap:.75rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;min-height:3rem;padding:0 1.25rem;border-radius:var(--r);background:var(--amber-500);color:#0b1220;font-weight:700;font-size:.875rem}
+.btn.ghost{background:#fff;border:1.5px solid var(--navy-800);color:var(--navy-800)}
+.hero2 .ph{position:relative}
+.hero2 .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 28%);mask-image:linear-gradient(90deg,transparent 0,#000 28%)}
+.hero2 .dots{position:absolute;z-index:3;left:0;right:0;bottom:.5rem;display:flex;justify-content:center}
+.hero2 .dots i{display:block;width:.5rem;height:.5rem;border-radius:50%;background:rgb(24 66 104/.35);margin:.5rem .25rem}
+.hero2 .dots i:first-child{background:var(--navy-800)}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-top:.75rem}
+.strip a{display:flex;align-items:center;gap:.75rem;padding:.75rem .875rem;background:#fff;border:1px solid var(--rule);border-radius:var(--r);transition:border-color .15s,box-shadow .15s}
+.strip a:hover{border-color:var(--navy-800);box-shadow:0 1px 3px rgb(15 23 42/.08)}
+.strip .ic{flex:none;width:2.5rem;height:2.5rem;border-radius:.375rem;background:var(--navy-50);color:var(--navy-800);display:grid;place-items:center}
+.strip .ic svg{width:1.25rem;height:1.25rem}
+.strip b{display:block;font-size:.9375rem;line-height:1.2}.strip small{display:block;font-size:.75rem;color:var(--ink-3)}
+.strip .go{margin-left:auto;color:var(--ink-3)}
+.mid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:1rem;margin-top:1rem;align-items:stretch}
+.path{background:#fff;border:1px solid var(--rule);border-radius:var(--r);padding:1.25rem;display:flex;flex-direction:column}
+.path h2{font-family:var(--display);font-size:1.375rem;font-weight:800;letter-spacing:-.01em;line-height:1.2}
+.path>p{color:var(--ink-3);font-size:.875rem;margin:.25rem 0 1rem}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;list-style:none;padding:0;flex:1}
+.steps li{border-radius:var(--r);padding:.875rem .75rem;display:flex;flex-direction:column;gap:.25rem}
+.steps .n{font-family:var(--display);font-weight:800;font-size:1.5rem;line-height:1;color:var(--navy-800);opacity:.5}
+.steps b{font-size:.9375rem;line-height:1.2}.steps small{font-size:.75rem;color:var(--ink-2);line-height:1.4}
+.s1{background:#e4f0fb}.s2{background:#e3f6ec}.s3{background:#fdf0d8}.s4{background:#ece8fb}
+.path .more{margin-top:1rem;font-size:.875rem;font-weight:700;color:var(--navy-800)}
+.pzc{background:var(--navy-800);color:#fff;border-radius:var(--r);padding:1.25rem;display:flex;flex-direction:column;align-items:center;text-align:center}
+.pzc .k{align-self:flex-start;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--amber-400)}
+.pzc h3{align-self:flex-start;text-align:left;font-family:var(--display);font-size:1.25rem;font-weight:800;line-height:1.2;margin:.25rem 0 .75rem}
+.pzc .pz{background:transparent;border:0;box-shadow:none;padding:0;width:100%}
+.pzc .pz .hd,.pzc .pz h4{display:none}
+.pzc .board{margin:auto;max-width:20rem;border-color:var(--navy-950)}
+.pzc .pz .st{color:var(--navy-100);min-height:1.5rem}
+.pzc .pz .st.ok{color:#86efac}.pzc .pz .st.no{color:#fca5a5}
+.pzc .reset{margin-top:.25rem;font-size:.8125rem;color:var(--navy-200);text-decoration:underline}
+.cta{margin-top:1rem;border-radius:var(--r);background:var(--navy-900);color:#fff;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.cta p{font-family:var(--display);font-size:1.25rem;font-weight:700;line-height:1.3}
+.cta em{font-style:normal;color:var(--amber-400)}
+@media(max-width:900px){.hero2{grid-template-columns:1fr}.hero2 .txt{padding:1.5rem}.hero2 .ph{min-height:14rem}.hero2 .ph img{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 28%);mask-image:linear-gradient(180deg,transparent 0,#000 28%)}.hero2 h1{font-size:2.25rem}.mid{grid-template-columns:1fr}.steps{grid-template-columns:1fr 1fr}.strip{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="note"><b>Bản thu gọn từ mockup.</b> Giữ: hero sáng chữ bên trái ảnh bên phải (không lớp phủ đen), 4 thẻ lối tắt ngang, hành trình học 4 bước, thẻ bàn cờ navy, một băng đăng ký ở cuối. Bỏ: hai thẻ nổi trên ảnh, dải "Vì sao nên học cờ vua", ô chọn cấp độ/gợi ý/xem lời giải của bàn cờ (chưa có dữ liệu), nhân vật hoạt hình. Nút đăng ký chỉ còn ở hero và băng cuối.</p>
+  <div class="frame"><h3>Hero sáng + lối tắt ngang</h3>
+<div class="top"><div class="in"><span>Hotline: <b>0789059440</b> – <b>0963848430</b></span><span style="display:flex;gap:1rem;align-items:center"><span>f</span><span>⌖</span><span class="cta">Đăng ký học thử</span></span></div></div>
+<header class="nav"><div class="in"><div class="logo">GLOBAL CHESS<small>Một nước đi, mở tư duy</small></div><nav><span>Giới thiệu</span><span>Khoá học ▾</span><span>Cơ sở ▾</span><span>Học thử</span></nav></div></header>
+  <div class="stage">
+    <section class="hero2">
+      <div class="txt">
+        <span class="tag">Global Chess · Học cờ vua sáng tạo</span>
+        <h1>Một nước đi, <em>mở tư duy</em></h1>
+        <p>Khơi mở tư duy logic, khả năng tập trung và tính kiên trì của trẻ qua hành trình khám phá cờ vua đầy hứng thú.</p>
+        <div class="acts"><a class="btn" href="#" onclick="return false">Đăng ký học thử miễn phí →</a><a class="btn ghost" href="#" onclick="return false">Khám phá khoá học</a></div>
+      </div>
+      <div class="ph"><img src="../../src/assets/images/gallery-coach-student.jpg" alt="Huấn luyện viên và học viên đang chơi cờ"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+    </section>
+    <div class="strip"><a href="#" onclick="return false"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></span><span><b>Khoá học</b><small>Theo độ tuổi &amp; cấp độ</small></span><span class="go">›</span></a><a href="#" onclick="return false"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg></span><span><b>Học phí</b><small>Bảng giá theo cấp độ</small></span><span class="go">›</span></a><a href="#" onclick="return false"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span><b>Cơ sở</b><small>5 cơ sở tại TP.HCM</small></span><span class="go">›</span></a><a href="#" onclick="return false"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/></svg></span><span><b>Kiến thức</b><small>Bài viết về cờ vua</small></span><span class="go">›</span></a></div>
+    <div class="mid">
+      <section class="path"><h2>Hành trình học cờ vua tại Global Chess</h2><p>Lộ trình bài bản, phù hợp từng độ tuổi và năng lực của học viên.</p><ol class="steps"><li class="s1"><span class="n">1</span><b>Nhập môn</b><small>Làm quen &amp; yêu thích cờ vua</small></li><li class="s2"><span class="n">2</span><b>Cơ bản</b><small>Nắm vững luật chơi &amp; tư duy chiến thuật</small></li><li class="s3"><span class="n">3</span><b>Nâng cao</b><small>Rèn luyện chiến lược &amp; thi đấu thực tế</small></li><li class="s4"><span class="n">4</span><b>Chuyên sâu</b><small>Phát triển năng lực thi đấu &amp; cấp chứng chỉ</small></li></ol><a class="more" href="#" onclick="return false">Xem giáo trình chi tiết →</a></section>
+      <section class="pzc"><span class="k">Thử thách mỗi ngày</span><h3>Trắng đi trước: làm sao để bắt Xe của Đen?</h3><div id="pzmount" style="width:100%"></div><button type="button" class="reset" id="rs">Chơi lại</button></section>
+    </div>
+    <div class="cta"><p>Hãy để con bắt đầu hành trình<br>trở thành <em>“người chiến lược nhí”</em> ngay hôm nay!</p><a class="btn" href="#" onclick="return false">Đăng ký học thử miễn phí →</a></div>
+  </div>
+  </div>
+</div>
+<script>
+const FEN = "3r3k/ppp2ppp/8/4p1N1/8/8/PPPP1PPP/R1BQK2R w KQ - 0 1";
+const G = {k:"♚",q:"♛",r:"♜",b:"♝",n:"♞",p:"♟"}; // dùng glyph đặc cho cả hai bên, tô màu theo bên
+let uid = 0;
+function puzzle(size, {title=true, heading="Thử thách ngày hôm nay"}={}) {
+  const id = "pz"+(++uid);
+  const rows = FEN.split(" ")[0].split("/");
+  let cells = "";
+  rows.forEach((row,r)=>{ let c=0; for (const ch of row){ if(/\d/.test(ch)){ for(let k=0;k<+ch;k++){cells+=sq(r,c++,"")} } else { cells+=sq(r,c++,ch) } } });
+  function sq(r,c,p){
+    const name = "abcdefgh"[c]+(8-r);
+    const dark=(r+c)%2===1;
+    const w = p && p===p.toUpperCase();
+    const piece = p ? `<span class="${w?"pc-w":"pc-b"}">${G[p.toLowerCase()]}</span>` : "";
+    return `<div class="${dark?"d":"l"}${name==="g5"?" hint":""}" data-sq="${name}">${piece}</div>`;
+  }
+  return `<div class="pz" id="${id}" style="--bs:${size}px"><div class="hd"><span>${heading}</span><button type="button" data-reset>↺ Chơi lại</button></div>
+  ${title?`<h4>Trắng đi trước: Làm sao để bắt Xe của Đen?</h4>`:""}
+  <div class="board" style="max-width:${size}px;margin:auto">${cells}</div><div class="st">Bấm quân Mã ở g5, rồi bấm ô f7</div></div>`;
+}
+
+function wire(root){
+  const st = root.querySelector(".st"); let sel=null, done=false;
+  const sq = (n)=>root.querySelector(`[data-sq="${n}"]`);
+  root.querySelectorAll("[data-sq]").forEach(c=>c.onclick=()=>{
+    if(done) return;
+    const n=c.dataset.sq;
+    if(!sel){ if(n==="g5"){sel=n;c.classList.add("sel");} else {st.className="st no";st.textContent="Chọn quân Mã trắng ở ô g5 trước nhé";} return; }
+    if(n==="f7"){
+      sq("g5").innerHTML=""; sq("f7").innerHTML='<span class="pc-w">♞</span>'; sq("g5").classList.remove("sel","hint");
+      done=true; st.className="st ok"; st.textContent="Tuyệt vời! Đó là đòn Chĩa Đôi (Fork).";
+    } else { sq("g5").classList.remove("sel"); sel=null; st.className="st no"; st.textContent="Chưa chính xác. Hãy tìm ô tấn công cùng lúc 2 mục tiêu."; }
+  });
+  
+}
+
+function mountPz(){const m=document.getElementById("pzmount");m.innerHTML=puzzle(320);wire(m.querySelector(".pz"));}
+document.getElementById("rs").onclick=mountPz;mountPz();
+</script>
+</body>
+</html>
