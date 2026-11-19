@@ -9,10 +9,10 @@ import SiteFooter from "../components/SiteFooter.astro";
 import MobileContactBar from "../components/MobileContactBar.astro";
 import EnrolmentForm from "../components/EnrolmentForm";
 import { BRAND_INFO } from "../data/courses";
-import { getSiteConfig, getNewsAvailability } from "../server/site-config";
+import { getSiteConfig, getNewsCategories } from "../server/site-config";
 
 const { flags } = getSiteConfig();
-const { news, knowledge } = getNewsAvailability();
+const newsCategories = getNewsCategories();
 const hotline = BRAND_INFO.hotlines[0];
 ---
 
@@ -21,7 +21,7 @@ const hotline = BRAND_INFO.hotlines[0];
   description="Đăng ký học thử miễn phí cờ vua Global Chess: để lại thông tin, giáo viên sẽ gọi hoặc nhắn Zalo xếp lớp cho bé."
   bodyClass={flags.mobile_bar ? "pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:pb-0" : undefined}
 >
-  <SiteHeader enrolmentOpen={flags.enrolment} news={news} knowledge={knowledge} />
+  <SiteHeader enrolmentOpen={flags.enrolment} newsCategories={newsCategories} />
   <main id="main" tabindex="-1">
     <section class="bg-brand-800 py-16 text-white">
       <div class="mx-auto max-w-6xl px-4">
@@ -40,6 +40,6 @@ const hotline = BRAND_INFO.hotlines[0];
       </div>
     </section>
   </main>
-  <SiteFooter faq={flags.faq} news={news || knowledge} />
+  <SiteFooter faq={flags.faq} news={newsCategories.length > 0} />
   {flags.mobile_bar && <MobileContactBar />}
 </Layout>

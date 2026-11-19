@@ -2,7 +2,9 @@
 // Điểm vào duy nhất để trang công khai đọc cấu hình bật/tắt (đọc DB mỗi request, lỗi thì dùng mặc định).
 import { getDb } from "./db";
 import { loadSiteConfig, type SiteConfig } from "./flags";
-import { countPublished, listImages, listPublished } from "./posts";
+import { listPublishedCategories } from "./categories";
+import type { Db } from "./db";
+import { listImages, listPublished, type Post, type PostImage } from "./posts";
 import { listEnabledSlides, type Slide } from "./slides";
 import { loadTuition, type Tuition } from "./tuition";
 import { EXTRA_FEES, TUITION_LEVELS } from "../data/courses";
@@ -11,23 +13,37 @@ export function getSiteConfig(): SiteConfig {
   return loadSiteConfig(getDb);
 }
 
-/** Bài mới nhất cho khối tin trên trang chủ, kèm ảnh bìa; lỗi DB thì coi như chưa có bài. */
-export function getLatestPosts(count: number) {
+type NewsItems = { post: Post; cover: PostImage | null }[];
+
+/** Bài mới nhất kèm ảnh bìa; `category` là mã mục, bỏ trống thì lấy từ mọi mục. */
+function latest(db: Db, count: number, category?: string): NewsItems {
+  return listPublished(db, 1, count, category).map((post) => ({ post, cover: listImages(db, post.id)[0] ?? null }));
+}
+
+/**
+ * Khối tin trang chủ: một nhóm bài cho tab "Tất cả" và một nhóm cho mỗi mục đã có bài, theo thứ tự mục.
+ * Lỗi DB thì coi như chưa có bài (trang chủ ẩn khối này).
+ */
+export function getHomeNews(count: number): { slug: string | null; name: string; items: NewsItems }[] {
   try {
     const db = getDb();
-    return listPublished(db, 1, count).map((post) => ({ post, cover: listImages(db, post.id)[0] ?? null }));
+    const all = latest(db, count);
+    if (all.length === 0) return [];
+    return [
+      { slug: null, name: "Tất cả", items: all },
+      ...listPublishedCategories(db).map((c) => ({ slug: c.slug, name: c.name, items: latest(db, count, c.slug) })),
+    ];
   } catch {
     return [];
   }
 }
 
-/** Mục nào đã có bài đăng: quyết định menu, ô lối tắt và khối tin hiện gì. Lỗi DB thì coi như chưa có. */
-export function getNewsAvailability(): { news: boolean; knowledge: boolean } {
+/** Các mục đã có bài đăng, theo thứ tự hiển thị: quyết định menu, thanh lọc và khối tin hiện gì. Lỗi DB thì coi như chưa có. */
+export function getNewsCategories(): { slug: string; name: string }[] {
   try {
-    const db = getDb();
-    return { news: countPublished(db, "news") > 0, knowledge: countPublished(db, "knowledge") > 0 };
+    return listPublishedCategories(getDb()).map(({ slug, name }) => ({ slug, name }));
   } catch {
-    return { news: false, knowledge: false };
+    return [];
   }
 }
 

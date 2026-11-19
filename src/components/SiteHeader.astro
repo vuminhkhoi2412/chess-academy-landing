@@ -15,13 +15,11 @@ import zaloIcon from "../assets/zalo-icon.svg";
 interface Props {
   /** Trang chủ truyền false khi quản trị đã đóng form đăng ký: nhãn đổi sang "Học phí". */
   enrolmentOpen?: boolean;
-  /** Mục Tin tức đã có bài đăng. */
-  news?: boolean;
-  /** Mục Kiến thức đã có bài đăng. */
-  knowledge?: boolean;
+  /** Các mục bài đăng đã có bài, theo thứ tự hiển thị. Rỗng thì không có mục Tin tức trong menu. */
+  newsCategories?: { slug: string; name: string }[];
 }
 
-const { enrolmentOpen = true, news = false, knowledge = false } = Astro.props;
+const { enrolmentOpen = true, newsCategories = [] } = Astro.props;
 
 const NAV: { label: string; href: string; children?: { label: string; href: string }[] }[] = [
   { label: "Trang chủ", href: "/" },
@@ -39,24 +37,22 @@ const NAV: { label: string; href: string; children?: { label: string; href: stri
     href: "/branches",
     children: BRANCHES.map((branch) => ({ label: branch.name, href: `/branches#branch-${branch.id}` })),
   },
-  // Mục nào chưa có bài thì không hiện, để không dẫn tới trang trống.
-  ...(news && knowledge
+  // Mục nào chưa có bài thì không hiện, để không dẫn tới trang trống. Một mục thôi thì không có gì để chọn:
+  // menu là liên kết thẳng, mang tên mục đó.
+  ...(newsCategories.length > 1
     ? [
         {
           label: "Tin tức",
           href: "/news",
           children: [
             { label: "Tất cả bài viết", href: "/news" },
-            { label: "Tin tức", href: "/news?category=news" },
-            { label: "Kiến thức", href: "/news?category=knowledge" },
+            ...newsCategories.map((category) => ({ label: category.name, href: `/news?category=${category.slug}` })),
           ],
         },
       ]
-    : news
-      ? [{ label: "Tin tức", href: "/news" }]
-      : knowledge
-        ? [{ label: "Kiến thức", href: "/news?category=knowledge" }]
-        : []),
+    : newsCategories.length === 1
+      ? [{ label: newsCategories[0].name, href: "/news" }]
+      : []),
 ];
 
 const MENU_ID = "gc-mobile-menu";

@@ -13,7 +13,8 @@ Trình soạn hiện có: tiêu đề 1–4, danh sách chấm/số/ô tích, đ
 
 ## Bài đăng
 
-- Chia danh mục theo mục của trang (đã nói sẽ làm; hiện một danh sách chung).
+- Lượt xem mỗi bài (mẫu trang tin có hiện số lượt xem; cần cột đếm và cách bỏ qua bot).
+- Khối "Các khóa học nổi bật" trên trang Tin tức theo mẫu, lấy từ dữ liệu `/courses`.
 - Hẹn giờ đăng.
 - Tìm kiếm trong tin tức.
 - Sửa chú thích ảnh (cột `caption` đã có nhưng chưa có ô nhập).

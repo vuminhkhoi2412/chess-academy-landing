@@ -11,10 +11,10 @@ import MobileContactBar from "../components/MobileContactBar.astro";
 import CurriculumExplorer from "../components/CurriculumExplorer";
 import PricingAndCheckout from "../components/PricingAndCheckout";
 import { BRAND_INFO } from "../data/courses";
-import { getSiteConfig, getNewsAvailability, getTuition } from "../server/site-config";
+import { getSiteConfig, getNewsCategories, getTuition } from "../server/site-config";
 
 const { flags } = getSiteConfig();
-const { news, knowledge } = getNewsAvailability();
+const newsCategories = getNewsCategories();
 const tuition = getTuition();
 ---
 
@@ -23,7 +23,7 @@ const tuition = getTuition();
   description="Lộ trình cờ vua Global Chess cho trẻ 4–12 tuổi: Happy Chess, Sơ cấp, Trung cấp với giáo trình chi tiết từng cấp độ và bảng học phí."
   bodyClass={flags.mobile_bar ? "pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:pb-0" : undefined}
 >
-  <SiteHeader enrolmentOpen={flags.enrolment} news={news} knowledge={knowledge} />
+  <SiteHeader enrolmentOpen={flags.enrolment} newsCategories={newsCategories} />
   <main id="main" tabindex="-1">
     <div class="mx-auto max-w-6xl px-4 pt-12">
       <h1 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900">Khoá học và học phí</h1>
@@ -31,6 +31,6 @@ const tuition = getTuition();
     <CurriculumExplorer client:load />
     <PricingAndCheckout client:load enrolmentOpen={flags.enrolment} levels={tuition.levels} form={false} />
   </main>
-  <SiteFooter faq={flags.faq} news={news || knowledge} />
+  <SiteFooter faq={flags.faq} news={newsCategories.length > 0} />
   {flags.mobile_bar && <MobileContactBar />}
 </Layout>

@@ -17,18 +17,15 @@ export class PostError extends Error {
   }
 }
 
-/** Mục của bài đăng: nhãn tiếng Việt hiển thị trên trang và trong quản trị. */
-export const POST_CATEGORIES = { news: "Tin tức", knowledge: "Kiến thức" } as const;
-export type PostCategory = keyof typeof POST_CATEGORIES;
-export const isCategory = (value: unknown): value is PostCategory =>
-  typeof value === "string" && Object.hasOwn(POST_CATEGORIES, value);
-
 export interface Post {
   id: number;
   slug: string;
   title: string;
   summary: string;
-  category: PostCategory;
+  /** Mã mục (categories.slug), dùng trong địa chỉ ?category=. */
+  category: string;
+  /** Tên mục để hiển thị. */
+  categoryName: string;
   /** HTML đã lọc nếu bodyFormat là "html"; văn bản thuần nếu là "text" (bài cũ). Hiển thị bằng `bodyHtml`. */
   body: string;
   bodyFormat: "text" | "html";
@@ -52,11 +49,15 @@ export interface PostInput {
   title: string;
   summary: string;
   body: string;
-  /** Không truyền thì là "news". */
-  category?: PostCategory;
+  /** Mã mục (categories.slug). Không truyền: bài mới vào mục đầu tiên, bài đang sửa giữ mục hiện tại. */
+  category?: string;
 }
 
 type Row = Record<string, unknown>;
+
+// Mọi truy vấn bài đều nối bảng mục để có mã và tên mục; trigger đảm bảo bài nào cũng có mục.
+const SELECT_POST = `SELECT p.*, c.slug AS category_slug, c.name AS category_name
+  FROM posts p JOIN categories c ON c.id = p.category_id`;
 
 function toPost(r: Row): Post {
   return {
@@ -64,7 +65,8 @@ function toPost(r: Row): Post {
     slug: r.slug as string,
     title: r.title as string,
     summary: r.summary as string,
-    category: isCategory(r.category) ? r.category : "news",
+    category: r.category_slug as string,
+    categoryName: r.category_name as string,
     body: r.body as string,
     bodyFormat: (r.body_format as "text" | "html") ?? "text",
     status: r.status as Post["status"],
@@ -98,9 +100,19 @@ function uniqueSlug(db: Db, title: string): string {
   return slug;
 }
 
-function clean(input: PostInput): Required<PostInput> {
-  const category = input.category ?? "news";
-  if (!isCategory(category)) throw new PostError("category", "Hãy chọn mục cho bài viết.");
+/** Mã mục → id; không truyền mã thì lấy mục đầu tiên. Mã lạ (hoặc mục đã bị xoá) là lỗi người nhập. */
+function categoryId(db: Db, slug: string | undefined): number {
+  const row = (
+    slug === undefined
+      ? db.prepare("SELECT id FROM categories ORDER BY position, id LIMIT 1").get()
+      : db.prepare("SELECT id FROM categories WHERE slug = ?").get(slug)
+  ) as { id: number } | undefined;
+  if (!row) throw new PostError("category", "Hãy chọn mục cho bài viết.");
+  return row.id;
+}
+
+function clean(input: PostInput): PostInput {
+  const category = input.category;
   const title = input.title.replace(/\s+/g, " ").trim();
   const summary = input.summary.replace(/\s+/g, " ").trim();
   // Nội dung luôn là HTML từ trình soạn thảo, đã lọc: chỉ giữ thẻ/thuộc tính cho phép.
@@ -119,13 +131,14 @@ function clean(input: PostInput): Required<PostInput> {
 
 export function createPost(db: Db, input: PostInput, actor: Actor, now: number = Date.now()): Post {
   const v = clean(input);
+  const categoryRef = categoryId(db, v.category);
   const slug = uniqueSlug(db, v.title);
   const info = db
     .prepare(
-      `INSERT INTO posts (slug, title, summary, category, body, body_format, status, created_at, created_by, updated_at, updated_by)
+      `INSERT INTO posts (slug, title, summary, category_id, body, body_format, status, created_at, created_by, updated_at, updated_by)
        VALUES (?, ?, ?, ?, ?, 'html', 'draft', ?, ?, ?, ?)`,
     )
-    .run(slug, v.title, v.summary, v.category, v.body, now, actor.username, now, actor.username);
+    .run(slug, v.title, v.summary, categoryRef, v.body, now, actor.username, now, actor.username);
   const id = Number(info.lastInsertRowid);
   audit(db, actor, "post_created", String(id), { title: v.title }, now);
   return getPostById(db, id)!;
@@ -134,11 +147,14 @@ export function createPost(db: Db, input: PostInput, actor: Actor, now: number =
 /** Đường dẫn (slug) giữ nguyên khi sửa tiêu đề, để link đã chia sẻ không chết. */
 export function updatePost(db: Db, id: number, input: PostInput, actor: Actor, now: number = Date.now()): Post {
   const v = clean(input);
-  if (!getPostById(db, id)) throw new PostError("not_found", "Bài viết không tồn tại.");
-  db.prepare("UPDATE posts SET title=?, summary=?, category=?, body=?, body_format='html', updated_at=?, updated_by=? WHERE id=?").run(
+  const existing = getPostById(db, id);
+  if (!existing) throw new PostError("not_found", "Bài viết không tồn tại.");
+  // Không truyền mục khi sửa thì giữ mục hiện tại.
+  const categoryRef = categoryId(db, v.category ?? existing.category);
+  db.prepare("UPDATE posts SET title=?, summary=?, category_id=?, body=?, body_format='html', updated_at=?, updated_by=? WHERE id=?").run(
     v.title,
     v.summary,
-    v.category,
+    categoryRef,
     v.body,
     now,
     actor.username,
@@ -186,34 +202,34 @@ export function deletePost(db: Db, id: number, actor: Actor, now: number = Date.
 }
 
 export function getPostById(db: Db, id: number): Post | null {
-  const r = db.prepare("SELECT * FROM posts WHERE id = ?").get(id) as Row | undefined;
+  const r = db.prepare(`${SELECT_POST} WHERE p.id = ?`).get(id) as Row | undefined;
   return r ? toPost(r) : null;
 }
 
 /** Chỉ bài đã đăng; nháp trả về null để địa chỉ công khai không lộ bài chưa xong. */
 export function getPublishedBySlug(db: Db, slug: string): Post | null {
-  const r = db.prepare("SELECT * FROM posts WHERE slug = ? AND status = 'published'").get(slug) as Row | undefined;
+  const r = db.prepare(`${SELECT_POST} WHERE p.slug = ? AND p.status = 'published'`).get(slug) as Row | undefined;
   return r ? toPost(r) : null;
 }
 
 export function listPosts(db: Db): Post[] {
-  return (db.prepare("SELECT * FROM posts ORDER BY updated_at DESC, id DESC").all() as Row[]).map(toPost);
+  return (db.prepare(`${SELECT_POST} ORDER BY p.updated_at DESC, p.id DESC`).all() as Row[]).map(toPost);
 }
 
-/** Bài đã đăng, mới nhất trước; truyền `category` để chỉ lấy một mục. */
-export function listPublished(db: Db, page = 1, perPage = POSTS_POLICY.perPage, category?: PostCategory): Post[] {
+/** Bài đã đăng, mới nhất trước; truyền mã mục `category` để chỉ lấy một mục. */
+export function listPublished(db: Db, page = 1, perPage = POSTS_POLICY.perPage, category?: string): Post[] {
   const offset = (Math.max(1, page) - 1) * perPage;
-  const where = category ? "status='published' AND category=?" : "status='published'";
+  const where = category ? "p.status='published' AND c.slug=?" : "p.status='published'";
   const args = category ? [category, perPage, offset] : [perPage, offset];
   return (
-    db.prepare(`SELECT * FROM posts WHERE ${where} ORDER BY published_at DESC, id DESC LIMIT ? OFFSET ?`).all(...args) as Row[]
+    db.prepare(`${SELECT_POST} WHERE ${where} ORDER BY p.published_at DESC, p.id DESC LIMIT ? OFFSET ?`).all(...args) as Row[]
   ).map(toPost);
 }
 
-export function countPublished(db: Db, category?: PostCategory): number {
+export function countPublished(db: Db, category?: string): number {
   const row = (
     category
-      ? db.prepare("SELECT COUNT(*) AS n FROM posts WHERE status='published' AND category=?").get(category)
+      ? db.prepare("SELECT COUNT(*) AS n FROM posts p JOIN categories c ON c.id = p.category_id WHERE p.status='published' AND c.slug=?").get(category)
       : db.prepare("SELECT COUNT(*) AS n FROM posts WHERE status='published'").get()
   ) as { n: number };
   return row.n;

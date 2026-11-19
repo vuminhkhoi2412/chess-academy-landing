@@ -30,6 +30,10 @@ const LABELS: Record<string, string> = {
   post_image_added: "Thêm ảnh vào bài",
   post_image_removed: "Gỡ ảnh khỏi bài",
   post_cover_set: "Đổi ảnh bìa",
+  category_created: "Thêm mục bài đăng",
+  category_renamed: "Đổi tên mục bài đăng",
+  category_moved: "Đổi thứ tự mục bài đăng",
+  category_deleted: "Xoá mục bài đăng",
   slide_created: "Thêm slide banner",
   slide_updated: "Sửa slide banner",
   slide_enabled: "Bật slide banner",
@@ -46,6 +50,8 @@ function describe(action: string, detail: Record<string, unknown> | null): strin
   if (action === "role_changed") return `${ROLE_NAME[String(detail.from)] ?? "?"} → ${ROLE_NAME[String(detail.to)] ?? "?"}`;
   if (action === "user_created") return `Quyền: ${ROLE_NAME[String(detail.role)] ?? "?"}`;
   if (action === "price_changed") return `${Number(detail.from).toLocaleString("vi-VN")}đ → ${Number(detail.to).toLocaleString("vi-VN")}đ`;
+  if (action === "category_renamed") return `${String(detail.from)} → ${String(detail.to)}`;
+  if (action.startsWith("category_") && detail.name) return String(detail.name);
   if (action === "login" || action === "login_failed") return `IP ${String(detail.ip ?? "?")}`;
   return "";
 }

@@ -10,6 +10,7 @@ const isAdmin = user.role === "admin";
 const TILES = [
   { title: "Bật/tắt tính năng", text: "Ẩn hoặc hiện từng phần của trang chủ, đóng mở form đăng ký.", href: "", admin: true },
   { title: "Bài đăng", text: "Soạn và xuất bản tin tức, bài kiến thức cho phụ huynh.", href: "/admin/posts", admin: false },
+  { title: "Mục bài đăng", text: "Thêm, đổi tên, sắp xếp các mục của trang Tin tức (Giải đấu, Câu chuyện học viên...).", href: "/admin/categories", admin: true },
   { title: "Banner trang chủ", text: "Thay ảnh, chữ và thứ tự các slide đầu trang chủ.", href: "/admin/slides", admin: false },
   { title: "Học phí", text: "Sửa giá các cấp độ và phụ phí (sách, đồng phục, bộ cờ). Biên tập chỉ xem.", href: "/admin/tuition", admin: false },
   { title: "Tài khoản", text: "Thêm nhân viên, đặt lại mật khẩu, khoá tài khoản.", href: "/admin/accounts", admin: true },

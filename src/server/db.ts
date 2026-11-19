@@ -125,6 +125,32 @@ export const MIGRATIONS: string[] = [
   ALTER TABLE slides ADD COLUMN layout TEXT NOT NULL DEFAULT 'photo' CHECK (layout IN ('photo', 'poster'));
   UPDATE slides SET layout = 'poster' WHERE title = '' AND text = '';
   `,
+  // Mục bài đăng thành dữ liệu sửa được trong quản trị. `slug` là mã trên địa chỉ (?category=...), đặt một lần
+  // rồi giữ nguyên để link cũ không chết; 'news' và 'knowledge' giữ mã cũ. Cột posts.category (có CHECK cũ) không
+  // còn dùng nhưng giữ lại, như cột title/text của slides: SQLite không gỡ được CHECK mà không dựng lại bảng.
+  // Cột category_id phải để NULL khi thêm (SQLite bắt buộc với REFERENCES), nên có trigger gán mục đầu tiên cho
+  // bài chèn không khai mục.
+  `
+  CREATE TABLE categories (
+    id       INTEGER PRIMARY KEY,
+    slug     TEXT NOT NULL UNIQUE,
+    name     TEXT NOT NULL,
+    position INTEGER NOT NULL
+  );
+  INSERT INTO categories (slug, name, position) VALUES
+    ('news', 'Tin tức', 0),
+    ('knowledge', 'Kiến thức', 1),
+    ('events', 'Giải đấu & Sự kiện', 2),
+    ('stories', 'Câu chuyện học viên', 3),
+    ('parents', 'Bí quyết cho phụ huynh', 4);
+  ALTER TABLE posts ADD COLUMN category_id INTEGER REFERENCES categories(id);
+  UPDATE posts SET category_id = (SELECT id FROM categories WHERE slug = posts.category);
+  CREATE INDEX posts_category_id ON posts (category_id, status, published_at DESC);
+  CREATE TRIGGER posts_default_category AFTER INSERT ON posts WHEN NEW.category_id IS NULL
+  BEGIN
+    UPDATE posts SET category_id = (SELECT id FROM categories ORDER BY position, id LIMIT 1) WHERE id = NEW.id;
+  END;
+  `,
 ];
 
 export function migrate(db: Db): void {

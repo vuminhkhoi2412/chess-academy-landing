@@ -47,6 +47,13 @@ export const POSTS_POLICY = {
   perPage: 12,
 };
 
+/** Mục bài đăng (src/server/categories.ts). */
+export const CATEGORIES_POLICY = {
+  nameMax: 40,
+  /** Số mục tối đa; nhiều hơn thì thanh lọc ở /news tràn dòng. */
+  maxCategories: 10,
+};
+
 /** Slide banner trang chủ (src/server/slides.ts, uploads.ts). */
 export const SLIDES_POLICY = {
   /** Số slide tối đa; nhiều hơn thì banner quá dài để lướt qua. */

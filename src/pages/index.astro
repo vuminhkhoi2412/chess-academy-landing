@@ -6,6 +6,7 @@ import SiteFooter from "../components/SiteFooter.astro";
 import MobileContactBar from "../components/MobileContactBar.astro";
 import HomeBanner from "../components/home/HomeBanner.astro";
 import NewsSection from "../components/home/NewsSection.astro";
+import FeaturedSection from "../components/home/FeaturedSection.astro";
 import BranchesSection from "../components/home/BranchesSection.astro";
 import GallerySection from "../components/home/GallerySection.astro";
 import TestimonialsSection from "../components/home/TestimonialsSection.astro";
@@ -13,13 +14,15 @@ import FaqSection from "../components/home/FaqSection.astro";
 import CurriculumExplorer from "../components/CurriculumExplorer";
 import PricingAndCheckout from "../components/PricingAndCheckout";
 import Layout from "../layouts/Layout.astro";
-import { getSiteConfig, getHomeSlides, getLatestPosts, getNewsAvailability, getTuition } from "../server/site-config";
+import { getSiteConfig, getHomeSlides, getHomeNews, getNewsCategories, getTuition } from "../server/site-config";
 import { BRAND_INFO, BRANCHES, TUITION_PROGRAMS, TESTIMONIALS } from "../data/courses";
 
 // Cấu hình bật/tắt đọc ở MỖI request (trang này chạy trên server), nên đổi trong /admin có hiệu lực ngay.
 const { flags, banner, engine } = getSiteConfig();
-const latestPosts = getLatestPosts(4);
-const { news, knowledge } = getNewsAvailability();
+const homeNews = getHomeNews(4);
+// Thẻ "Giải đấu & Sự kiện": bài mới nhất của mục có mã "events" (nếu mục còn và đã có bài).
+const eventPanel = homeNews.find((panel) => panel.slug === "events");
+const newsCategories = getNewsCategories();
 const slides = getHomeSlides();
 const tuition = getTuition();
 
@@ -113,12 +116,13 @@ const structuredData = {
     )}
 
 
-    <SiteHeader enrolmentOpen={flags.enrolment} news={news} knowledge={knowledge} />
+    <SiteHeader enrolmentOpen={flags.enrolment} newsCategories={newsCategories} />
 
     <main id="main" tabindex="-1">
     <HomeBanner enrolment={flags.enrolment} puzzle={flags.puzzle} engine={engine} slides={slides} />
 
-    {latestPosts.length > 0 && <NewsSection items={latestPosts} news={news} knowledge={knowledge} />}
+    {homeNews.length > 0 && <NewsSection panels={homeNews} />}
+    <FeaturedSection joined={homeNews.length > 0} event={eventPanel && { ...eventPanel.items[0], category: { slug: eventPanel.slug!, name: eventPanel.name } }} />
 
     <!-- Interactive Curriculum Explorer (Sơ cấp 1-2 & Trung cấp Q1-Q2) -->
     <CurriculumExplorer client:load />
@@ -135,7 +139,7 @@ const structuredData = {
     <PricingAndCheckout client:load enrolmentOpen={flags.enrolment} levels={tuition.levels} />
     </main>
 
-    <SiteFooter faq={flags.faq} news={latestPosts.length > 0} />
+    <SiteFooter faq={flags.faq} news={homeNews.length > 0} />
 
     {flags.mobile_bar && <MobileContactBar />}
 </Layout>

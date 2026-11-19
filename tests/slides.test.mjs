@@ -12,7 +12,7 @@ import {
   SlideError, createSlide, deleteSlide, isSafeLink, listEnabledSlides, listSlides, moveSlide, setSlideEnabled, updateSlide,
 } from "../src/server/slides.ts";
 import { UploadError, processSlideImage } from "../src/server/uploads.ts";
-import { countPublished, createPost, listPublished, setPublished, updatePost } from "../src/server/posts.ts";
+import { countPublished, createPost, getPostById, listPublished, setPublished, updatePost } from "../src/server/posts.ts";
 
 const actor = { id: 1, username: "nv.lan" };
 const T0 = 1_800_000_000_000;
@@ -67,7 +67,8 @@ test("kiểu hiển thị lưu và sửa được; slide cũ không có chữ tr
   const { DatabaseSync } = await import("node:sqlite");
   const { MIGRATIONS, migrate } = await import("../src/server/db.ts");
   const old = new DatabaseSync(":memory:");
-  MIGRATIONS.slice(0, -1).forEach((sql, i) => {
+  // Dừng ngay trước bước thêm cột layout (không giả định nó là bước cuối: sau đó còn các bước khác).
+  MIGRATIONS.slice(0, MIGRATIONS.findIndex((sql) => sql.includes("ADD COLUMN layout"))).forEach((sql, i) => {
     old.exec(sql);
     old.exec(`PRAGMA user_version = ${i + 1}`);
   });
@@ -131,11 +132,11 @@ test("bài mới mặc định thuộc mục Tin tức; đổi mục, lọc và 
   assert.throws(() => createPost(db, { ...base, title: "X", category: "khac" }, actor), (e) => e.code === "category");
 });
 
-test("cột category có mặc định là Tin tức, nên bài chèn không khai mục (như bài cũ) vẫn hợp lệ", async () => {
+test("bài chèn không khai mục (như bài cũ) tự vào mục đầu tiên", async () => {
   const { DatabaseSync } = await import("node:sqlite");
   const { migrate } = await import("../src/server/db.ts");
   const db = new DatabaseSync(":memory:");
   migrate(db);
   db.prepare("INSERT INTO posts (slug,title,summary,body,status,created_at,updated_at) VALUES ('a','A','','x','draft',1,1)").run();
-  assert.equal(db.prepare("SELECT category FROM posts").get().category, "news");
+  assert.equal(getPostById(db, 1).category, "news");
 });

@@ -1,0 +1,17 @@
+---
+// src/components/news/DateLine.astro
+// Ngày đăng: biểu tượng lịch và ngày dạng số, không ghi chữ.
+import { CalendarDays } from "lucide-react";
+import { formatDate } from "./ui";
+
+interface Props {
+  at: number;
+  class?: string;
+}
+const { at, class: className } = Astro.props;
+---
+
+<span class:list={["inline-flex items-center gap-1.5 text-sm tabular-nums", className]}>
+  <CalendarDays className="h-4 w-4 shrink-0" aria-hidden="true" />
+  <time datetime={new Date(at).toISOString()}>{formatDate(at)}</time>
+</span>

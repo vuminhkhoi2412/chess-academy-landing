@@ -6,17 +6,16 @@ export const prerender = false;
 
 import AdminLayout from "../../../layouts/AdminLayout.astro";
 import RichEditor from "../../../components/admin/RichEditor";
+import { listCategories } from "../../../server/categories";
 import { getDb } from "../../../server/db";
 import { POSTS_POLICY } from "../../../server/policy";
 import {
-  POST_CATEGORIES,
   PostError,
   addImage,
   bodyHtml,
   createPost,
   deletePost,
   getPostById,
-  isCategory,
   listImages,
   removeImage,
   setCover,
@@ -47,7 +46,8 @@ const DONE: Record<string, string> = {
 
 let error = "";
 let confirmingDelete = false;
-let draft = { title: post?.title ?? "", summary: post?.summary ?? "", category: post?.category ?? "news", body: post ? bodyHtml(post) : "" };
+const categories = listCategories(db);
+let draft = { title: post?.title ?? "", summary: post?.summary ?? "", category: post?.category ?? categories[0]?.slug ?? "", body: post ? bodyHtml(post) : "" };
 let consentChecked = false;
 
 if (Astro.request.method === "POST") {
@@ -56,7 +56,7 @@ if (Astro.request.method === "POST") {
   draft = {
     title: String(form.get("title") ?? ""),
     summary: String(form.get("summary") ?? ""),
-    category: isCategory(form.get("category")) ? (form.get("category") as "news" | "knowledge") : "news",
+    category: String(form.get("category") ?? ""),
     body: String(form.get("body") ?? ""),
   };
   consentChecked = form.get("photo_consent") === "1";
@@ -169,11 +169,11 @@ const btn = "min-h-12 px-5 font-bold border-2";
       <label class="flex flex-col gap-1.5">
         <span class="font-semibold">Mục</span>
         <select name="category" class={field}>
-          {Object.entries(POST_CATEGORIES).map(([value, label]) => (
-            <option value={value} selected={draft.category === value}>{label}</option>
+          {categories.map((c) => (
+            <option value={c.slug} selected={draft.category === c.slug}>{c.name}</option>
           ))}
         </select>
-        <span class="text-sm text-slate-600">Tin tức: hoạt động, sự kiện, giải đấu. Kiến thức: bài hướng dẫn, chiến thuật cờ vua.</span>
+        <span class="text-sm text-slate-600">Bài hiện ở trang Tin tức, trong tab của mục này. {me.role === "admin" && <a href="/admin/categories" class="underline">Quản lý mục</a>}</span>
       </label>
       <label class="flex flex-col gap-1.5">
         <span class="font-semibold">Tóm tắt ngắn (hiện ở danh sách tin)</span>
