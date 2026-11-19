@@ -15,10 +15,12 @@ import {
   FlagError,
   defaultFlags,
   getBannerText,
+  getEngineSettings,
   getFlags,
   listFlagStates,
   loadSiteConfig,
   setBannerText,
+  setEngineSettings,
   setFlag,
 } from "../src/server/flags.ts";
 
@@ -90,11 +92,26 @@ test("DB hỏng thì trang chủ vẫn dựng được với mặc định, khô
     const config = loadSiteConfig(() => {
       throw new Error("disk I/O error");
     });
-    assert.deepEqual(config, { flags: defaultFlags(), banner: null });
+    assert.deepEqual(config, { flags: defaultFlags(), engine: { level: "easy", side: "w" }, banner: null });
     assert.equal(logged.length, 1);
   } finally {
     console.error = originalError;
   }
+});
+
+test("máy đối thủ: mặc định Dễ và người chơi cầm Trắng; lưu, ghi nhật ký và từ chối giá trị lạ", () => {
+  const db = openDb(":memory:");
+  assert.deepEqual(getEngineSettings(db), { level: "easy", side: "w" });
+  assert.deepEqual(setEngineSettings(db, "hard", "b", actor, T0), { level: "hard", side: "b" });
+  assert.deepEqual(getEngineSettings(db), { level: "hard", side: "b" });
+  assert.deepEqual(loadSiteConfig(() => db).engine, { level: "hard", side: "b" });
+  assert.equal(listAudit(db, 10)[0].action, "engine_settings_changed");
+  assert.throws(() => setEngineSettings(db, "insane", "w", actor), FlagError);
+  assert.throws(() => setEngineSettings(db, "easy", "x", actor), FlagError);
+  assert.deepEqual(getEngineSettings(db), { level: "hard", side: "b" });
+  // Giá trị lạ nằm sẵn trong DB (sửa tay) thì quay về mặc định.
+  db.prepare("UPDATE site_settings SET value = 'zzz' WHERE key = 'engine_level'").run();
+  assert.equal(getEngineSettings(db).level, "easy");
 });
 
 test("chỉ form đăng ký cần xác nhận trước khi tắt, và nó là cờ có thật", () => {

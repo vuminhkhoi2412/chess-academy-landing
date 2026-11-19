@@ -8,6 +8,12 @@ import type { Actor } from "./auth.ts";
 import { audit } from "./auth.ts";
 import type { Db } from "./db.ts";
 import { SITE_POLICY } from "./policy.ts";
+import {
+  DEFAULT_ENGINE_SETTINGS,
+  isEngineLevel,
+  isEngineSide,
+  type EngineSettings,
+} from "../data/chess-engine.ts";
 
 export interface FlagDef {
   key: string;
@@ -30,8 +36,8 @@ export const FLAG_DEFS = [
   },
   {
     key: "puzzle",
-    label: "Bàn cờ đố ở đầu trang",
-    description: "Bàn cờ tương tác bên phải phần đầu trang (chỉ hiện trên máy tính và máy tính bảng).",
+    label: "Bàn cờ đấu với máy ở đầu trang",
+    description: "Bàn cờ \"Chess Challenge\" bên phải phần đầu trang: khách đánh một ván với máy (chỉ hiện trên máy tính và máy tính bảng).",
     whenOff: "Phần đầu trang không còn bàn cờ.",
     default: true,
   },
@@ -163,10 +169,45 @@ export function setBannerText(db: Db, raw: string, actor: Actor, now: number = D
   return text;
 }
 
+// ---------- Máy đối thủ trên bàn cờ ----------
+
+const ENGINE_LEVEL_KEY = "engine_level";
+const ENGINE_SIDE_KEY = "engine_side";
+
+export function getEngineSettings(db: Db): EngineSettings {
+  const rows = db.prepare("SELECT key, value FROM site_settings WHERE key IN (?, ?)").all(ENGINE_LEVEL_KEY, ENGINE_SIDE_KEY) as Array<{
+    key: string;
+    value: string;
+  }>;
+  const stored = new Map(rows.map((row) => [row.key, row.value]));
+  const level = stored.get(ENGINE_LEVEL_KEY) ?? "";
+  const side = stored.get(ENGINE_SIDE_KEY) ?? "";
+  // Giá trị lạ trong DB (sửa tay) thì dùng mặc định thay vì làm hỏng bàn cờ.
+  return {
+    level: isEngineLevel(level) ? level : DEFAULT_ENGINE_SETTINGS.level,
+    side: isEngineSide(side) ? side : DEFAULT_ENGINE_SETTINGS.side,
+  };
+}
+
+export function setEngineSettings(db: Db, level: string, side: string, actor: Actor, now: number = Date.now()): EngineSettings {
+  if (!isEngineLevel(level)) throw new FlagError("bad_level", "Độ khó không hợp lệ.");
+  if (!isEngineSide(side)) throw new FlagError("bad_side", "Màu quân không hợp lệ.");
+  const upsert = db.prepare(
+    `INSERT INTO site_settings (key, value, updated_at, updated_by) VALUES (?, ?, ?, ?)
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at, updated_by = excluded.updated_by`,
+  );
+  upsert.run(ENGINE_LEVEL_KEY, level, now, actor.username);
+  upsert.run(ENGINE_SIDE_KEY, side, now, actor.username);
+  audit(db, actor, "engine_settings_changed", null, { level, side }, now);
+  return { level, side };
+}
+
 // ---------- Cho trang công khai ----------
 
 export interface SiteConfig {
   flags: Flags;
+  /** Độ khó và màu quân của bàn cờ đấu với máy. */
+  engine: EngineSettings;
   /** Nội dung dải thông báo cần hiện, hoặc null khi cờ tắt hoặc chưa có nội dung. */
   banner: string | null;
 }
@@ -180,9 +221,9 @@ export function loadSiteConfig(open: () => Db): SiteConfig {
     const db = open();
     const flags = getFlags(db);
     const text = getBannerText(db);
-    return { flags, banner: flags.banner && text !== "" ? text : null };
+    return { flags, engine: getEngineSettings(db), banner: flags.banner && text !== "" ? text : null };
   } catch (error) {
     console.error("[site-config] không đọc được cấu hình, dùng mặc định:", error);
-    return { flags: defaultFlags(), banner: null };
+    return { flags: defaultFlags(), engine: { ...DEFAULT_ENGINE_SETTINGS }, banner: null };
   }
 }

@@ -33,12 +33,21 @@ Quyết định đi kèm: bộ nhớ đệm nằm trong RAM, mất khi khởi đ
 | Khoá | Mặc định | Khi tắt |
 |---|---|---|
 | `banner` | tắt | Ẩn dải thông báo; chỉ hiện khi bật **và** có nội dung |
-| `puzzle` | bật | Bỏ bàn cờ ở đầu trang |
+| `puzzle` | bật | Bỏ bàn cờ đấu với máy ở đầu trang |
 | `testimonials` | bật | Ẩn mục nhận xét **và** lời trích + ảnh các bé ở đầu trang |
 | `gallery` | bật | Ẩn mục ảnh (không xử lý ảnh nữa) |
 | `faq` | bật | Ẩn mục hỏi đáp và liên kết ở chân trang |
 | `mobile_bar` | bật | Bỏ thanh Gọi/Zalo cố định trên điện thoại |
 | `enrolment` | bật | Ẩn form, nút "Đăng ký ngay", "Chọn cơ sở này"; nút đầu trang đổi thành "Xem học phí" |
+
+Dưới nút `puzzle` có hai cài đặt cho máy đối thủ (lưu ở `site_settings`, khoá `engine_level` và `engine_side`; mức độ định nghĩa ở `src/data/chess-engine.ts`):
+
+| Cài đặt | Mặc định | Ý nghĩa |
+|---|---|---|
+| Độ khó | Dễ | Dễ (Skill Level 0, nghĩ 60 ms), Vừa (6, 250 ms), Khó (12, 700 ms) |
+| Khách cầm quân | Trắng | Chọn Đen thì máy đi nước đầu |
+
+Khách không tự đổi được hai cài đặt này.
 
 Các quyết định cần chủ trung tâm xác nhận:
 

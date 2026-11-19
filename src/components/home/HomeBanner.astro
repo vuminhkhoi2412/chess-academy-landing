@@ -12,7 +12,8 @@ import quanCoNen from "../../assets/images/icons/quan-co-nen.png";
 import bacTot from "../../assets/images/bac-1-tot.png";
 import bacMa from "../../assets/images/bac-2-ma.png";
 import bacXe from "../../assets/images/bac-3-xe.png";
-import InteractivePuzzle from "../InteractivePuzzle";
+import ChessChallenge from "../ChessChallenge";
+import type { EngineSettings } from "../../data/chess-engine";
 import { BRAND_INFO, BRANCHES, CURRICULUM_PROGRAMS } from "../../data/courses";
 import HeroPhoto from "./HeroPhoto.astro";
 import coach from "../../assets/images/gallery-coach-student.jpg";
@@ -25,8 +26,10 @@ interface Props {
   slides?: Slide[];
   /** Công tắc bàn cờ đố: bật thì bàn cờ nằm cạnh "Hành trình học" (chỉ từ md trở lên). */
   puzzle: boolean;
+  /** Độ khó và màu quân của bàn cờ đấu với máy (quản trị đặt). */
+  engine: EngineSettings;
 }
-const { enrolment, puzzle, slides = [] } = Astro.props;
+const { enrolment, puzzle, engine, slides = [] } = Astro.props;
 
 const cta = { label: enrolment ? "Đăng ký học thử miễn phí" : "Xem học phí", href: enrolment ? "/trial" : "/courses#pricing" };
 
@@ -204,7 +207,7 @@ const STEPS = CURRICULUM_PROGRAMS.map((program, i) => ({
       {
         puzzle && (
           <div class="hidden md:col-span-5 md:flex md:items-start">
-            <InteractivePuzzle variant="panel" client:media="(min-width: 768px)" />
+            <ChessChallenge engine={engine} client:media="(min-width: 768px)" />
           </div>
         )
       }

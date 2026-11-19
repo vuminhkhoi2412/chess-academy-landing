@@ -62,13 +62,13 @@ tuition grid.
 - Scope: the home page, news posts (`/news`, with "Kiến thức" as a post category once the
   admin supports it), a 404, a privacy policy and a terms page. Course, campus, trial and
   about pages are planned in the redesign. Recruitment, shop and YouTube are out of scope.
-- Astro 7 on the Node adapter with three hydrated React islands (puzzle board, curriculum
+- Astro 7 on the Node adapter with three hydrated React islands (chess challenge board vs. Stockfish, curriculum
   explorer, pricing + checkout); Tailwind CSS 4 via Vite. The home page and posts render on
   the server and read a small SQLite database (feature switches, posts, staff accounts) behind
   the staff admin at `/admin`. Hosting is moving from Vercel to a Droplet (see the brief,
   section 5).
 - Content is data-driven: `src/data/courses.ts` holds brand strings, branches (address, phone,
-  Maps link), the three curriculum programmes, the seven tuition levels, the interactive puzzle, parent
+  Maps link), the three curriculum programmes, the seven tuition levels, parent
   quotes and FAQs.
 - Curriculum: Happy Chess 72 sessions (3 levels × 24), Global Chess Sơ cấp 48 (2 × 24),
   Global Chess Trung cấp 48 (2 × 24). Sessions run 60–90 minutes. Happy Chess takes children
@@ -81,8 +81,8 @@ tuition grid.
 - Changing tuition today means editing `TUITION_LEVELS` and `tests/tuition.test.mjs` together.
   Planned: prices editable by Quản trị only in the admin (extras too), with the database as
   the current price and the PDF only the seed. Until that ships, the code is the source.
-- Campus details stay in code (`BRANCHES`);
-  changing the puzzle in `INTERACTIVE_PUZZLE` means re-running `npm test`.
+- Campus details stay in code (`BRANCHES`). The home-page board plays against Stockfish in the visitor's
+  browser (files in `public/engine/`, GPL-3.0); staff set its level and the visitor's colour in the admin.
 - The build fails when `PUBLIC_GOOGLE_SHEETS_ENDPOINT` is unset, so a dead form is never
   deployed. `PUBLIC_*` values are inlined into the browser bundle, so the endpoint URL is
   visible to anyone; a honeypot field (`_hp`) deflects naive bots, and the sheet owner deletes

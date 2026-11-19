@@ -211,7 +211,7 @@ none should be introduced for a marketing page.
 - The only looping animation is `animate-pulse` on a blocking form error, always paired with `motion-reduce:animate-none`.
 - Board-notation texture, the perspective chessboard plane and hover states must not animate on `top`, `left`, `width` or `height`. Transform and opacity only.
 - The decorative grain runs on a fixed pseudo-element/absolute layer at 4.5% opacity — never on a scrolling wrapper.
-- Cheap interactive islands (puzzle board, curriculum explorer, pricing checkout) are hydrated individually; decoration stays server-rendered.
+- Cheap interactive islands (chess board vs. engine, curriculum explorer, pricing checkout) are hydrated individually; decoration stays server-rendered.
 - Honor `prefers-reduced-motion`: `scroll-behavior: auto` replaces smooth scroll, and any added animation must be gated.
 
 ---

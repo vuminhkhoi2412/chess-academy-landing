@@ -71,7 +71,7 @@ src/
   lib/enrolment.ts      kiểm tra, dựng và gửi payload đăng ký (test được bằng node --test)
   lib/clack.ts          tiếng "cạch" quân cờ, tổng hợp bằng Web Audio (không có file âm thanh)
   components/
-    InteractivePuzzle.tsx    bàn cờ đố ở hero (tọa độ, tiếng cạch khi giải đúng)
+    ChessChallenge.tsx       bàn cờ đấu với máy ở hero (Stockfish WASM trong Web Worker, file ở public/engine/)
     CurriculumExplorer.tsx   tab 3 lộ trình: Happy Chess / Sơ cấp / Trung cấp
     PricingAndCheckout.tsx   bảng học phí; prop `form` (mặc định bật) dựng form đăng ký, tắt ở /courses
     EnrolmentForm.tsx        form đăng ký gửi Google Sheets (trang chủ và /trial; đọc ?branch=<mã cơ sở>)
@@ -94,7 +94,6 @@ src/
                         và các class dùng chung: nhãn mục (.gc-eyebrow), tiêu đề mục
                         (.gc-section-title), mặt phẳng bàn cờ, hạt mịn
 tests/
-  puzzle.test.mjs       test thế cờ đố
   curriculum.test.mjs   test dữ liệu 3 lộ trình
   tuition.test.mjs      test bảng học phí chính thức
   links.test.mjs        mọi liên kết nội bộ ở menu, chân trang, banner, thẻ cơ sở phải có trang thật
