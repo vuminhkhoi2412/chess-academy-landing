@@ -94,12 +94,13 @@ Quyết định đã làm, chờ chủ trung tâm xác nhận:
 | Thông số | Hiện tại | Ý nghĩa |
 |---|---|---|
 | `maxSlides` | 6 | Số slide tối đa |
-| `titleMax` / `textMax` / `altMax` / `linkMax` | 60 / 120 / 160 / 200 | Số ký tự tối đa của tiêu đề, dòng phụ, mô tả ảnh, liên kết |
+| `altMax` / `linkMax` | 160 / 200 | Số ký tự tối đa của mô tả ảnh và liên kết |
 | `minWidth` × `minHeight` | 1600 × 900 px | Ảnh nhỏ hơn bị từ chối để banner không bị mờ |
 
 - Cả Quản trị và Biên tập thêm, sửa, bật/tắt, đổi thứ tự và xoá slide. Mọi thay đổi vào nhật ký.
-- Không có slide nào đang bật (hoặc DB lỗi) thì trang chủ dùng slide tạm trong `HomeBanner.astro`: ảnh lớp học và hai khẩu hiệu cố định của thương hiệu.
-- Liên kết chỉ nhận `/đường-dẫn` trong site hoặc `https://`; chặn `//`, `http:`, `javascript:`. Slide không có tiêu đề (chữ đã in trên ảnh) bắt buộc có mô tả ảnh.
+- Mỗi slide có **kiểu hiển thị**: *Ảnh học viên* (ảnh được đặt vào hero mặc định, giữ dòng chữ "Một nước đi nhỏ…", hai nút, ba đặc điểm và hoạ tiết bàn cờ; component `HeroPhoto.astro`) hoặc *Banner có sẵn chữ* (chỉ hiện ảnh trải hết bề ngang, cả slide là liên kết nếu có). Chữ trên hero là cố định, không sửa theo từng slide.
+- Không có slide nào đang bật (hoặc DB lỗi) thì trang chủ dùng hero mặc định: kiểu *Ảnh học viên* với ảnh huấn luyện viên có sẵn trong `src/assets/images`.
+- Liên kết chỉ nhận `/đường-dẫn` trong site hoặc `https://`; chặn `//`, `http:`, `javascript:`. Mô tả ảnh luôn bắt buộc (với banner có sẵn chữ, chép lại chữ in trên ảnh). Liên kết chỉ dùng cho kiểu *Banner có sẵn chữ*.
 - Ảnh slide cũng nằm ở `DATA_DIR/uploads`, cùng sao lưu với `app.db`. **Triển khai bản có đợt 3 lên Droplet: sao lưu `app.db` trước, migration chạy tự động khi server khởi động.**
 
 ## Học phí và phụ phí (`src/server/tuition.ts`, `TUITION_POLICY`; trang `/admin/tuition`)

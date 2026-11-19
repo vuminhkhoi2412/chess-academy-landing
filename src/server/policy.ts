@@ -51,8 +51,6 @@ export const POSTS_POLICY = {
 export const SLIDES_POLICY = {
   /** Số slide tối đa; nhiều hơn thì banner quá dài để lướt qua. */
   maxSlides: 6,
-  titleMax: 60,
-  textMax: 120,
   altMax: 160,
   linkMax: 200,
   /** Ảnh nhỏ hơn mức này bị từ chối để banner không bị mờ khi phóng ra. */

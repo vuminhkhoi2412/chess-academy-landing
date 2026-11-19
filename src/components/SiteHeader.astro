@@ -57,7 +57,6 @@ const NAV: { label: string; href: string; children?: { label: string; href: stri
       : knowledge
         ? [{ label: "Kiến thức", href: "/news?category=knowledge" }]
         : []),
-  ...(enrolmentOpen ? [{ label: "Học thử", href: "/trial" }] : []),
 ];
 
 const MENU_ID = "gc-mobile-menu";

@@ -1,6 +1,6 @@
 // tests/slides.test.mjs
 // Chạy: npm test
-// Khoá banner trang chủ: thứ tự, bật/tắt, kiểm tra chữ và liên kết, giới hạn số slide, kích thước ảnh tối thiểu,
+// Khoá banner trang chủ: thứ tự, bật/tắt, kiểu hiển thị, kiểm tra mô tả ảnh và liên kết, giới hạn số slide, kích thước ảnh tối thiểu,
 // nhật ký; và phân mục bài đăng (mặc định, đổi mục, lọc, đếm).
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -16,45 +16,67 @@ import { countPublished, createPost, listPublished, setPublished, updatePost } f
 
 const actor = { id: 1, username: "nv.lan" };
 const T0 = 1_800_000_000_000;
-const text = (over = {}) => ({ title: "Khai giảng", text: "Đăng ký sớm", link: "/news", alt: "", ...over });
+const text = (over = {}) => ({ layout: "photo", link: "/news", alt: "Lớp khai giảng", ...over });
 const file = (n) => `${String(n).repeat(32).slice(0, 32)}.webp`;
 const png = (width, height, extra = {}) =>
   sharp({ create: { width, height, channels: 3, background: "#184268" }, ...extra }).png().toBuffer();
 
 test("slide mới xếp cuối, bật sẵn; thứ tự đổi được lên/xuống và luôn liên tục", () => {
   const db = openDb(":memory:");
-  const a = createSlide(db, file(1), text({ title: "A" }), actor, T0);
-  const b = createSlide(db, file(2), text({ title: "B" }), actor, T0);
-  const c = createSlide(db, file(3), text({ title: "C" }), actor, T0);
-  assert.deepEqual(listSlides(db).map((s) => s.title), ["A", "B", "C"]);
+  const a = createSlide(db, file(1), text({ alt: "A" }), actor, T0);
+  const b = createSlide(db, file(2), text({ alt: "B" }), actor, T0);
+  const c = createSlide(db, file(3), text({ alt: "C" }), actor, T0);
+  assert.deepEqual(listSlides(db).map((s) => s.alt), ["A", "B", "C"]);
   assert.ok(listSlides(db).every((s) => s.enabled));
   moveSlide(db, c.id, -1, actor, T0 + 1);
-  assert.deepEqual(listSlides(db).map((s) => s.title), ["A", "C", "B"]);
+  assert.deepEqual(listSlides(db).map((s) => s.alt), ["A", "C", "B"]);
   moveSlide(db, a.id, -1, actor, T0 + 2); // đã ở đầu: không đổi
   moveSlide(db, b.id, 1, actor, T0 + 3); // đã ở cuối: không đổi
-  assert.deepEqual(listSlides(db).map((s) => s.title), ["A", "C", "B"]);
+  assert.deepEqual(listSlides(db).map((s) => s.alt), ["A", "C", "B"]);
   assert.deepEqual(listSlides(db).map((s) => s.position), [0, 1, 2]);
 });
 
 test("slide tắt không hiện ra trang chủ nhưng vẫn còn trong quản trị", () => {
   const db = openDb(":memory:");
-  const a = createSlide(db, file(1), text({ title: "A" }), actor, T0);
-  createSlide(db, file(2), text({ title: "B" }), actor, T0);
+  const a = createSlide(db, file(1), text({ alt: "A" }), actor, T0);
+  createSlide(db, file(2), text({ alt: "B" }), actor, T0);
   setSlideEnabled(db, a.id, false, actor, T0 + 1);
-  assert.deepEqual(listEnabledSlides(db).map((s) => s.title), ["B"]);
+  assert.deepEqual(listEnabledSlides(db).map((s) => s.alt), ["B"]);
   assert.equal(listSlides(db).length, 2);
   setSlideEnabled(db, a.id, true, actor, T0 + 2);
   assert.equal(listEnabledSlides(db).length, 2);
 });
 
-test("kiểm tra chữ: quá dài, thiếu mô tả khi không có tiêu đề, liên kết nguy hiểm", () => {
+test("kiểm tra đầu vào: bắt buộc có mô tả ảnh, kiểu hợp lệ, liên kết không nguy hiểm", () => {
   const db = openDb(":memory:");
-  assert.throws(() => createSlide(db, file(1), text({ title: "x".repeat(SLIDES_POLICY.titleMax + 1) }), actor), (e) => e instanceof SlideError && e.code === "title");
-  assert.throws(() => createSlide(db, file(1), text({ title: "", alt: "" }), actor), (e) => e.code === "alt");
-  assert.doesNotThrow(() => createSlide(db, file(1), text({ title: "", text: "", link: "", alt: "Ảnh lớp học" }), actor));
+  assert.throws(() => createSlide(db, file(1), text({ alt: "" }), actor), (e) => e instanceof SlideError && e.code === "alt");
+  assert.throws(() => createSlide(db, file(1), text({ alt: "x".repeat(SLIDES_POLICY.altMax + 1) }), actor), (e) => e.code === "alt");
+  assert.throws(() => createSlide(db, file(1), text({ layout: "khac" }), actor), (e) => e.code === "layout");
+  assert.doesNotThrow(() => createSlide(db, file(1), text({ layout: "poster", link: "", alt: "Chào mừng 20-11" }), actor));
   for (const link of ["javascript:alert(1)", "//evil.example", "http://khong-an-toan.vn", "data:text/html,x", "news", "/ có cách"])
     assert.throws(() => createSlide(db, file(2), text({ link }), actor), (e) => e.code === "link", link);
   for (const link of ["", "/news", "/#pricing", "https://www.facebook.com/global.chesss"]) assert.equal(isSafeLink(link), true, link);
+});
+
+test("kiểu hiển thị lưu và sửa được; slide cũ không có chữ trở thành poster, slide có chữ giữ kiểu ảnh học viên", async () => {
+  const db = openDb(":memory:");
+  const a = createSlide(db, file(1), text({ alt: "A" }), actor, T0);
+  assert.equal(a.layout, "photo");
+  assert.equal(updateSlide(db, a.id, text({ alt: "A", layout: "poster" }), actor, T0 + 1).layout, "poster");
+  // Migration: slide cũ không có chữ nào là poster; slide có chữ giữ kiểu ảnh học viên.
+  const { DatabaseSync } = await import("node:sqlite");
+  const { MIGRATIONS, migrate } = await import("../src/server/db.ts");
+  const old = new DatabaseSync(":memory:");
+  MIGRATIONS.slice(0, -1).forEach((sql, i) => {
+    old.exec(sql);
+    old.exec(`PRAGMA user_version = ${i + 1}`);
+  });
+  const ins = old.prepare("INSERT INTO slides (file, title, text, position, updated_at) VALUES (?, ?, ?, ?, 1)");
+  ins.run(file(1), "", "", 0);
+  ins.run(file(2), "Khai giảng", "", 1);
+  ins.run(file(3), "", "Đăng ký sớm", 2);
+  migrate(old);
+  assert.deepEqual(old.prepare("SELECT layout FROM slides ORDER BY position").all().map((r) => r.layout), ["poster", "photo", "photo"]);
 });
 
 test("tối đa số slide cho phép", () => {
@@ -65,9 +87,9 @@ test("tối đa số slide cho phép", () => {
 
 test("sửa chữ, xoá trả về tên file để xoá ảnh thật, và mọi thay đổi đều vào nhật ký", () => {
   const db = openDb(":memory:");
-  const a = createSlide(db, file(1), text({ title: "A" }), actor, T0);
-  updateSlide(db, a.id, text({ title: "A mới" }), actor, T0 + 1);
-  assert.equal(listSlides(db)[0].title, "A mới");
+  const a = createSlide(db, file(1), text({ alt: "A" }), actor, T0);
+  updateSlide(db, a.id, text({ alt: "A mới" }), actor, T0 + 1);
+  assert.equal(listSlides(db)[0].alt, "A mới");
   assert.equal(listSlides(db)[0].file, file(1), "sửa chữ không đổi ảnh");
   assert.equal(deleteSlide(db, a.id, actor, T0 + 2), file(1));
   assert.equal(listSlides(db).length, 0);

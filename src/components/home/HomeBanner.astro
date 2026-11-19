@@ -1,185 +1,163 @@
 ---
 // src/components/home/HomeBanner.astro
-// Đầu trang chủ: banner trượt (CSS scroll-snap, không thư viện) cạnh bàn cờ đố, và dải lối tắt bên dưới.
-// Slide lấy từ trang quản trị (/admin/slides). Chưa có slide nào đang bật thì dùng slide tạm:
-// ảnh lớp học thật kèm hai câu khẩu hiệu cố định của thương hiệu.
-import { Image } from "astro:assets";
-import { ArrowRight, BookOpen, Banknote, MapPin, Newspaper, Lightbulb, GraduationCap, Phone } from "lucide-react";
+// Đầu trang chủ: hero (hero mặc định, hoặc băng chuyền slide từ /admin/slides với hai kiểu: ảnh học viên / banner có sẵn chữ),
+// dải lối tắt, rồi hàng "Hành trình học" cạnh bàn cờ đố.
+import { ArrowRight, BookOpen, Banknote, MapPin, Layers } from "lucide-react";
 import InteractivePuzzle from "../InteractivePuzzle";
-import { BRAND_INFO, BRANCHES } from "../../data/courses";
-import classroom from "../../assets/images/gallery-classroom.jpg";
-import type { ImageMetadata } from "astro";
+import { BRAND_INFO, BRANCHES, CURRICULUM_PROGRAMS } from "../../data/courses";
+import HeroPhoto from "./HeroPhoto.astro";
+import coach from "../../assets/images/gallery-coach-student.jpg";
 import type { Slide } from "../../server/slides";
 
 interface Props {
-  /** Form đăng ký đang mở: ô "Học thử" dẫn tới form; tắt thì thành ô gọi điện. */
+  /** Form đăng ký đang mở: nút chính dẫn tới form học thử; tắt thì dẫn tới bảng học phí. */
   enrolment: boolean;
-  /** Có bài đã đăng thì có ô Tin tức. */
-  news: boolean;
-  /** Có bài thuộc mục Kiến thức thì có ô Kiến thức. */
-  knowledge?: boolean;
-  /** Slide đang bật từ trang quản trị, đã sắp thứ tự. Rỗng thì dùng slide tạm. */
+  /** Slide đang bật từ trang quản trị, đã sắp thứ tự. Rỗng thì dùng hero mặc định. */
   slides?: Slide[];
-  /** Công tắc bàn cờ đố: bật thì bàn cờ chiếm cột phải của banner (chỉ từ md trở lên). */
+  /** Công tắc bàn cờ đố: bật thì bàn cờ nằm cạnh "Hành trình học" (chỉ từ md trở lên). */
   puzzle: boolean;
 }
-const { enrolment, news, knowledge = false, puzzle, slides = [] } = Astro.props;
+const { enrolment, puzzle, slides = [] } = Astro.props;
 
-interface SlideView {
-  /** Ảnh dựng sẵn trong build (slide tạm) hoặc đường dẫn ảnh tải lên. */
-  image: ImageMetadata | string;
-  alt: string;
-  title: string;
-  text: string;
-  cta: { label: string; href: string } | null;
-}
+const cta = { label: enrolment ? "Đăng ký học thử miễn phí" : "Xem học phí", href: enrolment ? "/trial" : "/courses#pricing" };
 
-const FALLBACK: SlideView = {
-  image: classroom,
-  alt: "Phòng học cờ vua tại một cơ sở Global Chess, các học viên đang luyện tập.",
-  title: BRAND_INFO.slogan1,
-  text: BRAND_INFO.slogan2,
-  cta: { label: enrolment ? "Đăng ký học thử" : "Xem học phí", href: enrolment ? "/trial" : "/courses#pricing" },
-};
+const SLIDES = slides.map((slide) => ({
+  image: `/uploads/${slide.file}`,
+  alt: slide.alt,
+  layout: slide.layout,
+  link: slide.link,
+}));
 
-const SLIDES: SlideView[] =
-  slides.length > 0
-    ? slides.map((slide) => ({
-        image: `/uploads/${slide.file}`,
-        alt: slide.alt,
-        title: slide.title,
-        text: slide.text,
-        cta: slide.link ? { label: "Xem thêm", href: slide.link } : null,
-      }))
-    : [FALLBACK];
-
-const hotline = BRAND_INFO.hotlines[0];
-// Ô lối tắt: ô tin và kiến thức tự ẩn khi chưa có bài để không dẫn tới trang trống.
+// Dải lối tắt luôn đúng 4 ô trên một hàng (kể cả mobile), nên không có ô ẩn/hiện theo dữ liệu.
 const TILES = [
-  { href: "/courses", label: "Khoá học", hint: "Lộ trình từng cấp độ", Icon: BookOpen, show: true },
-  { href: "/courses#pricing", label: "Học phí", hint: "Bảng giá theo cấp độ", Icon: Banknote, show: true },
-  { href: "/branches", label: "Cơ sở", hint: `${BRANCHES.length} cơ sở tại TP.HCM`, Icon: MapPin, show: true },
-  { href: news && knowledge ? "/news?category=news" : "/news", label: "Tin tức", hint: "Hoạt động mới nhất", Icon: Newspaper, show: news },
-  { href: "/news?category=knowledge", label: "Kiến thức", hint: "Bài viết về cờ vua", Icon: Lightbulb, show: knowledge },
-  enrolment
-    ? { href: "/trial", label: "Học thử", hint: "Để lại thông tin", Icon: GraduationCap, show: true }
-    : { href: `tel:${hotline}`, label: "Gọi tư vấn", hint: hotline, Icon: Phone, show: true },
-].filter((tile) => tile.show);
+  { href: "/courses", label: "Khoá học", hint: "Theo độ tuổi & cấp độ", Icon: BookOpen },
+  { href: "/courses#curriculum", label: "Lộ trình đào tạo", hint: "Từ nhập môn đến nâng cao", Icon: Layers },
+  { href: "/courses#pricing", label: "Học phí", hint: "Ưu đãi & học bổng", Icon: Banknote },
+  { href: "/branches", label: "Cơ sở", hint: `${BRANCHES.length} cơ sở tại TP.HCM`, Icon: MapPin },
+];
+
+// Hành trình học: lấy thẳng từ giáo trình để không lệch với trang /courses.
+const STEP_TINTS = ["bg-sky-100", "bg-emerald-100", "bg-amber-100"];
+const STEPS = CURRICULUM_PROGRAMS.map((program, i) => ({
+  n: i + 1,
+  title: program.title,
+  badge: program.badge,
+  duration: program.totalDuration.split(" (")[0],
+  href: `/courses#curriculum:${program.id}`,
+  tint: STEP_TINTS[i % STEP_TINTS.length],
+}));
 ---
+
+{/* Hero trải hết bề ngang: mặc định là "ảnh học viên" với ảnh huấn luyện viên; admin có slide thì băng chuyền thế chỗ. */}
+<section aria-label="Banner" class="relative">
+  <div
+    class="flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    tabindex={SLIDES.length > 1 ? 0 : undefined}
+    role={SLIDES.length > 1 ? "region" : undefined}
+    aria-roledescription={SLIDES.length > 1 ? "băng chuyền" : undefined}
+    aria-label={SLIDES.length > 1 ? "Banner" : undefined}
+  >
+    {
+      SLIDES.length === 0 ? (
+        <div class="w-full shrink-0">
+          <HeroPhoto image={coach} alt="Huấn luyện viên hướng dẫn học viên chơi cờ vua tại Global Chess." cta={cta} />
+        </div>
+      ) : (
+        SLIDES.map((slide, i) => (
+          <div id={`slide-${i + 1}`} class="w-full shrink-0 snap-start">
+            {slide.layout === "photo" ? (
+              <HeroPhoto image={slide.image} alt={slide.alt} cta={cta} first={i === 0} />
+            ) : (
+              <div class="relative min-h-[18rem] overflow-hidden bg-brand-900 sm:min-h-[22rem] lg:aspect-[2.6/1] lg:max-h-[40rem] lg:min-h-0">
+                <img
+                  src={slide.image}
+                  alt={slide.alt}
+                  width="1600"
+                  height="900"
+                  loading={i === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                  class="absolute inset-0 h-full w-full object-cover"
+                />
+                {i === 0 && <h1 class="sr-only">{BRAND_INFO.name} – {BRAND_INFO.slogan1}</h1>}
+                {slide.link && <a href={slide.link} class="absolute inset-0" aria-label={slide.alt}></a>}
+              </div>
+            )}
+          </div>
+        ))
+      )
+    }
+  </div>
+
+  {
+    SLIDES.length > 1 && (
+      <nav class="absolute inset-x-0 bottom-3 flex justify-center gap-1" aria-label="Chọn banner">
+        {SLIDES.map((_, i) => (
+          <a href={`#slide-${i + 1}`} class="grid size-6 place-items-center" aria-label={`Banner ${i + 1}`}>
+            <span class="block size-2 rounded-full bg-brand-800 ring-2 ring-white/80"></span>
+          </a>
+        ))}
+      </nav>
+    )
+  }
+</section>
 
 <section class="bg-cream py-5 md:py-8" aria-label="Giới thiệu nhanh">
   <div class="mx-auto max-w-6xl space-y-4 px-4">
-   <div class="grid gap-4 lg:grid-cols-12">
-    <div class:list={["relative", puzzle ? "lg:col-span-8" : "lg:col-span-12"]}>
-      <div
-        class="flex h-full snap-x snap-mandatory overflow-x-auto scroll-smooth rounded-lg [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        tabindex="0"
-        role="region"
-        aria-roledescription="băng chuyền"
-        aria-label="Banner"
-      >
-        {
-          SLIDES.map((slide, i) => {
-            const hasText = slide.title !== "" || slide.text !== "";
-            // Trang cần đúng một <h1>: slide đầu không có tiêu đề thì dùng h1 ẩn mang tên thương hiệu.
-            const Heading = i === 0 ? "h1" : "h2";
-            return (
-              <div id={`slide-${i + 1}`} class="relative min-h-[22rem] w-full shrink-0 snap-start overflow-hidden bg-brand-900 md:min-h-[24rem] lg:min-h-[22rem]">
-                {typeof slide.image === "string" ? (
-                  <img
-                    src={slide.image}
-                    alt={slide.title ? "" : slide.alt}
-                    width="1600"
-                    height="900"
-                    loading={i === 0 ? "eager" : "lazy"}
-                    decoding="async"
-                    class="absolute inset-0 h-full w-full object-cover"
-                  />
-                ) : (
-                  <Image
-                    src={slide.image}
-                    alt={slide.alt}
-                    widths={[640, 960, 1280]}
-                    sizes="(min-width: 1024px) 66vw, 100vw"
-                    quality={80}
-                    loading={i === 0 ? "eager" : "lazy"}
-                    class="absolute inset-0 h-full w-full object-cover"
-                  />
-                )}
-                {i === 0 && slide.title === "" && <h1 class="sr-only">{BRAND_INFO.name} – {BRAND_INFO.slogan1}</h1>}
-                {/* Slide chỉ có ảnh (chữ đã in sẵn trên ảnh): cả slide là liên kết nếu có. */}
-                {!hasText && slide.cta && (
-                  <a href={slide.cta.href} class="absolute inset-0" aria-label={slide.alt || slide.cta.label}></a>
-                )}
-                {hasText && (
-                  <>
-                    {/* Lớp phủ navy giữ chữ trắng đủ tương phản trên mọi ảnh. */}
-                    <div aria-hidden="true" class="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/55 to-brand-950/10 md:bg-gradient-to-r md:from-brand-950/90 md:via-brand-950/60 md:to-transparent"></div>
-                    <div class="relative flex h-full min-h-[inherit] flex-col justify-end gap-4 p-6 md:max-w-[34rem] md:justify-center md:p-10">
-                      {slide.title !== "" && (
-                        <Heading class="text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl">{slide.title}</Heading>
-                      )}
-                      {slide.text !== "" && <p class="text-base font-medium text-brand-100 sm:text-lg">{slide.text}</p>}
-                      {slide.cta && (
-                        <div>
-                          <a href={slide.cta.href} class="gc-move gc-move--amber gc-move--lg">
-                            <span class="gc-move__label">{slide.cta.label}</span>
-                            <span class="gc-move__go" aria-hidden="true"><ArrowRight className="h-4 w-4" /></span>
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-            );
-          })
-        }
-      </div>
 
-      {
-        SLIDES.length > 1 && (
-          <nav class="absolute inset-x-0 bottom-3 flex justify-center gap-1" aria-label="Chọn banner">
-            {SLIDES.map((_, i) => (
-              <a href={`#slide-${i + 1}`} class="grid size-6 place-items-center" aria-label={`Banner ${i + 1}`}>
-                <span class="block size-2 rounded-full bg-white/80"></span>
-              </a>
-            ))}
-          </nav>
-        )
-      }
-    </div>
-
-    {
-      puzzle && (
-        <div class="hidden md:block lg:col-span-4">
-          <InteractivePuzzle client:media="(min-width: 768px)" />
-        </div>
-      )
-    }
-   </div>
-
-    {/* Dải lối tắt: thẻ phẳng, icon + tên + một dòng mô tả. */}
-    <ul class:list={["grid list-none grid-cols-2 gap-3 sm:grid-cols-3", TILES.length === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"]}>
+    {/* Dải lối tắt: luôn 4 ô trên một hàng. Dưới md chỉ còn icon + tên xếp dọc cho vừa chiều ngang. */}
+    <ul class="grid list-none grid-cols-4 gap-2 md:gap-3">
       {
         TILES.map(({ href, label, hint, Icon }) => (
           <li class="contents">
             <a
               href={href}
-              class="group flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 transition hover:border-brand-800 hover:shadow-sm active:scale-[0.99]"
+              class="group flex min-w-0 flex-col items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-2 text-center transition hover:border-brand-800 hover:shadow-sm active:scale-[0.99] md:flex-row md:gap-3 md:p-3 md:text-left"
             >
-              <span class="grid size-10 shrink-0 place-items-center rounded-md bg-brand-50 text-brand-800">
+              <span class="grid size-9 shrink-0 place-items-center rounded-md bg-brand-50 text-brand-800 md:size-10">
                 <Icon className="h-5 w-5" aria-hidden="true" />
               </span>
               <span class="min-w-0 flex-1">
-                <span class="block text-[0.9375rem] font-bold leading-tight text-slate-900">{label}</span>
-                <span class="block text-xs text-slate-600">{hint}</span>
+                <span class="block text-xs font-bold leading-tight text-slate-900 md:text-[0.9375rem]">{label}</span>
+                <span class="hidden text-xs text-slate-600 md:block">{hint}</span>
               </span>
-              <ArrowRight className="h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-brand-800" aria-hidden="true" />
+              <ArrowRight className="hidden h-4 w-4 shrink-0 text-slate-400 transition group-hover:text-brand-800 md:block" aria-hidden="true" />
             </a>
           </li>
         ))
       }
     </ul>
+
+    {/* Hành trình học (từ giáo trình) cạnh bàn cờ đố; tắt bàn cờ thì hành trình chiếm cả hàng. */}
+    <div class:list={["grid gap-4", puzzle && "md:grid-cols-12"]}>
+      <section class:list={["flex flex-col rounded-lg border border-slate-200 bg-white p-5", puzzle && "md:col-span-7"]} aria-labelledby="journey-title">
+        <h2 id="journey-title" class="text-xl font-extrabold leading-tight tracking-tight text-slate-900">Hành trình học cờ vua tại Global Chess</h2>
+        <p class="mb-4 mt-1 text-sm text-slate-600">Lộ trình bài bản, phù hợp từng độ tuổi và năng lực của học viên.</p>
+        <ol class="grid flex-1 list-none gap-2 sm:grid-cols-3">
+          {
+            STEPS.map((step) => (
+              <li class="contents">
+                <a href={step.href} class:list={["flex flex-col gap-1 rounded-lg p-3.5 transition hover:shadow-sm active:scale-[0.99]", step.tint]}>
+                  <span class="text-2xl font-extrabold leading-none text-brand-800/50">{step.n}</span>
+                  <span class="text-[0.9375rem] font-bold leading-tight text-slate-900">{step.title}</span>
+                  <span class="text-xs leading-snug text-slate-700">{step.badge}</span>
+                  <span class="mt-auto pt-2 text-xs font-semibold text-brand-800">{step.duration}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+        <a href="/courses" class="mt-4 inline-flex min-h-11 items-center gap-1 self-start text-sm font-bold text-brand-800 hover:underline">
+          Xem giáo trình chi tiết <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </a>
+      </section>
+
+      {
+        puzzle && (
+          <div class="hidden md:col-span-5 md:flex md:items-center md:justify-center">
+            <InteractivePuzzle client:media="(min-width: 768px)" />
+          </div>
+        )
+      }
+    </div>
   </div>
 </section>

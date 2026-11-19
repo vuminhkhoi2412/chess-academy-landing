@@ -12,7 +12,7 @@ export type Db = DatabaseSync;
 
 // Mỗi phần tử là một bước nâng cấp, chạy theo thứ tự; `PRAGMA user_version` nhớ đã chạy tới đâu.
 // Không bao giờ sửa bước đã phát hành: thêm bước mới ở cuối.
-const MIGRATIONS: string[] = [
+export const MIGRATIONS: string[] = [
   `
   CREATE TABLE users (
     id            INTEGER PRIMARY KEY,
@@ -117,6 +117,13 @@ const MIGRATIONS: string[] = [
     updated_at INTEGER NOT NULL,
     updated_by TEXT
   );
+  `,
+  // Kiểu hiển thị của slide: 'photo' = ảnh học viên đặt vào hero mặc định (giữ chữ, nút, hoạ tiết);
+  // 'poster' = banner đã có chữ in trên ảnh, chỉ hiện ảnh. Slide cũ không có chữ nào là poster. Cột title/text
+  // không còn dùng nhưng giữ lại để không mất dữ liệu cũ.
+  `
+  ALTER TABLE slides ADD COLUMN layout TEXT NOT NULL DEFAULT 'photo' CHECK (layout IN ('photo', 'poster'));
+  UPDATE slides SET layout = 'poster' WHERE title = '' AND text = '';
   `,
 ];
 

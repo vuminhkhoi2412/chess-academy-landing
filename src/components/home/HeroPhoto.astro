@@ -1,0 +1,140 @@
+---
+// src/components/home/HeroPhoto.astro
+// Hero sáng "ảnh học viên": chữ, hai nút, ba đặc điểm và hoạ tiết bàn cờ bên trái; ảnh bên phải mờ dần vào nền
+// (không lớp phủ đen). Dùng cho hero mặc định và cho slide kiểu "Ảnh học viên" từ /admin/slides.
+import { Image } from "astro:assets";
+import { ArrowRight, Crown, CalendarDays, CirclePlay, Brain, Target, Trophy } from "lucide-react";
+import { BRAND_INFO } from "../../data/courses";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  /** Ảnh dựng sẵn trong build (hero mặc định) hoặc đường dẫn ảnh tải lên. */
+  image: ImageMetadata | string;
+  alt: string;
+  /** Nút chính: đăng ký học thử, hoặc xem học phí khi form đăng ký tắt. */
+  cta: { label: string; href: string };
+  /** Slide đầu mới là <h1>; các slide sau dùng thẻ <p> cùng kiểu chữ, để trang chỉ có một <h1>. */
+  first?: boolean;
+  eager?: boolean;
+}
+const { image, alt, cta, first = true, eager = first } = Astro.props;
+const Heading = first ? "h1" : "p";
+
+const TRAITS = [
+  { label: "Tư duy chiến lược", Icon: Brain },
+  { label: "Tập trung bền bỉ", Icon: Target },
+  { label: "Tự tin và bản lĩnh", Icon: Trophy },
+];
+---
+
+<div class="relative h-full overflow-hidden bg-gradient-to-r from-white via-brand-50 to-brand-100">
+  <div aria-hidden="true" class="hero-checker pointer-events-none absolute inset-y-0 left-0 w-[42%]"><div></div></div>
+  <div class="relative z-10 mx-auto max-w-6xl px-4 py-8 md:py-12">
+    <div class="flex flex-col gap-5 md:max-w-[33rem]">
+      <span class="inline-flex items-center gap-2 self-start rounded-full border border-amber-200 bg-gradient-to-r from-amber-100 via-amber-50 to-white py-1.5 pl-2 pr-4 text-xs font-extrabold uppercase tracking-wide text-brand-800">
+        <Crown className="h-5 w-5 text-amber-500" aria-hidden="true" />
+        {BRAND_INFO.name} · Học cờ vua sáng tạo
+      </span>
+      <Heading class="text-4xl font-extrabold leading-[1.08] tracking-tight text-brand-800 sm:text-5xl lg:text-[3.5rem]">
+        Một nước đi nhỏ.
+        <span class="relative mt-1 block w-fit text-amber-500">
+          Một tư duy lớn.
+          <svg aria-hidden="true" viewBox="0 0 340 16" preserveAspectRatio="none" class="absolute -bottom-2 left-0 h-3 w-[112%] max-w-none">
+            <defs>
+              <linearGradient id="swoosh" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0" stop-color="#fbbf24" stop-opacity="0.2" />
+                <stop offset="0.35" stop-color="#f59e0b" />
+                <stop offset="1" stop-color="#fbbf24" stop-opacity="0.9" />
+              </linearGradient>
+            </defs>
+            <path d="M2 12 C 70 4, 190 3, 338 5 C 200 7, 80 9, 2 12 Z" fill="url(#swoosh)" />
+          </svg>
+        </span>
+      </Heading>
+      <p class="max-w-md text-base leading-relaxed text-slate-700">
+        Khơi mở tư duy logic, khả năng tập trung, tính kiên trì và sự tự tin của trẻ thông qua hành trình khám phá cờ vua đầy hứng thú.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a href={cta.href} class="gc-move gc-move--amber gc-move--lg">
+          <span class="gc-move__label"><CalendarDays className="h-5 w-5 shrink-0" aria-hidden="true" />{cta.label}</span>
+          <span class="gc-move__go" aria-hidden="true"><ArrowRight className="h-4 w-4" /></span>
+        </a>
+        <a href="/courses" class="gc-move gc-move--quiet-light gc-move--lg">
+          <span class="gc-move__label"><CirclePlay className="h-5 w-5 shrink-0 text-brand-800" aria-hidden="true" />Khám phá khoá học</span>
+        </a>
+      </div>
+      <ul class="flex list-none flex-wrap gap-x-6 gap-y-3 pt-1">
+        {
+          TRAITS.map(({ label, Icon }) => (
+            <li class="flex items-center gap-2 text-sm font-semibold text-brand-900">
+              <Icon className="h-6 w-6 shrink-0 text-brand-600" aria-hidden="true" />
+              {label}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+  <div class="hero-photo relative h-60 md:absolute md:inset-y-0 md:right-0 md:h-auto md:w-[58%]">
+    {
+      typeof image === "string" ? (
+        <img
+          src={image}
+          alt={alt}
+          width="1600"
+          height="900"
+          loading={eager ? "eager" : "lazy"}
+          decoding="async"
+          class="absolute inset-0 h-full w-full object-cover [mask-image:linear-gradient(180deg,transparent,#000_30%)] md:[mask-image:none]"
+        />
+      ) : (
+        <Image
+          src={image}
+          alt={alt}
+          widths={[640, 960, 1280, 1920]}
+          sizes="(min-width: 768px) 58vw, 100vw"
+          quality={80}
+          loading={eager ? "eager" : "lazy"}
+          class="absolute inset-0 h-full w-full object-cover [mask-image:linear-gradient(180deg,transparent,#000_30%)] md:[mask-image:none]"
+        />
+      )
+    }
+  </div>
+</div>
+
+<style>
+  /* Mép trái của ảnh hero lượn sóng thay vì thẳng (chỉ từ md, khi ảnh nằm bên phải). */
+  @media (min-width: 768px) {
+    .hero-photo {
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cdefs%3E%3Cfilter id='b' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='1.8'/%3E%3C/filter%3E%3C/defs%3E%3Cpath filter='url(%23b)' d='M10 -5 C -2 28, 20 68, 6 105 L110 105 L110 -5Z'/%3E%3C/svg%3E");
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cdefs%3E%3Cfilter id='b' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='1.8'/%3E%3C/filter%3E%3C/defs%3E%3Cpath filter='url(%23b)' d='M10 -5 C -2 28, 20 68, 6 105 L110 105 L110 -5Z'/%3E%3C/svg%3E");
+      -webkit-mask-size: 100% 100%;
+      mask-size: 100% 100%;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+    }
+  }
+  /* Hoạ tiết bàn cờ nhìn xiên (phối cảnh) ở góc trái dưới hero, mờ dần lên trên và sang phải. */
+  .hero-checker {
+    overflow: hidden;
+    perspective: 520px;
+    -webkit-mask-image: radial-gradient(ellipse 85% 90% at 0% 100%, #000 15%, transparent 75%);
+    mask-image: radial-gradient(ellipse 85% 90% at 0% 100%, #000 15%, transparent 75%);
+  }
+  .hero-checker > div {
+    position: absolute;
+    left: -30%;
+    bottom: -70%;
+    width: 170%;
+    height: 185%;
+    transform-origin: 20% 100%;
+    transform: translateY(-18%) rotateX(58deg) rotateZ(-30deg);
+    background-image: conic-gradient(rgb(143 180 214 / 0.3) 25%, rgb(255 255 255 / 0.35) 0 50%, rgb(143 180 214 / 0.3) 0 75%, rgb(255 255 255 / 0.35) 0);
+    background-size: 170px 170px;
+    /* Mờ chính các cạnh của bàn cờ (mask nằm trong hệ toạ độ đã xoay): cạnh trái xiên và cạnh trên hướng lên thanh điều hướng. */
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 22%), linear-gradient(180deg, transparent 0%, #000 22%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(90deg, transparent 0%, #000 22%), linear-gradient(180deg, transparent 0%, #000 22%);
+    mask-composite: intersect;
+  }
+</style>
