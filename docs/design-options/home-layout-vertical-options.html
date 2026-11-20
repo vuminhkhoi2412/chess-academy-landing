@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Global Chess – Banner dài, bàn cờ trái, lối tắt xếp dọc</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-950:#0b2136;--navy-900:#123350;--navy-800:#184268;--navy-700:#1b4a76;--navy-600:#1f5285;--navy-200:#b6d0e8;--navy-100:#d9e8f5;--navy-50:#eef5fb;
+  --cream:#faf8f5;--ink:#0f172a;--ink-2:#334155;--ink-3:#475569;--rule:#e2e8f0;--board-light:#f7f3ed;
+  --amber-400:#fbbf24;--amber-500:#f59e0b;--amber-700:#b45309;
+  --display:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;
+  --sans:"Be Vietnam Pro",system-ui,sans-serif;
+  --r:.5rem; /* bo góc nhỏ như đã chốt: 8px */
+}
+*{box-sizing:border-box;margin:0}
+html,body{overflow-x:clip}
+body{font-family:var(--sans);color:var(--ink);background:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--navy-800);outline-offset:2px}
+.wrap{max-width:72rem;margin:0 auto;padding:0 1rem}
+
+/* ---- thành phần mô phỏng trang thật ---- */
+.top{background:var(--navy-800);color:var(--navy-100);font-size:.75rem;padding:.4rem 1rem}
+.top .in{max-width:72rem;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.top .cta{background:var(--amber-400);color:#0b1220;font-weight:700;padding:.15rem .75rem;border-radius:.375rem}
+header.nav{background:rgb(250 248 245/.95);border-bottom:1px solid var(--rule);height:3.5rem}
+header.nav .in{max-width:72rem;margin:0 auto;padding:0 1rem;height:100%;display:flex;align-items:center;gap:2rem}
+.logo{font-weight:800;font-size:1rem;letter-spacing:-.01em;line-height:1}
+.logo small{display:block;font-size:.6875rem;color:var(--amber-700);font-weight:600;margin-top:2px}
+header.nav nav{display:flex;gap:1.5rem;font-size:.8125rem;font-weight:600;color:var(--ink-3);margin-left:auto}
+.stage{max-width:72rem;margin:0 auto;padding:1.25rem 1rem}
+
+/* thẻ bàn cờ */
+.pz{background:#fff;border:1px solid var(--rule);border-radius:var(--r);padding:1rem;box-shadow:0 8px 24px -14px rgb(15 23 42/.3)}
+.pz .hd{display:flex;justify-content:space-between;align-items:center;font-size:.8125rem;font-weight:600;color:var(--ink-3);margin-bottom:.5rem}
+.pz .hd button{font-size:.75rem;color:var(--ink-3)}
+.pz h4{font-size:.9375rem;line-height:1.3;margin-bottom:.5rem}
+.board{display:grid;grid-template-columns:repeat(8,1fr);aspect-ratio:1;border:2px solid var(--navy-900);border-radius:.375rem;overflow:hidden;user-select:none}
+.board div{display:grid;place-items:center;font-size:calc(var(--bs,320px)/8*.72);line-height:1;cursor:pointer;position:relative}
+.board .l{background:var(--board-light)}.board .d{background:var(--navy-600)}
+.board .hint::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 3px var(--amber-400);background:rgb(251 191 36/.3)}
+.board .sel::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 3px #fff}
+.pc-w{color:#fff;text-shadow:0 0 2px #0b2136,0 0 2px #0b2136,0 0 2px #0b2136}
+.pc-b{color:#0b1220}
+.pz .st{margin-top:.5rem;font-size:.8125rem;color:var(--ink-3);font-style:italic;text-align:center;min-height:1.5rem}
+.pz .st.ok{color:#065f46;font-style:normal;font-weight:600}
+.pz .st.no{color:#b91c1c;font-style:normal;font-weight:600}
+
+
+
+.sec{padding:2.5rem 0;border-top:1px solid var(--rule)}
+.sec h2{font-family:var(--display);font-size:1.75rem;font-weight:800;letter-spacing:-.02em}
+.ghost{margin-top:1rem;height:7rem;border:1px dashed #cbd5e1;border-radius:var(--r);background:repeating-linear-gradient(135deg,#f1f5f9 0 8px,#f8fafc 8px 16px);display:grid;place-items:center;color:var(--ink-3);font-size:.8125rem}
+.note{font-size:.875rem;color:var(--ink-3);max-width:62rem;padding:1.5rem 0 .5rem}.note b{color:var(--ink)}
+.frame{border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;background:var(--cream);margin:1rem 0 2rem}
+.frame>h3{font-size:.8125rem;font-weight:700;padding:.5rem 1rem;background:#fff;border-bottom:1px solid var(--rule);color:var(--ink-2)}
+
+/* ---- phương án mới ---- */
+/* Banner dài trọn bề ngang khung 72rem (mép phải = mép phải cột lối tắt bên dưới). Ảnh in sẵn chữ: không lớp phủ. */
+.hero{position:relative;display:block;border-radius:var(--r);overflow:hidden;aspect-ratio:2.2/1;background:var(--navy-900)}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero .dots{position:absolute;left:0;right:0;bottom:.6rem;display:flex;justify-content:center;gap:.25rem}
+.hero .dots i{display:block;width:.5rem;height:.5rem;border-radius:50%;background:rgb(255 255 255/.5);margin:.5rem .25rem}
+.hero .dots i:first-child{background:#fff}
+/* hàng dưới: bàn cờ (trái, mép trái = mép trái banner) + cột lối tắt dọc (phải) */
+.under{display:grid;grid-template-columns:minmax(0,22rem) minmax(0,1fr);gap:1rem;margin-top:1rem;align-items:stretch}
+.under .pz{height:100%;display:flex;flex-direction:column}
+.under .pz .board{width:100%}
+.menu{display:flex;flex-direction:column;gap:.5rem;list-style:none;padding:0}
+.menu li{flex:1;display:flex}
+.menu a{flex:1;display:grid;grid-template-columns:5rem 1fr;min-height:4.25rem;background:#fff;border:1px solid var(--amber-500);transition:box-shadow .15s,transform .15s}
+.menu a:hover{box-shadow:0 2px 8px rgb(15 23 42/.15)}
+.menu a:active{transform:scale(.995)}
+.menu .ic{display:grid;place-items:center;color:#fff}
+.menu .ic svg{width:1.75rem;height:1.75rem}
+.menu .tx{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:.5rem 1rem;line-height:1.35}
+.menu .tx b{font-size:1rem}
+.menu .tx small{font-size:.875rem;color:var(--ink-3)}
+.c1 .ic{background:#d64545}.c2 .ic{background:#1b84a3}.c3 .ic{background:#b36a00}.c4 .ic{background:#3f9a4a}
+@media(max-width:820px){.under{grid-template-columns:1fr}.under .pz{max-width:24rem}.hero{aspect-ratio:1.6/1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="note"><b>Thử nghiệm bố cục đầu trang chủ.</b> (1) Banner kéo dài trọn khung 72rem, giữ nguyên tỉ lệ ảnh, không lớp phủ đen và không chữ HTML đè lên (chữ nằm sẵn trong ảnh). (2) Bàn cờ đố chuyển xuống dưới banner, mép trái trùng mép trái banner. (3) Các lối tắt xếp dọc thành cột bên phải, mép phải trùng mép phải banner. Ảnh dưới đây là ảnh lớp học tạm, thay bằng ảnh poster in sẵn chữ khi dùng thật.</p>
+  <div class="frame"><h3>Bố cục đề xuất</h3>
+<div class="top"><div class="in"><span>Hotline: <b>0789059440</b> – <b>0963848430</b></span><span style="display:flex;gap:1rem;align-items:center"><span>f</span><span>⌖</span><span class="cta">Đăng ký học thử</span></span></div></div>
+<header class="nav"><div class="in"><div class="logo">GLOBAL CHESS<small>Một nước đi, mở tư duy</small></div><nav><span>Giới thiệu</span><span>Khoá học ▾</span><span>Cơ sở ▾</span><span>Học thử</span></nav></div></header>
+  <div class="stage">
+    <a class="hero" href="#" onclick="return false" aria-label="Đăng ký học thử">
+      <img src="../../src/assets/images/gallery-classroom.jpg" alt="Lớp học cờ vua tại Global Chess">
+      <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    </a>
+    <div class="under">
+      <div id="pzmount"></div>
+      <ul class="menu">
+        <li class="c1"><a href="#" onclick="return false"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></span><span class="tx"><b>Khoá học</b><small>Lộ trình từng cấp độ</small></span></a></li>
+        <li class="c2"><a href="#" onclick="return false"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg></span><span class="tx"><b>Học phí</b><small>Bảng giá theo cấp độ</small></span></a></li>
+        <li class="c3"><a href="#" onclick="return false"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span class="tx"><b>Cơ sở</b><small>5 cơ sở tại TP.HCM</small></span></a></li>
+        <li class="c4"><a href="#" onclick="return false"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/></svg></span><span class="tx"><b>Kiến thức</b><small>Bài viết về cờ vua</small></span></a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="stage"><div class="sec"><h2>Lộ trình đào tạo</h2><div class="ghost">nội dung hiện có, không đổi</div></div><div class="sec"><h2>Hệ thống các cơ sở</h2><div class="ghost">nội dung hiện có, không đổi</div></div></div>
+  </div>
+</div>
+<script>
+const FEN = "3r3k/ppp2ppp/8/4p1N1/8/8/PPPP1PPP/R1BQK2R w KQ - 0 1";
+const G = {k:"♚",q:"♛",r:"♜",b:"♝",n:"♞",p:"♟"}; // dùng glyph đặc cho cả hai bên, tô màu theo bên
+let uid = 0;
+function puzzle(size, {title=true, heading="Thử thách ngày hôm nay"}={}) {
+  const id = "pz"+(++uid);
+  const rows = FEN.split(" ")[0].split("/");
+  let cells = "";
+  rows.forEach((row,r)=>{ let c=0; for (const ch of row){ if(/\d/.test(ch)){ for(let k=0;k<+ch;k++){cells+=sq(r,c++,"")} } else { cells+=sq(r,c++,ch) } } });
+  function sq(r,c,p){
+    const name = "abcdefgh"[c]+(8-r);
+    const dark=(r+c)%2===1;
+    const w = p && p===p.toUpperCase();
+    const piece = p ? `<span class="${w?"pc-w":"pc-b"}">${G[p.toLowerCase()]}</span>` : "";
+    return `<div class="${dark?"d":"l"}${name==="g5"?" hint":""}" data-sq="${name}">${piece}</div>`;
+  }
+  return `<div class="pz" id="${id}" style="--bs:${size}px"><div class="hd"><span>${heading}</span><button type="button" data-reset>↺ Chơi lại</button></div>
+  ${title?`<h4>Trắng đi trước: Làm sao để bắt Xe của Đen?</h4>`:""}
+  <div class="board" style="max-width:${size}px;margin:auto">${cells}</div><div class="st">Bấm quân Mã ở g5, rồi bấm ô f7</div></div>`;
+}
+
+function wire(root){
+  const st = root.querySelector(".st"); let sel=null, done=false;
+  const sq = (n)=>root.querySelector(`[data-sq="${n}"]`);
+  root.querySelectorAll("[data-sq]").forEach(c=>c.onclick=()=>{
+    if(done) return;
+    const n=c.dataset.sq;
+    if(!sel){ if(n==="g5"){sel=n;c.classList.add("sel");} else {st.className="st no";st.textContent="Chọn quân Mã trắng ở ô g5 trước nhé";} return; }
+    if(n==="f7"){
+      sq("g5").innerHTML=""; sq("f7").innerHTML='<span class="pc-w">♞</span>'; sq("g5").classList.remove("sel","hint");
+      done=true; st.className="st ok"; st.textContent="Tuyệt vời! Đó là đòn Chĩa Đôi (Fork).";
+    } else { sq("g5").classList.remove("sel"); sel=null; st.className="st no"; st.textContent="Chưa chính xác. Hãy tìm ô tấn công cùng lúc 2 mục tiêu."; }
+  });
+  root.querySelector("[data-reset]").onclick=()=>{ mountPz(); };
+}
+
+
+function mountPz(){ const m=document.getElementById("pzmount"); m.innerHTML=puzzle(320); wire(m.querySelector(".pz")); }
+mountPz();
+</script>
+</body>
+</html>

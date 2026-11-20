@@ -9,7 +9,7 @@ const PIECE_PATHS: Record<string, React.ReactNode> = {
       <path d="M6.684 16.772a1 1 0 0 0 -.684 .949v1.279a1 1 0 0 0 1 1h10a1 1 0 0 0 1 -1v-1.28a1 1 0 0 0 -.684 -.948l-2.316 -.772h-6l-2.316 .772" />
     </>
   ),
-  "so-cap": (
+  "beginner": (
     <>
       <path d="M8 16l-1.447 .724a1 1 0 0 0 -.553 .894v2.382h12v-2.382a1 1 0 0 0 -.553 -.894l-1.447 -.724h-8" />
       <path d="M8 16l1 -9h6l1 9" />
@@ -18,7 +18,7 @@ const PIECE_PATHS: Record<string, React.ReactNode> = {
       <path d="M14 4v3" />
     </>
   ),
-  "trung-cap": (
+  "intermediate": (
     <>
       <path d="M8 16l-1.447 .724a1 1 0 0 0 -.553 .894v2.382h12v-2.382a1 1 0 0 0 -.553 -.894l-1.447 -.724h-8" />
       <path d="M8.5 16a3.5 3.5 0 1 1 3.163 -5h.674a3.5 3.5 0 1 1 3.163 5l-7 0" />

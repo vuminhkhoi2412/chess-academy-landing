@@ -1,0 +1,16 @@
+---
+// src/components/news/CategoryIcon.astro
+// Biểu tượng của một mục bài đăng, chọn theo mã mục; mục do quản trị tự thêm (mã lạ) dùng biểu tượng thẻ chung.
+// `slug` rỗng là tab "Tất cả".
+import { GraduationCap, Heart, LayoutGrid, Newspaper, ShieldCheck, Tag, Trophy, Users } from "lucide-react";
+
+interface Props {
+  slug: string | null | undefined;
+  class?: string;
+}
+const { slug, class: className = "h-[18px] w-[18px]" } = Astro.props;
+const ICONS = { news: Newspaper, knowledge: ShieldCheck, events: Trophy, stories: Users, parents: Heart, courses: GraduationCap } as const;
+const Icon = slug ? (ICONS[slug as keyof typeof ICONS] ?? Tag) : LayoutGrid;
+---
+
+<Icon className={className} aria-hidden="true" />

@@ -1,0 +1,102 @@
+---
+// src/components/home/FeaturedSection.astro
+// Dải dưới khối tin: "Các khóa học nổi bật" (lấy từ giáo trình, nên không lệch với /courses) và, khi có bài, một
+// thẻ "Giải đấu & Sự kiện" lấy bài mới nhất của mục đó. Không có bài sự kiện thì khoá học chiếm cả hàng.
+import { Image } from "astro:assets";
+import { ArrowRight, CalendarDays, Trophy } from "lucide-react";
+import { CURRICULUM_PROGRAMS } from "../../data/courses";
+import type { Post, PostImage } from "../../server/posts";
+import DateLine from "../news/DateLine.astro";
+import classPractice from "../../assets/images/gallery-class-practice.jpg";
+import coachStudent from "../../assets/images/gallery-coach-student.jpg";
+import classroom from "../../assets/images/gallery-classroom.jpg";
+
+interface Props {
+  /** Bài mới nhất của mục sự kiện (kèm ảnh bìa), và tên + mã mục đó; bỏ trống thì không dựng thẻ. */
+  event?: { post: Post; cover: PostImage | null; category: { slug: string; name: string } };
+  /** Dải này nằm ngay dưới khối tin: bỏ đường kẻ ngăn để hai khối liền một mảng. */
+  joined?: boolean;
+}
+const { event, joined = false } = Astro.props;
+
+// Ba chương trình lấy từ giáo trình.
+const PHOTOS = [classPractice, coachStudent, classroom];
+const BADGE = ["bg-amber-100 text-amber-900 border-amber-300", "bg-sky-100 text-sky-900 border-sky-300", "bg-emerald-100 text-emerald-900 border-emerald-300"];
+const COURSES = [
+  ...CURRICULUM_PROGRAMS.map((program, i) => ({
+    title: program.title,
+    badge: program.badge,
+    // "Trẻ từ 4 – 12 tuổi (…)" -> "4 – 12 tuổi"; "72 buổi (3 Level …)" -> "72 buổi".
+    meta: `${program.targetAudience.match(/\d+\s*–\s*\d+\s*tuổi/)?.[0] ?? program.targetAudience} · ${program.totalDuration.split(" (")[0]}`,
+    href: `/courses#curriculum:${program.id}`,
+    cta: "Chi tiết khoá học",
+    tone: BADGE[i % BADGE.length],
+    photo: PHOTOS[i % PHOTOS.length],
+  })),
+];
+
+const card = "overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md";
+---
+
+<section aria-label="Khoá học và sự kiện nổi bật" class:list={["bg-white pb-14", joined ? "pt-0" : "border-t border-slate-200 pt-10"]}>
+  <div class:list={["mx-auto grid max-w-6xl gap-x-6 gap-y-10 px-4", event && "lg:grid-cols-12"]}>
+    <div class={event ? "lg:col-span-7" : undefined}>
+      <div class="flex items-center justify-between gap-4">
+        <h2 class="flex items-center gap-2.5 whitespace-nowrap text-2xl font-extrabold text-slate-900">
+          <Trophy className="h-7 w-7 text-amber-500" aria-hidden="true" /> Các khoá học nổi bật
+        </h2>
+        <a href="/courses" class="inline-flex min-h-11 items-center gap-1.5 text-sm font-bold text-brand-800 hover:underline">
+          Xem tất cả <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+        </a>
+      </div>
+      <ul class="mt-4 grid list-none gap-4 sm:grid-cols-3">
+        {COURSES.map((course) => (
+          <li>
+            <a href={course.href} class:list={["group flex h-full flex-col", card]}>
+              <div class="relative">
+                <Image src={course.photo} alt="" width={360} class="aspect-[4/3] w-full object-cover" loading="lazy" />
+                <span class:list={["absolute bottom-2 left-2 rounded-full border px-2.5 py-0.5 text-xs font-bold", course.tone]}>{course.badge}</span>
+              </div>
+              <div class="flex flex-1 flex-col p-3.5">
+                <h3 class="text-base font-extrabold leading-snug text-slate-900">{course.title}</h3>
+                <p class="mt-1 text-sm text-slate-600">{course.meta}</p>
+                <span class="mt-auto inline-flex items-center gap-1.5 pt-3 text-sm font-extrabold">
+                  <span class="bg-gradient-to-r from-brand-800 to-brand-500 bg-clip-text text-transparent">{course.cta}</span>
+                  <ArrowRight className="h-4 w-4 text-brand-500 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                </span>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    {event && (
+      <div class="flex flex-col lg:col-span-5">
+        <div class="flex items-center justify-between gap-4">
+          <h2 class="flex items-center gap-2.5 whitespace-nowrap text-2xl font-extrabold text-slate-900">
+            <CalendarDays className="h-7 w-7 text-amber-500" aria-hidden="true" /> {event.category.name}
+          </h2>
+          <a href={`/news?category=${event.category.slug}`} class="inline-flex min-h-11 items-center gap-1.5 text-sm font-bold text-brand-800 hover:underline">
+            Xem tất cả <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+          </a>
+        </div>
+        <a href={`/news/${event.post.slug}`} class:list={["group mt-4 flex flex-col lg:flex-1", card]}>
+          {/* Từ lg ảnh co giãn theo chiều cao của khối khoá học bên cạnh, để hai khối cao bằng nhau. */}
+          <div class="relative aspect-video bg-brand-50 lg:aspect-auto lg:min-h-40 lg:flex-1">
+            {event.cover && <img src={`/uploads/${event.cover.file}`} alt="" width="640" height="360" loading="lazy" class="absolute inset-0 h-full w-full bg-slate-100 object-cover" />}
+          </div>
+          <div class="flex items-end justify-between gap-3 p-4">
+            <div>
+              <h3 class="text-lg font-extrabold leading-snug text-slate-900 group-hover:underline">{event.post.title}</h3>
+              <DateLine at={event.post.publishedAt ?? event.post.createdAt} class="mt-1.5 text-slate-600" />
+            </div>
+            <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-400 text-slate-900" aria-hidden="true">
+              <ArrowRight className="h-5 w-5" />
+            </span>
+          </div>
+        </a>
+      </div>
+    )}
+  </div>
+</section>

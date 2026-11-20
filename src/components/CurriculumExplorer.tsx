@@ -1,5 +1,5 @@
 // src/components/CurriculumExplorer.tsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CURRICULUM_PROGRAMS } from "../data/courses";
 import type { MajorProgram } from "../data/courses";
 import PieceIcon from "./PieceIcon";
@@ -23,7 +23,7 @@ const PROGRAM_STYLES: Record<string, ProgramStyle> = {
     bandMeta: "text-brand-700",
     rule: "border-brand-800",
   },
-  "so-cap": {
+  "beginner": {
     bar: "bg-amber-700",
     color: "var(--color-amber-700)",
     tint: "var(--color-tint-amber)",
@@ -32,7 +32,7 @@ const PROGRAM_STYLES: Record<string, ProgramStyle> = {
     bandMeta: "text-amber-800",
     rule: "border-amber-700",
   },
-  "trung-cap": {
+  "intermediate": {
     bar: "bg-emerald-700",
     color: "var(--color-emerald-700)",
     tint: "var(--color-tint-emerald)",
@@ -48,8 +48,8 @@ const FALLBACK_STYLE = PROGRAM_STYLES["happy-chess"];
 // Tên ngắn của từng khóa, dùng trên gáy sách.
 const SHORT_PROGRAM_NAMES: Record<string, string> = {
   "happy-chess": "Happy Chess",
-  "so-cap": "Sơ cấp",
-  "trung-cap": "Trung cấp",
+  "beginner": "Sơ cấp",
+  "intermediate": "Trung cấp",
 };
 
 /**
@@ -109,8 +109,39 @@ function LevelTitle({ name, programId }: { name: string; programId: string }) {
 export default function CurriculumExplorer() {
   const [selectedCode, setSelectedCode] = useState(LEVELS[0].code);
   const selected = LEVELS.find((level) => level.code === selectedCode) ?? LEVELS[0];
-  // Chỉ một khóa mở tại một thời điểm; bấm khóa đang mở thì gập lại.
-  const [openProgram, setOpenProgram] = useState<string | null>(null);
+  // Chỉ một khóa mở tại một thời điểm; bấm khóa đang mở thì gập lại. Mặc định mở khóa của cấp độ đang chọn.
+  const [openProgram, setOpenProgram] = useState<string | null>(LEVELS[0].program.id);
+
+  // Chọn cấp độ thì mở luôn khóa chứa nó trong giáo trình chi tiết.
+  function selectLevel(code: string) {
+    setSelectedCode(code);
+    setOpenProgram(LEVELS.find((level) => level.code === code)?.program.id ?? null);
+  }
+
+  // Menu "Khoá học" trỏ tới "/#curriculum:<id khóa>": chọn cấp độ đầu của khóa đó rồi cuộn tới mục này.
+  // Trình duyệt không tự cuộn tới mảnh không có phần tử tương ứng nên cuộn ở đây.
+  useEffect(() => {
+    const apply = () => {
+      const raw = decodeURIComponent(window.location.hash).match(/^#curriculum:(.+)$/)?.[1];
+      // Link đã chia sẻ trước khi đổi tên mã khoá (so-cap, trung-cap) vẫn mở đúng khoá.
+      const id = raw === "so-cap" ? "beginner" : raw === "trung-cap" ? "intermediate" : raw;
+      const program = CURRICULUM_PROGRAMS.find((p) => p.id === id);
+      if (!program) return;
+      selectLevel(program.subLevels[0].code);
+      document.getElementById("curriculum")?.scrollIntoView();
+    };
+    // Bấm lại đúng liên kết cũ không đổi hash nên không có hashchange: bắt cả click.
+    const onClick = (event: MouseEvent) => {
+      if (event.target instanceof Element && event.target.closest('a[href*="#curriculum:"]')) setTimeout(apply);
+    };
+    apply();
+    window.addEventListener("hashchange", apply);
+    document.addEventListener("click", onClick);
+    return () => {
+      window.removeEventListener("hashchange", apply);
+      document.removeEventListener("click", onClick);
+    };
+  }, []);
 
   return (
     <section id="curriculum" className="py-20 bg-cream">
@@ -145,7 +176,7 @@ export default function CurriculumExplorer() {
                       <li key={level.code} className="flex-1">
                         <button
                           type="button"
-                          onClick={() => setSelectedCode(level.code)}
+                          onClick={() => selectLevel(level.code)}
                           aria-pressed={isActive}
                           className={`min-h-12 w-full cursor-pointer border px-2 py-2 font-display text-[15px] font-extrabold tracking-tight transition-colors ${
                             isActive

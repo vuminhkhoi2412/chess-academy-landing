@@ -1,0 +1,32 @@
+---
+// src/components/news/NewsLead.astro
+// Bài nổi bật: ảnh bìa phủ cả thẻ, nhãn mục ở góc trên trái, tiêu đề và ngày ở dưới ảnh, nút mũi tên tròn ở góc dưới phải.
+// Bài chưa có ảnh bìa dùng nền xanh đậm để chữ trắng vẫn đọc được.
+import { ArrowRight } from "lucide-react";
+import type { Post, PostImage } from "../../server/posts";
+import CategoryIcon from "./CategoryIcon.astro";
+import DateLine from "./DateLine.astro";
+
+interface Props {
+  post: Post;
+  cover: PostImage | null;
+}
+const { post, cover } = Astro.props;
+---
+
+<a href={`/news/${post.slug}`} class="group relative block aspect-[4/3] overflow-hidden rounded-2xl bg-gradient-to-br from-brand-700 to-brand-950 sm:aspect-video">
+  {cover && <img src={`/uploads/${cover.file}`} alt="" width="800" height="450" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />}
+  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" aria-hidden="true"></div>
+  <span class="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-amber-300 bg-amber-100 py-1.5 pl-3 pr-4 text-sm font-bold text-amber-950 shadow-sm">
+    <CategoryIcon slug={post.category} class="h-4 w-4 text-amber-700" /> {post.categoryName}
+  </span>
+  <div class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-6">
+    <div class="min-w-0">
+      <h3 class="text-xl font-extrabold leading-tight text-white sm:text-2xl lg:text-[1.75rem]">{post.title}</h3>
+      <DateLine at={post.publishedAt ?? post.createdAt} class="mt-2 text-white/90" />
+    </div>
+    <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-amber-400 text-slate-900 shadow-md transition-transform group-hover:translate-x-0.5" aria-hidden="true">
+      <ArrowRight className="h-5 w-5" />
+    </span>
+  </div>
+</a>

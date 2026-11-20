@@ -20,6 +20,11 @@ astro dev --background
 
 `npm run build` fails when `PUBLIC_GOOGLE_SHEETS_ENDPOINT` is unset. Copy `.env.example` to `.env` before building. The README lists the full set.
 
+## Conventions
+
+- URLs and route file names are plain English (`/admin/posts`, `/news`, `/privacy-policy`). Page text stays Vietnamese.
+- When a public URL is renamed, add a 301 in `redirects` in `astro.config.mjs` so old links keep working.
+
 ## Documentation
 
 Full documentation: https://docs.astro.build

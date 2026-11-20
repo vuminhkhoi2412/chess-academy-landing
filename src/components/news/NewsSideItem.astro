@@ -1,0 +1,24 @@
+---
+// src/components/news/NewsSideItem.astro
+// Bài nhỏ ở cột bên phải: ảnh nhỏ bên trái, tiêu đề, bên dưới là biểu tượng lịch và ngày dạng số.
+import type { Post, PostImage } from "../../server/posts";
+import DateLine from "./DateLine.astro";
+
+interface Props {
+  post: Post;
+  cover: PostImage | null;
+}
+const { post, cover } = Astro.props;
+---
+
+<a href={`/news/${post.slug}`} class="group grid grid-cols-[8.5rem_1fr] items-center gap-4 sm:grid-cols-[10rem_1fr]">
+  {cover ? (
+    <img src={`/uploads/${cover.file}`} alt="" width="320" height="200" loading="lazy" class="aspect-[16/10] w-full rounded-xl bg-slate-100 object-cover" />
+  ) : (
+    <div class="aspect-[16/10] w-full rounded-xl bg-brand-50" aria-hidden="true"></div>
+  )}
+  <div>
+    <h3 class="text-base font-bold leading-snug text-slate-900 group-hover:underline">{post.title}</h3>
+    <DateLine at={post.publishedAt ?? post.createdAt} class="mt-2 text-slate-500" />
+  </div>
+</a>

@@ -1,0 +1,127 @@
+---
+// src/pages/news/index.astro
+// Trang tin tức: thanh lọc theo mục, một bài nổi bật cùng ba bài kế bên, phần còn lại là lưới thẻ. Chạy trên
+// server nên bài vừa đăng hiện ngay, không cần build lại. Các mục lấy từ bảng categories (quản trị chỉnh được).
+export const prerender = false;
+
+import Layout from "../../layouts/Layout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+import { BRAND_INFO } from "../../data/courses";
+import { getCategoryBySlug, listPublishedCategories } from "../../server/categories";
+import { getDb } from "../../server/db";
+import { POSTS_POLICY } from "../../server/policy";
+import CategoryIcon from "../../components/news/CategoryIcon.astro";
+import DateLine from "../../components/news/DateLine.astro";
+import NewsLead from "../../components/news/NewsLead.astro";
+import NewsSideItem from "../../components/news/NewsSideItem.astro";
+import { TAB_CLASS } from "../../components/news/ui";
+import { countPublished, listImages, listPublished } from "../../server/posts";
+
+const db = getDb();
+// Chỉ mục đã có bài mới hiện ở thanh lọc; mã lạ trên địa chỉ thì coi như xem tất cả.
+const categories = listPublishedCategories(db);
+const allTotal = categories.reduce((sum, c) => sum + c.published, 0);
+const requestedCategory = Astro.url.searchParams.get("category");
+const requestedRow = requestedCategory ? getCategoryBySlug(db, requestedCategory) : null;
+// Mục có thật nhưng chưa có bài vẫn hiện trang "chưa có bài" thay vì đổ về tất cả.
+const current = requestedRow ?? undefined;
+const category = current?.slug;
+const total = current ? countPublished(db, current.slug) : allTotal;
+const pages = Math.max(1, Math.ceil(total / POSTS_POLICY.perPage));
+const requested = Number(Astro.url.searchParams.get("page") ?? 1);
+const page = Number.isInteger(requested) ? Math.min(Math.max(requested, 1), pages) : 1;
+const posts = listPublished(db, page, POSTS_POLICY.perPage, category).map((post) => ({ post, cover: listImages(db, post.id)[0] ?? null }));
+// Trang đầu: bài nổi bật + ba bài kế bên; còn lại (và các trang sau) là lưới thẻ.
+const lead = page === 1 ? posts[0] : undefined;
+const rest = lead ? posts.slice(1) : posts;
+const side = lead ? rest.slice(0, 3) : [];
+const grid = lead ? rest.slice(3) : rest;
+
+// Liên kết lọc mục / phân trang giữ nguyên mục đang xem.
+const listHref = (cat: string | undefined, n = 1) => {
+  const query = new URLSearchParams();
+  if (cat) query.set("category", cat);
+  if (n > 1) query.set("page", String(n));
+  const text = query.toString();
+  return text ? `/news?${text}` : "/news";
+};
+// Chỉ hiện thanh lọc khi có từ hai mục trở lên; một mục thôi thì không có gì để chọn.
+const showTabs = categories.length > 1;
+const TABS = [
+  { label: "Tất cả", cat: undefined as string | undefined, n: allTotal },
+  ...categories.map((c) => ({ label: c.name, cat: c.slug as string | undefined, n: c.published })),
+];
+const heading = current ? current.name : "Tin tức & Góc học tập";
+---
+
+<Layout
+  title={`${heading} – ${BRAND_INFO.name}`}
+  description={`Tin tức, hoạt động lớp học và giải đấu mới nhất của ${BRAND_INFO.name}.`}
+  robots={total === 0 ? "noindex, follow" : "index, follow"}
+>
+  <SiteHeader newsCategories={categories} />
+  <main id="main" tabindex="-1" class="max-w-6xl mx-auto px-4 py-12 md:py-16">
+    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900">{heading}</h1>
+    {!current && <p class="mt-2 max-w-2xl text-slate-600">Cập nhật kiến thức, hoạt động, giải đấu và những câu chuyện truyền cảm hứng từ {BRAND_INFO.name}.</p>}
+
+    {showTabs && (
+      <nav class="mt-6 flex gap-2.5 overflow-x-auto pb-2" aria-label="Lọc theo mục">
+        {TABS.map((tab) => (
+          <a href={listHref(tab.cat)} aria-current={tab.cat === category ? "page" : undefined} class={TAB_CLASS}>
+            <CategoryIcon slug={tab.cat} /> {tab.label} <span class="font-medium opacity-70">({tab.n})</span>
+          </a>
+        ))}
+      </nav>
+    )}
+
+    {total === 0 ? (
+      <p class="mt-8 text-slate-600">{category ? "Chưa có bài nào trong mục này." : "Chưa có bài viết nào."} Mời bạn quay lại sau.</p>
+    ) : (
+      <>
+        {lead && (
+          <div class="mt-8 grid gap-8 lg:grid-cols-12 lg:items-center">
+            <div class="lg:col-span-7"><NewsLead post={lead.post} cover={lead.cover} /></div>
+            {side.length > 0 && (
+              <ul class="grid list-none content-start divide-y divide-slate-200 lg:col-span-5">
+                {side.map(({ post, cover }) => (
+                  <li class="py-4 first:pt-0 last:pb-0">
+                    <NewsSideItem post={post} cover={cover} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
+        {grid.length > 0 && (
+          <ul class:list={["grid list-none gap-8 sm:grid-cols-2 lg:grid-cols-3", lead && "mt-12 border-t border-slate-200 pt-10", !lead && "mt-8"]}>
+            {grid.map(({ post, cover }) => (
+              <li>
+                <a href={`/news/${post.slug}`} class="group block">
+                  {cover ? (
+                    <img src={`/uploads/${cover.file}`} alt="" width="448" height="336" loading="lazy" class="aspect-[4/3] w-full bg-slate-100 object-cover" />
+                  ) : (
+                    <div class="aspect-[4/3] w-full bg-brand-50" aria-hidden="true"></div>
+                  )}
+                  <h2 class="mt-3 text-lg font-extrabold leading-snug text-slate-900 group-hover:underline">{post.title}</h2>
+                  <DateLine at={post.publishedAt ?? post.createdAt} class="mt-1.5 text-slate-500" />
+                  {post.summary && <p class="mt-2 text-sm leading-relaxed text-slate-700">{post.summary}</p>}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </>
+    )}
+
+    {pages > 1 && (
+      <nav class="mt-12 flex items-center justify-between" aria-label="Phân trang">
+        {page > 1 ? <a href={listHref(category, page - 1)} class="inline-flex min-h-12 items-center px-5 border-2 border-brand-800 font-bold text-brand-800">← Mới hơn</a> : <span></span>}
+        <span class="text-sm text-slate-600">Trang {page}/{pages}</span>
+        {page < pages ? <a href={listHref(category, page + 1)} class="inline-flex min-h-12 items-center px-5 border-2 border-brand-800 font-bold text-brand-800">Cũ hơn →</a> : <span></span>}
+      </nav>
+    )}
+  </main>
+  <SiteFooter news={allTotal > 0} />
+</Layout>

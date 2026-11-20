@@ -1,0 +1,36 @@
+---
+// src/pages/courses.astro
+// Trang khoá học: lộ trình, giáo trình chi tiết và bảng học phí (giá hiện hành trong DB). Chạy trên server
+// để giá và công tắc quản trị có hiệu lực ngay. Form đăng ký không ở đây: nút "Đăng ký ngay" dẫn sang /trial.
+export const prerender = false;
+
+import Layout from "../layouts/Layout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import MobileContactBar from "../components/MobileContactBar.astro";
+import CurriculumExplorer from "../components/CurriculumExplorer";
+import PricingAndCheckout from "../components/PricingAndCheckout";
+import { BRAND_INFO } from "../data/courses";
+import { getSiteConfig, getNewsCategories, getTuition } from "../server/site-config";
+
+const { flags } = getSiteConfig();
+const newsCategories = getNewsCategories();
+const tuition = getTuition();
+---
+
+<Layout
+  title={`Khoá học và học phí – ${BRAND_INFO.name}`}
+  description="Lộ trình cờ vua Global Chess cho trẻ 4–12 tuổi: Happy Chess, Sơ cấp, Trung cấp với giáo trình chi tiết từng cấp độ và bảng học phí."
+  bodyClass={flags.mobile_bar ? "pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:pb-0" : undefined}
+>
+  <SiteHeader enrolmentOpen={flags.enrolment} newsCategories={newsCategories} />
+  <main id="main" tabindex="-1">
+    <div class="mx-auto max-w-6xl px-4 pt-12">
+      <h1 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900">Khoá học và học phí</h1>
+    </div>
+    <CurriculumExplorer client:load />
+    <PricingAndCheckout client:load enrolmentOpen={flags.enrolment} levels={tuition.levels} form={false} />
+  </main>
+  <SiteFooter faq={flags.faq} news={newsCategories.length > 0} />
+  {flags.mobile_bar && <MobileContactBar />}
+</Layout>
