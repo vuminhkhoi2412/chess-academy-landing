@@ -8,7 +8,7 @@ import { Chess, type Square } from "chess.js";
 import { Chessboard, type PieceDropHandlerArgs } from "react-chessboard";
 import confetti from "canvas-confetti";
 import { RefreshCw, Loader2, CheckCircle2, Handshake, Crown } from "lucide-react";
-import { playClack } from "../lib/clack";
+import { playClack, preloadClack } from "../lib/clack";
 import { DEFAULT_ENGINE_SETTINGS, ENGINE_LEVELS, type EngineSettings } from "../data/chess-engine";
 
 const ENGINE_URL = "/engine/stockfish-19-lite-single.js";
@@ -49,6 +49,7 @@ export default function ChessChallenge({ engine: settings = DEFAULT_ENGINE_SETTI
   const inflight = useRef<{ id: number; done: (move: string) => void }[]>([]);
 
   useEffect(() => {
+    preloadClack();
     let worker: Worker;
     try {
       worker = new Worker(ENGINE_URL);
