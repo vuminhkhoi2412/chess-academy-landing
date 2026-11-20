@@ -30,7 +30,7 @@ None found.
 - **Fix**: use a ring that clears 3:1 on both cream and white, for example `brand-800` (`#184268`, about 10:1) or `amber-700` (`#b45309`, 4.7:1), with `outline-offset: 2px`. On navy sections keep amber-400 (6.2:1 on `#184268`). Do that with one `:focus-visible` rule plus a navy-section override.
 
 **H2. Small gray text on cream drops just under 4.5:1.**
-- **What**: the gallery consent note (`index.astro:428`) is `text-xs text-slate-500` (12 px) on the cream `#hinh-anh` section: **4.49:1**, borderline fail. The same color passes on white (4.76:1), so it is a section-background mismatch rather than a wrong token. Other `slate-500` text sits on white (modal labels, hotline text) or on a background I did not verify (`CurriculumExplorer.tsx:184, 219`).
+- **What**: the gallery consent note (`index.astro:428`) is `text-xs text-slate-500` (12 px) on the cream `#gallery` section: **4.49:1**, borderline fail. The same color passes on white (4.76:1), so it is a section-background mismatch rather than a wrong token. Other `slate-500` text sits on white (modal labels, hotline text) or on a background I did not verify (`CurriculumExplorer.tsx:184, 219`).
 - **Why**: `accessibility.md › Color and effects`: text up to 17 pt needs 4.5:1.
 - **Fix**: use `text-slate-600` (7.15:1 on cream) for any gray body/metadata text that can land on cream. Simplest rule: `slate-500` is allowed only on `#fff`.
 

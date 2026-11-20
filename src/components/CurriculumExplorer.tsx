@@ -23,7 +23,7 @@ const PROGRAM_STYLES: Record<string, ProgramStyle> = {
     bandMeta: "text-brand-700",
     rule: "border-brand-800",
   },
-  "so-cap": {
+  "beginner": {
     bar: "bg-amber-700",
     color: "var(--color-amber-700)",
     tint: "var(--color-tint-amber)",
@@ -32,7 +32,7 @@ const PROGRAM_STYLES: Record<string, ProgramStyle> = {
     bandMeta: "text-amber-800",
     rule: "border-amber-700",
   },
-  "trung-cap": {
+  "intermediate": {
     bar: "bg-emerald-700",
     color: "var(--color-emerald-700)",
     tint: "var(--color-tint-emerald)",
@@ -48,8 +48,8 @@ const FALLBACK_STYLE = PROGRAM_STYLES["happy-chess"];
 // Tên ngắn của từng khóa, dùng trên gáy sách.
 const SHORT_PROGRAM_NAMES: Record<string, string> = {
   "happy-chess": "Happy Chess",
-  "so-cap": "Sơ cấp",
-  "trung-cap": "Trung cấp",
+  "beginner": "Sơ cấp",
+  "intermediate": "Trung cấp",
 };
 
 /**
@@ -122,7 +122,9 @@ export default function CurriculumExplorer() {
   // Trình duyệt không tự cuộn tới mảnh không có phần tử tương ứng nên cuộn ở đây.
   useEffect(() => {
     const apply = () => {
-      const id = decodeURIComponent(window.location.hash).match(/^#curriculum:(.+)$/)?.[1];
+      const raw = decodeURIComponent(window.location.hash).match(/^#curriculum:(.+)$/)?.[1];
+      // Link đã chia sẻ trước khi đổi tên mã khoá (so-cap, trung-cap) vẫn mở đúng khoá.
+      const id = raw === "so-cap" ? "beginner" : raw === "trung-cap" ? "intermediate" : raw;
       const program = CURRICULUM_PROGRAMS.find((p) => p.id === id);
       if (!program) return;
       selectLevel(program.subLevels[0].code);

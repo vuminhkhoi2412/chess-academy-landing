@@ -94,7 +94,7 @@ test("mỗi cấp độ trỏ tới một chương trình có thẻ học phí v
   assert.equal(TUITION_PROGRAMS.length, 3);
   assert.deepEqual(
     TUITION_PROGRAMS.map((program) => program.id),
-    ["happy-chess", "so-cap", "trung-cap"]
+    ["happy-chess", "beginner", "intermediate"]
   );
 
   for (const level of TUITION_LEVELS) {

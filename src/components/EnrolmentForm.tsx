@@ -38,7 +38,7 @@ const ERROR_TEXT: Record<EnrolmentError, string> = {
   branch: "Vui lòng chọn cơ sở.",
 };
 
-const FORM_ID = "dang-ky";
+const FORM_ID = "enrol";
 
 /** Cuộn tới form và đưa focus vào ô đầu tiên (nếu form còn đang hiện). Dùng cho các nút ở bảng giá. */
 export function scrollToEnrolment() {

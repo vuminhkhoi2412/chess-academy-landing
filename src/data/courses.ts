@@ -166,7 +166,7 @@ export const CURRICULUM_PROGRAMS: MajorProgram[] = [
     ],
   },
   {
-    id: "so-cap",
+    id: "beginner",
     title: "Global Chess Sơ Cấp",
     badge: "Học viên mới & Đã biết chơi",
     totalDuration: "48 buổi (2 Levels – mỗi Level 24 buổi)",
@@ -227,7 +227,7 @@ export const CURRICULUM_PROGRAMS: MajorProgram[] = [
     ],
   },
   {
-    id: "trung-cap",
+    id: "intermediate",
     title: "Global Chess Trung Cấp",
     badge: "Đã nắm vững cơ bản",
     totalDuration: "48 buổi (2 quyển – 15 bài học chuyên sâu)",
@@ -315,7 +315,7 @@ export const CURRICULUM_PROGRAMS: MajorProgram[] = [
  */
 export interface TuitionLevel {
   code: string;
-  programId: "happy-chess" | "so-cap" | "trung-cap";
+  programId: "happy-chess" | "beginner" | "intermediate";
   label: string;
   sessionLength: string;
   group12: number;
@@ -357,7 +357,7 @@ export const TUITION_LEVELS: TuitionLevel[] = [
   },
   {
     code: "SC1",
-    programId: "so-cap",
+    programId: "beginner",
     label: "Sơ cấp 1 (Global 1, 2)",
     sessionLength: "60 phút",
     group12: 2100000,
@@ -367,7 +367,7 @@ export const TUITION_LEVELS: TuitionLevel[] = [
   },
   {
     code: "SC2",
-    programId: "so-cap",
+    programId: "beginner",
     label: "Sơ cấp 2 (Global 3, 4)",
     sessionLength: "90 phút",
     group12: 2700000,
@@ -377,7 +377,7 @@ export const TUITION_LEVELS: TuitionLevel[] = [
   },
   {
     code: "TC1",
-    programId: "trung-cap",
+    programId: "intermediate",
     label: "Trung cấp 1 (Global 5, 6)",
     sessionLength: "90 phút",
     group12: 3240000,
@@ -387,7 +387,7 @@ export const TUITION_LEVELS: TuitionLevel[] = [
   },
   {
     code: "TC2",
-    programId: "trung-cap",
+    programId: "intermediate",
     label: "Trung cấp 2 (Global 7, 8)",
     sessionLength: "90 phút",
     group12: 3888000,
@@ -398,7 +398,7 @@ export const TUITION_LEVELS: TuitionLevel[] = [
 ];
 
 export interface TuitionProgram {
-  id: "happy-chess" | "so-cap" | "trung-cap";
+  id: "happy-chess" | "beginner" | "intermediate";
   name: string;
   subtitle: string;
   popular: boolean;
@@ -414,14 +414,14 @@ export const TUITION_PROGRAMS: TuitionProgram[] = [
     features: ["Học luật chơi cơ bản và tư duy chiến thuật"],
   },
   {
-    id: "so-cap",
+    id: "beginner",
     name: "Global Chess Sơ cấp",
     subtitle: "Global Chess 1 - 4",
     popular: true,
     features: ["Luyện khai cuộc, chiến thuật và thi đấu"],
   },
   {
-    id: "trung-cap",
+    id: "intermediate",
     name: "Global Chess Trung cấp",
     subtitle: "Global Chess 5 - 8",
     popular: false,

@@ -115,7 +115,7 @@ const fmtPhone = (p: string) => p.replace(/(\d{4})(\d{3})(\d{3})/, "$1 $2 $3");
                 {/* Nhãn đọc được phải chứa đúng chữ hiển thị "Chọn cơ sở này"; tên cơ sở nối thêm để phân biệt các thẻ. */}
                 {enrolment && (
                 <a
-                  href={trial ? `/trial?branch=${branch.id}` : "#dang-ky"}
+                  href={trial ? `/trial?branch=${branch.id}` : "#enrol"}
                   data-branch={branch.id}
                   class:list={[trial ? "" : "js-choose-branch", "inline-flex min-h-11 items-center gap-1.5 rounded-control bg-brand-800 px-3.5 text-sm font-bold text-white transition hover:bg-brand-900"]}
                   aria-label={`Chọn cơ sở này – ${branch.name}`}
@@ -151,7 +151,7 @@ const fmtPhone = (p: string) => p.replace(/(\d{4})(\d{3})(\d{3})/, "$1 $2 $3");
 
 <script is:inline>
   // Progressive enhancement: clicking a branch card selects that branch in the enrolment form
-  // (the anchor itself scrolls to #dang-ky). Without JS the anchor still jumps to the form.
+  // (the anchor itself scrolls to #enrol). Without JS the anchor still jumps to the form.
   document.addEventListener("click", (event) => {
     const target = event.target;
     if (!(target instanceof Element)) return;

@@ -113,7 +113,7 @@ export default function PricingAndCheckout({ enrolmentOpen = true, levels: allLe
           })}
         </div>
 
-        {/* Form đăng ký học thử đặt thẳng trên trang, ngay dưới bảng giá. Neo #dang-ky là chính form. */}
+        {/* Form đăng ký học thử đặt thẳng trên trang, ngay dưới bảng giá. Neo #enrol là chính form. */}
         {enrolmentOpen && form && (
         <div className="mt-20">
           <div className="mb-8 max-w-2xl">
