@@ -16,11 +16,15 @@ send it to parents over Zalo.
 
 ## Product Purpose
 
-A single Vietnamese landing page for Global Chess, a chess centre with five TP.HCM campuses.
-It exists to turn a browsing parent into an enrolled student: it explains the curriculum,
-shows real classes, lists tuition per level, and collects an enrolment form for the chosen
-class. Success means an enrolment submitted to the centre's Google Sheet so staff can call the
-parent back — the page itself takes no payment.
+A Vietnamese information portal for Global Chess, a chess centre with five TP.HCM campuses.
+The home page leads with a banner and the latest news and knowledge posts, then the courses in
+depth, the five campuses and the tuition grid; courses, campuses, trial enrolment and about
+each also have their own page. It exists to turn a browsing parent
+into an enrolled student: it explains the curriculum, shows real classes, lists tuition per
+level, and collects an enrolment form for the chosen class. Success means an enrolment
+submitted to the centre's Google Sheet so staff can call the parent back — the site itself
+takes no payment. The redesign (branch `redesign/portal`) has shipped five stages so far; see
+`docs/redesign-brief.md` section 6 for the decisions it follows and `docs/backlog.md` for what is left.
 
 ## Positioning
 
@@ -34,13 +38,15 @@ tuition grid.
 - Vietnamese-facing, TP.HCM only. Families choose a campus by district, then a weekly slot.
 - Schedule slots: a weekday evening slot (Mon–Fri) and three weekend slots (Sat/Sun morning,
   afternoon, evening). The page states no clock times; none are in the code or the sources.
-- Enrolment is a free-trial form placed inline under the tuition table (no modal). It POSTs the
+- Enrolment is a free-trial form (no modal), placed under the tuition table on the home page and
+  on its own page `/trial`; `/courses` shows the tuition without the form and links to `/trial`. It POSTs the
   answers to a Google Apps Script web app that appends one row to the centre's Google Sheet; the
   parent then sees a confirmation ticket (stamped with the centre seal) saying the centre will
   contact them soon. The form asks for child name, birth year or age, parent name, Zalo phone,
   learning mode (at centre / online / 1-on-1) and campus. It no longer asks for a course or
-  level and shows no price; the learning mode is stored in the sheet's Ghi chú column. There is no payment of any kind,
-  no account, no server of our own.
+  level and shows no price; the learning mode is stored in the sheet's Ghi chú column. There is no payment of any kind
+  and no parent account. A server of our own exists only for the staff admin, posts and settings,
+  not for enrolment.
 - Contact channels: two central hotlines and one Zalo number (0789.059.440, 0963.848.430,
   Zalo 0789059440), plus one direct phone per campus (listed on each branch card and in the
   schema.org `department` data).
@@ -48,7 +54,7 @@ tuition grid.
   811 Hậu Giang, P. Bình Phú (Q.6) · 55 Tên Lửa, P. An Lạc (Bình Tân) ·
   52 đường T6, P. Tây Thạnh (Tân Phú) · 152 Nguyễn Sơn, P. Phú Thọ Hoà (Tân Phú) ·
   26 Manhattan, Vinhomes Grand Park, P. Long Bình (TP. Thủ Đức).
-- The page is also the destination for the centre's Facebook/Zalo links, so it must read
+- The site is also the destination for the centre's Facebook/Zalo links, so it must read
   correctly on a phone with no app installed.
 - Global Chess also teaches robotics at the same campuses, but no robotics curriculum,
   pricing or schedule has been supplied. Only chess may be designed for until the centre
@@ -56,12 +62,17 @@ tuition grid.
 
 ## Capabilities and Constraints
 
-- Scope today: one landing page plus a 404, a privacy policy and a terms page. No blog, no
-  per-course or per-campus pages. Multi-page expansion is not planned yet.
-- Static Astro 7 build with three hydrated React islands (puzzle board, curriculum explorer,
-  pricing + checkout); Tailwind CSS 4 via Vite; intended for Vercel. No server, no database.
+- Scope: the home page, `/about`, `/courses`, `/branches`, `/trial`, news and knowledge posts
+  (`/news`, filtered by category such as Tin tức and Kiến thức), a 404, a privacy policy and a
+  terms page. Recruitment, shop and YouTube are out of scope.
+- Astro 7 on the Node adapter with three hydrated React islands (chess challenge board vs. Stockfish, curriculum
+  explorer, pricing + checkout); Tailwind CSS 4 via Vite. The home page and posts render on
+  the server and read a small SQLite database (feature switches, posts, staff accounts) behind
+  the staff admin at `/admin` (accounts, activity log, posts, categories, home banner, feature
+  switches, tuition). It ships as Docker + Caddy with the data in a persistent volume; Vercel is
+  not used (see the brief, section 5, and `docs/docker-local.md`).
 - Content is data-driven: `src/data/courses.ts` holds brand strings, branches (address, phone,
-  Maps link), the three curriculum programmes, the seven tuition levels, the interactive puzzle, parent
+  Maps link), the three curriculum programmes, the seven tuition levels, parent
   quotes and FAQs.
 - Curriculum: Happy Chess 72 sessions (3 levels × 24), Global Chess Sơ cấp 48 (2 × 24),
   Global Chess Trung cấp 48 (2 × 24). Sessions run 60–90 minutes. Happy Chess takes children
@@ -71,8 +82,17 @@ tuition grid.
   Books (50.000đ / 90.000đ), uniform (150.000đ), tournament set (250.000đ) and clock
   (400.000đ) are sold separately — tuition does not include them. Global Chess 9–10
   (Chuyên nghiệp) is priced by title and is deliberately absent from the form.
-- Changing tuition means editing `TUITION_LEVELS` and `tests/tuition.test.mjs` together;
-  changing the puzzle in `INTERACTIVE_PUZZLE` means re-running `npm test`.
+- Quản trị (not other staff) edits tuition and extras at `/admin/tuition`. The database holds only
+  prices that were changed, and every change is audit-logged with old and new value. The current
+  price is the database row if present, else the seed in `TUITION_LEVELS` / `EXTRA_FEES`
+  (from the PDF, locked by tests). A new official price sheet means updating the seed and the tests.
+- Campus details stay in code (`BRANCHES`). The home-page board plays against Stockfish in the visitor's
+  browser (files in `public/engine/`, GPL-3.0); staff set its level and the visitor's colour at `/admin/features`, where the other home-page
+  features (banner, puzzle board, testimonials, gallery, FAQ, mobile contact bar, enrolment) are
+  also switched on and off.
+- Photos of children can be attached to posts in the admin only after the editor confirms the
+  parents consented; uploads have EXIF stripped and are downscaled. The privacy policy has not yet
+  been updated for this (see `docs/backlog.md`).
 - The build fails when `PUBLIC_GOOGLE_SHEETS_ENDPOINT` is unset, so a dead form is never
   deployed. `PUBLIC_*` values are inlined into the browser bundle, so the endpoint URL is
   visible to anyone; a honeypot field (`_hp`) deflects naive bots, and the sheet owner deletes
@@ -91,10 +111,9 @@ tuition grid.
   superlatives, no "elevate/seamless/world-class", no invented awards or alumni outcomes.
 - The logo is the real centre mark (shield); source file is `assets/logo.jpg`, never published
   as-is. This is the only brand mark; no new logo concepts.
-- Real photography only: the five classroom photos with parent consent (gallery) and one real
-  photo per campus (branch cards), never stock or AI images of children or classrooms.
-  Consent is recorded only for the five gallery photos; the branch photos have no consent
-  note yet.
+- Real photography only: the five classroom photos (gallery), the six campus photos (branch
+  cards) and the three child portraits (testimonials), never stock or AI images of children or
+  classrooms. The site owner confirmed on 2026-11-11 that parents consented to all 14.
 
 ## Evidence on Hand
 
@@ -103,12 +122,14 @@ tuition grid.
 - `assets/nguon/trichdan.txt` — three real parent quotes, used verbatim with the child's first
   name and branch label; do not edit, extend or reword them.
 - `assets/nguon/hinh-anh/` — five original photos plus `NGUON.md` recording Drive IDs and the
-  consent confirmation dated 2026-10-22; cropped copies live in `src/assets/images/`.
-- `src/assets/images/branch_images/` — one photo per campus, shown on the branch cards.
-  Their source and consent are not documented.
+  consent confirmations (2026-10-22 for the gallery, 2026-11-11 for all 14 photos); cropped
+  copies live in `src/assets/images/`.
+- `src/assets/images/branch_images/` (six photos, five campuses) and
+  `src/assets/images/anh_chan_dung/` (three child portraits) — consent confirmed 2026-11-11.
 - `assets/logo.jpg` — source logo (920×813, white background, no alpha).
-- Absent, and therefore not to be fabricated: student counts, ratings or review scores,
-  awards or tournament results, teacher/coach bios or credentials, campus exterior photos,
+- Absent, and therefore not to be fabricated: introduction copy (the brand manager will send it;
+  use a labelled placeholder), teacher bios and photos, tournament history, student counts, ratings or review scores,
+  awards, campus exterior photos,
   usable horizontal video, online reviews, and any robotics material.
 
 ## Product Principles
@@ -120,8 +141,9 @@ tuition grid.
    schedule, address and enrolment steps. Superlatives are treated as defects.
 3. **The curriculum is the proof.** Depth of syllabus and outcome per level carries the
    argument; imagery and motion support it, never replace it.
-4. **One page, one decision.** The page stays a single linear path from "is this for my child"
-   to a filled enrolment form; extra pages are added only when asked.
+4. **One decision per page.** Each page leads a parent towards one next step (choose a campus,
+   read the syllabus, fill the enrolment form); the home page links onward and never buries
+   the enrolment path.
 5. **The parent's phone is the real viewport.** Every change must survive a mid-range Android
    on mobile data, in Vietnamese, with tap targets a parent can hit.
 

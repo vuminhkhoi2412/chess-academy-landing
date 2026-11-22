@@ -38,7 +38,7 @@ const ERROR_TEXT: Record<EnrolmentError, string> = {
   branch: "Vui lòng chọn cơ sở.",
 };
 
-const FORM_ID = "dang-ky";
+const FORM_ID = "enrol";
 
 /** Cuộn tới form và đưa focus vào ô đầu tiên (nếu form còn đang hiện). Dùng cho các nút ở bảng giá. */
 export function scrollToEnrolment() {
@@ -116,6 +116,9 @@ export default function EnrolmentForm() {
       document.getElementById(FIELD_ID.name)?.focus({ preventScroll: true });
     }
     window.addEventListener("gc:choose-branch", onChooseBranch);
+    // Trang /branches dẫn sang /trial?branch=CS2: chọn sẵn cơ sở đó.
+    const fromUrl = new URLSearchParams(window.location.search).get("branch");
+    if (fromUrl && BRANCHES.some((b) => b.id === fromUrl)) setBranchId(fromUrl);
     return () => window.removeEventListener("gc:choose-branch", onChooseBranch);
   }, []);
 

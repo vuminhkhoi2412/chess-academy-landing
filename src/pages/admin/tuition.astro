@@ -1,0 +1,149 @@
+---
+// src/pages/admin/tuition.astro
+// Học phí và phụ phí. Quản trị sửa được; biên tập chỉ xem. Sửa xong có màn xác nhận liệt kê giá cũ → mới,
+// bước xác nhận chạy ở server (không phụ thuộc JavaScript). Giá có hiệu lực ngay ở lần tải trang chủ kế tiếp.
+export const prerender = false;
+
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { TUITION_PROGRAMS } from "../../data/courses";
+import { getDb } from "../../server/db";
+import { formatTime } from "../../server/session";
+import { LEVEL_FIELDS, TuitionError, lastEdits, loadTuition, reviewPrices, savePrices, type PriceChange } from "../../server/tuition";
+
+const me = Astro.locals.user!;
+const canEdit = me.role === "admin";
+const db = getDb();
+const actor = { id: me.id, username: me.username };
+
+let error = "";
+let changes: PriceChange[] = [];
+let draft: Record<string, string> = {};
+
+if (Astro.request.method === "POST") {
+  if (!canEdit) return new Response("Chỉ quản trị được sửa học phí.", { status: 403 });
+  const form = await Astro.request.formData();
+  const intent = String(form.get("intent") ?? "");
+  const input: Record<string, string> = {};
+  for (const [name, value] of form.entries()) if (name.includes(".") && typeof value === "string") input[name] = value;
+  draft = input;
+  try {
+    if (intent === "review") changes = reviewPrices(db, input);
+    else if (intent === "save") {
+      const saved = savePrices(db, input, actor);
+      return Astro.redirect(`/admin/tuition?ok=${saved.length}`);
+    }
+  } catch (caught) {
+    if (!(caught instanceof TuitionError)) throw caught;
+    error = caught.message;
+    Astro.response.status = 400;
+  }
+}
+
+const saved = Number(Astro.url.searchParams.get("ok") ?? 0);
+const tuition = loadTuition(db);
+const edits = lastEdits(db);
+const vnd = (amount: number) => `${amount.toLocaleString("vi-VN")}đ`;
+const shown = (key: string, amount: number) => draft[key] ?? amount.toLocaleString("vi-VN");
+const field = "w-full min-w-28 border-2 border-slate-300 bg-white p-2 text-right tabular-nums focus:border-brand-600 focus:outline-none read-only:bg-slate-100";
+const btn = "min-h-11 px-5 font-bold border-2";
+---
+
+<AdminLayout title="Học phí" active="tuition" user={me}>
+  <h1 class="text-2xl lg:text-3xl font-extrabold">Học phí và phụ phí</h1>
+  <p class="mt-1 max-w-prose text-slate-600">
+    Giá ở đây là giá hiện hành, hiện ngay trên trang chủ ở lần tải trang kế tiếp. Chỉ sửa giá; tên khoá, độ tuổi và giáo trình nằm trong mã nguồn.
+    {!canEdit && " Bạn có quyền xem, chỉ Quản trị mới sửa được."}
+  </p>
+
+  {saved > 0 && <p role="status" class="mt-5 border-l-4 border-green-700 bg-white px-4 py-3 font-semibold text-green-800">Đã lưu {saved} giá. Trang chủ cập nhật ở lần tải trang kế tiếp.</p>}
+  {error && <p role="alert" class="mt-5 border-l-4 border-seal-red bg-white px-4 py-3 font-semibold text-seal-red">{error}</p>}
+
+  {changes.length > 0 && (
+    <section role="alertdialog" aria-labelledby="confirm-title" class="mt-6 border-2 border-seal-red bg-white p-6">
+      <h2 id="confirm-title" class="text-lg font-extrabold">Đổi {changes.length} giá?</h2>
+      <p class="mt-1">Phụ huynh sẽ thấy giá mới ngay khi tải lại trang chủ.</p>
+      <div class="mt-4 overflow-x-auto">
+        <table class="w-full text-left">
+          <thead class="bg-slate-100">
+            <tr><th class="px-3 py-2">Mục</th><th class="px-3 py-2 text-right">Giá cũ</th><th class="px-3 py-2 text-right">Giá mới</th></tr>
+          </thead>
+          <tbody>
+            {changes.map((change) => (
+              <tr class="border-t border-slate-200">
+                <td class="px-3 py-2">{change.label}</td>
+                <td class="px-3 py-2 text-right tabular-nums text-slate-600">{vnd(change.from)}</td>
+                <td class="px-3 py-2 text-right tabular-nums font-bold">{vnd(change.to)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <form method="post" class="mt-5 flex flex-wrap gap-3">
+        <input type="hidden" name="intent" value="save" />
+        {changes.map((change) => <input type="hidden" name={change.key} value={change.to} />)}
+        <button type="submit" class={`${btn} border-seal-red bg-seal-red text-white`}>Có, lưu giá mới</button>
+        <a href="/admin/tuition" class={`${btn} inline-flex items-center border-slate-400 bg-white`}>Không, giữ nguyên</a>
+      </form>
+    </section>
+  )}
+
+  <form method="post" class="mt-8 grid gap-8">
+    <input type="hidden" name="intent" value="review" />
+
+    {TUITION_PROGRAMS.map((program) => (
+      <section class="bg-white border-2 border-slate-200 p-5">
+        <h2 class="text-lg font-bold">{program.name}</h2>
+        <div class="mt-3 overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-slate-100">
+              <tr>
+                <th scope="col" class="px-3 py-2">Cấp độ</th>
+                {LEVEL_FIELDS.map((f) => <th scope="col" class="px-3 py-2 text-right">{f.label}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {tuition.levels.filter((level) => level.programId === program.id).map((level) => (
+                <tr class="border-t border-slate-200">
+                  <th scope="row" class="px-3 py-2 font-semibold whitespace-nowrap">{level.label} <span class="text-sm font-normal text-slate-500">· {level.sessionLength}</span></th>
+                  {LEVEL_FIELDS.map((f) => {
+                    const key = `${level.code}.${f.field}`;
+                    const edit = edits.get(key);
+                    return (
+                      <td class="px-3 py-2" title={edit ? `Sửa lần cuối: ${edit.by ?? "?"}, ${formatTime(edit.at)}` : "Giá khởi tạo, chưa ai sửa"}>
+                        <input name={key} value={shown(key, level[f.field])} inputmode="numeric" autocomplete="off" readonly={!canEdit} aria-label={`${level.code}: ${f.label}`} class={field} />
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    ))}
+
+    <section class="bg-white border-2 border-slate-200 p-5">
+      <h2 class="text-lg font-bold">Phụ phí</h2>
+      <p class="mt-1 text-sm text-slate-600">Hiện trong câu hỏi thường gặp ("Học phí đã bao gồm sách chưa?").</p>
+      <ul class="mt-3 grid max-w-xl gap-3">
+        {tuition.extras.map((fee) => {
+          const key = `extra.${fee.id}`;
+          const edit = edits.get(key);
+          return (
+            <li class="flex items-center justify-between gap-4" title={edit ? `Sửa lần cuối: ${edit.by ?? "?"}, ${formatTime(edit.at)}` : "Giá khởi tạo, chưa ai sửa"}>
+              <label for={`f-${fee.id}`} class="font-semibold">{fee.label}</label>
+              <input id={`f-${fee.id}`} name={key} value={shown(key, fee.amount)} inputmode="numeric" autocomplete="off" readonly={!canEdit} class={`${field} max-w-44`} />
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+
+    {canEdit && (
+      <div>
+        <button type="submit" class={`${btn} border-brand-800 bg-brand-800 text-white hover:bg-brand-700`}>Xem lại các giá đã đổi</button>
+        <p class="mt-2 text-sm text-slate-600">Chưa lưu gì cho đến khi bạn xác nhận ở bước tiếp theo.</p>
+      </div>
+    )}
+  </form>
+</AdminLayout>

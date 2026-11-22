@@ -1,0 +1,45 @@
+---
+// src/pages/trial.astro
+// Trang đăng ký học thử (form giống trang chủ). Quản trị đã đóng form thì trang báo tạm đóng và để lại hotline.
+export const prerender = false;
+
+import Layout from "../layouts/Layout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import MobileContactBar from "../components/MobileContactBar.astro";
+import EnrolmentForm from "../components/EnrolmentForm";
+import { BRAND_INFO } from "../data/courses";
+import { getSiteConfig, getNewsCategories } from "../server/site-config";
+
+const { flags } = getSiteConfig();
+const newsCategories = getNewsCategories();
+const hotline = BRAND_INFO.hotlines[0];
+---
+
+<Layout
+  title={`Đăng ký học thử – ${BRAND_INFO.name}`}
+  description="Đăng ký học thử miễn phí cờ vua Global Chess: để lại thông tin, giáo viên sẽ gọi hoặc nhắn Zalo xếp lớp cho bé."
+  bodyClass={flags.mobile_bar ? "pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:pb-0" : undefined}
+>
+  <SiteHeader enrolmentOpen={flags.enrolment} newsCategories={newsCategories} />
+  <main id="main" tabindex="-1">
+    <section class="bg-brand-800 py-16 text-white">
+      <div class="mx-auto max-w-6xl px-4">
+        <h1 class="gc-section-title mb-8 max-w-2xl text-3xl font-extrabold md:text-4xl lg:text-5xl">Đăng ký học thử miễn phí</h1>
+        {
+          flags.enrolment ? (
+            <EnrolmentForm client:load />
+          ) : (
+            <p class="max-w-prose text-lg text-brand-100">
+              Đăng ký trên web đang tạm đóng. Vui lòng gọi{" "}
+              <a href={`tel:${hotline.replace(/\./g, "")}`} class="font-bold text-white underline tabular-nums">{hotline}</a> hoặc{" "}
+              <a href={`https://zalo.me/${BRAND_INFO.zaloPhone}`} class="font-bold text-white underline">nhắn Zalo</a> để được xếp lớp.
+            </p>
+          )
+        }
+      </div>
+    </section>
+  </main>
+  <SiteFooter faq={flags.faq} news={newsCategories.length > 0} />
+  {flags.mobile_bar && <MobileContactBar />}
+</Layout>

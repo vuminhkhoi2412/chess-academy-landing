@@ -9,8 +9,8 @@ const byId = (id) => CURRICULUM_PROGRAMS.find((p) => p.id === id);
 test("có đủ 3 lộ trình lớn", () => {
   assert.equal(CURRICULUM_PROGRAMS.length, 3);
   assert.ok(byId("happy-chess"), "thiếu happy-chess");
-  assert.ok(byId("so-cap"), "thiếu so-cap");
-  assert.ok(byId("trung-cap"), "thiếu trung-cap");
+  assert.ok(byId("beginner"), "thiếu beginner");
+  assert.ok(byId("intermediate"), "thiếu intermediate");
 });
 
 test("Happy Chess: 72 buổi, 3 level × 24 buổi, tuổi 4–12", () => {

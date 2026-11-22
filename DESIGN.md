@@ -23,7 +23,7 @@ paper and a single amber accent keep it friendly for parents of 4–12 year old 
 - **Density:** 4 / 10 — Daily App Balanced. Generous section padding (16 = 4rem vertical
   rhythm), relaxed card interiors, nothing cramped. Pricing is the one denser surface.
 - **Variance:** 6 / 10 — Offset Asymmetric. Hero is a deliberate 7/5 split, the branch
-  cards carry a 16:9 photo and the `#hinh-anh` gallery is a bento (one square photo
+  cards carry a 16:9 photo and the `#gallery` gallery is a bento (one square photo
   spanning two rows beside four smaller ones). The branch row is a plain three-up
   grid on desktop.
 - **Motion:** 3 / 10 — Static Restrained. The site informs; it does not perform. Motion is
@@ -32,7 +32,7 @@ paper and a single amber accent keep it friendly for parents of 4–12 year old 
 
 The signature move is **geometry for atmosphere, real photos for proof**: the hero
 builds depth from a perspective-rotated chessboard plane, a warm/cool radial mesh and a
-fine SVG grain; the branch cards and the `#hinh-anh` gallery then show real photos only,
+fine SVG grain; the branch cards and the `#gallery` gallery then show real photos only,
 the gallery ones used with parents' consent. Never stock photos or AI-generated children.
 
 ---
@@ -146,7 +146,7 @@ Rules:
 
 **Gallery**
 
-- `#hinh-anh` is a 3-column bento from `md`: the first photo is square and spans two rows
+- `#gallery` is a 3-column bento from `md`: the first photo is square and spans two rows
   (`md:row-span-2`) and sets the height; the other four fill the remaining two columns,
   cropped with `object-cover`. Mobile stacks to one column in DOM order.
 - Figures: `relative overflow-hidden rounded-card bg-slate-100 ring-1 ring-slate-900/5`, the
@@ -168,12 +168,12 @@ Rules:
 **Loaders, empty and error states**
 
 - Skeletons must match the exact dimensions of the content they replace. No circular spinner.
-- `TESTIMONIALS` (three real parent quotes) render as chat cards in `#phu-huynh`, straight after the gallery: a `bg-brand-800` header with a round `bg-brand-600` avatar holding the child's initials (BK, KL, VM) in `text-amber-400`, then the parent label and branch; a `bg-brand-50` body with the verbatim quote in a white bubble (square bottom-left corner) and a small right-aligned "Đã nhận" with a double check. Cards are equal height, 1 → 2 (`md`) → 3 (`lg`) columns. No ratings, no timestamps, no Zalo logo or colours, no child photos. An empty `TESTIMONIALS` fails the build instead of showing a TODO panel.
+- `TESTIMONIALS` (three real parent quotes) render as chat cards in `#testimonials`, straight after the gallery: a `bg-brand-800` header with a round `bg-brand-600` avatar holding the child's initials (BK, KL, VM) in `text-amber-400`, then the parent label and branch; a `bg-brand-50` body with the verbatim quote in a white bubble (square bottom-left corner) and a small right-aligned "Đã nhận" with a double check. Cards are equal height, 1 → 2 (`md`) → 3 (`lg`) columns. No ratings, no timestamps, no Zalo logo or colours, no child photos. An empty `TESTIMONIALS` fails the build instead of showing a TODO panel.
 - Error pages reuse the same cream + navy + amber vocabulary: the 404 shows a navy chessboard motif and a filled amber or navy return button.
 
 **Enrolment form and confirmation ticket**
 
-- The form (`EnrolmentForm`, anchor `#dang-ky`) sits inline under the tuition table as a paper ticket: a kraft stub on the left (`.gc-enrol__stub`) that fills in as the parent types, ruled paper on the right (`.gc-enrol__main`) with the inputs, round notches at the tear line. Learning mode is three radio cards (`.gc-mode`), never a select. Campus and learning mode start unselected so the stub never shows something the parent did not choose.
+- The form (`EnrolmentForm`, anchor `#enrol`) sits inline under the tuition table as a paper ticket: a kraft stub on the left (`.gc-enrol__stub`) that fills in as the parent types, ruled paper on the right (`.gc-enrol__main`) with the inputs, round notches at the tear line. Learning mode is three radio cards (`.gc-mode`), never a select. Campus and learning mode start unselected so the stub never shows something the parent did not choose.
 - After sending, the whole form is replaced by `EnrolmentTicket` (`.gc-pass`): peach paper, a centre seal (`CentreStamp`, logo shield in ink `#A3141C`) in place of any illustration, parent-entered data in blue ink, a brown-earth stub (`#8f4a30`) with the child's name, "XÁC NHẬN" and two tags (learning mode, "Miễn Phí"). It uses Cormorant SC, Roboto, Roboto Condensed and Oswald, loaded only on the homepage. It invents no ticket number.
 
 **Modal (retired for enrolment)**
@@ -211,7 +211,7 @@ none should be introduced for a marketing page.
 - The only looping animation is `animate-pulse` on a blocking form error, always paired with `motion-reduce:animate-none`.
 - Board-notation texture, the perspective chessboard plane and hover states must not animate on `top`, `left`, `width` or `height`. Transform and opacity only.
 - The decorative grain runs on a fixed pseudo-element/absolute layer at 4.5% opacity — never on a scrolling wrapper.
-- Cheap interactive islands (puzzle board, curriculum explorer, pricing checkout) are hydrated individually; decoration stays server-rendered.
+- Cheap interactive islands (chess board vs. engine, curriculum explorer, pricing checkout) are hydrated individually; decoration stays server-rendered.
 - Honor `prefers-reduced-motion`: `scroll-behavior: auto` replaces smooth scroll, and any added animation must be gated.
 
 ---
@@ -254,7 +254,7 @@ none should be introduced for a marketing page.
 - No custom mouse cursors.
 - No overlapping elements; no absolutely-positioned content stacking on top of text.
 - No new three-equal-card rows; no centered hero.
-- No stock or AI photography of classrooms or children, and no fake image links. Only real photos: the `#hinh-anh` gallery (with parents' consent) and the branch-card photos; never invent captions, branch names or results. Where imagery is missing, draw geometry (chessboard plane, mesh, grain) or leave a labeled TODO.
+- No stock or AI photography of classrooms or children, and no fake image links. Only real photos: the `#gallery` gallery (with parents' consent) and the branch-card photos; never invent captions, branch names or results. Where imagery is missing, draw geometry (chessboard plane, mesh, grain) or leave a labeled TODO.
 - No fabricated testimonials, ratings, student counts, or awards.
 - No `h-screen`; no `calc()` percentage layout hacks; no animating layout properties.
 - No emoji, no decorative confetti, no bouncing arrows.

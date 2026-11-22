@@ -1,0 +1,134 @@
+---
+// src/components/home/GallerySection.astro
+// Gallery ảnh thật kèm hộp phóng to. Chỉ xử lý ảnh khi trang chủ dựng khối này (mục ảnh đang bật).
+import { Image, getImage } from "astro:assets";
+import galleryCoachStudent from "../../assets/images/gallery-coach-student.jpg";
+import galleryClassCoach from "../../assets/images/gallery-class-coach.jpg";
+import galleryTournamentPlay from "../../assets/images/gallery-tournament-play.jpg";
+import galleryClassPractice from "../../assets/images/gallery-class-practice.jpg";
+import galleryClassroom from "../../assets/images/gallery-classroom.jpg";
+
+// Ảnh gallery theo thứ tự trong lưới bento (ảnh đầu là ảnh vuông chiếm hai hàng).
+// `full` là bản tối đa 1600px (không phóng quá kích thước gốc) tối ưu sẵn khi build, dùng cho hộp phóng to; không có JS thì link mở thẳng ảnh này.
+const GALLERY_SOURCES = [
+  { src: galleryClassPractice, alt: "Các học viên Global Chess đối kháng trên bàn cờ trong lớp học.", cls: "aspect-square md:row-span-2" },
+  { src: galleryCoachStudent, alt: "Huấn luyện viên Global Chess hướng dẫn một học viên trong giờ học cờ vua.", pos: "object-[50%_8%]" },
+  { src: galleryTournamentPlay, alt: "Học viên tập trung thi đấu trên bàn cờ trong giải đấu nội bộ Global Chess." },
+  { src: galleryClassroom, alt: "Phòng học cờ vua tại một cơ sở Global Chess, các học viên đang luyện tập." },
+  { src: galleryClassCoach, alt: "Giáo viên đứng lớp và theo dõi các học viên luyện tập cờ vua tại Global Chess." },
+];
+
+const GALLERY = await Promise.all(
+  GALLERY_SOURCES.map(async (photo) => ({
+    ...photo,
+    full: (await getImage({ src: photo.src, width: Math.min(1600, photo.src.width), quality: 82 })).src,
+  })),
+);
+---
+
+<!--
+  Gallery ảnh thật: 5 ảnh lớp học/giải đấu do trung tâm cung cấp, đã có sự
+  đồng ý của phụ huynh. Ảnh gốc nằm ở assets/nguon/hinh-anh/; bản trong
+  src/assets/images/ đã crop bỏ banner/logo in sẵn trên ảnh.
+
+  Không dùng ảnh stock và không gắn tên cơ sở: nguồn ảnh không ghi rõ ảnh
+  chụp tại cơ sở nào, nên caption/alt chỉ mô tả đúng những gì nhìn thấy.
+-->
+<section id="gallery" class="py-16 bg-cream border-t border-slate-200">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="grid lg:grid-cols-12 gap-4 lg:gap-8 lg:items-end">
+      <div class="lg:col-span-7">
+        <h2 class="gc-section-title text-3xl md:text-4xl lg:text-5xl font-extrabold">Hình ảnh trung tâm</h2>
+      </div>
+      <p class="lg:col-span-5 text-base text-slate-600 leading-relaxed lg:pb-1">
+        Những khoảnh khắc trong lớp Happy Chess và Global Chess.
+      </p>
+    </div>
+
+    {/*
+      Lưới bento 3 cột: ảnh vuông chiếm hai hàng và quyết định chiều cao, bốn ảnh
+      còn lại lấp hai cột sau nên khối ảnh là một hình chữ nhật phẳng, không còn
+      khoảng trống giữa phần mô tả và ảnh. Ảnh nằm tuyệt đối trong khung nên bốn ô
+      nhỏ bị cắt (object-cover); ảnh huấn luyện viên neo phía trên để giữ biển Global Chess.
+      Mỗi ảnh là một link tới bản lớn; JS bắt click để mở hộp phóng to (#gallery-lightbox).
+      Trên mobile ảnh xếp thành một cột theo đúng thứ tự trong DOM.
+    */}
+    <div class="mt-10 grid gap-4 md:grid-cols-3">
+      {GALLERY.map((photo) => (
+        <figure
+          class:list={[
+            "relative overflow-hidden rounded-card bg-slate-100 ring-1 ring-slate-900/5",
+            photo.cls ?? "aspect-[4/3] md:aspect-auto",
+          ]}
+        >
+          <a
+            href={photo.full}
+            class="js-zoom absolute inset-0 block cursor-zoom-in focus-visible:outline-offset-[-3px]"
+            aria-label={`Phóng to ảnh: ${photo.alt}`}
+            data-alt={photo.alt}
+          >
+            <Image
+              src={photo.src}
+              alt={photo.alt}
+              widths={[480, 720, 1080]}
+              sizes="(min-width: 768px) 33vw, 100vw"
+              quality={82}
+              loading="lazy"
+              decoding="async"
+              class:list={["h-full w-full object-cover", photo.pos]}
+            />
+          </a>
+        </figure>
+      ))}
+    </div>
+
+    <p class="mt-6 text-[0.8125rem] text-slate-600 leading-relaxed">
+      Ảnh chụp tại lớp học và giải đấu nội bộ Global Chess. Phụ huynh của các học viên trong ảnh đã đồng ý cho trung tâm sử dụng trên website.
+    </p>
+
+    {/* Hộp phóng to: <dialog> gốc nên có sẵn Esc, khoá tương tác nền và trả focus về ảnh đã bấm. Ảnh được tạo bằng JS. */}
+    <dialog
+      id="gallery-lightbox"
+      aria-label="Xem ảnh phóng to"
+      class="m-auto w-full max-w-5xl bg-transparent p-0 text-white backdrop:bg-brand-950/90"
+    >
+      <figure>
+        <figcaption class="mt-3 px-4 text-sm text-brand-200 md:px-0"></figcaption>
+      </figure>
+      <button
+        type="button"
+        class="js-zoom-close absolute right-2 top-2 grid size-11 place-items-center rounded-full bg-brand-950/80 text-2xl leading-none text-white"
+        aria-label="Đóng ảnh"
+      >
+        ×
+      </button>
+    </dialog>
+  </div>
+</section>
+
+<script is:inline>
+  // Phóng to ảnh gallery: bấm ảnh mở hộp #gallery-lightbox; bấm nền hoặc nút × để đóng.
+  // Không có JS thì link của ảnh mở thẳng bản lớn.
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const dialog = document.getElementById("gallery-lightbox");
+    if (!(dialog instanceof HTMLDialogElement)) return;
+    if (target === dialog || target.closest(".js-zoom-close")) {
+      dialog.close();
+      return;
+    }
+    const zoom = target.closest(".js-zoom");
+    if (!(zoom instanceof HTMLAnchorElement)) return;
+    event.preventDefault();
+    const figure = dialog.querySelector("figure");
+    const big = new Image();
+    big.src = zoom.href;
+    big.alt = zoom.dataset.alt || "";
+    big.className = "max-h-[80vh] w-full rounded-card object-contain";
+    figure.querySelector("img")?.remove();
+    figure.prepend(big);
+    figure.querySelector("figcaption").textContent = big.alt;
+    dialog.showModal();
+  });
+</script>

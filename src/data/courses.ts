@@ -166,7 +166,7 @@ export const CURRICULUM_PROGRAMS: MajorProgram[] = [
     ],
   },
   {
-    id: "so-cap",
+    id: "beginner",
     title: "Global Chess Sơ Cấp",
     badge: "Học viên mới & Đã biết chơi",
     totalDuration: "48 buổi (2 Levels – mỗi Level 24 buổi)",
@@ -227,7 +227,7 @@ export const CURRICULUM_PROGRAMS: MajorProgram[] = [
     ],
   },
   {
-    id: "trung-cap",
+    id: "intermediate",
     title: "Global Chess Trung Cấp",
     badge: "Đã nắm vững cơ bản",
     totalDuration: "48 buổi (2 quyển – 15 bài học chuyên sâu)",
@@ -315,7 +315,7 @@ export const CURRICULUM_PROGRAMS: MajorProgram[] = [
  */
 export interface TuitionLevel {
   code: string;
-  programId: "happy-chess" | "so-cap" | "trung-cap";
+  programId: "happy-chess" | "beginner" | "intermediate";
   label: string;
   sessionLength: string;
   group12: number;
@@ -357,7 +357,7 @@ export const TUITION_LEVELS: TuitionLevel[] = [
   },
   {
     code: "SC1",
-    programId: "so-cap",
+    programId: "beginner",
     label: "Sơ cấp 1 (Global 1, 2)",
     sessionLength: "60 phút",
     group12: 2100000,
@@ -367,7 +367,7 @@ export const TUITION_LEVELS: TuitionLevel[] = [
   },
   {
     code: "SC2",
-    programId: "so-cap",
+    programId: "beginner",
     label: "Sơ cấp 2 (Global 3, 4)",
     sessionLength: "90 phút",
     group12: 2700000,
@@ -377,7 +377,7 @@ export const TUITION_LEVELS: TuitionLevel[] = [
   },
   {
     code: "TC1",
-    programId: "trung-cap",
+    programId: "intermediate",
     label: "Trung cấp 1 (Global 5, 6)",
     sessionLength: "90 phút",
     group12: 3240000,
@@ -387,7 +387,7 @@ export const TUITION_LEVELS: TuitionLevel[] = [
   },
   {
     code: "TC2",
-    programId: "trung-cap",
+    programId: "intermediate",
     label: "Trung cấp 2 (Global 7, 8)",
     sessionLength: "90 phút",
     group12: 3888000,
@@ -398,7 +398,7 @@ export const TUITION_LEVELS: TuitionLevel[] = [
 ];
 
 export interface TuitionProgram {
-  id: "happy-chess" | "so-cap" | "trung-cap";
+  id: "happy-chess" | "beginner" | "intermediate";
   name: string;
   subtitle: string;
   popular: boolean;
@@ -414,14 +414,14 @@ export const TUITION_PROGRAMS: TuitionProgram[] = [
     features: ["Học luật chơi cơ bản và tư duy chiến thuật"],
   },
   {
-    id: "so-cap",
+    id: "beginner",
     name: "Global Chess Sơ cấp",
     subtitle: "Global Chess 1 - 4",
     popular: true,
     features: ["Luyện khai cuộc, chiến thuật và thi đấu"],
   },
   {
-    id: "trung-cap",
+    id: "intermediate",
     name: "Global Chess Trung cấp",
     subtitle: "Global Chess 5 - 8",
     popular: false,
@@ -430,25 +430,22 @@ export const TUITION_PROGRAMS: TuitionProgram[] = [
 ];
 
 /**
- * Thế cờ đố tương tác ở đầu trang chủ (InteractivePuzzle).
- *
- * Đây là đòn "Chĩa đôi" (Fork) thật: Mã Trắng đi từ g5 sang f7, chiếu Vua Đen ở h8
- * và đồng thời tấn công Xe Đen ở d8.
- * Vua h8 không kề ô f7, và Đen không còn quân nào bắt được Mã f7, nên Đen buộc phải
- * đi Vua h8 -> g8. Sau đó Trắng ăn Xe d8.
- *
- * Không sửa FEN mà không chạy lại `npm test`: test sẽ báo lỗi nếu thế cờ không còn
- * là đòn chĩa đôi hợp lệ.
+ * Phụ phí ngoài học phí lớp học. Giá ở đây là giá khởi tạo (theo bảng giá của trung tâm);
+ * giá hiện hành do quản trị sửa trong DB (src/server/tuition.ts).
  */
-export interface InteractivePuzzleConfig {
-  fen: string;
-  solution: { from: string; to: string };
+export interface ExtraFee {
+  id: "book" | "workbook" | "uniform" | "chess-set" | "clock";
+  label: string;
+  amount: number;
 }
 
-export const INTERACTIVE_PUZZLE: InteractivePuzzleConfig = {
-  fen: "3r3k/ppp2ppp/8/4p1N1/8/8/PPPP1PPP/R1BQK2R w KQ - 0 1",
-  solution: { from: "g5", to: "f7" },
-};
+export const EXTRA_FEES: ExtraFee[] = [
+  { id: "book", label: "Sách học theo cấp độ", amount: 50000 },
+  { id: "workbook", label: "Sách bài tập bổ trợ", amount: 90000 },
+  { id: "uniform", label: "Áo đồng phục", amount: 150000 },
+  { id: "chess-set", label: "Bộ cờ tiêu chuẩn thi đấu", amount: 250000 },
+  { id: "clock", label: "Đồng hồ thi đấu", amount: 400000 },
+];
 
 /**
  * Nhận xét của phụ huynh.
@@ -499,41 +496,45 @@ export interface FaqItem {
   a: string;
 }
 
-export const FAQS: FaqItem[] = [
-  {
-    q: "Bé mấy tuổi thì tham gia được?",
-    a: "Global Chess nhận học viên từ 4 đến 12 tuổi. Lộ trình Happy Chess dành cho bé từ 4 tuổi; lộ trình Global Sơ cấp và Trung cấp dành cho bé từ 7 tuổi. Các bé được xếp theo trình độ thực tế chứ không chỉ theo tuổi.",
-  },
-  {
-    q: "Một lộ trình học kéo dài bao lâu?",
-    a: "Happy Chess gồm 72 buổi (3 Level, mỗi Level 24 buổi). Lộ trình Global Sơ cấp và Trung cấp mỗi lộ trình gồm 48 buổi, chia thành 2 cấp độ nhỏ 24 buổi. Mỗi buổi kéo dài 60 – 90 phút.",
-  },
-  {
-    q: "Học phí đã bao gồm sách chưa?",
-    a: "Học phí niêm yết là học phí lớp học. Sách học theo cấp độ 50.000đ, sách bài tập bổ trợ 90.000đ; áo đồng phục 150.000đ, bộ cờ tiêu chuẩn thi đấu 250.000đ, đồng hồ thi đấu 400.000đ (theo bảng giá của trung tâm).",
-  },
-  {
-    q: "Học 1 buổi/tuần hay 2 buổi/tuần?",
-    a: "Trung tâm có cả hai hình thức: gói 12 buổi học 1 buổi/tuần, gói 24 buổi học 2 buổi/tuần. Ngoài ra có lớp 1 kèm 1 và 1 kèm 2, học phí tính theo từng buổi.",
-  },
-  {
-    q: "Có lớp cuối tuần không?",
-    a: "Có. Khung giờ gồm ca tối trong tuần (Thứ 2 – Thứ 6) và ba ca cuối tuần: sáng, chiều và tối Thứ 7 / Chủ Nhật.",
-  },
-  {
-    q: "Trung tâm có những cơ sở nào?",
-    a: "Hiện có 5 cơ sở tại TP.HCM. Danh sách địa chỉ đầy đủ nằm ở mục “Hệ thống các cơ sở” phía trên.",
-  },
-  {
-    q: "Đóng học phí bằng cách nào?",
-    a: "Điền form đăng ký, trung tâm sẽ liên hệ lại với phụ huynh. Học phí và hình thức đóng được trao đổi trực tiếp với trung tâm.",
-  },
-  {
-    q: "Chưa rõ trình độ của bé thì sao?",
-    a: "Ghi chú khi đăng ký hoặc gọi hotline. Bộ phận giáo vụ sẽ kiểm tra trình độ đầu vào và xếp lớp phù hợp.",
-  },
-  {
-    q: "Bé nghỉ một buổi thì xử lý thế nào?",
-    a: "Việc học bù và bảo lưu tuỳ theo chính sách hiện hành của trung tâm. Vui lòng liên hệ giáo vụ qua hotline hoặc Zalo để được hướng dẫn cụ thể.",
-  },
-];
+/** Câu hỏi thường gặp; giá phụ phí lấy từ `fees` (giá hiện hành trong DB) để không lệch bảng giá. */
+export function buildFaqs(fees: ExtraFee[]): FaqItem[] {
+  const vnd = (id: ExtraFee["id"]) => `${fees.find((fee) => fee.id === id)!.amount.toLocaleString("vi-VN")}đ`;
+  return [
+    {
+      q: "Bé mấy tuổi thì tham gia được?",
+      a: "Global Chess nhận học viên từ 4 đến 12 tuổi. Lộ trình Happy Chess dành cho bé từ 4 tuổi; lộ trình Global Sơ cấp và Trung cấp dành cho bé từ 7 tuổi. Các bé được xếp theo trình độ thực tế chứ không chỉ theo tuổi.",
+    },
+    {
+      q: "Một lộ trình học kéo dài bao lâu?",
+      a: "Happy Chess gồm 72 buổi (3 Level, mỗi Level 24 buổi). Lộ trình Global Sơ cấp và Trung cấp mỗi lộ trình gồm 48 buổi, chia thành 2 cấp độ nhỏ 24 buổi. Mỗi buổi kéo dài 60 – 90 phút.",
+    },
+    {
+      q: "Học phí đã bao gồm sách chưa?",
+      a: `Học phí niêm yết là học phí lớp học. Sách học theo cấp độ ${vnd("book")}, sách bài tập bổ trợ ${vnd("workbook")}; áo đồng phục ${vnd("uniform")}, bộ cờ tiêu chuẩn thi đấu ${vnd("chess-set")}, đồng hồ thi đấu ${vnd("clock")} (theo bảng giá của trung tâm).`,
+    },
+    {
+      q: "Học 1 buổi/tuần hay 2 buổi/tuần?",
+      a: "Trung tâm có cả hai hình thức: gói 12 buổi học 1 buổi/tuần, gói 24 buổi học 2 buổi/tuần. Ngoài ra có lớp 1 kèm 1 và 1 kèm 2, học phí tính theo từng buổi.",
+    },
+    {
+      q: "Có lớp cuối tuần không?",
+      a: "Có. Khung giờ gồm ca tối trong tuần (Thứ 2 – Thứ 6) và ba ca cuối tuần: sáng, chiều và tối Thứ 7 / Chủ Nhật.",
+    },
+    {
+      q: "Trung tâm có những cơ sở nào?",
+      a: "Hiện có 5 cơ sở tại TP.HCM. Danh sách địa chỉ đầy đủ nằm ở mục “Hệ thống các cơ sở” phía trên.",
+    },
+    {
+      q: "Đóng học phí bằng cách nào?",
+      a: "Điền form đăng ký, trung tâm sẽ liên hệ lại với phụ huynh. Học phí và hình thức đóng được trao đổi trực tiếp với trung tâm.",
+    },
+    {
+      q: "Chưa rõ trình độ của bé thì sao?",
+      a: "Ghi chú khi đăng ký hoặc gọi hotline. Bộ phận giáo vụ sẽ kiểm tra trình độ đầu vào và xếp lớp phù hợp.",
+    },
+    {
+      q: "Bé nghỉ một buổi thì xử lý thế nào?",
+      a: "Việc học bù và bảo lưu tuỳ theo chính sách hiện hành của trung tâm. Vui lòng liên hệ giáo vụ qua hotline hoặc Zalo để được hướng dẫn cụ thể.",
+    },
+  ];
+}
